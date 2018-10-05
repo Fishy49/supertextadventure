@@ -1,18 +1,23 @@
 {
-  "name": "connect4",
-  "version": "1.0.0",
+  "name": "sta_app",
+  "private": true,
   "scripts": {
-    "client": "cd client && yarn start",
-    "server": "nodemon server.js",
-    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+    "start": "meteor run",
+    "test": "meteor test --once --driver-package meteortesting:mocha",
+    "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
+    "visualize": "meteor --production --extra-packages bundle-visualizer"
   },
   "dependencies": {
-    "express": "^4.16.2",
-    "global": "^4.3.2",
-    "nodemon": "^1.17.3",
-    "socket.io": "^2.1.0"
+    "@babel/runtime": "7.0.0-beta.55",
+    "meteor-node-stubs": "^0.4.1",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
   },
-  "devDependencies": {
-    "concurrently": "^3.5.0"
+  "meteor": {
+    "mainModule": {
+      "client": "client/main.js",
+      "server": "server/main.js"
+    },
+    "testModule": "tests/main.js"
   }
 }

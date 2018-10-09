@@ -1,4 +1,88 @@
+@font-face {
+  font-family: "C64 Pro Mono Local";
+  src: url("/fonts/C64_Pro_Mono-STYLE.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "C64 Pro Mono Local";
+  src: url("/fonts/C64_Pro_Mono-STYLE.woff") format("woff");
+}
+
+@font-face {
+  font-family: "C64 Pro Mono Local";
+  src: url("/fonts/C64_Pro_Mono-STYLE.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "C64 Pro Mono Local";
+  src: url('/fonts/C64_Pro_Mono-STYLE.svg#C64ProMono') format('svg');
+}
+
+@font-face {
+  font-family: "C64 Pro Mono Local";
+  src: url('/fonts/C64_Pro_Mono-STYLE.eot');
+  src: url('/fonts/C64_Pro_Mono-STYLE.eot?#iefix') format('embedded-opentype');
+}
+
+html {
+  background: black;
+  color: #1ca325;
+  font: normal 15px "C64 Pro Mono Local", verdana, helvetica, sans-serif;
+  letter-spacing: 0px;
+  padding: 0;
+  margin: 0;
+}
+
 body {
   padding: 10px;
-  font-family: sans-serif;
+}
+
+h1.title {
+    text-align: center;
+}
+
+.login-container {
+    margin: 0 auto;
+    width: 230px;
+    text-align: center;
+}
+
+#login-buttons a {
+    text-decoration: none;
+}
+
+#login-dropdown-list {
+    top: 35px;
+    left: calc(50% - 253px/2);
+    background: transparent;
+    color: #1ca325;
+    border: dashed 5px #1ca325;
+    border-radius: 0;
+}
+
+.accounts-dialog * {
+    font-family: inherit;
+}
+
+#login-buttons .login-button, .accounts-dialog .login-button {
+    background: #1ca325;
+    border: 1px dashed #1ca325;
+    font-family: inherit;
+    border-radius: 0;
+}
+
+#login-buttons input[type=text], .accounts-dialog input[type=text], #login-buttons input[type=email], .accounts-dialog input[type=email], #login-buttons input[type=password], .accounts-dialog input[type=password] {
+    border-radius: 0;
+}
+
+#login-buttons .login-button:hover,
+.accounts-dialog .login-button:hover {
+  background: #1ca325;
+}
+#login-buttons .login-button:active,
+.accounts-dialog .login-button:active {
+  background: #1ca325;
+  box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.2) inset;
+  -webkit-box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.2) inset;
+  outline: none;
 }

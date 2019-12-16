@@ -1,7 +1,64 @@
+$oldschool-font-color: #0cbf0c;
+$oldschool-bg-color: #292922;
+
 html, body {
   font-family: 'c64', monospace;
 }
 
 body.oldschool {
+  color: $oldschool-font-color;
+  background-color: $oldschool-bg-color;
 
+  background-image: radial-gradient(
+    rgba(0, 150, 0, 0.13), $oldschool-bg-color 120%
+  );
+  height: 100vh;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(black, 0.15),
+      rgba(black, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  }
+
+  a {
+    color: $oldschool-font-color;
+
+    &:hover {
+      color: lighten( $oldschool-font-color, 10% );
+    }
+  }
+
+  select, input, textarea {
+    background-color: transparent;
+    border: solid 2px $oldschool-font-color;
+    caret-color: $oldschool-font-color;
+    box-shadow: none;
+    color: $oldschool-font-color;
+
+    &:focus{
+      background-color: transparent;
+      border-color: $oldschool-font-color;
+      outline: 0;
+      box-shadow: none;
+      color: $oldschool-font-color;
+    }
+  }
+
+  &.form-control:focus{
+    background-color: transparent;
+    border-color: $oldschool-font-color;
+    outline: 0;
+    box-shadow: none;
+    color: $oldschool-font-color;
+  }
 }

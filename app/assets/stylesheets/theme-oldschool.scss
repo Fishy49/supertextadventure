@@ -86,6 +86,10 @@ body.oldschool {
     transition: none;
   }
 
+  .btn:focus, button:focus {
+    outline: none;
+  }
+
   .form-check input {
     position: absolute;
     z-index: -1;

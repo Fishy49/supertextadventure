@@ -1,13 +1,14 @@
 <div class="login-container row">
   <div class="col-md-6 mx-auto">
-    <p class="text-center"> --== Greetings, Adventurer ==--</p>
+    <p class="text-center"> --== Welcome Back, Adventurer ==--</p>
 
     <%= simple_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
       <div class="form-inputs">
-        <%= f.input :email,
+        <%= f.input :login,
+                    label: 'Username or Email',
                     required: false,
                     autofocus: true,
-                    input_html: { autocomplete: "email" } %>
+                    input_html: { autocomplete: false } %>
         <%= f.input :password,
                     required: false,
                     input_html: { autocomplete: "current-password" } %>

@@ -3,15 +3,16 @@
   <div class="row">
     <div class="col-md-8 border-container">
       <div class="lobby-filters w-100 py-2">
-        <div class="form-check form-check-inline">
+        <div class="form-check form-check-inline filter-trigger">
           <input class="form-check-input boolean optional" type="checkbox" value="1" name="friendly_games" id="friendly_games">
-          <label class="form-check-label boolean optional" for="friendly_games">Friendly Games</label></div>
-        <div class="form-check form-check-inline">
+          <label class="form-check-label boolean optional" for="friendly_games">Friend's Games</label></div>
+        <div class="form-check form-check-inline filter-trigger">
           <input class="form-check-input boolean optional" type="checkbox" value="1" name="my_games" id="my_games">
           <label class="form-check-label boolean optional" for="my_games">My Games</label></div>
       </div>
-      <div class="games-container w-100 border-container border-left-0 border-right-0 border-bottom-0">
-        <h3>TEST</h3>
+      <div class="games-container loading w-100 border-container border-left-0 border-right-0 border-bottom-0">
+        <div class="games-list"></div>
+        <div class="games-loading text-center pt-5 loader"></div>
       </div>
     </div>
 

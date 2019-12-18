@@ -27,3 +27,27 @@
     text-decoration: none;
   }
 }
+
+.games-container {
+  min-height: 200px;
+  .games-loading {
+    display: none;
+  }
+
+  &.loading {
+    .games-loading {
+      display: block;
+    }
+
+    .games-list {
+      display: none;
+    }
+  }
+
+  .games-loading {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+

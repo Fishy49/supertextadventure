@@ -3,6 +3,7 @@ class CreateGameTable < ActiveRecord::Migration[6.0]
     create_table :games do |t|
       t.string :name
       t.string :mode
+      t.string :description, default: ''
       t.integer :max_players
       t.string :timestamps
     end

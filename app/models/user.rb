@@ -16,15 +16,17 @@ class User < ApplicationRecord
   end
 
   def login
-    @login || self.username || self.email
+    @login || username || email
   end
 
+  # rubocop:disable Rails/FindBy
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
-    if login = conditions.delete(:login)
-      where(conditions).where(["username = :value OR lower(email) = lower(:value)", { :value => login }]).first
-    elsif conditions.has_key?(:username) || conditions.has_key?(:email)
+    if login == conditions.delete(:login)
+      where(conditions).where(['username = :value OR lower(email) = lower(:value)', { value: login }]).first
+    elsif conditions.key?(:username) || conditions.key?(:email)
       where(conditions.to_h).first
     end
   end
+  # rubocop:enable Rails/FindBy
 end

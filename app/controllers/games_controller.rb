@@ -1,6 +1,5 @@
 class GamesController < ApplicationController
   def index
-
     respond_to :js
   end
 

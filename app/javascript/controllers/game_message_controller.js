@@ -3,21 +3,21 @@ import { cspNonce } from '@rails/ujs';
 import createChannel from "cables/cable";
 
 export default class extends Controller {
-  static targets = [ "game" ]
+  static targets = [ "game_message" ]
 
   initialize() {
-    let gameController = this;
-    this.gameChannel = createChannel(
+    let GameMessageController = this;
+    this.GameMessageChannel = createChannel(
       { 
-        channel: "GameChannel",
+        channel: "GameMessageChannel",
         game_id: document.getElementById('game').getAttribute('data-game-id'),
         connected() {
-          gameController.listen()
+          GameMessageController.listen()
         },
         received(data) {
           let script = document.createElement('script');
           script.setAttribute('nonce', cspNonce());
-          script.text = response;
+          script.text = data;
           document.head.appendChild(script).parentNode.removeChild(script);
         }
       }
@@ -29,12 +29,12 @@ export default class extends Controller {
   }
 
   disconnect() {
-    this.gameChannel.perform('unfollow')
+    this.GameMessageChannel.perform('unfollow')
   }
 
   listen() {
-    if (this.gameChannel) {
-      this.gameChannel.perform('follow')
+    if (this.GameMessageChannel) {
+      this.GameMessageChannel.perform('follow')
     }
   }
 }

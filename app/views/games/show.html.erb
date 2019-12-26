@@ -1,10 +1,10 @@
 <div data-game-id="<%= @game.id %>" id="game" class="game-container row">
   <div class="col-md-8 border-container border-right-0 border-bottom-0 position-relative">
     <div data-controller="game-message" id="message-container">
-      <%= render partial: "games/components/message", collection: @game_messages %>
+      <%= render partial: "game_messages/message", collection: @game_messages %>
     </div>
     <div id="message-form" class="position-absolute">
-      <textarea class="form-control"></textarea>
+      <textarea class="form-control" id="game-message-input"></textarea>
     </div>
   </div>
   <div class="col-md-4 border-container border-bottom-0">

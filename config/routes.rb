@@ -4,4 +4,5 @@ Rails.application.routes.draw do
 
   resources :lobby
   resources :games
+  resources :game_messages
 end

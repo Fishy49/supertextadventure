@@ -10,14 +10,16 @@ export default class extends Controller {
     this.GameMessageChannel = createChannel(
       { 
         channel: "GameMessageChannel",
-        game_id: document.getElementById('game').getAttribute('data-game-id'),
+        game_id: document.getElementById('game').getAttribute('data-game-id')
+      },
+      {
         connected() {
           GameMessageController.listen()
         },
         received(data) {
           let script = document.createElement('script');
           script.setAttribute('nonce', cspNonce());
-          script.text = data;
+          script.text = data.script;
           document.head.appendChild(script).parentNode.removeChild(script);
         }
       }

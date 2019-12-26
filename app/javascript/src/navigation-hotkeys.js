@@ -1,5 +1,5 @@
 function key_press(e) {
-  var evtobj = window.event ? event : e
+  let evtobj = window.event ? event : e
   if(evtobj.ctrlKey){
     switch(evtobj.keyCode){
       case 72:

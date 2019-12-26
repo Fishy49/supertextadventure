@@ -1,0 +1,2 @@
+var message_html = document.createRange().createContextualFragment("<%= escape_javascript(render('message', game_message: @game_message)) %>");
+document.getElementById('message-container').appendChild(message_html);

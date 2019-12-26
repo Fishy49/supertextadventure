@@ -1,0 +1,5 @@
+var list_html = '<%= escape_javascript(render('list', games: @games)) %>';
+
+document.getElementsByClassName('games-list')[0].innerHTML = list_html;
+
+document.getElementsByClassName('games-container')[0].classList.remove('loading');

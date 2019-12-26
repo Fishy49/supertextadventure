@@ -1,7 +1,6 @@
-class CreateCharacterItemsTable < ActiveRecord::Migration[6.0]
+class CreateInventoryItemsTable < ActiveRecord::Migration[6.0]
   def change
-    create_table :character_items_tables do |t|
-      t.references :character
+    create_table :inventory_items do |t|
       t.string :name
       t.string :item_type
       t.string :description

@@ -1,3 +1,15 @@
+html {
+  overflow: hidden;
+}
+
+nav {
+  max-height: 56px;
+}
+
+.app-container {
+  margin-top: 56px;
+}
+
 .width-fit-content {
   width: fit-content;
 }
@@ -34,6 +46,13 @@
     display: none;
   }
 
+  .games-list {
+    .game-list-item {
+      border-bottom: dashed 2px;
+      min-height: 50px;
+    }
+  }
+
   &.loading {
     .games-loading {
       display: block;
@@ -50,4 +69,18 @@
   }
 }
 
+.game-container {
+  height: calc(100vh - 100px);
 
+  #message-form {
+    bottom: 0px;
+    width: 100%;
+    left: 4px;
+    
+    textarea {
+      border: none;
+      border-top: solid;
+      min-height: 90px;
+    }
+  }
+}

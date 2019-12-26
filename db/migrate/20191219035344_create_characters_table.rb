@@ -2,6 +2,7 @@ class CreateCharactersTable < ActiveRecord::Migration[6.0]
   def change
     create_table :characters do |t|
       t.references :user
+      t.boolean :is_npc, default: false
       t.string :name
       t.string :class
       t.string :race
@@ -19,3 +20,4 @@ class CreateCharactersTable < ActiveRecord::Migration[6.0]
     end
   end
 end
+

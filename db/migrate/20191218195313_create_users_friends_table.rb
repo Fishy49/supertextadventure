@@ -6,6 +6,7 @@ class CreateUsersFriendsTable < ActiveRecord::Migration[6.0]
       t.timestamps
 
       t.index [:user_id, :friend_id]
+      t.index [:friend_id, :user_id]
     end
   end
 end

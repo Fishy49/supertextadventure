@@ -5,10 +5,17 @@
       <div class="lobby-filters w-100 py-2">
         <div class="form-check form-check-inline filter-trigger">
           <input class="form-check-input boolean optional" type="checkbox" value="1" name="friendly_games" id="friendly_games">
-          <label class="form-check-label boolean optional" for="friendly_games">Friend's Games</label></div>
+          <label class="form-check-label boolean optional" for="friendly_games">Friend's Games</label>
+        </div>
         <div class="form-check form-check-inline filter-trigger">
           <input class="form-check-input boolean optional" type="checkbox" value="1" name="my_games" id="my_games">
-          <label class="form-check-label boolean optional" for="my_games">My Games</label></div>
+          <label class="form-check-label boolean optional" for="my_games">My Games</label>
+        </div>
+        <div class="d-inline-block">
+          <%= link_to new_game_path, class: "btn btn-sm" do %>
+            Create Game +
+          <% end %>
+        </div>
       </div>
       <div class="games-container loading w-100 border-container border-left-0 border-right-0 border-bottom-0">
         <div class="games-list"></div>

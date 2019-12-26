@@ -1,0 +1,13 @@
+<div data-controller="game" data-game-id="<%= @game.id %>" id="game" class="game-container row">
+  <div class="col-md-8 border-container border-right-0 border-bottom-0 position-relative">
+    <div data-controller="game-messages-container" id="message-container">
+      <%= render partial: "games/components/message", collection: @game_messages %>
+    </div>
+    <div id="message-form" class="position-absolute">
+      <textarea class="form-control"></textarea>
+    </div>
+  </div>
+  <div class="col-md-4 border-container border-bottom-0">
+    <div id="sidebar"></div>
+  </div>
+</div>

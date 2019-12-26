@@ -1,0 +1,13 @@
+<% if games.present? %>
+  <% games.each do |game| %>
+    <%= link_to game_path(game) do %>
+      <div class="game-list-item" attr-id="<%= game.id %>">
+        <img src="/scroll.svg" width="45" class="float-right mr-2">
+        <span class="game-name"><%= game.name %></span><br>
+        <span><small><%= game.description %></small></span>
+      </div>
+    <% end %>
+  <% end %>
+<% else %>
+  <div class="text-center pt-5"> --== No Games Found ==--</div>
+<% end %>

@@ -22,6 +22,8 @@ _Graphics are for peasants..._
    `Y-.____(__}                `Y-.____(__}                `Y-.____(__}                                 
     |     {__)                  |     {__)                  |     {__)                                 
           ()                          ()                          ()                                 
+
+source: https://www.asciiart.eu/people/occupations/knights
 ```
 
 This is a web-based game that attempts to capture some of the nostalgia from the old text-based adventure games (e.g. Zork).

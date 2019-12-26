@@ -1,6 +1,7 @@
 # Super Text Adventure
 _Graphics are for peasants..._
 
+<p style="text-align: center;">
 ```
       _,.
     ,` -.)
@@ -23,3 +24,4 @@ _Graphics are for peasants..._
     |     {__)
           ()
 ```
+</p>

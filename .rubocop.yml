@@ -97,7 +97,7 @@ Metrics/ClassLength:
   CountComments: false
   Max: 100
 
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: true
   Max: 160
 

@@ -1,5 +1,5 @@
 <% if games.present? %>
-  <% games.each do |game| %>
+  <% games.uniq.each do |game| %>
     <%= link_to game_path(game) do %>
       <div class="game-list-item" attr-id="<%= game.id %>">
         <img src="/scroll.svg" width="45" class="float-right mr-2">

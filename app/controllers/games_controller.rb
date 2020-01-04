@@ -1,9 +1,9 @@
 class GamesController < ApplicationController
   def index
     @games = []
-    if params[:my_games].present? || params[:friendly_games].present? 
+    if params[:my_games].present? || params[:friendly_games].present?
       @games = current_user.games if params[:my_games].present?
-      @games = @games + current_user.friends.map { |friend| friend.games  }.flatten
+      @games += current_user.friends.map(&:games).flatten
     else
       @games = Game.all
     end
@@ -20,7 +20,7 @@ class GamesController < ApplicationController
   end
 
   def create
-    @game = Game.create game_params.merge({created_by: current_user.id})
+    @game = Game.create game_params.merge(created_by: current_user.id)
     @game.games_users.create user_id: current_user.id, role: 'dm'
 
     flash[:success] = 'Game Created Successfully! You can now prepare content and invite players.'

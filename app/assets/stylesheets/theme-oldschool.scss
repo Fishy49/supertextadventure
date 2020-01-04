@@ -84,6 +84,9 @@ body.oldschool {
 
   .btn {
     transition: none;
+    padding-top: 3px;
+    padding-bottom: 1px;
+    text-transform: uppercase;
   }
 
   .btn:focus, button:focus {

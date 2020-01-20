@@ -1,7 +1,11 @@
 <div data-game-id="<%= @game.id %>" id="game" class="game-container row">
   <div class="col-md-8 border-container border-right-0 border-bottom-0 position-relative">
     <div data-controller="game-message" id="message-container">
-      <%= render partial: "game_messages/message", collection: @game_messages %>
+      <% current_username = nil %>
+      <% @game.game_messages.each do |message| %>
+        <%= render "game_messages/message", { message: message, show_username: (current_username != message.user.username) } %>
+        <% current_username = message.user.username %>
+      <% end %>
     </div>
     <div id="message-form" class="position-absolute">
       <textarea class="form-control" id="game-message-input"></textarea>

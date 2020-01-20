@@ -72,6 +72,24 @@ nav {
 .game-container {
   height: calc(100vh - 100px);
 
+  #message-container {
+    height: calc(100vh - 190px);
+    padding-bottom: 150px;
+    overflow-y: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+
+    &::-webkit-scrollbar { /* WebKit */
+        width: 0;
+        height: 0;
+    }
+
+    .game-message-user-divider {
+      border-top: 2px dashed;
+      opacity: 0.3;
+    }
+  }
+
   #message-form {
     bottom: 0px;
     width: 100%;

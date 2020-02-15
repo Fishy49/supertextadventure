@@ -21,9 +21,9 @@ class GamesController < ApplicationController
 
   def create
     @game = Game.create game_params.merge(created_by: current_user.id)
-    @game.games_users.create user_id: current_user.id, role: 'dm'
+    @game.games_users.create user_id: current_user.id, role: "dm"
 
-    flash[:success] = 'Game Created Successfully! You can now prepare content and invite players.'
+    flash[:success] = "Game Created Successfully! You can now prepare content and invite players."
 
     redirect_to game_path @game
   end

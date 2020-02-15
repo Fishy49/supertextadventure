@@ -1,14 +1,14 @@
 class User < ApplicationRecord
-  has_many :created_games, class_name: 'Game', foreign_key: :created_by, dependent: :nullify, inverse_of: :creator
+  has_many :created_games, class_name: "Game", foreign_key: :created_by, dependent: :nullify, inverse_of: :creator
 
-  has_many :games_users, dependent: :nullify, join_table: :games_users, class_name: 'GamesUsers'
+  has_many :games_users, dependent: :nullify, join_table: :games_users, class_name: "GamesUsers"
   has_many :games, through: :games_users
 
-  has_many :users_friends, dependent: :nullify, join_table: :users_friends, class_name: 'UsersFriends'
+  has_many :users_friends, dependent: :nullify, join_table: :users_friends, class_name: "UsersFriends"
   has_many :friends, through: :users_friends, source: :user
 
-  has_many :sent_friend_requests, dependent: :nullify, class_name: 'FriendRequest'
-  has_many :received_friend_requests, dependent: :nullify, class_name: 'FriendRequest', foreign_key: :friend_id, inverse_of: :requestee
+  has_many :sent_friend_requests, dependent: :nullify, class_name: "FriendRequest"
+  has_many :received_friend_requests, dependent: :nullify, class_name: "FriendRequest", foreign_key: :friend_id, inverse_of: :requestee
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable

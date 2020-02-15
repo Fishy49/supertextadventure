@@ -26,6 +26,16 @@
     <div class="col-md-4 border-container border-left-0">
       <div class="friends-containter">
         <p class="section-header">Friends</p>
+
+        <% if current_user.friends.present? %>
+          <% current_user.friends.each do |friend| %>
+            <div class="friend-list-item">
+              <span><%= friend.username %></span>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-center pt-5"><strong>THOU HAST NO FRIENDS!</strong></p>
+        <% end %>
       </div>
     </div>
   </div>

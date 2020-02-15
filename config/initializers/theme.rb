@@ -1,1 +1,1 @@
-APP_THEME = 'oldschool'.freeze
+APP_THEME = "oldschool".freeze

@@ -32,4 +32,4 @@ Most of these old games pitted you against a text interpreter and the cunning mi
 
 Essentially it's a glorified chat app, but the idea is to provide the dynamic nature of a DnD session with the graphical limitations of a text-based adventure.
 
-This is a Rails app that utilizes ActionCable and [ViewComponents](https://github.com/github/actionview-component). Please enjoy.
+This is a Rails app built with [Hotwire](https://hotwire.dev).

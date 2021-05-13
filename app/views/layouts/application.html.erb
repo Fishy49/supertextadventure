@@ -1,32 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Super Text Adventure</title>
+    <title>Supertextadventure</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= stylesheet_link_tag 'application', media: 'all' %>
-    <%= javascript_pack_tag 'application' %>
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
-  <body class="<%= APP_THEME %>">
-    <%= render 'layouts/nav' %>
-
-    <% unless flash.empty? %>
-      <% flash.each do |type, message| %>
-        <div class="alert alert-<%= bootstrap_alert_type(type) %> alert-dismissible show" role="alert">
-          <%= message %>
-          <button type="button" class="close" aria-label="Close">
-            <span aria-hidden="true">X</span>
-          </button>
-        </div>
-      <% end %>
-    <% end %>
-
-    <div class="app-container p-2">
-      <%= yield %>
-    </div>
-
-    <%= render 'layouts/footer' %>
+  <body>
+    <%= yield %>
   </body>
 </html>

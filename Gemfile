@@ -55,3 +55,5 @@ gem "hotwire-rails", "~> 0.1.3"
 gem "rubocop", "~> 1.18"
 gem "rubocop-performance", "~> 1.11"
 gem "rubocop-rails", "~> 2.11"
+
+gem "classes", "~> 0.1.0"

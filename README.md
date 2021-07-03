@@ -1,35 +1,24 @@
-# Super Text Adventure
-_Graphics are for peasants..._
+# README
 
-```
-      _,.                         _,.                         _,.                         _,.                  
-    ,` -.)                      ,` -.)                      ,` -.)                      ,` -.)                 
-   ( _/-\\-._                  ( _/-\\-._                  ( _/-\\-._                  ( _/-\\-._              
-  /,|`--._,-^|            ,   /,|`--._,-^|            ,   /,|`--._,-^|            ,   /,|`--._,-^|            ,
-  \_| |`-._/||          ,'|   \_| |`-._/||          ,'|   \_| |`-._/||          ,'|   \_| |`-._/||          ,'|
-    |  `-, / |         /  /     |  `-, / |         /  /     |  `-, / |         /  /     |  `-, / |         /  /
-    |     || |        /  /      |     || |        /  /      |     || |        /  /      |     || |        /  / 
-     `r-._||/   __   /  /        `r-._||/   __   /  /        `r-._||/   __   /  /        `r-._||/   __   /  /  
- __,-<_     )`-/  `./  /     __,-<_     )`-/  `./  /     __,-<_     )`-/  `./  /     __,-<_     )`-/  `./  /   
-'  \   `---'   \   /  /     '  \   `---'   \   /  /     '  \   `---'   \   /  /     '  \   `---'   \   /  /    
-    |           |./  /          |           |./  /          |           |./  /          |           |./  /     
-    /           //  /           /           //  /           /           //  /           /           //  /      
-\_/' \         |/  /        \_/' \         |/  /        \_/' \         |/  /        \_/' \         |/  /       
- |    |   _,^-'/  /          |    |   _,^-'/  /          |    |   _,^-'/  /          |    |   _,^-'/  /        
- |    , ``  (\/  /_          |    , ``  (\/  /_          |    , ``  (\/  /_          |    , ``  (\/  /_        
-  \,.->._    \X-=/^           \,.->._    \X-=/^           \,.->._    \X-=/^           \,.->._    \X-=/^        
-  (  /   `-._//^`             (  /   `-._//^`             (  /   `-._//^`             (  /   `-._//^`          
-   `Y-.____(__}                `Y-.____(__}                `Y-.____(__}                `Y-.____(__}            
-    |     {__)                  |     {__)                  |     {__)                  |     {__)             
-          ()                          ()                          ()                          ()               
+This README would normally document whatever steps are necessary to get the
+application up and running.
 
-source: https://www.asciiart.eu/people/occupations/knights
-```
+Things you may want to cover:
 
-This is a web-based game that attempts to capture some of the nostalgia from the old text-based adventure games (e.g. Zork).
+* Ruby version
 
-Most of these old games pitted you against a text interpreter and the cunning mind of the game designer! Super Text Adventure replaces the latter with a real person.
+* System dependencies
 
-Essentially it's a glorified chat app, but the idea is to provide the dynamic nature of a DnD session with the graphical limitations of a text-based adventure.
+* Configuration
 
-This is a Rails app built with [Hotwire](https://hotwire.dev).
+* Database creation
+
+* Database initialization
+
+* How to run the test suite
+
+* Services (job queues, cache servers, search engines, etc.)
+
+* Deployment instructions
+
+* ...

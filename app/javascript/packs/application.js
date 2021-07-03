@@ -8,6 +8,8 @@ import "@hotwired/turbo-rails"
 import * as ActiveStorage from "@rails/activestorage"
 import "channels"
 
+import "@fontsource/dotgothic16"; // Defaults to weight 400.
+
 Rails.start()
 ActiveStorage.start()
 

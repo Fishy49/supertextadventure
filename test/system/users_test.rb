@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "application_system_test_case"
 
 class UsersTest < ApplicationSystemTestCase
@@ -15,8 +17,8 @@ class UsersTest < ApplicationSystemTestCase
     click_on "New User"
 
     fill_in "Email", with: @user.email
-    fill_in "Password", with: 'secret'
-    fill_in "Password confirmation", with: 'secret'
+    fill_in "Password", with: "secret"
+    fill_in "Password confirmation", with: "secret"
     fill_in "Username", with: @user.username
     click_on "Create User"
 
@@ -29,8 +31,8 @@ class UsersTest < ApplicationSystemTestCase
     click_on "Edit", match: :first
 
     fill_in "Email", with: @user.email
-    fill_in "Password", with: 'secret'
-    fill_in "Password confirmation", with: 'secret'
+    fill_in "Password", with: "secret"
+    fill_in "Password confirmation", with: "secret"
     fill_in "Username", with: @user.username
     click_on "Update User"
 

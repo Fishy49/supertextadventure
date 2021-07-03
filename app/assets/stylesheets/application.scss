@@ -1,6 +1,12 @@
+@import "bulma/sass/base/minireset.sass";
+@import "bulma/sass/base/generic.sass";
 @import "bulma/sass/utilities/_all.sass";
 @import "bulma/sass/grid/columns.sass";
+@import "bulma/sass/helpers/spacing.sass";
+@import "bulma/sass/helpers/typography.sass";
 
 @import "scaffolds";
 
 @import "terminal";
+
+@import "vendor_customizations";

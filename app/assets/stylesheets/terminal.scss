@@ -53,6 +53,7 @@ footer {
   bottom: 0;
   border-top: 2px solid $terminal-text-border;
   width: 100%;
+  font-size: 1.5rem;
 
   .footer-controls {
     .divider {
@@ -79,6 +80,18 @@ label {
   text-transform: uppercase;
 }
 
+input, textarea, option, select, optgroup {
+  font-family: "DotGothic16", monospace;
+}
+
+input[type="submit"] {
+  cursor: pointer;
+
+  &:hover {
+    color: $terminal-text-light;
+  }
+}
+
 input, textarea {
   background-color: transparent;
   outline: none;
@@ -90,5 +103,6 @@ input, textarea {
 
   &::placeholder {
     color: $terminal-text-border;
+    text-transform: uppercase;
   }
 }

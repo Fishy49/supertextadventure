@@ -1,12 +1,23 @@
 $terminal-bg: #282823;
 $terminal-text: #8fe86b;
+$terminal-text-light: #bafb9f;
 $terminal-text-border: rgba(143, 232, 107, 0.3);
 
+// Layout
 html, body {
   height: 100vh;
   background-color: $terminal-bg;
   font-family: "DotGothic16", monospace;
   color: $terminal-text;
+}
+
+a {
+  color: $terminal-text;
+  text-decoration: underline;
+
+  &:hover {
+    color: $terminal-text-light;
+  }
 }
 
 .crt::before {
@@ -51,4 +62,18 @@ footer {
       }
     }
   }
+}
+
+
+// Form
+label {
+  text-transform: uppercase;
+}
+
+input, textarea {
+  background-color: transparent;
+  outline: none;
+  caret-color: $terminal-text;
+  color: $terminal-text;
+  border: solid 1px $terminal-text-border;
 }

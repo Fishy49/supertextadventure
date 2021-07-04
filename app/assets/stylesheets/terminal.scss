@@ -38,6 +38,15 @@ header {
   border-bottom: 2px solid $terminal-text-border;
 }
 
+.main {
+  font-size: 120%;
+}
+
+pre {
+  width: fit-content;
+  background-color: transparent;
+  color: $terminal-text;
+}
 
 footer {
   position: fixed;
@@ -76,4 +85,10 @@ input, textarea {
   caret-color: $terminal-text;
   color: $terminal-text;
   border: solid 1px $terminal-text-border;
+  padding: 5px;
+  font-size: 2rem;
+
+  &::placeholder {
+    color: $terminal-text-border;
+  }
 }

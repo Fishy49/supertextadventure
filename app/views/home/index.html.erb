@@ -1,12 +1,17 @@
 <div class="columns">
-  <div class="column is-half is-offset-one-quarter has-text-centered">
-    <% if logged_in? %>
-      Logged in as <%= current_user.username %>.
-      <%= link_to "Log Out", logout_path %>
-    <% else %>
-      <%= render "/sessions/form" %>
-    <% end %>
+  <div class="column is-half is-offset-one-quarter">
+    
+    <%= render "knight" %>
+    
+    <div class="has-text-centered">
+      <% if logged_in? %>
+        Logged in as <%= current_user.username %>.
+        <%= link_to "Log Out", logout_path %>
+      <% else %>
+        <%= render "/sessions/form" %>
+      <% end %>
 
-    <p id="notice"><%= notice %></p>
+      <p id="notice"><%= notice %></p>
+    </div>
   </div>
 </div>

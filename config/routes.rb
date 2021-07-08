@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :friend_requests
   get "home/index"
   Rails.application.routes.draw do
+    resources :friend_requests
     get "home/index"
     root "home#index"
 

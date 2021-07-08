@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Requester:</strong>
+  <%= @friend_request.requester_id %>
+</p>
+
+<p>
+  <strong>Requestee:</strong>
+  <%= @friend_request.requestee_id %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @friend_request.status %>
+</p>
+
+<p>
+  <strong>Accepted on:</strong>
+  <%= @friend_request.accepted_on %>
+</p>
+
+<p>
+  <strong>Rejected on:</strong>
+  <%= @friend_request.rejected_on %>
+</p>
+
+<%= link_to 'Edit', edit_friend_request_path(@friend_request) %> |
+<%= link_to 'Back', friend_requests_path %>

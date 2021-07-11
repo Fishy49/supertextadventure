@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_08_043854) do
+ActiveRecord::Schema.define(version: 2021_07_11_050504) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -26,6 +26,20 @@ ActiveRecord::Schema.define(version: 2021_07_08_043854) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "games", force: :cascade do |t|
+    t.bigint "users_id", null: false
+    t.string "name"
+    t.string "game_type"
+    t.string "status"
+    t.boolean "is_friends_only"
+    t.integer "max_players"
+    t.datetime "opened_at"
+    t.datetime "closed_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["users_id"], name: "index_games_on_users_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.citext "username"
     t.string "password_digest"
@@ -34,4 +48,5 @@ ActiveRecord::Schema.define(version: 2021_07_08_043854) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "games", "users", column: "users_id"
 end

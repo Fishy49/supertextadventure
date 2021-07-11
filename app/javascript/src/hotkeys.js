@@ -1,6 +1,4 @@
 function hotKeyTrigger(e) {
-  console.log("OK")
-  console.log(e.key)
   if (e.ctrlKey) {
     switch(e.key) {
       case 'h':
@@ -10,6 +8,9 @@ function hotKeyTrigger(e) {
         if(confirm("Logout?")){
           document.location.href = "/logout"
         }
+        break;
+      case 'g':
+        document.location.href = "/games"
         break;
     }
   }

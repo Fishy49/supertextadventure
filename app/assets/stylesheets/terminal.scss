@@ -44,8 +44,8 @@ header {
 
 .main {
   font-size: 120%;
-  padding: 0 15px 100px 15px;
-  height: 100%;
+  padding: 0 15px;
+  height: calc(100% - 100px);
 }
 
 pre {

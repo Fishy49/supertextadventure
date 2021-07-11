@@ -1,7 +1,13 @@
-<header class="px-2 pb-1 mb-2">
-  <h1 class="is-size-3">
+<header class="px-2 pb-1 mb-2 is-clearfix">
+  <h1 class="is-size-3 is-pulled-left">
     <%= link_to root_path do %>
       SuperTextAdventure
     <% end %>
-    <small>v0.1</small></h1>
+    <small>v0.1</small>
+  </h1>
+  <% if logged_in? %>
+    <div class="is-pulled-right pt-3">
+      Logged in as <span class="has-text-weight-bold"><%= current_user.username %></span>
+    </div>
+  <% end %>
 </header>

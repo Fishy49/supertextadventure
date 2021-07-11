@@ -14,3 +14,6 @@ Rails.start()
 ActiveStorage.start()
 
 import "controllers"
+
+const files = require.context('../src', true, /\.js$/);
+files.keys().forEach(files);

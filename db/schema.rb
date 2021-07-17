@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_11_050504) do
+ActiveRecord::Schema.define(version: 2021_07_17_033938) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -26,8 +26,23 @@ ActiveRecord::Schema.define(version: 2021_07_11_050504) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "game_users", force: :cascade do |t|
+    t.bigint "game_id"
+    t.bigint "user_id"
+    t.string "player_type"
+    t.datetime "invited_at"
+    t.datetime "joined_at"
+    t.datetime "left_at"
+    t.datetime "kicked_at"
+    t.datetime "banned_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["game_id"], name: "index_game_users_on_game_id"
+    t.index ["user_id"], name: "index_game_users_on_user_id"
+  end
+
   create_table "games", force: :cascade do |t|
-    t.bigint "users_id", null: false
+    t.bigint "user_id", null: false
     t.string "name"
     t.string "game_type"
     t.string "status"
@@ -37,7 +52,7 @@ ActiveRecord::Schema.define(version: 2021_07_11_050504) do
     t.datetime "closed_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["users_id"], name: "index_games_on_users_id"
+    t.index ["user_id"], name: "index_games_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -48,5 +63,5 @@ ActiveRecord::Schema.define(version: 2021_07_11_050504) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
-  add_foreign_key "games", "users", column: "users_id"
+  add_foreign_key "games", "users"
 end

@@ -4,5 +4,5 @@ class GameUser < ApplicationRecord
   belongs_to :user
   belongs_to :game
 
-  validates :player_type, presence: true
+  validates :status, presence: true
 end

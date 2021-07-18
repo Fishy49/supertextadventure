@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(version: 2021_07_17_033938) do
   create_table "game_users", force: :cascade do |t|
     t.bigint "game_id"
     t.bigint "user_id"
-    t.string "player_type"
+    t.string "status"
     t.datetime "invited_at"
     t.datetime "joined_at"
     t.datetime "left_at"
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 2021_07_17_033938) do
     t.datetime "banned_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["game_id", "user_id"], name: "index_game_users_on_game_id_and_user_id", unique: true
     t.index ["game_id"], name: "index_game_users_on_game_id"
     t.index ["user_id"], name: "index_game_users_on_user_id"
   end
@@ -46,6 +47,7 @@ ActiveRecord::Schema.define(version: 2021_07_17_033938) do
     t.string "name"
     t.string "game_type"
     t.string "status"
+    t.text "description"
     t.boolean "is_friends_only"
     t.integer "max_players"
     t.datetime "opened_at"

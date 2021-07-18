@@ -16,4 +16,4 @@ function hotKeyTrigger(e) {
   }
 }
 
-document.addEventListener('keydown', hotKeyTrigger, false);
+window.addEventListener('keydown', hotKeyTrigger, false);

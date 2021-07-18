@@ -5,7 +5,7 @@ class CreateGameUsers < ActiveRecord::Migration[6.1]
     create_table :game_users do |t|
       t.references :game
       t.references :user
-      t.string :player_type
+      t.string :status
       t.datetime :invited_at
       t.datetime :joined_at
       t.datetime :left_at
@@ -13,6 +13,8 @@ class CreateGameUsers < ActiveRecord::Migration[6.1]
       t.datetime :banned_at
 
       t.timestamps
+
+      t.index [:game_id, :user_id], unique: true
     end
   end
 end

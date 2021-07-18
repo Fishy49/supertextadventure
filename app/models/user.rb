@@ -20,15 +20,10 @@ class User < ApplicationRecord
            class_name: "User",
            source: :requestee
 
-  has_many :games, inverse_of: :user, dependent: :destroy
+  has_many :hosted_games, class_name: "Game", inverse_of: :user, dependent: :destroy
 
   has_many :game_users, inverse_of: :user, dependent: :destroy
-  %w[invited joined left kicked banned].each do |player_type|
-    has_many "#{player_type}_games".to_sym,
-             proc { where(game_users: { player_type: player_type }) },
-             through: :game_users,
-             source: :game
-  end
+  has_many :games, through: :game_users
 
   def friends
     (my_friends + accepted_friends).uniq

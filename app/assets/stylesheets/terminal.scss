@@ -11,6 +11,10 @@ html, body {
   color: $terminal-text;
 }
 
+hr {
+  background-color: $terminal-text;
+}
+
 a {
   color: $terminal-text;
   text-decoration: underline;
@@ -93,6 +97,15 @@ a.button {
   font-size: 1.5rem;
   display: inline-block;
 
+  &.is-small {
+    font-size: 80%;
+  }
+
+  &.is-delete {
+    color: red;
+    border-color: red;
+  }
+
   &:hover {
     color: $terminal-text-light;
     background-color: $terminal-text-opaque;
@@ -128,5 +141,43 @@ input, textarea {
   &::placeholder {
     color: $terminal-text-opaque;
     text-transform: uppercase;
+  }
+}
+
+// Borders
+.border-top {
+  border-top: 1px dashed $terminal-text;
+}
+
+.border-right {
+  border-right: 1px dashed $terminal-text;
+}
+
+.border-bottom {
+  border-bottom: 1px dashed $terminal-text;
+}
+
+.border-left {
+  border-left: 1px dashed $terminal-text;
+}
+
+// Card
+.card {
+  border: dashed 1px $terminal-text;
+  padding: 5px;
+  margin-bottom: 5px;
+
+  .card-title {
+    border-bottom: dashed 1px $terminal-text;
+    padding: 0 0 5px 15px;
+  }
+
+  .card-body {
+    padding: 25px 15px 0 15px;
+  }
+
+  .card-footer {
+    padding: 5px 0 0 0;
+    border-top: dashed 1px $terminal-text;
   }
 }

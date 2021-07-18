@@ -1,0 +1,17 @@
+<div class="card mx-auto">
+  <div class="card-title has-text-weight-bold"><%= game.name %></div>
+  <div class="card-body">
+    <%= game.description %>
+    <hr>
+    <p class="is-size-6">
+      Players: <%= game.active_players.count %> <span class="has-text-weight-bold">|</span> Status: <%= game.status.titleize %>
+    </p>
+  </div>
+  <div class="card-footer is-clearfix">
+    <%= link_to game_path(game), method: :delete, class: "button is-small mb-0 is-pulled-left is-delete", data: { confirm: "Delete This Game?" } do %>
+      Delete <span>X</span>
+    <% end %>
+
+    <div class="button is-small mb-0 is-pulled-right">Enter Game</div>
+  </div>
+</div>

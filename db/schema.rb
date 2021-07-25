@@ -10,11 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_17_033938) do
+ActiveRecord::Schema.define(version: 2021_07_25_060931) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
+
+  create_table "characters", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name"
+    t.string "race"
+    t.string "height"
+    t.string "hair_color"
+    t.string "eye_color"
+    t.text "backstory"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_characters_on_user_id"
+  end
 
   create_table "friend_requests", force: :cascade do |t|
     t.integer "requester_id"
@@ -29,6 +42,7 @@ ActiveRecord::Schema.define(version: 2021_07_17_033938) do
   create_table "game_users", force: :cascade do |t|
     t.bigint "game_id"
     t.bigint "user_id"
+    t.bigint "character_id"
     t.string "status"
     t.datetime "invited_at"
     t.datetime "joined_at"
@@ -37,6 +51,7 @@ ActiveRecord::Schema.define(version: 2021_07_17_033938) do
     t.datetime "banned_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["character_id"], name: "index_game_users_on_character_id"
     t.index ["game_id", "user_id"], name: "index_game_users_on_game_id_and_user_id", unique: true
     t.index ["game_id"], name: "index_game_users_on_game_id"
     t.index ["user_id"], name: "index_game_users_on_user_id"
@@ -57,6 +72,34 @@ ActiveRecord::Schema.define(version: 2021_07_17_033938) do
     t.index ["user_id"], name: "index_games_on_user_id"
   end
 
+  create_table "standard_items", force: :cascade do |t|
+    t.string "name"
+    t.string "item_type"
+    t.text "description"
+    t.string "modifier_type"
+    t.integer "modifier"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "standard_items_stat_sheets", id: false, force: :cascade do |t|
+    t.bigint "standard_stat_sheet_id", null: false
+    t.bigint "standard_item_id", null: false
+  end
+
+  create_table "standard_stat_sheets", force: :cascade do |t|
+    t.bigint "character_id", null: false
+    t.integer "level"
+    t.integer "xp"
+    t.integer "max_hitpoints"
+    t.integer "current_hitpoints"
+    t.integer "max_spell_slots"
+    t.integer "current_spell_slots"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["character_id"], name: "index_standard_stat_sheets_on_character_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.citext "username"
     t.string "password_digest"
@@ -65,5 +108,7 @@ ActiveRecord::Schema.define(version: 2021_07_17_033938) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "characters", "users"
   add_foreign_key "games", "users"
+  add_foreign_key "standard_stat_sheets", "characters"
 end

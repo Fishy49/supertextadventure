@@ -1,4 +1,5 @@
 $terminal-bg: #282823;
+$terminal-bg-opaque: rgba(84, 84, 84, 0.3);
 $terminal-text: #8fe86b;
 $terminal-text-light: #bafb9f;
 $terminal-text-opaque: rgba(143, 232, 107, 0.3);
@@ -48,8 +49,7 @@ header {
 
 .main {
   font-size: 120%;
-  padding: 0 15px;
-  height: calc(100% - 100px);
+  padding: 0 15px 100px;
 }
 
 pre {
@@ -92,20 +92,34 @@ a.button {
 
 .button {
   padding: 2px 10px;
+  font-weight: bold;
   border: solid 2px $terminal-text;
   color: $terminal-text;
   font-size: 1.5rem;
   display: inline-block;
+  text-transform: uppercase;
 
   &.is-small {
     font-size: 80%;
   }
 
+  &:hover {
+    color: $terminal-text-light;
+    background-color: $terminal-text-opaque;
+  }
+
   &.is-delete {
     color: red;
     border-color: red;
-  }
 
+    &:hover {
+      color: white;
+      background-color: red;
+    }
+  }
+}
+
+input.submit {
   &:hover {
     color: $terminal-text-light;
     background-color: $terminal-text-opaque;
@@ -129,7 +143,7 @@ input[type="submit"] {
   display: inline-block;
 }
 
-input, textarea {
+input, textarea, select {
   background-color: transparent;
   outline: none;
   caret-color: $terminal-text;
@@ -144,31 +158,41 @@ input, textarea {
   }
 }
 
+select {
+  width: 100%;
+  -webkit-appearance: none;
+
+  &::after {
+    content: "V";
+  }
+}
+
 // Borders
 .border-top {
-  border-top: 1px dashed $terminal-text;
+  border-top: 2px solid $terminal-text;
 }
 
 .border-right {
-  border-right: 1px dashed $terminal-text;
+  border-right: 2px solid $terminal-text;
 }
 
 .border-bottom {
-  border-bottom: 1px dashed $terminal-text;
+  border-bottom: 2px solid $terminal-text;
 }
 
 .border-left {
-  border-left: 1px dashed $terminal-text;
+  border-left: 2px solid $terminal-text;
 }
 
 // Card
 .card {
-  border: dashed 1px $terminal-text;
+  border: solid 2px $terminal-text;
+  background-color: $terminal-bg-opaque;
   padding: 5px;
   margin-bottom: 5px;
 
   .card-title {
-    border-bottom: dashed 1px $terminal-text;
+    border-bottom: solid 2px $terminal-text;
     padding: 0 0 5px 15px;
   }
 
@@ -178,6 +202,41 @@ input, textarea {
 
   .card-footer {
     padding: 5px 0 0 0;
-    border-top: dashed 1px $terminal-text;
+    border-top: solid 2px $terminal-text;
   }
+}
+
+// Bulma Overrides
+label.label {
+  text-transform: uppercase;
+  color: $terminal-text;
+}
+
+.input, .select select, .textarea {
+  background-color: transparent;
+  outline: none;
+  caret-color: $terminal-text;
+  color: $terminal-text;
+  border: solid 1px $terminal-text-opaque;
+}
+
+.select:not(.is-multiple):not(.is-loading)::after {
+  border-color: $terminal-text;
+}
+
+.select select:focus, .textarea:focus, .input:focus, .select select.is-focused, .is-focused.textarea, .is-focused.input, .select select:active, .textarea:active, .input:active, .select select.is-active, .is-active.textarea, .is-active.input {
+  border-color: $terminal-text;
+}
+
+.select select:hover, .textarea:hover, .input:hover, .select select.is-hovered, .is-hovered.textarea, .is-hovered.input {
+  border-color: $terminal-text;
+}
+
+.select:not(.is-multiple):not(.is-loading):hover::after {
+  border-color: $terminal-text-light;
+}
+
+
+.radio:hover, .checkbox:hover {
+  color: $terminal-text-light;
 }

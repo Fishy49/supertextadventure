@@ -1,57 +1,100 @@
-<%= form_with(model: game) do |form| %>
-  <% if game.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(game.errors.count, "error") %> prohibited this game from being saved:</h2>
+<div class="columns mt-5">
+  <div class="column is-half is-offset-one-quarter">
+    <%= form_with(model: game) do |form| %>
+      <% if game.errors.any? %>
+        <div id="error_explanation" class="mb-5">
+          <h2><%= pluralize(game.errors.count, "error") %> prohibited this game from being saved:</h2>
 
-      <ul>
-        <% game.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+          <ul>
+            <% game.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
 
-  <div class="field">
-    <%= form.label :name %>
-    <%= form.text_field :name %>
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <%= form.label :name, class: "label" %>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <%= form.text_field :name, class: "input is-medium" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <%= form.label :description, class: "label" %>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <%= form.text_area :description, class: "textarea is-medium" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <%= form.label :game_type, class: "label" %>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <div class="select is-fullwidth is-medium">
+                <%= form.select :game_type, options_for_select([["Standard - Super Text Adventure Defaults", :standard]]) %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <%= form.label :max_players, class: "label" %>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <div class="select is-medium">
+                <%= form.select :max_players, options_for_select(1..5, @game.max_players) %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label">
+          <%= form.label :is_friends_only, class: "label" do %>
+            Friends Only
+          <% end %>
+        </div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control mt-3">
+              <label class="radio">
+                <%= form.radio_button :is_friends_only, true, checked: true %>
+                Yes
+              </label>
+              <label class="radio">
+                <%= form.radio_button :is_friends_only, false, checked: false %>
+                No
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions has-text-centered">
+        <%= form.submit "#{ @game.new_record? ? "Createth" : "Updateth" } Thine Game", class: "submit" %>
+      </div>
+
+    <% end %>
   </div>
-
-  <div class="field">
-    <%= form.label :game_type %>
-    <%= form.text_field :game_type %>
-  </div>
-
-  <div class="field">
-    <%= form.label :users_id %>
-    <%= form.text_field :users_id %>
-  </div>
-
-  <div class="field">
-    <%= form.label :status %>
-    <%= form.text_field :status %>
-  </div>
-
-  <div class="field">
-    <%= form.label :opened_at %>
-    <%= form.datetime_select :opened_at %>
-  </div>
-
-  <div class="field">
-    <%= form.label :closed_at %>
-    <%= form.datetime_select :closed_at %>
-  </div>
-
-  <div class="field">
-    <%= form.label :is_friends_only %>
-    <%= form.check_box :is_friends_only %>
-  </div>
-
-  <div class="field">
-    <%= form.label :max_players %>
-    <%= form.number_field :max_players %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit %>
-  </div>
-<% end %>
+</div>

@@ -1,0 +1,20 @@
+<div class="columns home">
+  <div class="column is-half is-offset-one-quarter">
+    
+    <h2 class="has-text-centered is-size-3">Welcome, Ye Adventurer!</h2>
+    <hr>
+    <p class="pb-5">In days of olde, one would play a text-based adventure against the wits of a game designer using the limitations of a text-parser. These games were often challenging, entertaining, and full hidden treasure. <span class="has-text-weight-bold is-underlined">Fun ensued</span>.</p>
+
+    <p class="pb-5">In days of olde and now, D&D is a great way to have adventures of the mind. The story is written at the will of players by the guidance of the dungeon master. <span class="has-text-weight-bold is-underlined">Fun ensues</span>.</p>
+
+    <p class="pb-5"><em><span class="has-text-weight-bold is-underlined">SUPER</span></em> <span class="has-text-weight-bold">Text Adventure</span> combines the free-form joy of a session of D&D, with the interface limitations of the old text-adventures. Join a game as an adventurer, or host a game to help guide the story...</p>
+
+    <p class="has-text-weight-bold has-text-centered is-size-4">
+      <% if logged_in? %>
+        <%= link_to "Type. Your. Adventure.", games_path, class: "no-decoration" %>
+      <% else %>
+        <%= link_to "Type. Your. Adventure.", root_path, class: "no-decoration" %>
+      <% end %>
+    </p>
+  </div>
+</div>

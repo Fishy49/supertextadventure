@@ -1,10 +1,10 @@
-<div class="card mx-auto">
+<div class="card mx-auto mb-5">
   <div class="card-title has-text-weight-bold"><%= game.name %></div>
   <div class="card-body">
     <%= game.description %>
     <hr>
     <p class="is-size-6">
-      Players: <%= game.active_players.count %> <span class="has-text-weight-bold">|</span> Status: <%= game.status.titleize %>
+      Players: <%= game.active_players&.count || 0 %> <span class="has-text-weight-bold">|</span> Status: <%= game.status&.titleize %>
     </p>
   </div>
   <div class="card-footer is-clearfix">
@@ -12,6 +12,6 @@
       Delete <span>X</span>
     <% end %>
 
-    <div class="button is-small mb-0 is-pulled-right">Enter Game</div>
+    <%= link_to "Enter Game", game_path(game), class: "button is-small mb-0 is-pulled-right" %>
   </div>
 </div>

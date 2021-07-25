@@ -1,0 +1,1454 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"is-siz",
+				"is-size-5"
+			],
+			[
+				"has-",
+				"has-text-weight-bold"
+			],
+			[
+				"termi",
+				"terminal-text"
+			],
+			[
+				"co",
+				"column"
+			],
+			[
+				"colu",
+				"columns"
+			],
+			[
+				"hast-",
+				"has-text-centered"
+			],
+			[
+				"uniq",
+				"unique"
+			],
+			[
+				"root_",
+				"root_path"
+			],
+			[
+				"root",
+				"root_path"
+			],
+			[
+				"termin",
+				"terminal-text"
+			],
+			[
+				"terminal",
+				"terminal-text"
+			],
+			[
+				"ter",
+				"terminal-text"
+			],
+			[
+				"foot",
+				"footer-controls"
+			],
+			[
+				"font-",
+				"font-family"
+			],
+			[
+				"filter",
+				"filter_form\t(manage.html.erb)"
+			],
+			[
+				"class",
+				"classList\tabc"
+			],
+			[
+				"locati",
+				"location_id\tabc"
+			],
+			[
+				"perf",
+				"perform_now\tabc"
+			],
+			[
+				"report",
+				"report_id\tabc"
+			],
+			[
+				"repo",
+				"report_id\tabc"
+			],
+			[
+				"rail_c",
+				"rail_car\tabc"
+			],
+			[
+				"cars",
+				"cars_file_imported_at\t(global_setting.rb)"
+			],
+			[
+				"filt",
+				"filter_date\tabc"
+			],
+			[
+				"rail_ca",
+				"rail_car_id\tabc"
+			],
+			[
+				"chec",
+				"checked\tabc"
+			],
+			[
+				"check",
+				"checkbox\t(index.html.erb)"
+			],
+			[
+				"is-s",
+				"is-success\t(_form.html.erb)"
+			],
+			[
+				"recon",
+				"reconciliation_summary\t(reconciliation.html.erb)"
+			],
+			[
+				"reconili",
+				"reconciliation\tabc"
+			],
+			[
+				"Reconcil",
+				"Reconciliation\tabc"
+			],
+			[
+				"home",
+				"home_tracks_for_select\t(track.rb)"
+			],
+			[
+				"col",
+				"columns\tabc"
+			],
+			[
+				"format",
+				"formatted_hash\tabc"
+			],
+			[
+				"road",
+				"road_name\t(generate_reconciliation_report_file_job.rb)"
+			],
+			[
+				"rep",
+				"report_id\tabc"
+			],
+			[
+				"reconc",
+				"reconcile\tabc"
+			],
+			[
+				"road_numb",
+				"road_number\t(rail_cars_controller.rb)"
+			],
+			[
+				"rail",
+				"rail_car_id\t(rail_cars_controller.rb)"
+			],
+			[
+				"rail_",
+				"rail_car\t(rail_cars_controller.rb)"
+			],
+			[
+				"rail_car_rea",
+				"rail_car_reads\t(routes.rb)"
+			],
+			[
+				"succ",
+				"success\t(reader_sessions_controller.rb)"
+			],
+			[
+				"quer",
+				"querySelectorAll\t(hamburger.js)"
+			],
+			[
+				"car",
+				"car_search#search\t(_search_modal.html.erb)"
+			],
+			[
+				"result",
+				"results_html\tabc"
+			],
+			[
+				"search",
+				"search_modal\tabc"
+			],
+			[
+				"cre",
+				"created_at\t(check_sessions_job.rb)"
+			],
+			[
+				"location_",
+				"location_id\t(rail_car.rb)"
+			],
+			[
+				"loca",
+				"location_attributes\tabc"
+			],
+			[
+				"xpa",
+				"xpath\tabc"
+			],
+			[
+				"edit",
+				"edit-reader\t(_reader_card.html.erb)"
+			],
+			[
+				"get_",
+				"get_car_file\t(dropbox_setting.rb)"
+			],
+			[
+				"xml",
+				"xml_doc\tabc"
+			],
+			[
+				"exis",
+				"existing_car\tabc"
+			],
+			[
+				"exist",
+				"existing_cars\tabc"
+			],
+			[
+				"create",
+				"created_at\tabc"
+			],
+			[
+				"navb",
+				"navbar-item\tabc"
+			],
+			[
+				"backg",
+				"background-color\tabc"
+			],
+			[
+				"curr",
+				"currentTarget\tabc"
+			],
+			[
+				"set",
+				"setTimeout\t(light.js)"
+			],
+			[
+				"clas",
+				"classList\t(light.js)"
+			],
+			[
+				"gloab",
+				"global_settings\tabc"
+			],
+			[
+				"globa",
+				"global_settings\tabc"
+			],
+			[
+				"times",
+				"timestamps\tabc"
+			],
+			[
+				"read_w",
+				"read_wait_time_in_seconds\tabc"
+			],
+			[
+				"latest_read",
+				"latest_read_at\tabc"
+			],
+			[
+				"curre",
+				"current_time\tabc"
+			],
+			[
+				"global",
+				"global_setting_params\tabc"
+			],
+			[
+				"csv",
+				"csv_data\tabc"
+			],
+			[
+				"after_cre",
+				"after_create_commit\t(rail_car_read.rb)"
+			],
+			[
+				"raod_",
+				"road_name\t(_rail_car_read.html.erb)"
+			],
+			[
+				"n",
+				"nullify\tabc"
+			],
+			[
+				"get",
+				"getElementById\t(hamburger.js)"
+			],
+			[
+				"tim",
+				"timestamps\tabc"
+			],
+			[
+				"activ",
+				"active_session\t(rail_car_reads_controller.rb)"
+			],
+			[
+				"read",
+				"readers_id\tabc"
+			],
+			[
+				"token",
+				"token_params\tabc"
+			],
+			[
+				"reader",
+				"reader_session\tabc"
+			],
+			[
+				"expir",
+				"expires_at\t(20210219052143_create_dropbox_settings.rb)"
+			],
+			[
+				"connec",
+				"connect_dropbox_path\t(_auth_form.html.erb)"
+			],
+			[
+				"drop",
+				"dropbox_settings\tabc"
+			],
+			[
+				"aut",
+				"authorize_url\t(dropbox_setting.rb)"
+			],
+			[
+				"acce",
+				"access_token\tabc"
+			],
+			[
+				"exp",
+				"expires_at\tabc"
+			],
+			[
+				"ref",
+				"refresh_token\tabc"
+			],
+			[
+				"toke",
+				"token\tabc"
+			],
+			[
+				"Drop",
+				"DropboxSetting\tabc"
+			],
+			[
+				"auth",
+				"authorize"
+			],
+			[
+				"app_",
+				"app_secret\tabc"
+			],
+			[
+				"app",
+				"app_id\t(_form.html.erb)"
+			],
+			[
+				"ex",
+				"expires_at\tabc"
+			],
+			[
+				"expre",
+				"expires_at\t(20210219052143_create_dropbox_settings.rb)"
+			],
+			[
+				"au",
+				"authorize_url\tabc"
+			],
+			[
+				"refre",
+				"refreshed_at\tabc"
+			],
+			[
+				"glob",
+				"global_settings\tabc"
+			],
+			[
+				"men",
+				"menu_title\tabc"
+			],
+			[
+				"admn",
+				"admin_controllers\tabc"
+			],
+			[
+				"tab",
+				"tab-control\t(index.html.erb)"
+			],
+			[
+				"aci",
+				"active\t(reader_session.rb)"
+			],
+			[
+				"Dro",
+				"Dropbox\t(index.html.erb)"
+			],
+			[
+				"Globa",
+				"Global\t(index.html.erb)"
+			],
+			[
+				"glo",
+				"global_settings\t(routes.rb)"
+			],
+			[
+				"confi",
+				"config_var\tabc"
+			],
+			[
+				"has-ba",
+				"has-background-white\t(manage.html.erb)"
+			],
+			[
+				"de",
+				"destination\tabc"
+			],
+			[
+				"des",
+				"destination\t(manage.html.erb)"
+			],
+			[
+				"cont",
+				"controller_name\tabc"
+			],
+			[
+				"bac",
+				"background-color\t(flair.scss)"
+			],
+			[
+				"inlin",
+				"inline-block\t(flair.scss)"
+			],
+			[
+				"margin",
+				"margin-bottom\tproperty"
+			],
+			[
+				"has-te",
+				"has-text-weight-bold\t(_reader_card.html.erb)"
+			],
+			[
+				"table-h",
+				"table-header-cell\t(manage.html.erb)"
+			],
+			[
+				"table-c",
+				"table-column-group\tdisplay"
+			],
+			[
+				"the",
+				"thead\t(manage.html.erb)"
+			],
+			[
+				"tabl",
+				"table-cell\t(manage.html.erb)"
+			],
+			[
+				"def",
+				"default-only\tabc"
+			],
+			[
+				"updat",
+				"updated_at\t(schema.rb)"
+			],
+			[
+				"created",
+				"created_at\t(_reader_card.html.erb)"
+			],
+			[
+				"road_",
+				"road_name\t(cars_dump.sql)"
+			],
+			[
+				"find",
+				"find_by\tabc"
+			],
+			[
+				"acti",
+				"active_session\t(_reader_card.html.erb)"
+			],
+			[
+				"ac",
+				"active\tabc"
+			],
+			[
+				"last",
+				"last_heartbeat_at\tabc"
+			],
+			[
+				"reader_sessi",
+				"reader_sessions\t(reader_sessions_controller.rb)"
+			],
+			[
+				"th",
+				"thead\tTag"
+			],
+			[
+				"rea",
+				"reader_sessions\t(reader_sessions_controller.rb)"
+			],
+			[
+				"has-back",
+				"has-background-white-ter\t(application.html.erb)"
+			],
+			[
+				"manag",
+				"manage_reader_session\t(routes.rb)"
+			],
+			[
+				"start",
+				"start_reader_session_path\t(_reader_card.html.erb)"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/rick/code/yomomma/app.rb",
+			"settings":
+			{
+				"buffer_size": 7840,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			},
+			"undo_stack":
+			[
+				[
+					12,
+					1,
+					"insert",
+					{
+						"characters": "m"
+					},
+					"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"
+				],
+				[
+					17,
+					1,
+					"insert",
+					{
+						"characters": "momaa"
+					},
+					"BgAAAH0DAAAAAAAAfgMAAAAAAAAAAAAAfgMAAAAAAAB+AwAAAAAAAAcAAAB1ciBtdW1zfgMAAAAAAAB/AwAAAAAAAAAAAAB/AwAAAAAAAIADAAAAAAAAAAAAAIADAAAAAAAAgQMAAAAAAAAAAAAAgQMAAAAAAACCAwAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAB9AwAAAAAAAIQDAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					19,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAAH0DAAAAAAAAfgMAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAB9AwAAAAAAAH0DAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					21,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIEDAAAAAAAAgQMAAAAAAAABAAAAYQ",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACCAwAAAAAAAIIDAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					22,
+					1,
+					"insert",
+					{
+						"characters": "m"
+					},
+					"AQAAAIEDAAAAAAAAggMAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACBAwAAAAAAAIEDAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					25,
+					1,
+					"left_delete",
+					null,
+					"AQAAAH8DAAAAAAAAfwMAAAAAAAABAAAAbw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACAAwAAAAAAAIADAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					26,
+					1,
+					"insert",
+					{
+						"characters": "a"
+					},
+					"AQAAAH8DAAAAAAAAgAMAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAB/AwAAAAAAAH8DAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					31,
+					1,
+					"insert",
+					{
+						"characters": "mamma"
+					},
+					"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"
+				],
+				[
+					36,
+					1,
+					"left_delete",
+					null,
+					"AQAAAKUKAAAAAAAApQoAAAAAAAABAAAAJw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACmCgAAAAAAAKYKAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					41,
+					1,
+					"left_delete",
+					null,
+					"AQAAAKsKAAAAAAAAqwoAAAAAAAABAAAAcw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACsCgAAAAAAAKwKAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					44,
+					2,
+					"left_delete",
+					null,
+					"AgAAAAcLAAAAAAAABwsAAAAAAAABAAAAcwYLAAAAAAAABgsAAAAAAAABAAAAJw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAICwAAAAAAAAgLAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					47,
+					2,
+					"left_delete",
+					null,
+					"AgAAAO8HAAAAAAAA7wcAAAAAAAABAAAAc+4HAAAAAAAA7gcAAAAAAAABAAAAJw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAADwBwAAAAAAAPAHAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					50,
+					2,
+					"left_delete",
+					null,
+					"AgAAAGoVAAAAAAAAahUAAAAAAAABAAAAcmkVAAAAAAAAaRUAAAAAAAABAAAAdQ",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAABrFQAAAAAAAGsVAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					53,
+					1,
+					"left_delete",
+					null,
+					"AQAAALoTAAAAAAAAuhMAAAAAAAABAAAAcw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAC7EwAAAAAAALsTAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					58,
+					2,
+					"left_delete",
+					null,
+					"AgAAAKMXAAAAAAAAoxcAAAAAAAABAAAAcqIXAAAAAAAAohcAAAAAAAABAAAAdQ",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACkFwAAAAAAAKQXAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					63,
+					2,
+					"left_delete",
+					null,
+					"BAAAACwcAAAAAAAALBwAAAAAAAABAAAAc9kbAAAAAAAA2RsAAAAAAAABAAAAcyocAAAAAAAAKhwAAAAAAAABAAAAJ9gbAAAAAAAA2BsAAAAAAAABAAAAJw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAIAAADaGwAAAAAAANobAAAAAAAAAAAAAAAA8L8tHAAAAAAAAC0cAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					68,
+					1,
+					"left_delete",
+					null,
+					"AQAAAGQcAAAAAAAAZBwAAAAAAAABAAAAcw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAABlHAAAAAAAAGUcAAAAAAAAAAAAAAAA8L8"
+				]
+			]
+		},
+		{
+			"file": "/Users/rick/code/yomomma/.ruby-version",
+			"settings":
+			{
+				"buffer_size": 6,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			},
+			"undo_stack":
+			[
+				[
+					5,
+					1,
+					"left_delete",
+					null,
+					"AQAAAAQAAAAAAAAABAAAAAAAAAABAAAANg",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAFAAAAAAAAAAUAAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					6,
+					1,
+					"insert",
+					{
+						"characters": "7"
+					},
+					"AQAAAAQAAAAAAAAABQAAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					8,
+					1,
+					"left_delete",
+					null,
+					"AQAAAAQAAAAAAAAABAAAAAAAAAABAAAANw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAFAAAAAAAAAAUAAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					9,
+					1,
+					"insert",
+					{
+						"characters": "8"
+					},
+					"AQAAAAQAAAAAAAAABQAAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAA8L8"
+				]
+			]
+		},
+		{
+			"file": "/Users/rick/code/yomomma/Gemfile",
+			"settings":
+			{
+				"buffer_size": 156,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			},
+			"undo_stack":
+			[
+				[
+					5,
+					1,
+					"left_delete",
+					null,
+					"AQAAACgAAAAAAAAAKAAAAAAAAAABAAAANg",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAApAAAAAAAAACkAAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					6,
+					1,
+					"insert",
+					{
+						"characters": "7"
+					},
+					"AQAAACgAAAAAAAAAKQAAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAoAAAAAAAAACgAAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					10,
+					1,
+					"left_delete",
+					null,
+					"AQAAACgAAAAAAAAAKAAAAAAAAAABAAAANw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAApAAAAAAAAACkAAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					11,
+					1,
+					"insert",
+					{
+						"characters": "8"
+					},
+					"AQAAACgAAAAAAAAAKQAAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAoAAAAAAAAACgAAAAAAAAAAAAAAAAA8L8"
+				]
+			]
+		},
+		{
+			"file": "/Users/rick/code/yomomma/config.ru",
+			"settings":
+			{
+				"buffer_size": 144,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 357.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Enable Package"
+			],
+			[
+				"SFT",
+				"SFTP: Cancel Upload"
+			],
+			[
+				"lin",
+				"SublimeLinter: Next Error"
+			],
+			[
+				"Glu",
+				"Glue - Launch"
+			],
+			[
+				"Snippet: h",
+				"Snippet: html"
+			],
+			[
+				"show",
+				"SFTP: Show Panel"
+			],
+			[
+				"Snippet: ",
+				"Snippet: html"
+			],
+			[
+				"packa",
+				"Package Control: Install Package"
+			],
+			[
+				"",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 494.0
+	},
+	"console":
+	{
+		"height": 174.0,
+		"history":
+		[
+			"sublime.log_indexing(True)",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/rick/code/yomomma"
+	],
+	"file_history":
+	[
+		"/Users/rick/code/supertextadventure/app/views/games/_form.html.erb",
+		"/Users/rick/code/supertextadventure/app/views/games/index.html.erb",
+		"/Users/rick/code/supertextadventure/app/views/games/_game_card.html.erb",
+		"/Users/rick/code/supertextadventure/app/assets/stylesheets/vendor_customizations.scss",
+		"/Users/rick/code/supertextadventure/app/assets/stylesheets/terminal.scss",
+		"/Users/rick/code/supertextadventure/app/views/games/new.html.erb",
+		"/Users/rick/code/supertextadventure/app/controllers/games_controller.rb",
+		"/Users/rick/code/supertextadventure/app/views/games/show.html.erb",
+		"/Users/rick/code/supertextadventure/app/views/about/index.html.erb",
+		"/Users/rick/code/supertextadventure/app/models/user.rb",
+		"/Users/rick/code/supertextadventure/app/controllers/about_controller.rb",
+		"/Users/rick/code/supertextadventure/config/routes.rb",
+		"/Users/rick/code/supertextadventure/app/javascript/src/hotkeys.js",
+		"/Users/rick/code/supertextadventure/app/views/layouts/_footer.html.erb",
+		"/Users/rick/code/supertextadventure/app/views/layouts/application.html.erb",
+		"/Users/rick/code/supertextadventure/db/migrate/20210717033938_create_game_users.rb",
+		"/Users/rick/code/supertextadventure/db/migrate/20210711050504_create_games.rb",
+		"/Users/rick/code/supertextadventure/app/models/game_user.rb",
+		"/Users/rick/code/supertextadventure/app/models/game.rb",
+		"/Users/rick/code/supertextadventure/app/assets/stylesheets/application.scss",
+		"/Users/rick/code/supertextadventure/app/views/home/index.html.erb",
+		"/Users/rick/code/supertextadventure/app/views/layouts/_header.html.erb",
+		"/Users/rick/code/supertextadventure/test/controllers/games_controller_test.rb",
+		"/Users/rick/code/supertextadventure/.rubocop.yml",
+		"/Users/rick/code/supertextadventure/app/views/users/new.html.erb",
+		"/Users/rick/code/supertextadventure/app/controllers/users_controller.rb",
+		"/Users/rick/code/supertextadventure/db/migrate/20210703010456_create_users.rb",
+		"/Users/rick/code/supertextadventure/app/views/users/_form.html.erb",
+		"/Users/rick/code/supertextadventure/app/assets/stylesheets/home.scss",
+		"/Users/rick/code/supertextadventure/app/views/home/_knight.html.erb",
+		"/Users/rick/code/supertextadventure/app/controllers/sessions_controller.rb",
+		"/Users/rick/code/supertextadventure/app/controllers/application_controller.rb",
+		"/Users/rick/code/supertextadventure/app/javascript/packs/application.js",
+		"/Users/rick/code/supertextadventure/app/views/sessions/_form.html.erb",
+		"/Users/rick/code/supertextadventure/app/views/users/show.html.erb",
+		"/Users/rick/code/supertextadventure/app/views/sessions/new.html.erb",
+		"/Users/rick/code/supertextadventure/Gemfile",
+		"/Users/rick/code/supertextadventure/app/assets/stylesheets/scaffolds.scss",
+		"/Users/rick/code/supertextadventure/node_modules/bulma/sass/components/navbar.sass",
+		"/Users/rick/code/supertextadventure/README.md",
+		"/Users/rick/code/supertextadventure/app/views/users/_user.json.jbuilder",
+		"/Users/rick/code/supertextadventure/app/views/users/index.html.erb",
+		"/Users/rick/code/supertextadventure/app/helpers/users_helper.rb",
+		"/Users/rick/code/supertextadventure/config/environments/development.rb",
+		"/Users/rick/code/supertextadventure/app/controllers/home_controller.rb",
+		"/Users/rick/code/supertextadventure/app/assets/stylesheets/fluidable.scss",
+		"/Users/rick/code/supertextadventure/.ruby-version",
+		"/Users/rick/code/supertextadventure/config/environments/production.rb",
+		"/Users/rick/code/supertextadventure/config/initializers/clearance.rb",
+		"/Users/rick/code/supertextadventure/db/migrate/20210513070122_create_users.rb",
+		"/Users/rick/code/supertextadventure/db/migrate/20210513064259_devise_create_users.rb",
+		"/Users/rick/code/supertextadventure/app/views/devise/sessions/new.html.erb",
+		"/Users/rick/code/supertextadventure/app/views/devise/registrations/new.html.erb",
+		"/Users/rick/code/supertextadventure/app/views/devise/registrations/edit.html.erb",
+		"/Users/rick/code/supertextadventure/config/initializers/devise.rb",
+		"/Users/rick/code/mr-rfid/app/controllers/readers_controller.rb",
+		"/Users/rick/code/mr-rfid/app/controllers/rail_car_reads_controller.rb",
+		"/Users/rick/code/mr-rfid/app/controllers/rail_cars_controller.rb",
+		"/Users/rick/code/mr-rfid/config/routes.rb",
+		"/Users/rick/code/mr-rfid/app/models/rail_car_read.rb",
+		"/Users/rick/code/mr-rfid/app/models/reader.rb",
+		"/Users/rick/code/mr-rfid/app/controllers/dashboard_controller.rb",
+		"/Users/rick/Downloads/live_rfid_backup/home_tracks.json",
+		"/Users/rick/code/mr-rfid/app/views/readers/_reader_card.html.erb",
+		"/Users/rick/code/mr-rfid/app/models/reader_session.rb",
+		"/Users/rick/code/mr-rfid/app/views/dashboard/index.html.erb",
+		"/Users/rick/.local/share/fish/fish_history",
+		"/Users/rick/code/mr-rfid/app/jobs/car_file_import_job.rb",
+		"/Users/rick/code/mr-rfid/app/javascript/src/light.js",
+		"/Users/rick/code/mr-rfid/.env",
+		"/Users/rick/code/mr-rfid/README.md",
+		"/Users/rick/code/mr-rfid/raspberry-pi-setup.sh",
+		"/Users/rick/code/mr-rfid/app/views/global_settings/import_car_file.js.erb",
+		"/Users/rick/code/mr-rfid/app/views/layouts/_header.html.erb",
+		"/Users/rick/code/mr-rfid/app/controllers/global_settings_controller.rb",
+		"/Users/rick/code/mr-rfid/app/views/global_settings/import_location_file.js.erb",
+		"/Users/rick/code/mr-rfid/clock.rb",
+		"/Users/rick/history_for_rfid_app.txt",
+		"/Users/rick/code/mr-rfid/config/database.yml",
+		"/Users/rick/code/mr-rfid/config/environments/production.rb",
+		"/Users/rick/code/mr-rfid/default_nginx_config.conf",
+		"/Users/rick/code/mr-rfid/.env.example",
+		"/Users/rick/code/mr-rfid/app/views/global_settings/export_car_file.js.erb",
+		"/Users/rick/code/mr-rfid/config/environments/development.rb",
+		"/Users/rick/code/mr-rfid/app/views/dropbox_settings/_form.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/reports/_report_list.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/tracks/index.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/tracks/_track_list.html.erb",
+		"/Users/rick/code/mr-rfid/app/assets/javascripts/controllers/track_filter_controller.js",
+		"/Users/rick/code/mr-rfid/app/views/tracks/filter.js.erb",
+		"/Users/rick/code/mr-rfid/app/assets/javascripts/controllers/tracks_controller.js",
+		"/Users/rick/code/mr-rfid/app/controllers/tracks_controller.rb",
+		"/Users/rick/code/mr-rfid/app/views/rail_cars/index.html.erb",
+		"/Users/rick/code/mr-rfid/app/jobs/car_file_export_job.rb",
+		"/Users/rick/code/mr-rfid/app/assets/javascripts/controllers/car_search_controller.js",
+		"/Users/rick/code/mr-rfid/app/views/rail_cars/_search_modal.html.erb",
+		"/Users/rick/code/mr-rfid/config/initializers/sidekiq.rb",
+		"/Users/rick/code/mr-rfid/app/jobs/location_file_import_job.rb",
+		"/Users/rick/code/mr-rfid/app/jobs/generate_report_file_job.rb",
+		"/Users/rick/code/mr-rfid/app/jobs/generate_reconciliation_report_file_job.rb",
+		"/Users/rick/code/mr-rfid/app/jobs/check_sessions_job.rb",
+		"/Users/rick/code/mr-rfid/app/views/shared/_job_date.html.erb",
+		"/Users/rick/code/mr-rfid/config/application.rb",
+		"/Users/rick/code/mr-rfid/app/jobs/car_file_auto_import_check_job.rb",
+		"/Users/rick/code/mr-rfid/app/models/report.rb",
+		"/Users/rick/code/mr-rfid/app/controllers/reports_controller.rb",
+		"/Users/rick/code/mr-rfid/app/views/reports/index.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/shared/_last_imported.html.erb",
+		"/Users/rick/code/mr-rfid/app/models/global_setting.rb",
+		"/Users/rick/code/mr-rfid/app/assets/javascripts/controllers/report_filter_controller.js",
+		"/Users/rick/code/mr-rfid/app/views/reconciliations/_reconciliation.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/rail_cars/assign.js.erb",
+		"/Users/rick/code/mr-rfid/app/views/rail_car_reads/_rail_car_read.html.erb",
+		"/Users/rick/code/mr-rfid/app/models/reconciliation.rb",
+		"/Users/rick/code/mr-rfid/db/migrate/20210503064317_create_reconciliations.rb",
+		"/Users/rick/code/mr-rfid/app/views/rail_cars/filter.js.erb",
+		"/Users/rick/code/mr-rfid/app/views/reports/filter.js.erb",
+		"/Users/rick/code/mr-rfid/app/assets/javascripts/controllers/rail_car_filter_controller.js",
+		"/Users/rick/code/mr-rfid/.rubocop.yml",
+		"/Users/rick/code/mr-rfid/app/views/locations/index.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/locations/_form.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/readers/_form.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/readers/edit.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/rail_cars/edit.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/rail_cars/index.js.erb",
+		"/Users/rick/code/mr-rfid/app/views/rail_cars/_rail_car_list.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/rail_cars/_form.html.erb",
+		"/Users/rick/code/mr-rfid/app/views/tracks/home_track_toggle.js.erb"
+	],
+	"find":
+	{
+		"height": 33.0
+	},
+	"find_in_files":
+	{
+		"height": 132.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"momma",
+			"mama",
+			"Yo mamma"
+		],
+		"highlight": false,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/Users/rick/code/supertextadventure/app/assets/stylesheets",
+							"incomplete_sync": null,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/Users/rick/code/yomomma/app.rb",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7840,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7268,
+								7268
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Ruby/Ruby.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1740.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/Users/rick/code/yomomma/.ruby-version",
+					"selected": true,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5,
+								5
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/Users/rick/code/yomomma/Gemfile",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 156,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								41,
+								41
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Ruby/Ruby.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/Users/rick/code/yomomma/config.ru",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 144,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Ruby/Ruby.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"stack_multiselect": false,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 33.0
+	},
+	"input":
+	{
+		"height": 45.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.SFTP":
+	{
+		"height": 150.0
+	},
+	"output.SublimeLinter":
+	{
+		"height": 0.0
+	},
+	"output.exec":
+	{
+		"height": 150.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.sftp":
+	{
+		"height": 181.0
+	},
+	"pinned_build_system": "",
+	"project": "yomomma.sublime-project",
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"games_c",
+				"app/controllers/games_controller.rb"
+			],
+			[
+				"user.",
+				"app/models/user.rb"
+			],
+			[
+				"rout",
+				"config/routes.rb"
+			],
+			[
+				"hotke",
+				"app/javascript/src/hotkeys.js"
+			],
+			[
+				"game.",
+				"app/models/game.rb"
+			],
+			[
+				"game_c",
+				"test/controllers/games_controller_test.rb"
+			],
+			[
+				"routes",
+				"config/routes.rb"
+			],
+			[
+				"rou",
+				"config/routes.rb"
+			],
+			[
+				"user",
+				"app/models/user.rb"
+			],
+			[
+				"route",
+				"config/routes.rb"
+			],
+			[
+				"reade",
+				"app/models/reader.rb"
+			],
+			[
+				"reader_card",
+				"app/views/readers/_reader_card.html.erb"
+			],
+			[
+				"import_ca",
+				"app/views/global_settings/import_car_file.js.erb"
+			],
+			[
+				"rail_car_read",
+				"app/controllers/rail_car_reads_controller.rb"
+			],
+			[
+				"reports_c",
+				"app/controllers/reports_controller.rb"
+			],
+			[
+				"repo",
+				"app/models/report.rb"
+			],
+			[
+				"global_se",
+				"app/models/global_setting.rb"
+			],
+			[
+				"track",
+				"app/models/track.rb"
+			],
+			[
+				"rail_r",
+				"app/models/rail_car_read.rb"
+			],
+			[
+				"rail_",
+				"app/models/rail_car.rb"
+			],
+			[
+				"report",
+				"app/models/report.rb"
+			],
+			[
+				"read",
+				"app/models/reader.rb"
+			],
+			[
+				"drop",
+				"app/models/dropbox_setting.rb"
+			],
+			[
+				"global_sett",
+				"app/models/global_setting.rb"
+			],
+			[
+				"dropbx",
+				"app/models/dropbox_setting.rb"
+			],
+			[
+				"rail_ca",
+				"app/models/rail_car.rb"
+			],
+			[
+				"rail_car_re",
+				"app/models/rail_car_read.rb"
+			],
+			[
+				"reader_se",
+				"app/models/reader_session.rb"
+			],
+			[
+				"reader",
+				"app/models/reader.rb"
+			],
+			[
+				"reader_",
+				"app/models/reader_session.rb"
+			],
+			[
+				"pagy",
+				"config/initializers/pagy.rb"
+			],
+			[
+				"rail_car_reads_c",
+				"app/controllers/rail_car_reads_controller.rb"
+			],
+			[
+				"reader.r",
+				"app/models/reader.rb"
+			],
+			[
+				"dropb",
+				"app/models/dropbox_setting.rb"
+			],
+			[
+				"produc",
+				"config/environments/production.rb"
+			],
+			[
+				"sche",
+				"db/schema.rb"
+			],
+			[
+				"facilities_report__station_contacts",
+				"cctm-rc\\applications\\station_contacts\\facilities_report__station_contacts.sql"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"~/code/supertextadventure.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 281.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

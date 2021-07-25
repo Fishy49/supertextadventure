@@ -5,6 +5,7 @@ class CreateGameUsers < ActiveRecord::Migration[6.1]
     create_table :game_users do |t|
       t.references :game
       t.references :user
+      t.references :character
       t.string :status
       t.datetime :invited_at
       t.datetime :joined_at

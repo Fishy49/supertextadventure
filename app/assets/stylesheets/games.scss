@@ -25,4 +25,8 @@ $terminal-text-opaque: rgba(143, 232, 107, 0.3);
   border-left: 2px dashed $terminal-text-opaque;
   height: calc(100vh - 140px);
   padding: 5px 0 0 10px;
+
+  h2 {
+    border-bottom: 2px dashed $terminal-text-opaque;
+  }
 }

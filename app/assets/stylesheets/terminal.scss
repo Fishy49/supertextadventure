@@ -85,6 +85,20 @@ footer {
   }
 }
 
+// Table
+table {
+  width: 100%;
+
+  th {
+    color: $terminal-text;
+    font-weight: bold;
+  }
+
+  th, td {
+    border: solid 2px $terminal-text;
+  }
+}
+
 // Buttons
 a.button {
   text-decoration: none;

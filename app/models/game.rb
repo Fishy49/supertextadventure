@@ -12,4 +12,12 @@ class Game < ApplicationRecord
            proc { where("game_users.status = ?", :joined) },
            through: :game_users,
            source: :user
+
+  before_create :set_default_status
+
+  private
+
+    def set_default_status
+      self.status = :new if self.status.nil?
+    end
 end

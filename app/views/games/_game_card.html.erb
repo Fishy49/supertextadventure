@@ -3,7 +3,7 @@
   <div class="card-body">
     <%= game.description %>
     <hr>
-    <p class="is-size-6">
+    <p class="is-size-6 is-uppercase">
       Players: <%= game.active_players&.count || 0 %> <span class="has-text-weight-bold">|</span> Status: <%= game.status&.titleize %>
     </p>
   </div>

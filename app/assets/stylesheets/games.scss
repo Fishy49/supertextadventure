@@ -1,3 +1,28 @@
-// Place all the styles related to the Games controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: https://sass-lang.com/
+$terminal-bg: #282823;
+$terminal-bg-opaque: rgba(84, 84, 84, 0.3);
+$terminal-text: #8fe86b;
+$terminal-text-light: #bafb9f;
+$terminal-text-opaque: rgba(143, 232, 107, 0.3);
+
+#game-layout {
+  height: calc(100vh - 120px);
+  border: 2px dashed $terminal-text-opaque;
+}
+
+#game-messages-container {
+  height: calc(70vh - 70px);
+  overflow-y: scroll;
+  padding-left: 10px;
+}
+
+#message-form-container {
+  border-top: 2px dashed $terminal-text-opaque;
+  height: calc(30vh - 70px);
+  padding: 5px 0 0 10px;
+}
+
+#sidebar-container {
+  border-left: 2px dashed $terminal-text-opaque;
+  height: calc(100vh - 140px);
+  padding: 5px 0 0 10px;
+}

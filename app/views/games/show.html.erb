@@ -1,44 +1,18 @@
-<p id="notice"><%= notice %></p>
+<div id="game-layout">
+  <div class="columns is-gapless">
+    <div class="column is-two-thirds">
+      <div id="game-messages-container">
+        <h2>Messages</h2>
+      </div>
+      <div id="message-form-container">
+        <h2>Message Form</h2>
+      </div>
+    </div>
+    <div class="column is-one-third">
+      <div id="sidebar-container">
+        <h2>Sidebar</h2>
+      </div>
+    </div>
 
-<p>
-  <strong>Name:</strong>
-  <%= @game.name %>
-</p>
-
-<p>
-  <strong>Game type:</strong>
-  <%= @game.game_type %>
-</p>
-
-<p>
-  <strong>Users:</strong>
-  <%= @game.user_id %>
-</p>
-
-<p>
-  <strong>Status:</strong>
-  <%= @game.status %>
-</p>
-
-<p>
-  <strong>Opened at:</strong>
-  <%= @game.opened_at %>
-</p>
-
-<p>
-  <strong>Closed at:</strong>
-  <%= @game.closed_at %>
-</p>
-
-<p>
-  <strong>Is friends only:</strong>
-  <%= @game.is_friends_only %>
-</p>
-
-<p>
-  <strong>Max players:</strong>
-  <%= @game.max_players %>
-</p>
-
-<%= link_to 'Edit', edit_game_path(@game) %> |
-<%= link_to 'Back', games_path %>
+  </div>
+</div>

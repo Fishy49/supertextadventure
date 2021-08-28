@@ -12,6 +12,9 @@ function hotKeyTrigger(e) {
       case 'g':
         document.location.href = "/games"
         break;
+      case 'c':
+        document.location.href = "/characters"
+        break;
       case 'a':
         document.location.href = "/about"
         break;

@@ -10,14 +10,14 @@ $terminal-text-opaque: rgba(143, 232, 107, 0.3);
 }
 
 #game-messages-container {
-  height: calc(70vh - 70px);
+  height: calc(85vh - 70px);
   overflow-y: scroll;
   padding-left: 10px;
 }
 
 #message-form-container {
   border-top: 2px dashed $terminal-text-opaque;
-  height: calc(30vh - 70px);
+  height: calc(15vh - 70px);
   padding: 5px 0 0 10px;
 }
 

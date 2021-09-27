@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class StandardSheetItemTest < ActiveSupport::TestCase
+class GameMessageTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

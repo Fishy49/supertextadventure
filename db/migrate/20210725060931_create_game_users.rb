@@ -15,7 +15,7 @@ class CreateGameUsers < ActiveRecord::Migration[6.1]
 
       t.timestamps
 
-      t.index [:game_id, :user_id], unique: true
+      t.index %i[game_id user_id], unique: true
     end
   end
 end

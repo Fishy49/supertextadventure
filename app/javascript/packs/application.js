@@ -7,6 +7,8 @@ import Rails from "@rails/ujs"
 import "@hotwired/turbo-rails"
 import * as ActiveStorage from "@rails/activestorage"
 import "channels"
+import "trix"
+import "@rails/actiontext"
 
 import "@fontsource/dotgothic16"; // Defaults to weight 400.
 
@@ -17,3 +19,6 @@ import "controllers"
 
 const files = require.context('../src', true, /\.js$/);
 files.keys().forEach(files);
+
+require("trix")
+require("@rails/actiontext")

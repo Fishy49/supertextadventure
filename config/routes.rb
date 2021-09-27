@@ -14,5 +14,7 @@ Rails.application.routes.draw do
   get "logout", to: "sessions#destroy", as: :logout
 
   resources :friend_requests
-  resources :games
+  resources :games do
+    resources :game_messages
+  end
 end

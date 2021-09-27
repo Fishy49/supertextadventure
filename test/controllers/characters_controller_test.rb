@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class CharactersControllerTest < ActionDispatch::IntegrationTest
@@ -16,8 +18,11 @@ class CharactersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create character" do
-    assert_difference('Character.count') do
-      post characters_url, params: { character: { backstory: @character.backstory, eye_color: @character.eye_color, hair_color: @character.hair_color, height: @character.height, name: @character.name, race: @character.race, user_id: @character.user_id } }
+    assert_difference("Character.count") do
+      post characters_url,
+           params: { character: { backstory: @character.backstory, eye_color: @character.eye_color,
+                                  hair_color: @character.hair_color, height: @character.height,
+                                  name: @character.name, race: @character.race, user_id: @character.user_id } }
     end
 
     assert_redirected_to character_url(Character.last)
@@ -34,12 +39,15 @@ class CharactersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update character" do
-    patch character_url(@character), params: { character: { backstory: @character.backstory, eye_color: @character.eye_color, hair_color: @character.hair_color, height: @character.height, name: @character.name, race: @character.race, user_id: @character.user_id } }
+    patch character_url(@character),
+          params: { character: { backstory: @character.backstory, eye_color: @character.eye_color,
+                                 hair_color: @character.hair_color, height: @character.height,
+                                 name: @character.name, race: @character.race, user_id: @character.user_id } }
     assert_redirected_to character_url(@character)
   end
 
   test "should destroy character" do
-    assert_difference('Character.count', -1) do
+    assert_difference("Character.count", -1) do
       delete character_url(@character)
     end
 

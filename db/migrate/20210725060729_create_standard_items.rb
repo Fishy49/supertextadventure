@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateStandardItems < ActiveRecord::Migration[6.1]
   def change
     create_table :standard_items do |t|

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class GameMessagesController < ApplicationController
-  before_action :set_game, only: %i[show new edit update destroy]
+  before_action :set_game, except: %i[index destroy]
 
   # GET /games or /games.json
   def index; end
@@ -19,15 +19,11 @@ class GameMessagesController < ApplicationController
 
   # POST /games or /games.json
   def create
-    @game = GameMessage.new(game_params)
-    @game.user = current_user
+    @game.game_messages << GameMessage.new(game_params)
 
     respond_to do |format|
-      if @game.save
-        format.html { redirect_to @game, notice: "Game was successfully created." }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-      end
+      format.turbo_stream
+      format.html { redirect_to messages_url }
     end
   end
 

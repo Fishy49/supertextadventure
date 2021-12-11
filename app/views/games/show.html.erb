@@ -2,10 +2,18 @@
   <div class="columns is-gapless">
     <div class="column is-two-thirds">
       <div id="game-messages-container">
-        <h2>Messages</h2>
+        <%= turbo_stream_from @game %>
+        <div id="game_messages">
+          <%= render partial: "/game_messages/game_message", collection: @game.game_messages.order(:created_at).last(10) %>
+        </div>
       </div>
       <div id="message-form-container">
-        <h2>Message Form</h2>
+        <%= turbo_frame_tag "new_game_message", target: "_top" do %>
+          <%= form_with model: [@game, @game.game_messages.new(user_id: current_user.id)], data: { controller: "reset-form submit-form", action: "turbo:before-fetch-response->reset-form#reset", "submit-form-target": "form" } do |form| %>
+              <%= form.hidden_field :user_id %>
+              <%= form.text_area :content, data: { action: "keydown->submit-form#check_submit", "submit-form-target": "field" } %>
+            <% end %>
+        <% end %>
       </div>
     </div>
     <div class="column is-one-third">

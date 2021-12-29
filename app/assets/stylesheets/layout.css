@@ -1,0 +1,30 @@
+/* Grid CSS - from https://grid.layoutit.com/?id=Siveviv */
+.container {  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 0.3fr 1.7fr repeat(3, 1fr) 1.5fr 0.5fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "header header header"
+    "game-message-area game-message-area game-sidebar"
+    "game-message-area game-message-area game-sidebar"
+    "game-message-area game-message-area game-sidebar"
+    "game-message-area game-message-area game-sidebar"
+    "game-message-form game-message-form game-sidebar"
+    "footer footer footer";
+}
+
+.header { grid-area: header; }
+
+.footer { grid-area: footer; }
+
+.game-message-form { grid-area: game-message-form; }
+
+.game-sidebar { grid-area: game-sidebar; }
+
+.game-message-area { grid-area: game-message-area; }
+
+/* Overflows */
+.game-message-area {
+  overflow-y: auto;
+}

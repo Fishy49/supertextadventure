@@ -1,0 +1,59 @@
+/*$terminal-bg: #282823;
+$terminal-bg-opaque: rgba(84, 84, 84, 0.3);
+$terminal-text: #8fe86b;
+$terminal-text-light: #bafb9f;
+$terminal-text-opaque: rgba(143, 232, 107, 0.3);*/
+
+:root {
+  --global-font-size: 2rem;
+  --background-color: #282823;
+  --font-color: #8fe86b;
+  --primary-color: #8fe86b;
+  --secondary-color: #bafb9f;
+  --border-style: dashed 3px;
+  --page-width: 100vw;
+  --global-line-height: 1em;
+}
+
+html, body {
+  height: 100%;
+}
+
+html::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 2;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+h1 {
+  padding: 0;
+}
+
+.container {
+  height: 100vh;
+}
+
+.game-message-area {
+  border: var(--border-style);
+  border-right: none;
+  padding: 10px;
+}
+
+.game-message-form {
+  border-left: var(--border-style);
+  border-bottom: var(--border-style);
+  padding: 10px;
+}
+
+.game-sidebar {
+  border: var(--border-style);
+  padding: 10px;
+}

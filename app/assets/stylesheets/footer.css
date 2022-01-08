@@ -1,0 +1,19 @@
+.footer-hotkeys {
+  padding-top: 5px;
+}
+
+.footer-hotkeys .divider {
+  font-weight: bold;
+}
+
+.footer-hotkeys .footer-hotkey-item {
+  display: inline-block;
+  font-weight: bold;
+}
+
+.footer-hotkeys .footer-hotkey-item .text-filled {
+  background-color: var(--font-color);
+  color: var(--background-color);
+  padding: 0 2px;
+  margin-right: 2px;
+}

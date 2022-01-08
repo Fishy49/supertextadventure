@@ -1,0 +1,34 @@
+<div class="footer-hotkeys">
+  <span class="footer-hotkey-item">
+    <span class="text-filled">^H</span>ome
+  </span>
+
+  <% if !logged_in? %>
+    <span class="divider mx-1">|</span>
+    <span class="footer-hotkey-item">
+      <span class="text-filled">^L</span>ogin
+    </span>
+
+    <span class="divider mx-1">|</span>
+    <span class="footer-hotkey-item">
+      <span class="text-filled">^R</span>egister
+    </span>
+  <% end %>
+
+  <% if logged_in? %>
+    <span class="divider mx-1">|</span>
+    <span class="footer-hotkey-item">
+      <span class="text-filled">^L</span>ogout
+    </span>
+
+    <span class="divider mx-1">|</span>
+    <span class="footer-hotkey-item">
+      <span class="text-filled">^G</span>ames
+    </span>
+
+    <span class="divider mx-1">|</span>
+    <span class="footer-hotkey-item">
+      <span class="text-filled">^C</span>haracters
+    </span>
+  <% end %>
+</div>

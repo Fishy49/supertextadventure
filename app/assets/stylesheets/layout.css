@@ -18,13 +18,18 @@
 
 .footer { grid-area: footer; }
 
+.game-message-area { grid-area: game-message-area; }
+
 .game-message-form { grid-area: game-message-form; }
 
 .game-sidebar { grid-area: game-sidebar; }
 
-.game-message-area { grid-area: game-message-area; }
 
 /* Overflows */
 .game-message-area {
+  overflow-y: auto;
+}
+
+.game-sidebar {
   overflow-y: auto;
 }

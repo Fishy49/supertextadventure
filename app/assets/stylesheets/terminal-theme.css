@@ -19,6 +19,7 @@ html, body {
   height: 100%;
 }
 
+/* CRT Effect */
 html::before {
   content: " ";
   display: block;
@@ -41,6 +42,7 @@ h1 {
   height: 100vh;
 }
 
+/* Dividers  */
 .game-message-area {
   border: var(--border-style);
   border-right: none;

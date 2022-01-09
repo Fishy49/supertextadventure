@@ -76,3 +76,5 @@ end
 gem "rubocop", "~> 1.24"
 gem "rubocop-performance", "~> 1.13"
 gem "rubocop-rails", "~> 2.13"
+
+gem "classes", "~> 0.1.0"

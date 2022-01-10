@@ -20,6 +20,9 @@
     <div class="container">
       <div class="header"><%= render "header" %></div>
       <div class="game-message-form">
+        <% if notice.present? %>
+          <div class="text-center notice blink"><%= notice %></div>
+        <% end %>
         <%= yield :text_form %>
       </div>
       <div class="game-message-area">

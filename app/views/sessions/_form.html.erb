@@ -1,0 +1,12 @@
+<%= form_tag sessions_path do |form| %>
+  <div class="form-group">
+    <%= text_field_tag :username,"", placeholder: "USERNAME", class: "mx-auto text-center" %>
+    <%= password_field_tag :password, "", placeholder: "PASSWORD", class: "mx-auto text-center" %>
+    <div class="mx-auto text-center pt-1">
+      <%= submit_tag "Login", class: "button" %>
+      <%= link_to signup_path, class: "button" do %>
+        Sign Up
+      <% end %>
+    </div>
+  </div>
+<% end %>

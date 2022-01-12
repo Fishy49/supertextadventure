@@ -126,3 +126,18 @@ input.submit:hover {
   text-decoration: underline;
   padding-bottom: 15px;
 }
+
+.ascii {
+  color: var(--font-color);
+  width: fit-content;
+  margin: 0 auto;
+  border: none;
+  font-size: 15px;
+  line-height: 1.1em;
+  font-weight: bold;
+  white-space: revert;
+}
+
+ul, li {
+  list-style-type: square;
+}

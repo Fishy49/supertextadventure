@@ -1,0 +1,12 @@
+<h3 class="text-center mb-0">Ye Olde Tavern</h3>
+<%= render "/ascii/tavern" %>
+<p>You see many tables. Some contain adventurers. Others sit empty.</p>
+<p class="mb-0">You may...</p>
+<ul>
+  <li><strong>LIST GAMES</strong> to see a list of joinable games</li>
+  <li><strong>START GAME</strong> to start a new adventure</li>
+</ul>
+
+<% content_for :text_form do %>
+  <%= render "/shared/terminal_input", prompt: "Tavern", controllers: ["tavern"] %>
+<% end %>

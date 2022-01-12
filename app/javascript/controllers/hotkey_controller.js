@@ -14,7 +14,7 @@ export default class extends Controller {
         case 'r':
           document.location.href = "/signup"
           break;
-        case 'o':
+        case 'l':
           if(confirm("Logout?")){
             document.location.href = "/logout"
           }

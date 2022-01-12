@@ -1,0 +1,24 @@
+<% controllers = (defined?(controllers) && controllers.is_a?(Array)) ? controllers.concat(["terminal"]) : ["terminal"] %>
+<div id="terminalInput" class="terminal-input-wrapper" data-controller="<%= controllers.join(" ") %>">
+  <div class="error-container"
+       <% controllers.each do |controller| %>
+         data-<%= controller %>-target="error"
+       <% end %>
+  ></div>
+
+  <span class="prompt"
+        <% controllers.each do |controller| %>
+          data-<%= controller %>-target="prompt"
+        <% end %>
+  >
+    <%= prompt if defined?(prompt) %>
+  </span>
+  
+  <div class="terminal-input" 
+       contenteditable="true"
+       <% controllers.each do |controller| %>
+         data-<%= controller %>-target="input"
+       <% end %>
+  ></div>
+
+</div>

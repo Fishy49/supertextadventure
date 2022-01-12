@@ -1,9 +1,0 @@
-.ascii-knight {
-  color: var(--font-color);
-  width: fit-content;
-  margin: 0 auto;
-  border: none;
-  font-size: 15px;
-  line-height: 1.1em;
-  font-weight: bold;
-}

@@ -7,7 +7,6 @@ AllCops:
   Exclude:
     - 'bin/**'
     - 'db/schema.rb'
-    - 'db/migrate/**'
 
 Metrics/AbcSize:
   Enabled: false

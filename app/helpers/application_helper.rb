@@ -3,11 +3,11 @@
 module ApplicationHelper
   def greeting
     greetings = [
-      "AVAST",
-      "HALDO",
-      "HO THERE",
-      "M'LORD",
-      "SIRE"
+      "Avast",
+      "Haldo",
+      "Ho There",
+      "Good Morn",
+      "Hail"
     ]
 
     greetings.sample

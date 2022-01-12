@@ -19,8 +19,8 @@ export default class extends Controller {
             document.location.href = "/logout"
           }
           break;
-        case 'g':
-          document.location.href = "/games"
+        case 't':
+          document.location.href = "/tavern"
           break;
         case 'c':
           document.location.href = "/characters"

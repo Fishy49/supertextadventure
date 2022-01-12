@@ -1,3 +1,8 @@
+.footer {
+  display: grid;
+  grid-template-columns: 70% 30%; 
+}
+
 .footer-hotkeys {
   padding-top: 5px;
 }
@@ -16,4 +21,8 @@
   color: var(--background-color);
   padding: 0 2px;
   margin-right: 2px;
+}
+
+.footer .copyright {
+  white-space: nowrap;
 }

@@ -1,6 +1,4 @@
-<div class="header-wrapper">
-  <h1><%= link_to "SuperTextAdventure_v0.1", root_path %></h1>
-  <% if logged_in? %>
-    <h4 class="text-right pt-2 mb-0"><%= greeting %>, <%= current_user.username %></h4>
-  <% end %>
-</div>
+<h1><%= link_to "SuperTextAdventure_v0.1", root_path %></h1>
+<% if logged_in? %>
+  <h4 class="text-right pt-2 mb-0"><%= greeting %>, <%= current_user.username %></h4>
+<% end %>

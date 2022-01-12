@@ -40,8 +40,8 @@
   animation: blink-animation 1s steps(5, start) infinite;
   -webkit-animation: blink-animation 1s steps(5, start) infinite;
   position: absolute;
-  right: -12px;
-  top: 5px;
+  margin-right: -12px;
+  bottom: 4px;
   display: none;
 }
 

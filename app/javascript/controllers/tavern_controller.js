@@ -16,7 +16,8 @@ export default class extends Controller {
         } else if (input_text == "START GAME") {
 
         } else {
-          let error_text = 'I know not what "' + input_text + '" means!'
+          window.beep(15, 100, 250)
+          let error_text = 'What Doth "' + input_text + '" Imply!?'
           window.stimulus_controller("terminalInput", "terminal").show_error(error_text, false)
         }
       }

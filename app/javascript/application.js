@@ -2,3 +2,4 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 import "src/beep"
+import "src/place_caret_at_end"

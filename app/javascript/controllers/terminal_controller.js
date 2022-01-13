@@ -4,8 +4,18 @@ export default class extends Controller {
   static targets = [ "prompt", "input", "error" ]
 
   connect() {
+    // Focus on the contenteditable on a click anywhere in the container
     document.getElementById("terminalInput").addEventListener('click', () => {
       document.getElementById("terminalInput").querySelector(".terminal-input").focus()
+      window.placeCaretAtEnd(this.inputTarget)
+    })
+
+    // To preserve the cursor illusion, prevent left-arrow from changing caret position.
+    this.inputTarget.addEventListener('keydown', (e) => {
+      if(e.keyCode == 37){
+        e.preventDefault()
+        window.placeCaretAtEnd(this.inputTarget)
+      }
     })
   }
 

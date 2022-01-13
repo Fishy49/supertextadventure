@@ -1,3 +1,4 @@
+// https://stackoverflow.com/a/49077414
 window.beep = function(vol, freq, duration){
   if(!window.audio_context){
     window.audio_context = new AudioContext();

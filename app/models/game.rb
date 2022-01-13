@@ -7,4 +7,12 @@ class Game < ApplicationRecord
                     dependent: :destroy,
                     inverse_of: :hosted_games,
                     optional: true
+
+  before_create :set_uuid
+
+  private
+
+  def set_uuid
+    self.uuid = SecureRandom.uuid
+  end
 end

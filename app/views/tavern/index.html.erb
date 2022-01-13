@@ -10,3 +10,21 @@
 <% content_for :text_form do %>
   <%= render "/shared/terminal_input", prompt: "Tavern", controllers: ["tavern"] %>
 <% end %>
+
+
+<% content_for :sidebar do %>
+  <% if !@games.nil? %>
+    <ul>
+      <% @games.each do |game| %>
+        <li><%= game.name %></li>
+      <% end %>
+    </ul>
+  <% elsif @game.present? %>
+    <turbo-frame id="<%= dom_id(@game) %>">
+      <%= render "/games/form", game: @game %>
+    </turbo-frame>
+  <% else %>
+    <%= render '/ascii/bricks' %>
+  <% end %>
+<% end %>
+

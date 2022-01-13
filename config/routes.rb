@@ -12,4 +12,6 @@ Rails.application.routes.draw do
   get "logout", to: "sessions#destroy", as: :logout
 
   get "tavern", to: "tavern#index"
+  get "tavern/games", to: "tavern#games"
+  get "tavern/new-game", to: "tavern#new_game"
 end

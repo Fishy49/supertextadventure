@@ -3,6 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [ "prompt", "input", "error" ]
 
+  last_entry = ""
+
   connect() {
     // Focus on the contenteditable on a click anywhere in the container and place caret at end
     document.getElementById("terminalInput").addEventListener('click', () => {
@@ -15,6 +17,21 @@ export default class extends Controller {
       if(e.keyCode == 37){
         e.preventDefault()
         window.placeCaretAtEnd(this.inputTarget)
+      }
+
+      // Capture entry and store
+      if(e.keyCode == 13){
+        e.preventDefault()
+        this.last_entry = e.target.textContent.trim().toUpperCase()
+      }
+
+      // On "up" arrow, retrieve the last entry if it exists
+      if(e.keyCode == 38){
+        if(this.last_entry){
+          e.preventDefault()
+          e.target.textContent = this.last_entry
+          window.placeCaretAtEnd(this.inputTarget)
+        }
       }
     })
 

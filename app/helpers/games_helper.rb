@@ -7,4 +7,11 @@ module GamesHelper
       ["Strict Terminal", "strict"]
     ]
   end
+
+  def game_status_options
+    [
+      %w[Open open],
+      %w[Closed closed]
+    ]
+  end
 end

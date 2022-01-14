@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  resources :games
   root "home#index"
 
   resources :users
   resources :sessions, only: %i[new create destroy]
+  resources :games
 
   get "signup", to: "users#new", as: :signup
   get "login", to: "sessions#new", as: :login
@@ -14,4 +14,6 @@ Rails.application.routes.draw do
   get "tavern", to: "tavern#index"
   get "tavern/games", to: "tavern#games"
   get "tavern/new-game", to: "tavern#new_game"
+
+  get "about", to: "about#index"
 end

@@ -1,10 +1,12 @@
-<h1>Editing game</h1>
+<turbo-frame id="<%= @turbo_frame_id %>">
+  <h1>Editing game</h1>
 
-<%= render "form", game: @game %>
+  <%= render "form", game: @game %>
 
-<br>
+  <br>
 
-<div>
-  <%= link_to "Show this game", @game %> |
-  <%= link_to "Back to games", games_path %>
-</div>
+  <div>
+    <%= link_to "Show this game", @game %> |
+    <%= link_to "Back to games", games_path %>
+  </div>
+</turbo-frame>

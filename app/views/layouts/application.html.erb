@@ -19,18 +19,23 @@
   <body>
     <div class="container">
       <div class="header"><%= render "header" %></div>
-      <div class="game-message-form">
-        <% if notice.present? %>
-          <div class="text-center notice blink"><%= notice %></div>
-        <% end %>
-        <%= yield :text_form %>
-      </div>
+      
       <div class="game-message-area">
         <%= yield %>
       </div>
-      <div class="game-sidebar">
-        <%= yield :sidebar %>
+
+      <div class="game-message-form">
+        <turbo-frame id="text_form">
+          <%= yield :text_form %>
+        </turbo-frame>
       </div>
+
+      <div class="game-sidebar">
+        <turbo-frame id="sidebar">
+          <%= yield :sidebar %>
+        </turbo-frame>
+      </div>
+      
       <div class="footer"><%= render "footer" %></div>
     </div>
   </body>

@@ -1,14 +1,3 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Games</h1>
-
-<div id="games">
-  <% @games.each do |game| %>
-    <%= render game %>
-    <p>
-      <%= link_to "Show this game", game %>
-    </p>
-  <% end %>
-</div>
-
-<%= link_to "New game", new_game_path %>
+<turbo-frame id="<%= @turbo_frame_id %>">
+  <%= render "list" %>
+</turbo-frame>

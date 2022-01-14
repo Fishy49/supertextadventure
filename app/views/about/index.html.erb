@@ -1,0 +1,21 @@
+<h3 class="text-center mb-0">About</h3>
+
+<p><strong>"What is this?"</strong> - <em>You, probably.</em></p>
+
+<p>I'm glad you asked! Super Text Adventure is a few things:</p>
+
+<ol>
+  <li class="mb-1"><u>It's an unglorified chat application</u>. Pretty much all that's provided is a specific way to send messages to your friends while the "gameplay" aspect was intentionally left to you. The main goal was to blend an even mix of text-adventure and D&D session.</li>
+  <li class="mb-1"><u>A way to play an asynchronous game with your friends</u>. Pick up and leave off whenever you like. It'll always be waiting.</li>
+  <li class="mb-1"><u>The passion-project of a Ruby on Rails nerd</u>. The site is <u><a href="https://fishy.getgit.co/fishy/supertextadventure">open source</a></u> and built with <u><a href="https://rubyonrails.org/2021/12/15/Rails-7-fulfilling-a-vision">Rails 7</a></u>. I love Rails and hope this is a cool example of what Rails can do.</li>
+</ol>
+
+<p>Have fun! - <em>Richard Cagle</em></p>
+
+<% content_for :text_form do %>
+  <%= render "/shared/terminal_input", prompt: "About", controllers: ["about"] %>
+<% end %>
+
+<% content_for :sidebar do %>
+  <%= render "/ascii/tall_knight" %>
+<% end %>

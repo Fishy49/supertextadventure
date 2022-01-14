@@ -1,11 +1,19 @@
 # frozen_string_literal: true
 
 class GamesController < ApplicationController
+  before_action :set_turbo_frame_id
   before_action :set_game, only: %i[show edit update destroy]
 
   # GET /games or /games.json
   def index
     @games = Game.all
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "list")
+      end
+      format.html
+    end
   end
 
   # GET /games/1 or /games/1.json
@@ -14,10 +22,22 @@ class GamesController < ApplicationController
   # GET /games/new
   def new
     @game = Game.new
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game })
+      end
+    end
   end
 
   # GET /games/1/edit
-  def edit; end
+  def edit
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game })
+      end
+      format.html
+    end
+  end
 
   # POST /games or /games.json
   def create
@@ -25,8 +45,9 @@ class GamesController < ApplicationController
 
     respond_to do |format|
       if @game.save
-        format.html { redirect_to game_url(@game), notice: "Game was successfully created." }
-        format.json { render :show, status: :created, location: @game }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.update(@turbo_frame_id, template: "games/show")
+        end
       else
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @game.errors, status: :unprocessable_entity }
@@ -38,8 +59,9 @@ class GamesController < ApplicationController
   def update
     respond_to do |format|
       if @game.update(game_params)
-        format.html { redirect_to game_url(@game), notice: "Game was successfully updated." }
-        format.json { render :show, status: :ok, location: @game }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.update(@turbo_frame_id, template: "games/show")
+        end
       else
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @game.errors, status: :unprocessable_entity }
@@ -68,5 +90,9 @@ class GamesController < ApplicationController
   def game_params
     params.require(:game).permit(:uuid, :name, :game_type, :created_by, :status, :opened_at, :closed_at,
                                  :is_friends_only, :max_players)
+  end
+
+  def set_turbo_frame_id
+    @turbo_frame_id = params[:turbo_frame_id].presence&.to_sym || :sidebar
   end
 end

@@ -28,6 +28,8 @@ ActiveRecord::Schema.define(version: 2022_01_12_053517) do
     t.integer "max_players"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_games_on_name", unique: true
+    t.index ["uuid"], name: "index_games_on_uuid", unique: true
   end
 
   create_table "users", force: :cascade do |t|

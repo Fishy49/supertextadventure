@@ -155,4 +155,9 @@ select {
   border-top-left-radius: 0 !important;
   -webkit-appearance: none;
   padding-left: 5px;
+  outline: none;
+}
+
+input[type="checkbox"] {
+  font-size: 1em;
 }

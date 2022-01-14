@@ -1,0 +1,6 @@
+.game-list-card {
+  width: 100%;
+  padding: 20px;
+  border: solid 1px var(--font-color);
+  margin-bottom: 10px;
+}

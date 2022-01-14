@@ -14,6 +14,9 @@ class CreateGames < ActiveRecord::Migration[7.0]
       t.integer :max_players
 
       t.timestamps
+
+      t.index [:uuid], unique: true
+      t.index [:name], unique: true
     end
   end
 end

@@ -4,15 +4,22 @@
 
 <p class="text-center"><b>Type. Your. Story.</b></p>
 
+<% if logged_in? %>
+  <p>Ye see a TAVERN in the distance to the NORTH. Perhaps you should GO.</p>
+  <%= ascii("small_village") %>
+<% else %>
+  <%= ascii("knight") %>
+<% end %>
+
 
 <% content_for :text_form do %>
   <% if logged_in? %>
+    <%= render "/shared/terminal_input", prompt: "Welcome", controllers: ["home"] %>
   <% else %>
     <%= render "/sessions/form" %>
   <% end %>
 <% end %>
 
 <% content_for :sidebar do %>
-  <%= render "/ascii/knight" %>
-  <%= render "/ascii/knight" %>
+  <%= ascii("tall_knight") %>
 <% end %>

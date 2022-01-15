@@ -18,10 +18,17 @@
        contenteditable="true"
        <% controllers.each do |controller| %>
          data-<%= controller %>-target="input"
-         <% unless controller == "terminal" %>
-          data-action="keydown-><%= controller %>#capture_input"
-         <% end %>
        <% end %>
+       <%
+         actions = controllers.map do |c|
+           if c == "terminal"
+             "keydown->terminal#default_input_handling"
+           else
+             "keydown->#{c}#capture_input"
+           end
+         end.join(" ")
+       %>
+       data-action="<%= actions %>"
   ></div>
 
 </div>

@@ -1,4 +1,4 @@
-<%= render "/ascii/castle" %>
+<%= ascii("castle") %>
 
 <% content_for :text_form do %>
   <% unless @user&.errors.any? %>
@@ -11,5 +11,5 @@
 <% end %>
 
 <% content_for :sidebar do %>
-  <%= render "/ascii/troll" %>
+  <%= ascii("troll") %>
 <% end %>

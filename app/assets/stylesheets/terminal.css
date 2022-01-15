@@ -30,6 +30,12 @@
   caret-color: transparent;
   position: relative;
   outline: transparent;
+  vertical-align: bottom;
+}
+
+/* https://stackoverflow.com/a/67922804 */
+.terminal-input-wrapper .terminal-input br {
+    display: none;
 }
 
 .terminal-input-wrapper .terminal-input::after {

@@ -10,6 +10,10 @@ class Game < ApplicationRecord
 
   before_create :set_uuid
 
+  def host?(user)
+    created_by == user&.id
+  end
+
   private
 
   def set_uuid

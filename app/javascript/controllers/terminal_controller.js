@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [ "prompt", "input", "error" ]
 
-  last_entry = ""
+  last_input = ""
 
   connect() {
     // Focus on the contenteditable on a click anywhere in the container and place caret at end
@@ -12,33 +12,31 @@ export default class extends Controller {
       window.placeCaretAtEnd(this.inputTarget)
     })
 
-    // To preserve the caret illusion, prevent left-arrow from changing actual caret position.
-    this.inputTarget.addEventListener('keydown', (e) => {
-      if(e.keyCode == 37){
-        e.preventDefault()
-        window.placeCaretAtEnd(this.inputTarget)
-      }
-
-      // Capture entry and store
-      if(e.keyCode == 13){
-        e.preventDefault()
-        this.last_entry = e.target.textContent.trim().toUpperCase()
-      }
-
-      // On "up" arrow, retrieve the last entry if it exists
-      if(e.keyCode == 38){
-        if(this.last_entry){
-          e.preventDefault()
-          e.target.textContent = this.last_entry
-          window.placeCaretAtEnd(this.inputTarget)
-        }
-      }
-    })
-
     this.inputTarget.focus()
   }
 
+  default_input_handling(e){
+    if(e.keyCode == 37){
+      e.preventDefault()
+      window.placeCaretAtEnd(this.inputTarget)
+    }
+
+    // On "up" arrow, retrieve the last entry if it exists
+    if(e.keyCode == 38){
+      if(this.last_input){
+        e.preventDefault()
+        e.target.textContent = this.last_input
+        window.placeCaretAtEnd(this.inputTarget)
+      }
+    }
+  }
+
+  save_input(input){
+    this.last_input = input
+  }
+
   clear_input() {
+    this.save_input(this.inputTarget.textContent)
     this.inputTarget.textContent = ""
   }
 

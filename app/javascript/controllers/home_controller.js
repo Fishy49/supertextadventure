@@ -13,15 +13,15 @@ export default class extends Controller {
         return false;
       }
 
-      window.stimulus_controller("terminalInput", "terminal").clear_input();
+      window.stimulus_controller("terminalInput", "terminal").clear_input()
       this.errorTarget.style.display = "none"
 
-      if(input_text == "TAVERN"){
+      if(input_text.includes("TAVERN") || input_text.includes("NORTH")){
         Turbo.visit("/tavern")
-      } else if (input_text == "HOME") {
-        Turbo.visit("/")
+      } else if(input_text == "GO") {
+        window.stimulus_controller("terminalInput", "terminal").show_error('"Go" Where?', false)
       } else {
-        let error_text = '"' + input_text + '"!? You may go "HOME" or to the "TAVERN"'
+        let error_text = 'Perhaps Ye Should Just Go to Yon "TAVERN"...'
         window.stimulus_controller("terminalInput", "terminal").show_error(error_text, false)
       }
     }

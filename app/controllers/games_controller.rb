@@ -2,7 +2,7 @@
 
 class GamesController < ApplicationController
   before_action :set_turbo_frame_id
-  before_action :set_game, only: %i[show edit update destroy]
+  before_action :set_game, only: %i[show join lobby edit update destroy]
 
   # GET /games or /games.json
   def index
@@ -17,7 +17,22 @@ class GamesController < ApplicationController
   end
 
   # GET /games/1 or /games/1.json
-  def show; end
+  def join
+  end
+
+  # GET /games/1 or /games/1.json
+  def lobby
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "lobby")
+      end
+      format.html
+    end
+  end
+
+  # GET /games/1 or /games/1.json
+  def show
+  end
 
   # GET /games/new
   def new
@@ -83,13 +98,13 @@ class GamesController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_game
-    @game = Game.find(params[:id])
+    @game = Game.where(id: params[:id]).or(Game.where(uuid: params[:id])).first!
   end
 
   # Only allow a list of trusted parameters through.
   def game_params
     params.require(:game).permit(:uuid, :name, :game_type, :created_by, :status, :opened_at, :closed_at,
-                                 :is_friends_only, :max_players)
+                                 :is_friends_only, :max_players, :description)
   end
 
   def set_turbo_frame_id

@@ -8,10 +8,17 @@ class Game < ApplicationRecord
                     inverse_of: :hosted_games,
                     optional: true
 
+  has_many :game_users, inverse_of: :games, dependent: :nullify
+
   before_create :set_uuid
 
   def host?(user)
     created_by == user&.id
+  end
+
+  def can_user_join?(user)
+    # TODO: check to see if game is open and user is a friend of host
+    user.awesome?
   end
 
   private

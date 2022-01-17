@@ -3,7 +3,9 @@
 class TavernController < ApplicationController
   before_action :authorize!
 
-  def index; end
+  def index
+    @games = Game.all
+  end
 
   def games
     @games = Game.limit(10)

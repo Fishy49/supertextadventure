@@ -10,15 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_12_053517) do
+ActiveRecord::Schema.define(version: 2022_01_17_041502) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
 
+  create_table "game_users", force: :cascade do |t|
+    t.bigint "game_id", null: false
+    t.bigint "user_id", null: false
+    t.string "character_name", null: false
+    t.boolean "is_active"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["game_id", "user_id"], name: "index_game_users_on_game_id_and_user_id", unique: true
+    t.index ["game_id"], name: "index_game_users_on_game_id"
+    t.index ["user_id"], name: "index_game_users_on_user_id"
+  end
+
   create_table "games", force: :cascade do |t|
     t.string "uuid"
     t.string "name"
+    t.text "description"
     t.string "game_type"
     t.integer "created_by"
     t.string "status"
@@ -40,4 +53,6 @@ ActiveRecord::Schema.define(version: 2022_01_12_053517) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "game_users", "games"
+  add_foreign_key "game_users", "users"
 end

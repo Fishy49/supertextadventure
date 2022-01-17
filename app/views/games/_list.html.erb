@@ -1,7 +1,11 @@
-<h1>Games</h1>
+<h3 class="text-center mb-0">Games</h3>
 
 <div id="games">
-  <% @games.each do |game| %>
-    <%= render "game_list_card", game: game %>
+  <% if @games.present? %>
+    <% @games.each_with_index do |game, game_number| %>
+      <%= render "/games/game_list_card", game: game, game_number: game_number + 1 %>
+    <% end %>
+  <% else %>
+    <p class="text-center">** NO AVAILBLE GAMES **</p>
   <% end %>
 </div>

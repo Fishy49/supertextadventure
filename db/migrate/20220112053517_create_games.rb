@@ -5,6 +5,7 @@ class CreateGames < ActiveRecord::Migration[7.0]
     create_table :games do |t|
       t.string :uuid
       t.string :name
+      t.text :description
       t.string :game_type
       t.integer :created_by
       t.string :status

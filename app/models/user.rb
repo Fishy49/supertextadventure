@@ -7,5 +7,9 @@ class User < ApplicationRecord
 
   has_many :hosted_games, class_name: "Game", foreign_key: :created_by, dependent: :destroy, inverse_of: :host
 
-  has_many :game_users, inverse_of: :users, dependent: :destroy
+  has_many :game_users, inverse_of: :user, dependent: :destroy
+
+  def awesome?
+    true
+  end
 end

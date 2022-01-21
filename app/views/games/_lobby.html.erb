@@ -1,2 +1,23 @@
-<h3><%= @game.name %></h3>
+<h3 class="mb-0"><%= @game.name %></h3>
 <p><%= @game.description %></p>
+<p>Hosted By: <strong><%= @game.host.username %></strong></p>
+<p>Players: <strong><%= @game.game_users.count %> / <%= @game.max_players %></strong></p>
+<p>Type: <strong><%= @game.game_type.titleize %></strong></p>
+
+<% if @game.can_user_join?(current_user) %>
+  <h3 class="text-center">Join Game</h3>
+  <%= form_with(url: join_game_path(@game), method: :patch, data: { "turbo-frame": "_top" }) do |form| %>
+    <%= form.hidden_field :user_id, value: current_user.id %>
+
+    <div class="form-group">
+      <%= form.label :character_name, style: "display: block" %>
+      <%= form.text_field :character_name %>
+    </div>
+
+    <div class="text-center">
+      <%= form.submit class: "button", value: "Join Table" %>
+    </div>
+  <% end %>
+<% else %>
+  <p class="text-center"><strong>Ye mayn't join, m'lord.</strong></p>
+<% end %>

@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(version: 2022_01_17_041502) do
     t.bigint "game_id", null: false
     t.bigint "user_id", null: false
     t.string "character_name", null: false
-    t.boolean "is_active"
+    t.boolean "is_active", default: true
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["game_id", "user_id"], name: "index_game_users_on_game_id_and_user_id", unique: true

@@ -8,7 +8,7 @@ class Game < ApplicationRecord
                     inverse_of: :hosted_games,
                     optional: true
 
-  has_many :game_users, inverse_of: :games, dependent: :nullify
+  has_many :game_users, inverse_of: :game, dependent: :nullify
 
   before_create :set_uuid
 

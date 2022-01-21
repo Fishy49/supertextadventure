@@ -1,4 +1,6 @@
+# frozen_string_literal: true
+
 class GameUser < ApplicationRecord
-  belongs_to :games, inverse_of: :game_users, dependent: :destroy
-  belongs_to :users, inverse_of: :game_users, dependent: :destroy
+  belongs_to :game, inverse_of: :game_users
+  belongs_to :user, inverse_of: :game_users
 end

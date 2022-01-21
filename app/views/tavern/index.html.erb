@@ -15,6 +15,9 @@
 <% end %>
 
 <% content_for :sidebar do %>
+  <% if notice %>
+    <div class="notice blink text-center"><%= notice %></div>
+  <% end %>
   <%= render template: "/games/index" %>
 <% end %>
 

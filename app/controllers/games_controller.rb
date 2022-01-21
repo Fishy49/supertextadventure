@@ -16,8 +16,23 @@ class GamesController < ApplicationController
     end
   end
 
-  # GET /games/1 or /games/1.json
   def join
+    @game.with_lock do
+      if @game.can_user_join?(current_user)
+        @game_user = @game.game_users.create(
+          user_id: current_user.id,
+          character_name: params[:character_name]
+        )
+      end
+    end
+
+    respond_to do |format|
+      if @game_user.valid?
+        format.html { redirect_to game_url(id: @game.uuid), notice: "You joined." }
+      else
+        format.html { redirect_to tavern_url, notice: "Game could not be joined" }
+      end
+    end
   end
 
   # GET /games/1 or /games/1.json
@@ -31,8 +46,7 @@ class GamesController < ApplicationController
   end
 
   # GET /games/1 or /games/1.json
-  def show
-  end
+  def show; end
 
   # GET /games/new
   def new

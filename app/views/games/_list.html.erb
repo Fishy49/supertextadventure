@@ -1,11 +1,21 @@
-<h3 class="text-center mb-0">Games</h3>
+<% if @hosted_games.blank? && @joinable_games.blank? && @joinable_games.blank? %>
 
-<div id="games">
-  <% if @games.present? %>
-    <% @games.each_with_index do |game, game_number| %>
-      <%= render "/games/game_list_card", game: game, game_number: game_number + 1 %>
+  <h3 class="text-center mb-0">Tables</h3>
+  <p class="text-center">** NO OPEN TABLES **</p>
+
+<% else %>
+  <% game_counter = 1 %>
+  <div id="games">
+    <% { hosted: @hosted_games, joined: @joined_games, joinable: @joinable_games }.each do |type, games| %>
+      <% if games.present? %>
+        <h3 class="text-center mb-0"><%= type.to_s.titleize %> Tables</h3>
+
+        <% games.each do |game| %>
+          <%= render "/games/game_list_card", game: game, game_number: game_counter %>
+          <% game_counter += 1 %>
+        <% end %>
+      <% end %>
     <% end %>
-  <% else %>
-    <p class="text-center">** NO AVAILBLE GAMES **</p>
-  <% end %>
-</div>
+  </div>
+
+<% end %>

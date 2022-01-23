@@ -1,5 +1,15 @@
 <% controllers = (defined?(controllers) && controllers.is_a?(Array)) ? controllers.concat(["terminal"]) : ["terminal"] %>
-<div id="terminalInput" class="terminal-input-wrapper" data-controller="<%= controllers.join(" ") %>">
+<div id="terminalInput" 
+     class="terminal-input-wrapper"
+     data-controller="<%= controllers.join(" ") %>"
+     <% if defined?(values) %>
+      <% values.each do |value_controller, controller_values| %>
+        <% controller_values.each do |value_hash| %>
+          data-<%= value_controller %>-<%= value_hash.first %>-value="<%= value_hash.last %>"
+        <% end %>  
+      <% end %>
+     <% end %>
+>
   <div class="error-container"
        <% controllers.each do |controller| %>
          data-<%= controller %>-target="error"

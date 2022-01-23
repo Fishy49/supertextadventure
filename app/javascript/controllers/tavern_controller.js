@@ -18,7 +18,7 @@ export default class extends Controller {
       this.errorTarget.style.display = "none"
 
       let getMap = {
-        "LIST TABLES": "/games",
+        "LIST TABLES": "/games/list",
         "NEW TABLE": "/games/new",
         "LIST FRIENDS": "/friends"
       }

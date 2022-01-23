@@ -8,6 +8,9 @@ AllCops:
     - 'bin/**'
     - 'db/schema.rb'
 
+Layout/IndentationConsistency:
+  EnforcedStyle: indented_internal_methods
+
 Metrics/AbcSize:
   Enabled: false
 

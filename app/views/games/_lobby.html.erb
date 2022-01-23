@@ -18,6 +18,8 @@
       <%= form.submit class: "button", value: "Join Table" %>
     </div>
   <% end %>
+<% elsif(@game.user_in_game?(current_user) || @game.host?(current_user)) %>
+  <%= link_to "Rejoin Table", game_path(id: @game.uuid), class: "button", data: { "turbo-frame": "_top" } %>
 <% else %>
   <p class="text-center"><strong>Ye mayn't join, m'lord.</strong></p>
 <% end %>

@@ -10,20 +10,29 @@ class Game < ApplicationRecord
 
   has_many :game_users, inverse_of: :game, dependent: :nullify
 
+  has_many :messages, inverse_of: :game, dependent: :nullify
+
+  scope :joinable_by_user, ->(user) { where(status: :open).where.not(created_by: user.id) }
+
+  validates :created_by, presence: true
+
   before_create :set_uuid
 
   def host?(user)
     created_by == user&.id
   end
 
+  def user_in_game?(user)
+    game_users.include?(user)
+  end
+
   def can_user_join?(user)
-    # TODO: check to see if game is open and user is a friend of host
-    user.awesome?
+    !user_in_game?(user) && !host?(user)
   end
 
   private
 
-  def set_uuid
-    self.uuid = SecureRandom.uuid
-  end
+    def set_uuid
+      self.uuid = SecureRandom.uuid
+    end
 end

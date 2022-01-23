@@ -1,10 +1,11 @@
-<p style="color: green"><%= notice %></p>
-
-<%= render @game %>
-
-<div>
-  <%= link_to "Edit this game", edit_game_path(@game) %> |
-  <%= link_to "Back to games", games_path %>
-
-  <%= button_to "Destroy this game", @game, method: :delete %>
+<div id="game-messages">
+  <h3>Messages</h3>
 </div>
+
+<% content_for :text_form do %>
+  <%= render "/shared/terminal_input", prompt: "", controllers: ["game"], values: { game: [ [ :user, current_user.id ], [ :game, @game.id ] ] } %>
+<% end %>
+
+<% content_for :sidebar do %>
+  <p>This is the sidebar</p>
+<% end %>

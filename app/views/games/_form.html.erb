@@ -1,9 +1,8 @@
-<%= form_with(model: game) do |form| %>
+<%= form_with(model: game, data: { "turbo-frame": "_top" }) do |form| %>
   <%= form.hidden_field :created_by %>
   <% if game.errors.any? %>
     <div style="color: red">
       <h2><%= pluralize(game.errors.count, "error") %> prohibited this game from being saved:</h2>
-
       <ul>
         <% game.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -32,7 +31,7 @@
     <%= form.select :status, options_for_select(game_status_options, "closed") %>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" style="display: none;">
     <%= form.label :is_friends_only do %>
       Friends Only?
     <% end %>

@@ -9,6 +9,8 @@ class User < ApplicationRecord
 
   has_many :game_users, inverse_of: :user, dependent: :destroy
 
+  has_many :joined_games, through: :game_users, class_name: "Game", source: :game
+
   def awesome?
     true
   end

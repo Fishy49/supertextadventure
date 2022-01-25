@@ -1,5 +1,10 @@
 <div id="game-messages">
-  <h3>Messages</h3>
+  <%= turbo_stream_from(@game, :messages) %>
+  <%= turbo_frame_tag(:messages) do %>
+    <% @game.messages.each do |message| %>
+      <%= render "/messages/message", message: message %>
+    <% end %>
+  <% end %>
 </div>
 
 <% content_for :text_form do %>

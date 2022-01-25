@@ -10,9 +10,7 @@ class GamesController < ApplicationController
 
   def list
     respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "list")
-      end
+      format.turbo_stream { render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "list") }
       format.html
     end
   end
@@ -20,10 +18,7 @@ class GamesController < ApplicationController
   def join
     @game.with_lock do
       if @game.can_user_join?(current_user)
-        @game_user = @game.game_users.create(
-          user_id: current_user.id,
-          character_name: params[:character_name]
-        )
+        @game_user = @game.game_users.create(user_id: current_user.id, character_name: params[:character_name])
       end
     end
 
@@ -50,17 +45,13 @@ class GamesController < ApplicationController
   def new
     @game = Game.new(created_by: current_user.id)
     respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game })
-      end
+      format.turbo_stream { render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game }) }
     end
   end
 
   def edit
     respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game })
-      end
+      format.turbo_stream { render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game }) }
       format.html
     end
   end
@@ -80,9 +71,7 @@ class GamesController < ApplicationController
   def update
     respond_to do |format|
       if @game.update(game_params)
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.update(@turbo_frame_id, template: "games/show")
-        end
+        format.turbo_stream { render turbo_stream: turbo_stream.update(@turbo_frame_id, template: "games/show") }
       else
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @game.errors, status: :unprocessable_entity }

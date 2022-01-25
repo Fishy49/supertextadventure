@@ -14,22 +14,20 @@ export default class extends Controller {
 
       let inputText = e.target.textContent.trim().toUpperCase()
 
-      if(inputText === ""){
-        return false;
-      }
+      if(inputText === ""){ return false; }
 
       window.stimulus_controller("terminalInput", "terminal").clear_input()
       this.errorTarget.style.display = "none"
 
       let game_payload = {
         message: {
-          game_id: 1,
-          user_id: 1,
+          game_id: this.gameValue,
+          user_id: this.userValue,
           content: inputText
         }
       }
 
-      post("/messages/create", { body: game_payload }, { responseKind: "turbo-stream" })
+      post("/messages", { body: game_payload, responseKind: "turbo-stream" })
     }
   }
 }

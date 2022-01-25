@@ -32,7 +32,7 @@ export default class extends Controller {
         if(!username){
           this.show_error("Try typing a username!", false)
         } else {
-          post("/friends/create", { body: { username: username } }, { responseKind: "turbo-stream" })
+          post("/friends/create", { body: { username: username }, responseKind: "turbo-stream" })
         }
 
       } else if (inputText.startsWith("JOIN TABLE")) {

@@ -4,3 +4,7 @@
   border: solid 1px var(--font-color);
   margin-bottom: 10px;
 }
+
+#game-messages {
+  padding-bottom: 200px;
+}

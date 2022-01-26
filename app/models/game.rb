@@ -23,7 +23,7 @@ class Game < ApplicationRecord
   end
 
   def user_in_game?(user)
-    game_users.include?(user)
+    game_users.pluck(:user_id).include?(user.id)
   end
 
   def can_user_join?(user)

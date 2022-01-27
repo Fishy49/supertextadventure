@@ -45,13 +45,17 @@ class GamesController < ApplicationController
   def new
     @game = Game.new(created_by: current_user.id)
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game }) }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game })
+      end
     end
   end
 
   def edit
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game }) }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game })
+      end
       format.html
     end
   end
@@ -106,7 +110,7 @@ class GamesController < ApplicationController
 
     def game_params
       params.require(:game).permit(:uuid, :name, :game_type, :created_by, :status, :opened_at, :closed_at,
-                                   :is_friends_only, :max_players, :description)
+                                   :is_friends_only, :max_players, :description, :host_display_name)
     end
 
     def set_turbo_frame_id

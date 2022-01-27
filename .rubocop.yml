@@ -19,6 +19,8 @@ Metrics/CyclomaticComplexity:
 
 Metrics/MethodLength:
   Max: 15
+  Exclude: 
+    - 'db/migrate/**'
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes

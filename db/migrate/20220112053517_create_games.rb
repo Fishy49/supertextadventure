@@ -9,6 +9,7 @@ class CreateGames < ActiveRecord::Migration[7.0]
       t.string :game_type
       t.integer :created_by
       t.string :status
+      t.string :host_display_name
       t.datetime :opened_at
       t.datetime :closed_at
       t.boolean :is_friends_only

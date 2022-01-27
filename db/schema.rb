@@ -35,6 +35,7 @@ ActiveRecord::Schema.define(version: 2022_01_23_041932) do
     t.string "game_type"
     t.integer "created_by"
     t.string "status"
+    t.string "host_display_name"
     t.datetime "opened_at", precision: 6
     t.datetime "closed_at", precision: 6
     t.boolean "is_friends_only"
@@ -47,12 +48,13 @@ ActiveRecord::Schema.define(version: 2022_01_23_041932) do
 
   create_table "messages", force: :cascade do |t|
     t.bigint "game_id", null: false
-    t.bigint "user_id", null: false
+    t.bigint "game_user_id"
+    t.boolean "is_event", default: false
     t.text "content"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["game_id"], name: "index_messages_on_game_id"
-    t.index ["user_id"], name: "index_messages_on_user_id"
+    t.index ["game_user_id"], name: "index_messages_on_game_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -66,5 +68,4 @@ ActiveRecord::Schema.define(version: 2022_01_23_041932) do
   add_foreign_key "game_users", "games"
   add_foreign_key "game_users", "users"
   add_foreign_key "messages", "games"
-  add_foreign_key "messages", "users"
 end

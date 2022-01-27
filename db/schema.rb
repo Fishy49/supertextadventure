@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(version: 2022_01_23_041932) do
   create_table "messages", force: :cascade do |t|
     t.bigint "game_id", null: false
     t.bigint "game_user_id"
+    t.string "sender_name"
     t.boolean "is_event", default: false
     t.text "content"
     t.datetime "created_at", precision: 6, null: false

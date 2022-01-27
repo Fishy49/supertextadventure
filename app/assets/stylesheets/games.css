@@ -8,3 +8,22 @@
 #game-messages {
   padding-bottom: 200px;
 }
+
+.message.host-message {
+  padding: 20px 0;
+  color: #ffffff;
+}
+
+.message.host-message .display-name {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.message.host-message .message-content {
+  font-style: italic;
+  color: #ffffff;
+}
+
+.message.host-message + .message.host-message {
+  padding-top: 0;
+}

@@ -8,7 +8,7 @@
 </div>
 
 <% content_for :text_form do %>
-  <%= render "/shared/terminal_input", prompt: "", controllers: ["game"], values: { game: [ [ :user, current_user.id ], [ :game, @game.id ] ] } %>
+  <%= render "/shared/terminal_input", prompt: "", controllers: ["game"], values: { game: [ [ :game, @game.id ], [:"game-user", @game.game_user(current_user)&.id ] ] } %>
 <% end %>
 
 <% content_for :sidebar do %>

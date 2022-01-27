@@ -4,8 +4,8 @@ import { get, post } from '@rails/request.js'
 export default class extends Controller {
   static targets = [ "prompt", "input", "error" ]
   static values = {
-    user: Number,
-    game: Number
+    game: Number,
+    gameUser: Number
   }
 
   observer = null
@@ -42,7 +42,7 @@ export default class extends Controller {
       let game_payload = {
         message: {
           game_id: this.gameValue,
-          user_id: this.userValue,
+          game_user_id: this.gameUserValue,
           content: inputText
         }
       }

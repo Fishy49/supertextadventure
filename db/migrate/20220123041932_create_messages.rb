@@ -5,6 +5,7 @@ class CreateMessages < ActiveRecord::Migration[7.0]
     create_table :messages do |t|
       t.references :game, null: false, foreign_key: true
       t.references :game_user
+      t.string :sender_name
       t.boolean :is_event, default: false
       t.text :content
 

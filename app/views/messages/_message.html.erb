@@ -1,3 +1,9 @@
-<div class="message <%= "system-message" if message.is_system? %>" id="<%= dom_id(message) %>">
-  <%= message.display_name %> /&gt; <%= message.content %>
+<div class="message <%= "event-message" if message.is_event? %> <%= "host-message" if message.host_message? %>" id="<%= dom_id(message) %>">
+  <% if message.is_event? %>
+    <%= message.content %>
+  <% elsif message.host_message? %>
+    <span class="display-name"><%= message.display_name.upcase %>: </span><span class="message-content"><%= message.content %></span>
+  <% else %>
+    <%= message.display_name %> /&gt; <%= message.content %>
+  <% end %>
 </div>

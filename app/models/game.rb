@@ -18,6 +18,10 @@ class Game < ApplicationRecord
 
   before_create :set_uuid
 
+  def game_user(user)
+    game_users.find_by(user_id: user.id)
+  end
+
   def host?(user)
     created_by == user&.id
   end

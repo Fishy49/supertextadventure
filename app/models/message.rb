@@ -11,6 +11,10 @@ class Message < ApplicationRecord
   def display_name
     return sender_name if sender_name.present?
 
-    game_user&.chacter_name || game.host_display_name
+    game_user&.character_name || game.host_display_name
+  end
+
+  def host_message?
+    !is_event? && game_user.nil?
   end
 end

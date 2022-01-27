@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_23_041932) do
+ActiveRecord::Schema.define(version: 2022_01_27_044459) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -42,6 +42,7 @@ ActiveRecord::Schema.define(version: 2022_01_23_041932) do
     t.integer "max_players"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "current_context"
     t.index ["name"], name: "index_games_on_name", unique: true
     t.index ["uuid"], name: "index_games_on_uuid", unique: true
   end

@@ -1,3 +1,18 @@
-<pre class="ascii">
-<%= current_context.html_safe %>
-</pre>
+<%= turbo_frame_tag(:context) do %>
+  <% if game.current_context.present? %>
+    <% if game.is_current_context_ascii?  %>
+      <pre class="ascii">
+        <%= game.current_context.html_safe %>
+      </pre>
+    <% else %>
+      <p><strong><%= game.current_context %></strong></p>
+    <% end %>
+  <% else %>
+    <%= game.description %>
+  <% end %>
+  <% if game.host?(current_user) %>
+    <div class="text-center">
+      <%= link_to "Edit", game_edit_context_path(game_id: game.id), class: "button", data: {"turbo-frame": "context"}, remote: true %>
+    </div>
+  <% end %>
+<% end %>

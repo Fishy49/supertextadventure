@@ -15,4 +15,8 @@ class ApplicationController < ActionController::Base
   def logged_in?
     current_user.present?
   end
+
+  def authorize!
+    redirect_to root_url, notice: "Away with ye! The tavern is for adventurers only!" unless logged_in?
+  end
 end

@@ -27,3 +27,7 @@
 .message.host-message + .message.host-message {
   padding-top: 0;
 }
+
+.current-context p {
+  font-style: italic;
+}

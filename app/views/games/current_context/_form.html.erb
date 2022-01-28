@@ -1,0 +1,17 @@
+<%= form_with(model: game, url: game_update_context_path(game_id: game.id), method: :patch, data: { "turbo-frame": "context" }) do |form| %>
+  <div class="form-group">
+    <%= form.label :current_context, style: "display: block" %>
+    <%= form.text_area :current_context, value: game.current_context %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :is_current_context_ascii do %>
+      ASCII?
+    <% end %>
+    <%= form.check_box :is_current_context_ascii %>
+  </div>
+
+  <div>
+    <%= form.submit class: "button" %>
+  </div>
+<% end %>

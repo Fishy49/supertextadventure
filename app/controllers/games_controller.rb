@@ -100,17 +100,14 @@ class GamesController < ApplicationController
       @joinable_games = Game.joinable_by_user(current_user).load_async
     end
 
-    def authorize!
-      redirect_to root_url, notice: "Away with ye! The tavern is for adventurers only!" unless logged_in?
-    end
-
     def set_game
       @game = Game.where(id: params[:id]).or(Game.where(uuid: params[:id])).first!
     end
 
     def game_params
       params.require(:game).permit(:uuid, :name, :game_type, :created_by, :status, :opened_at, :closed_at,
-                                   :is_friends_only, :max_players, :description, :host_display_name)
+                                   :is_friends_only, :max_players, :description, :host_display_name,
+                                   :current_context, :is_current_context_ascii)
     end
 
     def set_turbo_frame_id

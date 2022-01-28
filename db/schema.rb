@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 2022_01_27_044459) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "current_context"
+    t.boolean "is_current_context_ascii", default: false
     t.index ["name"], name: "index_games_on_name", unique: true
     t.index ["uuid"], name: "index_games_on_uuid", unique: true
   end

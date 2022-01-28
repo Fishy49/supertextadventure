@@ -9,7 +9,12 @@ Rails.application.routes.draw do
   resources :sessions, only: %i[new create destroy]
 
   get "games/list", to: "games#list", as: :games_list
-  resources :games
+
+  resources :games do
+    patch "current-context", to: "games/current_context#update", as: :update_context
+    get "current-context/edit", to: "games/current_context#edit", as: :edit_context
+  end
+
   get "games/:id/lobby", to: "games#lobby", as: :game_lobby
   patch "games/:id/join", to: "games#join", as: :join_game
 

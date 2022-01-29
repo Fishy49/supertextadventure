@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  get "messages/create"
   root "home#index"
 
   resources :users
@@ -14,11 +13,13 @@ Rails.application.routes.draw do
     patch "current-context", to: "games/current_context#update", as: :update_context
     get "current-context/edit", to: "games/current_context#edit", as: :edit_context
   end
+  resources :inventory_items
 
   get "games/:id/lobby", to: "games#lobby", as: :game_lobby
   patch "games/:id/join", to: "games#join", as: :join_game
 
   post "messages", to: "messages#create", as: :create_message
+  get "messages/create"
 
   get "signup", to: "users#new", as: :signup
   get "login", to: "sessions#new", as: :login

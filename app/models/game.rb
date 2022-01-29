@@ -32,7 +32,11 @@ class Game < ApplicationRecord
   end
 
   def can_user_join?(user)
-    !user_in_game?(user) && !host?(user)
+    !user_in_game?(user) && !host?(user) && !max_players?
+  end
+
+  def max_players?
+    game_users.count == max_players
   end
 
   private

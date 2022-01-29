@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_27_044459) do
+ActiveRecord::Schema.define(version: 2022_01_29_032141) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -48,6 +48,17 @@ ActiveRecord::Schema.define(version: 2022_01_27_044459) do
     t.index ["uuid"], name: "index_games_on_uuid", unique: true
   end
 
+  create_table "inventory_items", force: :cascade do |t|
+    t.bigint "game_user_id", null: false
+    t.string "name"
+    t.integer "quantity"
+    t.text "description"
+    t.text "ascii"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["game_user_id"], name: "index_inventory_items_on_game_user_id"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.bigint "game_id", null: false
     t.bigint "game_user_id"
@@ -70,5 +81,6 @@ ActiveRecord::Schema.define(version: 2022_01_27_044459) do
 
   add_foreign_key "game_users", "games"
   add_foreign_key "game_users", "users"
+  add_foreign_key "inventory_items", "game_users"
   add_foreign_key "messages", "games"
 end

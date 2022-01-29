@@ -53,7 +53,7 @@ export default class extends Controller {
   }
 
   extract_argument(text, command){
-    return text.replace(command, "").trim()
+    return text.replace(command, "").trim().replace("#", "")
   }
 
   show_error(text, fade){

@@ -20,6 +20,10 @@ class GamesController < ApplicationController
       if @game.can_user_join?(current_user)
         @game_user = @game.game_users.create(user_id: current_user.id, character_name: params[:character_name])
       end
+
+      if @game_user.valid?
+        @game.update(status: :closed) if @game.max_players?
+      end
     end
 
     respond_to do |format|
@@ -97,7 +101,7 @@ class GamesController < ApplicationController
     def load_games
       @hosted_games = current_user.hosted_games.load_async
       @joined_games = current_user.joined_games.load_async
-      @joinable_games = Game.joinable_by_user(current_user).load_async
+      @joinable_games = Game.joinable_by_user(current_user).where.not(id: @joined_games.ids).load_async
     end
 
     def set_game

@@ -39,11 +39,15 @@ export default class extends Controller {
       window.stimulus_controller("terminalInput", "terminal").clear_input()
       this.errorTarget.style.display = "none"
 
-      let game_payload = {
-        message: {
-          game_id: this.gameValue,
-          game_user_id: this.gameUserValue,
-          content: inputText
+      if(inputText == "I" || inputText == "INV" || inputText == "INVENTORY") {
+        
+      } else {
+        let game_payload = {
+          message: {
+            game_id: this.gameValue,
+            game_user_id: this.gameUserValue,
+            content: inputText
+          }
         }
       }
 

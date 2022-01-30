@@ -15,6 +15,7 @@ class Game < ApplicationRecord
   scope :joinable_by_user, ->(user) { where(status: :open).where.not(created_by: user.id) }
 
   before_create :set_uuid
+
   after_save :broadcast_context, :will_save_change_to_current_context?
 
   validates :created_by, presence: true
@@ -46,7 +47,7 @@ class Game < ApplicationRecord
     end
 
     def broadcast_context
-      broadcast_replace_to(self, :context, target: :context, partial: "/games/current_context",
+      broadcast_replace_to(self, :state, target: :context, partial: "/games/current_context",
                                            locals: { game: self })
     end
 end

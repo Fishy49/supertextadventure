@@ -14,7 +14,9 @@
 <% content_for :sidebar do %>
   <h3 class="text-center"><strong><%= @game.name %></strong></h3>
   <div class="current-context">
-    <%= turbo_stream_from(@game, :context) unless @game.host?(current_user) %>
+    <%= turbo_stream_from(@game, :state) unless @game.host?(current_user) %>
     <%= render "current_context", game: @game %>
   </div>
+
+  <%= render "players", game_users: @game.game_users %>
 <% end %>

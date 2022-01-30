@@ -31,3 +31,17 @@
 .current-context p {
   font-style: italic;
 }
+
+.players {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+}
+
+.players .player {
+  text-align: center;
+  font-size: 60%;
+}
+
+.players .player pre {
+  font-size: 10px;
+}

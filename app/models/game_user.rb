@@ -9,12 +9,31 @@ class GameUser < ApplicationRecord
 
   before_create :check_game_users_count
 
+  after_save :broadcast_presence, :will_save_change_to_is_online?
+  after_save :broadcast_typing, :will_save_change_to_is_typing?
+  after_save :broadcast_block, :will_save_change_to_is_blocked?
+
   private
 
     def check_game_users_count
-      if game.max_players?
-        errors.add(:base, "Game is full.")
-        raise ActiveRecord::RecordInvalid.new(self)
-      end
+      return unless game.max_players?
+
+      errors.add(:base, "Game is full.")
+      raise ActiveRecord::RecordInvalid, self
+    end
+
+    def broadcast_presence
+      # broadcast_replace_to(game, :state, target: :context, partial: "/games/current_context",
+      # locals: { game: self })
+    end
+
+    def broadcast_typing
+      # broadcast_replace_to(game, :state, target: :context, partial: "/games/current_context",
+      # locals: { game: self })
+    end
+
+    def broadcast_block
+      # broadcast_replace_to(game, :state, target: :context, partial: "/games/current_context",
+      # locals: { game: self })
     end
 end

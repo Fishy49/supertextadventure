@@ -25,8 +25,9 @@ ActiveRecord::Schema.define(version: 2022_01_31_001843) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "max_health"
     t.integer "current_health"
-    t.boolean "is_typing"
-    t.boolean "is_blocked"
+    t.boolean "is_online", default: false
+    t.boolean "is_typing", default: false
+    t.boolean "is_blocked", default: false
     t.index ["game_id", "user_id"], name: "index_game_users_on_game_id_and_user_id", unique: true
     t.index ["game_id"], name: "index_game_users_on_game_id"
     t.index ["user_id"], name: "index_game_users_on_user_id"

@@ -21,9 +21,7 @@ class GamesController < ApplicationController
         @game_user = @game.game_users.create(user_id: current_user.id, character_name: params[:character_name])
       end
 
-      if @game_user.valid?
-        @game.update(status: :closed) if @game.max_players?
-      end
+      @game.update(status: :closed) if @game_user.valid? && @game.max_players?
     end
 
     respond_to do |format|

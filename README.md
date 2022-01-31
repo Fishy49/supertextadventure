@@ -1,24 +1,25 @@
-# README
+# SuperTextAdventure
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Welcome, ye adventurer!
+SuperTextAdventure is three things:
+1. An unglorified chat app.
+2. A tool for telling stories with your friends.
+3. A passion-project of a Ruby/Rails nerd.
 
-Things you may want to cover:
+The hope is that this application can provide a way to have a D&D-like experience in a nostalgic setting like the text-adventures of olde.
 
-* Ruby version
+## Setup
+Simply clone the repo and install with `bundle install && rails db:create && rails db:migrate`.
 
-* System dependencies
+## TODO
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- Add "Presence/Typing" indicators
+- Add HP
+- Add ability for host to control who can type
+- Add basic inventory system
+- Add loading of past message on scroll
+- Add ability for host to edit their messages
+- Add browsable ASCII library
+- Add "Strict" game mode that allows hosts to provide an allowlist of verbs that the "game" will accept
+- Add friend system
+- Add dice roller

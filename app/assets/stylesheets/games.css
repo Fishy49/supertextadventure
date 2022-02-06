@@ -45,3 +45,13 @@
 .players .player pre {
   font-size: 10px;
 }
+
+.game-message-form {
+  position: relative;
+}
+
+.game-message-form .typing-indicator {
+  position: absolute;
+  top: -34px;
+  font-size: 70%;
+}

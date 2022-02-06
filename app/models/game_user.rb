@@ -6,6 +6,8 @@ class GameUser < ApplicationRecord
   has_many :messages, inverse_of: :game_user, dependent: :destroy
 
   scope :active, -> { where(is_active: true) }
+  scope :online, -> { where(is_online: true) }
+  scope :typing, -> { where(is_typing: true) }
 
   before_create :check_game_users_count
 
@@ -28,8 +30,8 @@ class GameUser < ApplicationRecord
     end
 
     def broadcast_typing
-      # broadcast_replace_to(game, :state, target: :context, partial: "/games/current_context",
-      # locals: { game: self })
+      broadcast_replace_to(game, :state, target: :typing, partial: "/games/typing_indicators",
+                                         locals: { typers: game.game_users.typing })
     end
 
     def broadcast_block

@@ -1,6 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { get, post } from '@rails/request.js'
-import { createConsumer } from "@rails/actioncable"
+import { get, post, patch } from '@rails/request.js'
 
 export default class extends Controller {
   static targets = [ "prompt", "input", "error" ]
@@ -12,17 +11,8 @@ export default class extends Controller {
   observer = null
 
   connect(){
-    this.channel = createConsumer().subscriptions.create(
-      {
-        channel: "GameUserIndicatorsChannel",
-        id: this.gameUserValue,
-      },
-      {
-        connected: this.initChannel.bind(this),
-        disconnected: this._disconnected.bind(this),
-        received: this._received.bind(this),
-      }
-    );
+
+    patch(`/game_users/${this.gameUserValue}/online`)
 
     const targetNode = document.querySelector('.game-message-area');
     targetNode.scrollTo(0, 100000)
@@ -39,9 +29,12 @@ export default class extends Controller {
 
   disconnect(){
     this.observer.disconnect()
+    patch(`/game_users/${this.gameUserValue}/offline`)
   }
 
   capture_input(e) {
+    this.typing()
+
     if(e.keyCode == 13){
       e.preventDefault();
 
@@ -68,24 +61,11 @@ export default class extends Controller {
     }
   }
 
-  _disconnected() {}
-
-  _received(data) {
-  }
-
-  initChannel() {
-    this.typingHandler = this.typing.bind(this)
-    this.inputTarget.addEventListener('keydown', this.typingHandler)
-
-    this.stoppedTyping = this.stoppedTyping.bind(this)
-    this.inputTarget.addEventListener('blur', this.stoppedTyping)
-  }
-
   typing() {
     // Don't broadcast if we're already typing
     if(!this.isTyping) {
       this.isTyping = true
-      this.channel.perform('typing', { game_user_id: this.gameUserValue, typing: true } )
+      patch(`/game_users/${this.gameUserValue}/typing`)
     }
 
     // Do this no matter what so it resets the timer
@@ -95,15 +75,15 @@ export default class extends Controller {
   stoppedTyping() {
     this.isTyping = false
     this.stopTypingTimer()
-    this.channel.perform('typing', { game_user_id: this.gameUserValue, typing: false } )
+    patch(`/game_users/${this.gameUserValue}/stop-typing`)
   }
 
   startTypingTimer() {
-    // Clear the old timer or it'll still fire after 10 seconds. We're effectively resetting the timer.
+    // Clear the old timer or it'll still fire after 5 seconds. We're effectively resetting the timer.
     this.stopTypingTimer()
     // No need to save a reference to bound function since we don't need to reference it to stop the timer.
     // After 10 seconds of not typing, don't consider the user to be typing
-    this.typingTimeoutID = setTimeout(this.stoppedTyping.bind(this), 10000)
+    this.typingTimeoutID = setTimeout(this.stoppedTyping.bind(this), 5000)
   }
 
   stopTypingTimer() {

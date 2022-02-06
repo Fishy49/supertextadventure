@@ -18,6 +18,11 @@ Rails.application.routes.draw do
   get "games/:id/lobby", to: "games#lobby", as: :game_lobby
   patch "games/:id/join", to: "games#join", as: :join_game
 
+  patch "game_users/:id/online", to: "game_users#online"
+  patch "game_users/:id/offline", to: "game_users#offline"
+  patch "game_users/:id/typing", to: "game_users#typing"
+  patch "game_users/:id/stop-typing", to: "game_users#stop_typing"
+
   post "messages", to: "messages#create", as: :create_message
   get "messages/create"
 

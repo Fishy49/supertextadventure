@@ -7,7 +7,9 @@
   <% end %>
 </div>
 
+
 <% content_for :text_form do %>
+  <%= render "typing_indicators", typers: @game.game_users.typing %>
   <%= render "/shared/terminal_input", prompt: "", controllers: ["game"], values: { game: [ [ :game, @game.id ], [:"game-user", @game.game_user(current_user)&.id ] ] } %>
 <% end %>
 

@@ -40,7 +40,7 @@ export default class extends Controller {
         let gameListElement = document.getElementById('game-join-element-' + tableNumber)
 
         if(!gameListElement){
-          let error_text = 'Could not find ' + tableNumber + '!'
+          let error_text = 'Could not find a table for #' + tableNumber + '!'
           this.show_error(error_text, false)
         } else {
           get('/games/' + gameListElement.dataset.gameId + '/lobby', { responseKind: "turbo-stream" })

@@ -20,7 +20,7 @@ The application can be run with `rails s`. Clockwork is used to run background j
 - Add HP
 - Add ability for host to control who can type
 - Add basic inventory system
-- Add loading of past message on scroll
+- Add loading of past message on scroll <-- (Launchable version!)
 - Add ability for host to edit their messages
 - Add browsable ASCII library
 - Add "Strict" game mode that allows hosts to provide an allowlist of verbs that the "game" will accept

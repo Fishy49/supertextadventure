@@ -4,17 +4,17 @@ class GameUsersController < ApplicationController
   before_action :set_game_user
 
   def online
-    @game_user.update(is_online: true)
+    @game_user.update(is_online: true, online_at: DateTime.now)
     head :ok
   end
 
   def offline
-    @game_user.update(is_online: false)
+    @game_user.update(is_online: false, is_typing: false)
     head :ok
   end
 
   def typing
-    @game_user.update(is_typing: true)
+    @game_user.update(is_typing: true, typing_at: DateTime.now)
     head :ok
   end
 

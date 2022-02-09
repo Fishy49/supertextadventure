@@ -78,3 +78,7 @@ gem "rubocop-performance", "~> 1.13"
 gem "rubocop-rails", "~> 2.13"
 
 gem "classes", "~> 0.1.0"
+
+gem "clockwork", "~> 3.0"
+
+gem "sucker_punch", "~> 3.0"

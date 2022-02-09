@@ -1,5 +1,9 @@
 <%= turbo_frame_tag(:typing) do %>
-  <div class="typing-indicator <%= "is-hidden" if typers.count.zero? %>">
-    <%= typers.map(&:character_name).join(" and ") %> <%= typers.one? ? "is" : "are" %> typing...
+  <%
+    names = typers.map(&:character_name)
+    names << "Host" if host.present?
+  %>
+  <div class="typing-indicator <%= "is-hidden" if names.count.zero? %>">
+    <%= names.join(" and ") %> <%= names.one? ? "is" : "are" %> typing...
   </div>
 <% end %>

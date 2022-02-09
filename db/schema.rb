@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_31_001843) do
+ActiveRecord::Schema.define(version: 2022_02_09_013822) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -26,7 +26,9 @@ ActiveRecord::Schema.define(version: 2022_01_31_001843) do
     t.integer "max_health"
     t.integer "current_health"
     t.boolean "is_online", default: false
+    t.datetime "online_at"
     t.boolean "is_typing", default: false
+    t.datetime "typing_at"
     t.boolean "is_blocked", default: false
     t.index ["game_id", "user_id"], name: "index_game_users_on_game_id_and_user_id", unique: true
     t.index ["game_id"], name: "index_game_users_on_game_id"
@@ -49,6 +51,10 @@ ActiveRecord::Schema.define(version: 2022_01_31_001843) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "current_context"
     t.boolean "is_current_context_ascii", default: false
+    t.boolean "is_host_online", default: false
+    t.datetime "host_online_at"
+    t.boolean "is_host_typing", default: false
+    t.datetime "host_typing_at"
     t.index ["name"], name: "index_games_on_name", unique: true
     t.index ["uuid"], name: "index_games_on_uuid", unique: true
   end

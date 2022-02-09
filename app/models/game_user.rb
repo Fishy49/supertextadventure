@@ -11,9 +11,9 @@ class GameUser < ApplicationRecord
 
   before_create :check_game_users_count
 
-  after_save :broadcast_presence, :will_save_change_to_is_online?
-  after_save :broadcast_typing, :will_save_change_to_is_typing?
-  after_save :broadcast_block, :will_save_change_to_is_blocked?
+  after_save :broadcast_presence, if: :saved_change_to_is_online?
+  after_save :broadcast_typing, if: :saved_change_to_is_typing?
+  after_save :broadcast_block, if: :saved_change_to_is_blocked?
 
   private
 
@@ -31,7 +31,7 @@ class GameUser < ApplicationRecord
 
     def broadcast_typing
       broadcast_replace_to(game, :state, target: :typing, partial: "/games/typing_indicators",
-                                         locals: { typers: game.game_users.typing })
+                                         locals: { typers: game.game_users.typing, host: game.is_host_typing? })
     end
 
     def broadcast_block

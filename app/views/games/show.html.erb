@@ -1,5 +1,7 @@
+<%= turbo_stream_from(@game, :messages) %>
+<%= turbo_stream_from(@game, :state) %>
+
 <div id="game-messages" data-controller="scroll">
-  <%= turbo_stream_from(@game, :messages) %>
   <%= turbo_frame_tag(:messages, data: { "scroll-target": "container" }) do %>
     <% @game.messages.latest.each do |message| %>
       <%= render "/messages/message", message: message %>
@@ -9,14 +11,13 @@
 
 
 <% content_for :text_form do %>
-  <%= render "typing_indicators", typers: @game.game_users.typing %>
-  <%= render "/shared/terminal_input", prompt: "", controllers: ["game"], values: { game: [ [ :game, @game.id ], [:"game-user", @game.game_user(current_user)&.id ] ] } %>
+  <%= render "typing_indicators", typers: @game.game_users.typing, host: @game.is_host_typing? %>
+  <%= render "/shared/terminal_input", prompt: "", controllers: ["game"], values: { game: [ [ :game, @game.id ], [:"game-user", @game.host?(current_user) ? :host : @game.game_user(current_user)&.id ] ] } %>
 <% end %>
 
 <% content_for :sidebar do %>
   <h3 class="text-center"><strong><%= @game.name %></strong></h3>
   <div class="current-context">
-    <%= turbo_stream_from(@game, :state) unless @game.host?(current_user) %>
     <%= render "current_context", game: @game %>
   </div>
 

@@ -5,14 +5,14 @@ export default class extends Controller {
   static targets = [ "prompt", "input", "error" ]
   static values = {
     game: Number,
-    gameUser: Number
+    gameUser: String
   }
 
   observer = null
 
   connect(){
 
-    patch(`/game_users/${this.gameUserValue}/online`)
+    patch(this.patch_url('/online'))
 
     const targetNode = document.querySelector('.game-message-area');
     targetNode.scrollTo(0, 100000)
@@ -29,14 +29,29 @@ export default class extends Controller {
 
   disconnect(){
     this.observer.disconnect()
-    patch(`/game_users/${this.gameUserValue}/offline`)
+    patch(this.patch_url('/offline'))
+  }
+
+  is_host(){
+    return this.gameUserValue == "host"
+  }
+
+  patch_url(path = ''){
+    let url
+    if(this.is_host()){
+      url = `/games/${this.gameValue}/host`
+    } else {
+      url = `/game_users/${this.gameUserValue}`
+    }
+    return url + path
   }
 
   capture_input(e) {
-    this.typing()
 
     if(e.keyCode == 13){
-      e.preventDefault();
+      e.preventDefault()
+
+      this.stoppedTyping()
 
       let inputText = e.target.textContent.trim().toUpperCase()
 
@@ -58,14 +73,23 @@ export default class extends Controller {
       }
 
       post("/messages", { body: game_payload, responseKind: "turbo-stream" })
+    } else {
+      this.typing()
     }
+  }
+
+  onlineLoop() {
+    setTimeout(() => { 
+      patch(this.patch_url('/online'))
+      this.onlineLoop()
+    }, 5000)
   }
 
   typing() {
     // Don't broadcast if we're already typing
     if(!this.isTyping) {
       this.isTyping = true
-      patch(`/game_users/${this.gameUserValue}/typing`)
+      patch(this.patch_url('/typing'))
     }
 
     // Do this no matter what so it resets the timer
@@ -75,7 +99,7 @@ export default class extends Controller {
   stoppedTyping() {
     this.isTyping = false
     this.stopTypingTimer()
-    patch(`/game_users/${this.gameUserValue}/stop-typing`)
+    patch(this.patch_url('/stop-typing'))
   }
 
   startTypingTimer() {

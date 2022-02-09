@@ -54,4 +54,5 @@
   position: absolute;
   top: -34px;
   font-size: 70%;
+  background-color: var(--background-color);
 }

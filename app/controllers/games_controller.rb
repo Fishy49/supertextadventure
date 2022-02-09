@@ -3,7 +3,7 @@
 class GamesController < ApplicationController
   before_action :authorize!
   before_action :set_turbo_frame_id
-  before_action :set_game, only: %i[show join lobby edit update destroy]
+  before_action :set_game, except: %i[index list]
   before_action :load_games, only: %i[index list]
 
   def index; end

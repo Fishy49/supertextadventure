@@ -49,7 +49,7 @@ class Game < ApplicationRecord
     end
 
     def broadcast_context
-      broadcast_replace_to(self, :state, target: :context, partial: "/games/current_context",
+      broadcast_replace_to(self, :state, target: :context_content, partial: "/games/current_context",
                                          locals: { game: self })
     end
 

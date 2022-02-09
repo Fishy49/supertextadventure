@@ -13,6 +13,7 @@ export default class extends Controller {
   connect(){
 
     patch(this.patch_url('/online'))
+    this.onlineLoop()
 
     const targetNode = document.querySelector('.game-message-area');
     targetNode.scrollTo(0, 100000)
@@ -30,6 +31,7 @@ export default class extends Controller {
   disconnect(){
     this.observer.disconnect()
     patch(this.patch_url('/offline'))
+    clearTimeout(this.onlineTimeout)
   }
 
   is_host(){
@@ -79,7 +81,7 @@ export default class extends Controller {
   }
 
   onlineLoop() {
-    setTimeout(() => { 
+    this.onlineTimeout = setTimeout(() => { 
       patch(this.patch_url('/online'))
       this.onlineLoop()
     }, 5000)

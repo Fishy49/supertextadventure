@@ -46,6 +46,14 @@
   font-size: 10px;
 }
 
+.players .ascii-knight-head, .players .player span {
+  color: green;
+}
+
+.players .player.online .ascii-knight-head, .players .player.online span {
+  color: var(--font-color);
+}
+
 .game-message-form {
   position: relative;
 }

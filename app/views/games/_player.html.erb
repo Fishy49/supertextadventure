@@ -1,4 +1,4 @@
-<div class="player">
+<div class="player <%= "online" if online.present? %>">
   <%= ascii("knight_head") %>
-  <%= game_user.character_name %>
+  <span><%= game_user.character_name %></span>
 </div>

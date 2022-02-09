@@ -25,8 +25,8 @@ class GameUser < ApplicationRecord
     end
 
     def broadcast_presence
-      # broadcast_replace_to(game, :state, target: :context, partial: "/games/current_context",
-      # locals: { game: self })
+      broadcast_replace_to(game, :state, target: :players, partial: "/games/players",
+                                         locals: { game_users: game.game_users.order(:id) })
     end
 
     def broadcast_typing

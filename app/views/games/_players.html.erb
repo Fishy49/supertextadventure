@@ -1,6 +1,7 @@
-<h4 class="text-center mb-1">PLAYERS</h4>
-<div class="players">
-  <% game_users.each do |game_user| %>
-    <%= render "player", game_user: game_user %>
-  <% end %>
-</div>
+<%= turbo_frame_tag(:players) do %>
+  <div class="players">
+    <% game_users.each do |game_user| %>
+      <%= render "/games/player", game_user: game_user, online: game_user.is_online? %>
+    <% end %>
+  </div>
+<% end %>

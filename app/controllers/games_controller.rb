@@ -42,7 +42,9 @@ class GamesController < ApplicationController
     end
   end
 
-  def show; end
+  def show
+    @game.game_user(current_user).update(is_online: true, online_at: DateTime.now) unless @game.host?(current_user)
+  end
 
   def new
     @game = Game.new(created_by: current_user.id)

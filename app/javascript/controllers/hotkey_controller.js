@@ -1,4 +1,5 @@
-import { Controller } from "@hotwired/stimulus"
+import { Controller } from '@hotwired/stimulus'
+import { Turbo } from '@hotwired/turbo-rails'
 
 export default class extends Controller {
   connect() {
@@ -9,24 +10,24 @@ export default class extends Controller {
     if (e.ctrlKey) {
       switch(e.key) {
         case 'h':
-          document.location.href = '/'
+          Turbo.visit('/')
           break;
         case 'r':
-          document.location.href = "/signup"
+          Turbo.visit('/signup')
           break;
         case 'l':
-          if(confirm("Logout?")){
-            document.location.href = "/logout"
+          if(confirm('Logout?')){
+            Turbo.visit('/logout')
           }
           break;
         case 't':
-          document.location.href = "/tavern"
+          Turbo.visit('/tavern')
           break;
         case 'c':
-          document.location.href = "/characters"
+          Turbo.visit('/characters')
           break;
         case 'a':
-          document.location.href = "/about"
+          Turbo.visit('/about')
           break;
       }
     }

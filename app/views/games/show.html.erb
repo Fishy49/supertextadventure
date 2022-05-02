@@ -21,6 +21,6 @@
     <%= render "current_context", game: @game %>
   </div>
 
-  <h4 class="text-center mb-1">PLAYERS</h4>
+  <h4 class="text-center mb-0 mt-3">PLAYERS</h4>
   <%= render "players", game_users: @game.game_users.order(:id) %>
 <% end %>

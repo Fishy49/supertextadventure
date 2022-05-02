@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_09_013822) do
+ActiveRecord::Schema.define(version: 2022_02_12_022456) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -55,6 +55,8 @@ ActiveRecord::Schema.define(version: 2022_02_09_013822) do
     t.datetime "host_online_at"
     t.boolean "is_host_typing", default: false
     t.datetime "host_typing_at"
+    t.boolean "enable_hp", default: true
+    t.integer "starting_hp", default: 10
     t.index ["name"], name: "index_games_on_name", unique: true
     t.index ["uuid"], name: "index_games_on_uuid", unique: true
   end

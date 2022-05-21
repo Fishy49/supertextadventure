@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
 class GamesController < ApplicationController
   before_action :authorize!
   before_action :set_turbo_frame_id
@@ -15,10 +16,18 @@ class GamesController < ApplicationController
     end
   end
 
+  # rubocop:disable Metrics/MethodLength
   def join
     @game.with_lock do
       if @game.can_user_join?(current_user)
-        @game_user = @game.game_users.create(user_id: current_user.id, character_name: params[:character_name])
+        game_user_params = {
+          user_id: current_user.id,
+          character_name: params[:character_name]
+        }
+
+        game_user_params.merge(max_health: @game.starting_hp, current_health: @game.starting_hp) if @game.enable_hp?
+
+        @game_user = @game.game_users.create(game_user_params)
       end
 
       @game.update(status: :closed) if @game_user.valid? && @game.max_players?
@@ -32,6 +41,7 @@ class GamesController < ApplicationController
       end
     end
   end
+  # rubocop:enable Metrics/MethodLength
 
   def lobby
     respond_to do |format|
@@ -111,10 +121,11 @@ class GamesController < ApplicationController
     def game_params
       params.require(:game).permit(:uuid, :name, :game_type, :created_by, :status, :opened_at, :closed_at,
                                    :is_friends_only, :max_players, :description, :host_display_name,
-                                   :current_context, :is_current_context_ascii)
+                                   :current_context, :is_current_context_ascii, :enable_hp, :starting_hp)
     end
 
     def set_turbo_frame_id
       @turbo_frame_id = params[:turbo_frame_id].presence&.to_sym || :sidebar
     end
 end
+# rubocop:enable Metrics/ClassLength

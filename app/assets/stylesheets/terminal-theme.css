@@ -98,6 +98,7 @@ a.button {
 
 .button.is-small {
   font-size: 80%;
+  padding: 0 5px;
 }
 
 .button:hover {

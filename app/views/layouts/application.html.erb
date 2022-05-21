@@ -20,17 +20,17 @@
     <div class="container">
       <div class="header"><%= render "header" %></div>
       
-      <div class="game-message-area">
+      <div class="game-message-area styled-scrollbars">
         <%= yield %>
       </div>
 
-      <div class="game-message-form">
+      <div class="game-message-form styled-scrollbars">
         <turbo-frame id="text_form">
           <%= yield :text_form %>
         </turbo-frame>
       </div>
 
-      <div class="game-sidebar">
+      <div class="game-sidebar styled-scrollbars">
         <turbo-frame id="sidebar">
           <%= yield :sidebar %>
         </turbo-frame>

@@ -161,3 +161,18 @@ select {
 input[type="checkbox"] {
   font-size: 1em;
 }
+
+.styled-scrollbars::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #353638;
+}
+
+.styled-scrollbars::-webkit-scrollbar {
+  width: 12px;
+  background-color: #7b7b7b;
+}
+
+.styled-scrollbars::-webkit-scrollbar-thumb {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #47474a;
+}

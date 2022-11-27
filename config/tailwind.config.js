@@ -10,8 +10,8 @@ module.exports = {
       fontSize: {
         xs: ['1rem', { lineHeight: '1rem' }],
         sm: ['1.3rem', { lineHeight: '1.25rem' }],
-        base: ['1.6rem', { lineHeight: '1.5rem' }],
-        lg: ['1.8rem', { lineHeight: '1.75rem' }],
+        base: ['1.6rem', { lineHeight: '1.8rem' }],
+        lg: ['1.8rem', { lineHeight: '1.9rem' }],
         xl: ['2rem', { lineHeight: '1.75rem' }],
         '2xl': ['2.25rem', { lineHeight: '2rem' }],
         '3xl': ['2.875rem', { lineHeight: '2.25rem' }],

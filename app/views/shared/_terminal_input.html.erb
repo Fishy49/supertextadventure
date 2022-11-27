@@ -1,6 +1,6 @@
 <% controllers = (defined?(controllers) && controllers.is_a?(Array)) ? controllers.concat(["terminal"]) : ["terminal"] %>
 <div id="terminalInput" 
-     class="terminal-input-wrapper"
+     class="w-full h-full"
      data-controller="<%= controllers.join(" ") %>"
      <% if defined?(values) %>
       <% values.each do |value_controller, controller_values| %>
@@ -10,13 +10,13 @@
       <% end %>
      <% end %>
 >
-  <div class="error-container"
+  <div class="hidden text-white uppercase w-full before:content-['*** SYNTAX ERROR: ']"
        <% controllers.each do |controller| %>
          data-<%= controller %>-target="error"
        <% end %>
   ></div>
 
-  <span class="prompt"
+  <span class="inline-block uppercase after:content-['/>']"
         <% controllers.each do |controller| %>
           data-<%= controller %>-target="prompt"
         <% end %>

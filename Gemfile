@@ -82,3 +82,7 @@ gem "classes", "~> 0.1.0"
 gem "clockwork", "~> 3.0"
 
 gem "sucker_punch", "~> 3.0"
+
+gem "tailwindcss-rails", "~> 2.0"
+
+gem "foreman", "~> 0.87.2"

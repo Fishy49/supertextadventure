@@ -16,7 +16,7 @@ The application can be run with `rails s`. Clockwork is used to run background j
 
 ## TODO
 
-- ~~Add "Presence/Typing" indicators~~
+- Add "Presence/Typing" indicators
 - Add HP
 - Add ability for host to control who can type
 - Add basic inventory system

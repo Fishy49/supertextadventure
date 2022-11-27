@@ -1,4 +1,4 @@
-<h1><%= link_to "SuperTextAdventure_v0.1", root_path %></h1>
+<h1 class="text-xl font-bold"><%= link_to "SuperTextAdventure_v0.1", root_path %></h1>
 <% if logged_in? %>
-  <h4 class="text-right pt-2 mb-0"><%= greeting %>, <%= current_user.username %></h4>
+  <h4 class="text-sm text-right"><%= greeting %>, <%= current_user.username %></h4>
 <% end %>

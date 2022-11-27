@@ -7,7 +7,11 @@ module ApplicationHelper
       "Haldo",
       "Ho There",
       "Good Morn",
-      "Hail"
+      "Hail",
+      "Greetums",
+      "Frabjous Day",
+      "Jingle Jangle",
+      "Huzzah"
     ]
 
     greetings.sample

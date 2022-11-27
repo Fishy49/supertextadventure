@@ -1,42 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html class="w-[100%] h-[100%]">
   <head>
-    <title>Supertextadventure</title>
+    <title>Super Text Adventure</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com"> 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+    <% # stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <div class="container">
-      <div class="header"><%= render "header" %></div>
-      
-      <div class="game-message-area styled-scrollbars">
-        <%= yield %>
+  <body class="text-base p-6 bg-stone-800 text-[#8fe86b] flex flex-col h-full w-full">
+
+      <div class="grid grid-cols-2">
+        <%= render "header" %>
       </div>
 
-      <div class="game-message-form styled-scrollbars">
-        <turbo-frame id="text_form">
-          <%= yield :text_form %>
-        </turbo-frame>
-      </div>
+      <div class="grow grid grid-cols-2">
+        <div>
+          <div class="game-message-area styled-scrollbars">
+            <%= yield %>
+          </div>
 
-      <div class="game-sidebar styled-scrollbars">
-        <turbo-frame id="sidebar">
-          <%= yield :sidebar %>
-        </turbo-frame>
+          <div class="game-message-form styled-scrollbars">
+            <turbo-frame id="text_form">
+              <%= yield :text_form %>
+            </turbo-frame>
+          </div>
+        </div>
+
+        <div class="game-sidebar styled-scrollbars">
+          <turbo-frame id="sidebar">
+            <%= yield :sidebar %>
+          </turbo-frame>
+        </div>
       </div>
       
-      <div class="footer"><%= render "footer" %></div>
-    </div>
+      <div class="grid grid-cols-2"><%= render "footer" %></div>
+
   </body>
 </html>

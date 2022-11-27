@@ -1,33 +1,33 @@
-<div class="footer-hotkeys" data-controller="hotkey">
-  <span class="footer-hotkey-item">
-    <span class="text-filled">^H</span>ome
+<div data-controller="hotkey">
+  <span>
+    <span class="bg-terminal-green text-stone-800 font-bold"><span class="text-xl">&#x2387;</span>H</span>ome
   </span>
 
   <% if !logged_in? %>
-    <span class="divider mx-1">|</span>
-    <span class="footer-hotkey-item">
-      <span class="text-filled">^R</span>egister
+    <span class="mx-1">|</span>
+    <span>
+      <span class="bg-terminal-green text-stone-800 font-bold"><span class="text-xl">&#x2387;</span>R</span>egister
     </span>
   <% end %>
 
   <% if logged_in? %>
-    <span class="divider mx-1">|</span>
-    <span class="footer-hotkey-item">
-      <span class="text-filled">^L</span>ogout
+    <span class="mx-1">|</span>
+    <span>
+      <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>L</span>ogout
     </span>
 
-    <span class="divider mx-1">|</span>
-    <span class="footer-hotkey-item">
-      <span class="text-filled">^T</span>avern
+    <span class="mx-1">|</span>
+    <span>
+      <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>T</span>avern
     </span>
 
-    <span class="divider mx-1">|</span>
-    <span class="footer-hotkey-item">
-      <span class="text-filled">^A</span>bout
+    <span class="mx-1">|</span>
+    <span>
+      <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>A</span>bout
     </span>
   <% end %>
 </div>
 
-<div class="copyright text-right pt-1">
+<div class="text-right text-sm">
   &copy; <%= Date.today.year == 2022 ? "2022" : "2022 - #{Date.today.year}" %> <a href="https://richardcagle.dev">Richard Cagle</a>
 </div>

@@ -16,6 +16,7 @@ export default class extends Controller {
   }
 
   default_input_handling(e){
+    // On "left" arrow, we want to snap to the end of anything typed
     if(e.keyCode == 37){
       e.preventDefault()
       window.placeCaretAtEnd(this.inputTarget)

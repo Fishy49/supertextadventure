@@ -1,6 +1,6 @@
 # ASCII Credits
 
-ASCII art is located in the app/views/ascii folder
+ASCII art is located in the [app/views/ascii](/app/views/ascii) folder
 
 - Bricks From https://www.asciiart.eu/art-and-design/celtic
 - Castle From https://www.asciiart.eu/buildings-and-places/castles

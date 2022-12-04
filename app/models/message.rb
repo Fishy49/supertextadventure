@@ -4,9 +4,15 @@ class Message < ApplicationRecord
   belongs_to :game
   belongs_to :game_user, optional: true
 
+  serialize :event_data
+
   scope :latest, -> { order(:id).last(50) }
 
   after_create_commit -> { broadcast_append_to(game, :messages) }
+
+  def event?
+    event_type.present?
+  end
 
   def display_name
     return sender_name if sender_name.present?

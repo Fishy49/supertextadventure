@@ -6,39 +6,42 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <% # stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="text-base p-6 bg-stone-800 text-[#8fe86b] flex flex-col h-full w-full">
+  <body class="text-base bg-stone-800 text-terminal-green grid grid-areas-layout grid-flow-row gap-0 h-full">
 
-      <div class="grid grid-cols-2 pb-5 mb-5 border-b-2 border-b-terminal-green">
+      <header class="grid-in-header grid grid-cols-3 p-2 mb-5 border-b-2 border-b-terminal-green">
         <%= render "header" %>
+      </header>
+
+      <div class="grid-in-message-container terminal-scrollbars overflow-y-auto px-3 pb-[300px]">
+        <%= yield %>
       </div>
 
-      <div class="grow grid grid-cols-2">
-        <div>
-          <div class="game-message-area styled-scrollbars">
-            <%= yield %>
-          </div>
-
-          <div class="game-message-form styled-scrollbars">
-            <turbo-frame id="text_form">
-              <%= yield :text_form %>
-            </turbo-frame>
-          </div>
-        </div>
-
-        <div class="game-sidebar styled-scrollbars">
-          <turbo-frame id="sidebar">
-            <%= yield :sidebar %>
-          </turbo-frame>
-        </div>
+      <div class="grid-in-message-form terminal-scrollbars px-3 border-t-2 border-t-terminal-green border-dashed">
+        <turbo-frame id="text_form">
+          <%= yield :text_form %>
+        </turbo-frame>
       </div>
+
+      <div class="grid-in-sidebar border-l-2 border-l-terminal-green border-dashed terminal-scrollbars overflow-y-auto px-3">
+        <turbo-frame id="sidebar">
+          <%= yield :sidebar %>
+        </turbo-frame>
+      </div>
+
       
-      <div class="grid grid-cols-2"><%= render "footer" %></div>
+      <footer class="grid-in-footer grid grid-cols-3 border-t-2 border-t-terminal-green px-3">
+        <%= render "footer" %>
+      </footer>
 
   </body>
 </html>

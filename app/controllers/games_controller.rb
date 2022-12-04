@@ -53,7 +53,11 @@ class GamesController < ApplicationController
   end
 
   def show
-    @game.game_user(current_user).update(is_online: true, online_at: DateTime.now) unless @game.host?(current_user)
+    if @game.host?(current_user)
+      @game.update(host_active_at: DateTime.now)
+    else
+      @game.game_user(current_user).update(active_at: DateTime.now)
+    end
   end
 
   def new

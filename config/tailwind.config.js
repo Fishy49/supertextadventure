@@ -7,6 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      listStyleType: {
+        square: 'square',
+      },
       fontSize: {
         xs: ['1rem', { lineHeight: '1rem' }],
         sm: ['1.3rem', { lineHeight: '1.25rem' }],
@@ -34,6 +37,11 @@ module.exports = {
         'terminal-green': '#8fe86b',
       },
     },
+  },
+  variants: {
+    extend: {
+      padding: ['last']
+    }
   },
   plugins: [
     require('@tailwindcss/forms'),

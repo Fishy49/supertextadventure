@@ -11,7 +11,7 @@ export default class extends Controller {
   observer = null
 
   connect(){
-    const targetNode = document.querySelector('.game-message-area');
+    const targetNode = document.querySelector('.grid-in-message-container');
     targetNode.scrollTo(0, 100000)
 
     const callback = (mutationsList, observer) => {

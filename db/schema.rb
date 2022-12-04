@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_12_022456) do
-
+ActiveRecord::Schema[7.0].define(version: 2022_12_04_055623) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -21,15 +20,11 @@ ActiveRecord::Schema.define(version: 2022_02_12_022456) do
     t.bigint "user_id", null: false
     t.string "character_name", null: false
     t.boolean "is_active", default: true
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "max_health"
     t.integer "current_health"
-    t.boolean "is_online", default: false
-    t.datetime "online_at"
-    t.boolean "is_typing", default: false
-    t.datetime "typing_at"
-    t.boolean "is_blocked", default: false
+    t.datetime "active_at"
     t.index ["game_id", "user_id"], name: "index_game_users_on_game_id_and_user_id", unique: true
     t.index ["game_id"], name: "index_game_users_on_game_id"
     t.index ["user_id"], name: "index_game_users_on_user_id"
@@ -43,18 +38,15 @@ ActiveRecord::Schema.define(version: 2022_02_12_022456) do
     t.integer "created_by"
     t.string "status"
     t.string "host_display_name"
-    t.datetime "opened_at", precision: 6
-    t.datetime "closed_at", precision: 6
+    t.datetime "opened_at"
+    t.datetime "closed_at"
     t.boolean "is_friends_only"
     t.integer "max_players"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "current_context"
     t.boolean "is_current_context_ascii", default: false
-    t.boolean "is_host_online", default: false
-    t.datetime "host_online_at"
-    t.boolean "is_host_typing", default: false
-    t.datetime "host_typing_at"
+    t.datetime "host_active_at"
     t.boolean "enable_hp", default: true
     t.integer "starting_hp", default: 10
     t.index ["name"], name: "index_games_on_name", unique: true
@@ -67,8 +59,8 @@ ActiveRecord::Schema.define(version: 2022_02_12_022456) do
     t.integer "quantity"
     t.text "description"
     t.text "ascii"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["game_user_id"], name: "index_inventory_items_on_game_user_id"
   end
 
@@ -76,10 +68,11 @@ ActiveRecord::Schema.define(version: 2022_02_12_022456) do
     t.bigint "game_id", null: false
     t.bigint "game_user_id"
     t.string "sender_name"
-    t.boolean "is_event", default: false
     t.text "content"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "event_type"
+    t.text "event_data"
     t.index ["game_id"], name: "index_messages_on_game_id"
     t.index ["game_user_id"], name: "index_messages_on_game_user_id"
   end
@@ -87,8 +80,8 @@ ActiveRecord::Schema.define(version: 2022_02_12_022456) do
   create_table "users", force: :cascade do |t|
     t.citext "username"
     t.string "password_digest"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 

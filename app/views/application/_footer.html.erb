@@ -1,4 +1,4 @@
-<div data-controller="hotkey">
+<div class="col-span-3 md:col-span-2 text-center md:text-left" data-controller="hotkey">
   <span>
     <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>H</span>ome
   </span>
@@ -28,6 +28,6 @@
   <% end %>
 </div>
 
-<div class="text-right text-sm">
+<div class="col-span-3 md:col-span-1 text-center md:text-right text-sm pt-1">
   &copy; <%= Date.today.year == 2022 ? "2022" : "2022 - #{Date.today.year}" %> <a href="https://richardcagle.dev">Richard Cagle</a>
 </div>

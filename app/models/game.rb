@@ -17,8 +17,6 @@ class Game < ApplicationRecord
   before_create :set_uuid
 
   after_save :broadcast_context, if: :saved_change_to_current_context?
-  after_save :broadcast_presence, if: :saved_change_to_is_host_online?
-  after_save :broadcast_typing, if: :saved_change_to_is_host_typing?
 
   validates :created_by, presence: true
 
@@ -51,15 +49,5 @@ class Game < ApplicationRecord
     def broadcast_context
       broadcast_replace_to(self, :state, target: :context_content, partial: "/games/current_context",
                                          locals: { game: self })
-    end
-
-    def broadcast_presence
-      # broadcast_replace_to(game, :state, target: :context, partial: "/games/current_context",
-      # locals: { game: self })
-    end
-
-    def broadcast_typing
-      broadcast_replace_to(self, :state, target: :typing, partial: "/games/typing_indicators",
-                                         locals: { typers: game_users.typing, host: is_host_typing? })
     end
 end

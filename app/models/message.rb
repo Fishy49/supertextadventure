@@ -9,6 +9,7 @@ class Message < ApplicationRecord
   scope :latest, -> { order(:id).last(50) }
 
   after_create_commit -> { broadcast_append_to(game, :messages) }
+  after_create_commit :set_user_active
 
   def event?
     event_type.present?
@@ -21,6 +22,12 @@ class Message < ApplicationRecord
   end
 
   def host_message?
-    !is_event? && game_user.nil?
+    !event? && game_user.nil?
   end
+
+  private
+
+    def set_user_active
+      game_user.update(active_at: DateTime.now) unless host_message?
+    end
 end

@@ -15,7 +15,7 @@ export default class extends Controller {
     this.inputTarget.focus()
   }
 
-  default_input_handling(e){
+  capture_input(e){
     // On "left" arrow, we want to snap to the end of anything typed
     if(e.keyCode == 37){
       e.preventDefault()

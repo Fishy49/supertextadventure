@@ -1,0 +1,18 @@
+<div id="terminalInput" 
+     class="w-full h-full"
+     data-controller="<%= @controllers.join(" ") %>"
+     <% if @stimulus_values.present? %>
+      <% @stimulus_values.each do |value_key, value| %>
+      	data-<%= value_key %>-value="<%= value %>" 
+      <% end %>
+     <% end %>
+>
+  <div class="hidden text-white uppercase w-full before:content-['*** SYNTAX ERROR: ']" <%= targets("error") %>></div>
+
+  <span class="inline-block uppercase after:content-['/>']" <%= targets("prompt") %>>
+    <%= @terminal_prompt if @terminal_prompt.present? %>
+  </span>
+  
+  <div class="<%= input_classes %>" contenteditable="true" data-action="<%= actions %>" <%= targets("input") %>></div>
+
+</div>

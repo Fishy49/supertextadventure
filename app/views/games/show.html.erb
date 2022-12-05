@@ -1,5 +1,6 @@
 <%= turbo_stream_from(@game, :messages) %>
 <%= turbo_stream_from(@game, :state) %>
+<%= turbo_stream_from(@game, :players) %>
 
 <div id="game-messages" data-controller="scroll">
   <%= turbo_frame_tag(:messages, data: { "scroll-target": "container" }) do %>
@@ -10,7 +11,7 @@
 </div>
 
 <% content_for :text_form do %>
-  <%= render "/shared/terminal_input", prompt: "", controllers: ["game"], values: { game: [ [ :game, @game.id ], [:"game-user", @game.host?(current_user) ? :host : @game.game_user(current_user)&.id ] ] } %>
+  <%= render(TerminalInputComponent.new(prompt: "", stimulus_controllers: ["game"], stimulus_values: { "game-id": @game.id, "game-user": @game.host?(current_user) ? :host : @game.game_user(current_user)&.id })) %>
 <% end %>
 
 <% content_for :sidebar do %>

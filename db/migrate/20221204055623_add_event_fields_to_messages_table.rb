@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddEventFieldsToMessagesTable < ActiveRecord::Migration[7.0]
   def change
     remove_column :messages, :is_event, :boolean, default: false

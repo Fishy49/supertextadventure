@@ -4,8 +4,8 @@ import { get, post, patch } from '@rails/request.js'
 export default class extends Controller {
   static targets = [ "prompt", "input", "error" ]
   static values = {
-    game: Number,
-    gameUser: String
+    id: Number,
+    userId: String
   }
 
   observer = null
@@ -29,7 +29,7 @@ export default class extends Controller {
   }
 
   is_host(){
-    return this.gameUserValue == "host"
+    return this.userIdValue == "host"
   }
 
   capture_input(e) {
@@ -49,8 +49,8 @@ export default class extends Controller {
       } else {
         let game_payload = {
           message: {
-            game_id: this.gameValue,
-            game_user_id: this.gameUserValue,
+            game_id: this.idValue,
+            game_user_id: this.userIdValue,
             content: inputText
           }
         }

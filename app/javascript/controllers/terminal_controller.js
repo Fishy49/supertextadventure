@@ -12,6 +12,11 @@ export default class extends Controller {
       window.placeCaretAtEnd(this.inputTarget)
     })
 
+    document.getElementById("terminalInput").querySelector(".terminal-input").addEventListener('paste', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    })
+
     this.inputTarget.focus()
   }
 

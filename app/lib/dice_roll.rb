@@ -4,8 +4,12 @@ class DiceRoll
   VALID_DICE = %w[4 6 8 10 12 20 100].freeze
   attr_accessor :result_dice, :modifiers
 
-  def initialize(dice_strings, modifiers = nil)
-    @modifiers = modifiers.presence || []
+  def initialize(argument_string)
+    arguments = argument_string.scan(/(\dd\d{1,2})|([-+]\d{1,2})/)
+    dice_strings = arguments.map(&:first).compact
+    modifiers = arguments.map(&:last).compact
+
+    @modifiers = modifiers.presence
     @result_dice = parse_dice_strings(dice_strings)
   end
 

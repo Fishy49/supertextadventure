@@ -1,18 +1,18 @@
 <div id="terminalInput" 
      class="w-full h-full"
-     data-controller="<%= @controllers.join(" ") %>"
+     data-controller="<%= @stimulus_controllers.join(" ") %>"
      <% if @stimulus_values.present? %>
       <% @stimulus_values.each do |value_key, value| %>
       	data-<%= value_key %>-value="<%= value %>" 
       <% end %>
      <% end %>
 >
-  <div class="hidden text-white uppercase w-full before:content-['*** SYNTAX ERROR: ']" <%= targets("error") %>></div>
+  <div class="hidden text-white uppercase w-full before:content-['*** SYNTAX ERROR: ']" <%= stimulus_targets_for("error") %>></div>
 
-  <span class="inline-block uppercase after:content-['/>']" <%= targets("prompt") %>>
+  <span class="inline-block uppercase after:content-['/>']" <%= stimulus_targets_for("prompt") %>>
     <%= @terminal_prompt if @terminal_prompt.present? %>
   </span>
   
-  <div class="<%= input_classes %>" contenteditable="true" data-action="<%= actions %>" <%= targets("input") %>></div>
+  <div class="<%= input_classes %>" contenteditable="true" data-action="<%= input_capture_actions %>" <%= stimulus_targets_for("input") %>></div>
 
 </div>

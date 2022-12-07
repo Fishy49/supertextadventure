@@ -5,19 +5,19 @@ class TerminalInputComponent < ViewComponent::Base
     super
 
     @terminal_prompt = prompt
-    @controllers = stimulus_controllers
-    @controllers << "terminal" unless @controllers.include?("terminal")
+    @stimulus_controllers = stimulus_controllers
+    @stimulus_controllers << "terminal" unless @stimulus_controllers.include?("terminal")
     @stimulus_values = stimulus_values
   end
 
   private
 
-  def actions
-    @controllers.map { |c| "keydown->#{c}#capture_input" }.join(" ")
+  def input_capture_actions
+    @stimulus_controllers.map { |c| "keydown->#{c}#capture_input" }.join(" ")
   end
 
-  def targets(target_value)
-    @controllers.map { |c| "data-#{c}-target=#{target_value}"}.join(" ")
+  def stimulus_targets_for(target_value)
+    @stimulus_controllers.map { |c| "data-#{c}-target=#{target_value}"}.join(" ")
   end
 
   def input_classes

@@ -8,6 +8,8 @@ class Message < ApplicationRecord
 
   scope :latest, -> { order(:id).last(50) }
 
+  before_create :parse_dice_rolls
+
   after_create_commit -> { broadcast_append_to(game, :messages) }
   after_create_commit :set_user_active
 
@@ -26,6 +28,16 @@ class Message < ApplicationRecord
   end
 
   private
+
+    def parse_dice_rolls
+      return unless content.downcase.starts_with?("roll ")
+
+      self.event_type = "roll"
+
+      arguments = content.downcase.delete("roll ")
+
+      self.event_data = DiceRoll.new(arguments)
+    end
 
     def set_user_active
       game_user.update(active_at: DateTime.now) unless host_message?

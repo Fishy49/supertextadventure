@@ -11,7 +11,7 @@ class Message < ApplicationRecord
   before_create :parse_dice_rolls
 
   after_create_commit -> { broadcast_append_to(game, :messages) }
-  after_create_commit :set_user_active
+  after_create_commit :set_user_active_at
 
   def event?
     event_type.present?
@@ -39,7 +39,7 @@ class Message < ApplicationRecord
       self.event_data = DiceRoll.new(arguments)
     end
 
-    def set_user_active
+    def set_user_active_at
       game_user.update(active_at: DateTime.now) unless host_message?
     end
 end

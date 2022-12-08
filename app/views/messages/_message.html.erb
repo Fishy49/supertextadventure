@@ -1,9 +1,1 @@
-<div class="<%= classes("text-white host-message py-2 pl-5": message.host_message?) %>"  id="<%= dom_id(message) %>">
-  <% if message.event? %>
-    <%= render "/shared/message_event_#{message.event_type}", data: message.event_data %>
-  <% elsif message.host_message? %>
-    <span class="italic"><%= message.content %></span>
-  <% else %>
-    <%= message.display_name %> /&gt; <%= message.content %>
-  <% end %>
-</div>
+<%= render(MessageComponent.new(message: message, current_user: current_user)) %>

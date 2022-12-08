@@ -1,0 +1,15 @@
+<div class="w-full border-2 border-white my-2 border-dashed">
+	<% if @message.event_type == "roll" %>
+		<div class="w-full text-center">
+			<span class="font-bold"><%= @message.display_name %></span> rolled some dice:
+		</div>
+		<div class="flex justify-center w-full gap-x-3">
+			<% @message.event_data.result_dice.each do |die| %>
+				<pre class="text-xs"><%= render "/ascii/d#{die.last}", value: die.first %></pre>
+			<% end %>
+		</div>
+		<div class="w-full text-center mt-2">
+			TOTAL: <span class="font-bold"><%= @message.event_data.total %></span>
+		</div>
+	<% end %>
+</div>

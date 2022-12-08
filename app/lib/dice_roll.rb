@@ -9,7 +9,7 @@ class DiceRoll
     dice_strings = arguments.map(&:first).compact
     modifiers = arguments.map(&:last).compact
 
-    @modifiers = modifiers.presence
+    @modifiers = modifiers.presence || []
     @result_dice = parse_dice_strings(dice_strings)
   end
 
@@ -36,6 +36,7 @@ class DiceRoll
   end
 
   def modifiers_total
+    return 0 if @modifiers.nil?
     @modifiers.sum(&:to_i)
   end
 

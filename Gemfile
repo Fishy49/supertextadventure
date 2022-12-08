@@ -88,3 +88,7 @@ gem "tailwindcss-rails", "~> 2.0"
 gem "foreman", "~> 0.87.2"
 
 gem "view_component", "~> 2.78"
+
+gem "better_errors", "~> 2.9"
+
+gem "binding_of_caller", "~> 1.0"

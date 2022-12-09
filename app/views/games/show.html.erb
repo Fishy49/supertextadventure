@@ -2,8 +2,8 @@
 <%= turbo_stream_from(@game, :state) %>
 <%= turbo_stream_from(@game, :players) %>
 
-<div id="game-messages" data-controller="scroll">
-  <%= turbo_frame_tag(:messages, data: { "scroll-target": "container" }) do %>
+<div id="game-messages" data-scroll-context-value="messages">
+  <%= turbo_frame_tag(:messages) do %>
     <% @game.messages.latest.each do |message| %>
       <%= render "/messages/message", message: message %>
     <% end %>

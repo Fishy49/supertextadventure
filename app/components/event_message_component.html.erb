@@ -1,15 +1,20 @@
-<div class="w-full border-2 border-white my-2 border-dashed">
+<div class="w-fit border-2 border-white/75 my-5 px-4 pb-4 border-solid mx-auto">
 	<% if @message.event_type == "roll" %>
-		<div class="w-full text-center">
-			<span class="font-bold"><%= @message.display_name %></span> rolled some dice:
+		<div class="w-fit text-center px-4 mx-auto mt-[-18px] bg-stone-800">
+			<span class="font-bold"><%= @message.display_name %></span> rolled some dice
 		</div>
 		<div class="flex justify-center w-full gap-x-3">
 			<% @message.event_data.result_dice.each do |die| %>
 				<pre class="text-xs"><%= render "/ascii/d#{die.last}", value: die.first %></pre>
 			<% end %>
 		</div>
+		<% unless @message.event_data.modifiers_total.zero? %>
+			<div class="w-full text-center mt-2">
+				WITH MODIFIER: <span class="font-bold"><%= @message.event_data.modifiers_total.positive? ? "+" : "-" %><%= @message.event_data.modifiers_total %></span>
+			</div>
+		<% end %>
 		<div class="w-full text-center mt-2">
-			TOTAL: <span class="font-bold"><%= @message.event_data.total %></span>
+			TOTAL: <span class="font-bold animate-blink"><%= @message.event_data.total %></span>
 		</div>
 	<% end %>
 </div>

@@ -8,8 +8,8 @@ class MessageComponent < ViewComponent::Base
 
   def container_classes
     classes(
-      "text-bold": !@message.host_message? && @message.game_user.user == @user,
-      "text-white host-message py-2 pl-5": @message.host_message?
+      "text-bold": !@message.player_message? && @message.game_user&.user == @user,
+      "text-white host-message py-2 pl-5": @message.host_message? && !@message.event?
     )
   end
 end

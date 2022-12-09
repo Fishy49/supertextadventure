@@ -35,7 +35,7 @@ class TerminalInputComponent < ViewComponent::Base
       "after:w-[12px]",
       "after:h-[24px]",
       "after:absolute",
-      "after:bottom-[-1px]",
+      "after:bottom-[2px]",
       "after:hidden",
       "after:animate-blink",
       "after:focus:inline-block",

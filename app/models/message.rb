@@ -17,14 +17,18 @@ class Message < ApplicationRecord
     event_type.present?
   end
 
+  def host_message?
+    game_user.nil?
+  end
+
+  def player_message?
+    !event? && !host_message?
+  end
+
   def display_name
     return sender_name if sender_name.present?
 
     game_user&.character_name || game.host_display_name
-  end
-
-  def host_message?
-    !event? && game_user.nil?
   end
 
   private
@@ -34,7 +38,7 @@ class Message < ApplicationRecord
 
       self.event_type = "roll"
 
-      arguments = content.downcase.delete("roll ")
+      arguments = content.downcase.delete("roll")
 
       self.event_data = DiceRoll.new(arguments)
     end

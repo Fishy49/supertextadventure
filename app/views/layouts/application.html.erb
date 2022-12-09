@@ -18,11 +18,11 @@
 
   <body class="text-base bg-stone-800 text-terminal-green grid grid-areas-layout grid-flow-row gap-0 h-full">
 
-      <header class="grid-in-header grid grid-cols-3 p-2 mb-5 border-b-2 border-b-terminal-green">
+      <header class="grid-in-header grid grid-cols-3 p-2 border-b-2 border-b-terminal-green">
         <%= render "header" %>
       </header>
 
-      <div class="grid-in-message-container terminal-scrollbars overflow-y-auto px-3 pb-[300px]">
+      <div class="grid-in-message-container terminal-scrollbars overflow-y-auto px-3 pb-[300px]" data-controller="scroll" data-scroll-target="container">
         <%= yield %>
       </div>
 

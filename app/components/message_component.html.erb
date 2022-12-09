@@ -1,9 +1,9 @@
 <div class="<%= container_classes %>"  id="<%= dom_id(@message) %>">
-	<% if @message.host_message? %>
-		<%= @message.content %>
-	<% elsif @message.event? %>
+	<% if @message.event? %>
 		<%= render(EventMessageComponent.new(@message)) %>
-	<% else %>
+	<% elsif @message.host_message? %>
+		<%= @message.content %>
+	<% elsif @message.player_message? %>
 		<%= @message.display_name %> /&gt; <%= @message.content %>
 	<% end %>
 </div>

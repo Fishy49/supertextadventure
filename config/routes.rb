@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   patch "game_users/:id/typing", to: "game_users#typing"
   patch "game_users/:id/stop-typing", to: "game_users#stop_typing"
 
+  get "messages", to: "messages#index", as: :messages
   post "messages", to: "messages#create", as: :create_message
   get "messages/create"
 

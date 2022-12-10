@@ -1,0 +1,15 @@
+<div id="pager" class="min-w-full my-8 flex justify-center">
+  <div>
+    <% if pagy.next %>
+      <%= link_to(
+        "Load More Messages",
+        messages_path(game_id: game.uuid, page: pagy.next),
+        class: "button",
+        data: {
+          turbo_stream: ""
+        },
+        remote: true
+      ) %>
+    <% end %>
+  </div>
+</div>

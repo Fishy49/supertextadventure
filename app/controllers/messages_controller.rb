@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class MessagesController < ApplicationController
+  def index
+    @game = Game.find_by uuid: params[:game_id]
+    @pagy, @messages = pagy(Message.for_game(@game), items: 10)
+  end
+
   def create
     message = Message.create(message_params)
 

@@ -92,3 +92,5 @@ gem "view_component", "~> 2.78"
 gem "better_errors", "~> 2.9"
 
 gem "binding_of_caller", "~> 1.0"
+
+gem "pagy", "~> 5.10"

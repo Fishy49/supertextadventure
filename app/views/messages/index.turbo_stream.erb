@@ -1,0 +1,10 @@
+<%= turbo_stream_action_tag(
+  "prepend",
+  target: "messages",
+  template: %(#{render @messages.reverse}) 
+) %>
+<%= turbo_stream_action_tag(
+  "replace",
+  target: "pager",
+  template: %(#{render "pager", game: @game, pagy: @pagy})
+) %>

@@ -2,9 +2,11 @@
 <%= turbo_stream_from(@game, :state) %>
 <%= turbo_stream_from(@game, :players) %>
 
+<%= render "/messages/pager", game: @game, pagy: @pagy %>
+
 <div id="game-messages" data-scroll-context-value="messages">
   <%= turbo_frame_tag(:messages) do %>
-    <% @game.messages.latest.each do |message| %>
+    <% @messages.reverse.each do |message| %>
       <%= render "/messages/message", message: message %>
     <% end %>
   <% end %>

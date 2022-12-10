@@ -58,6 +58,8 @@ class GamesController < ApplicationController
     else
       @game.game_user(current_user).update(active_at: DateTime.now)
     end
+
+    @pagy, @messages = pagy(Message.for_game(@game), items: 10)
   end
 
   def new

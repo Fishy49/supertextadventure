@@ -6,7 +6,8 @@ class Message < ApplicationRecord
 
   serialize :event_data
 
-  scope :latest, -> { order(:id).last(50) }
+  scope :latest, -> { order(id: :desc) }
+  scope :for_game, ->(game) { where(game_id: game.id).latest }
 
   before_create :parse_dice_rolls
 

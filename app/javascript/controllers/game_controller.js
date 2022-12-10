@@ -9,14 +9,34 @@ export default class extends Controller {
   }
 
   observer = null
+  messageToScrollIntoView = 'last'
 
   connect(){
+    // If messages are being loaded from scrolling "up", we want the 
+    // mutation observer to scroll the view to 0, otherwise all the way down
+    document.addEventListener('turbo:before-stream-render', (event) => {
+      if(event.detail.newStream.target == 'messages') {
+        if(event.detail.newStream.action == 'prepend') {
+          this.messageToScrollIntoView = 'first'
+        } else {
+          this.messageToScrollIntoView = 'last'
+        }
+      }
+    });
+
     const targetNode = document.querySelector('.grid-in-message-container');
-    targetNode.scrollTo(0, 100000)
+    let game_messages = targetNode.querySelectorAll('.game-message')
+    game_messages[game_messages.length - 1].scrollIntoView();
 
     const callback = (mutationsList, observer) => {
       for(const mutation of mutationsList) {
-        if (mutation.type === 'childList') { targetNode.scrollTo(0, 100000) }
+        if (mutation.type === 'childList') {
+          if(this.messageToScrollIntoView){
+            targetNode.querySelector('.game-message').scrollIntoView();
+          } else {
+            game_messages[game_messages.length - 1].scrollIntoView();
+          }
+        }
       }
     }
 

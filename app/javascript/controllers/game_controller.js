@@ -9,32 +9,42 @@ export default class extends Controller {
   }
 
   observer = null
-  messageToScrollIntoView = 'last'
+  scrollPosition = 'last'
+  message_count = 0
 
   connect(){
+    const targetNode = document.querySelector('.grid-in-message-container');
+    let game_messages = targetNode.querySelectorAll('.game-message')
+
+    this.message_count = game_messages.length
+    game_messages[game_messages.length - 1].scrollIntoView();
+
+    setTimeout(() => {      
+      document.getElementById('loading-modal').remove();
+      document.getElementById('message-content-wrapper').classList.remove('invisible');
+    }, 500)
+
     // If messages are being loaded from scrolling "up", we want the 
     // mutation observer to scroll the view to 0, otherwise all the way down
     document.addEventListener('turbo:before-stream-render', (event) => {
       if(event.detail.newStream.target == 'messages') {
         if(event.detail.newStream.action == 'prepend') {
-          this.messageToScrollIntoView = 'first'
+          this.scrollPosition = document.getElementById('game-messages').getBoundingClientRect().height
         } else {
-          this.messageToScrollIntoView = 'last'
+          this.scrollPosition = 'last'
         }
       }
     });
 
-    const targetNode = document.querySelector('.grid-in-message-container');
-    let game_messages = targetNode.querySelectorAll('.game-message')
-    game_messages[game_messages.length - 1].scrollIntoView();
-
     const callback = (mutationsList, observer) => {
       for(const mutation of mutationsList) {
-        if (mutation.type === 'childList') {
-          if(this.messageToScrollIntoView){
-            targetNode.querySelector('.game-message').scrollIntoView();
-          } else {
+        if (mutation.type === 'childList' && game_messages.length != this.message_count) {
+          this.message_count = game_messages.length
+          if(this.scrollPosition == 'last'){
             game_messages[game_messages.length - 1].scrollIntoView();
+          } else {
+            let calculated_scroll = document.getElementById('game-messages').getBoundingClientRect().height - this.scrollPosition
+            targetNode.scrollTo(0, (calculated_scroll));
           }
         }
       }

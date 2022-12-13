@@ -1,19 +1,21 @@
 <%= turbo_frame_tag(:context) do %>
   <%= turbo_frame_tag(:context_content) do %>
-    <% if game.current_context.present? %>
-      <% if game.is_current_context_ascii?  %>
-        <pre class="ascii">
-          <%= game.current_context.html_safe %>
-        </pre>
+    <div class="text-center border-double border-2 border-terminal-green py-2 px-1 overflow-x-auto terminal-scrollbars">
+      <% if game.current_context.present? %>
+        <% if game.is_current_context_ascii?  %>
+          <pre class="text-xs">
+            <%= game.current_context.html_safe %>
+          </pre>
+        <% else %>
+          <p><strong><%= game.current_context %></strong></p>
+        <% end %>
       <% else %>
-        <p><strong><%= game.current_context %></strong></p>
+        <%= game.description %>
       <% end %>
-    <% else %>
-      <%= game.description %>
-    <% end %>
+    </div>
   <% end %>
   <% if game.host?(current_user) %>
-    <div class="text-center">
+    <div class="text-center mt-2">
       <%= link_to "Change Text/ASCII Art", game_edit_context_path(game_id: game.id), class: "button is-small", data: {"turbo-frame": "context"}, remote: true %>
     </div>
   <% end %>

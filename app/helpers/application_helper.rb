@@ -2,7 +2,7 @@
 
 module ApplicationHelper
   include Pagy::Frontend
-  
+
   def greeting
     greetings = [
       "Avast",
@@ -17,5 +17,22 @@ module ApplicationHelper
     ]
 
     greetings.sample
+  end
+
+  def loading_message
+    messages = [
+      "Parsing Text",
+      "Degaussing",
+      "Calibrating Scan Lines",
+      "Attaching Texticles",
+      "Filling The Mugs",
+      "Sharpening The Swords",
+      "Marking The Maps",
+      "Opening The Taverns",
+      "Encouraging The Dwarves",
+      "Practicing Our \"Huzzah\"'s"
+    ]
+
+    messages.sample
   end
 end

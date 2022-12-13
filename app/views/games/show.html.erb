@@ -2,14 +2,16 @@
 <%= turbo_stream_from(@game, :state) %>
 <%= turbo_stream_from(@game, :players) %>
 
-<%= render "/messages/pager", game: @game, pagy: @pagy %>
+<div id="message-content-wrapper" class="invisible">
+  <%= render "/messages/pager", game: @game, pagy: @pagy %>
 
-<div id="game-messages" data-scroll-context-value="messages">
-  <%= turbo_frame_tag(:messages) do %>
-    <% @messages.reverse.each do |message| %>
-      <%= render "/messages/message", message: message %>
+  <div id="game-messages" class="relative">
+    <%= turbo_frame_tag(:messages) do %>
+      <% @messages.reverse.each do |message| %>
+        <%= render "/messages/message", message: message %>
+      <% end %>
     <% end %>
-  <% end %>
+  </div>
 </div>
 
 <% content_for :text_form do %>
@@ -18,10 +20,14 @@
 
 <% content_for :sidebar do %>
   <h3 class="text-center"><strong><%= @game.name %></strong></h3>
-  <div class="current-context">
+  <div>
     <%= render "current_context", game: @game %>
   </div>
 
   <h4 class="text-center mb-0 mt-3">PLAYERS</h4>
   <%= render "players", game_users: @game.game_users.order(:id) %>
+<% end %>
+
+<% content_for :loading_modal do %>
+  <%= render "/shared/loading_modal" %>
 <% end %>

@@ -11,37 +11,36 @@
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
-    <% # stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-
     <%= javascript_importmap_tags %>
   </head>
 
   <body class="text-base bg-stone-800 text-terminal-green grid grid-areas-layout grid-flow-row gap-0 h-full">
 
-      <header class="grid-in-header grid grid-cols-3 p-2 border-b-2 border-b-terminal-green">
-        <%= render "header" %>
-      </header>
+    <%= yield :loading_modal %>
 
-      <div class="grid-in-message-container terminal-scrollbars overflow-y-auto px-3 pb-[300px]" data-controller="scroll" data-scroll-target="container">
-        <%= yield %>
-      </div>
+    <header class="grid-in-header grid grid-cols-3 p-2 border-b-2 border-b-terminal-green">
+      <%= render "header" %>
+    </header>
 
-      <div class="grid-in-message-form terminal-scrollbars px-3 border-t-2 border-t-terminal-green border-dashed">
-        <turbo-frame id="text_form">
-          <%= yield :text_form %>
-        </turbo-frame>
-      </div>
+    <div class="grid-in-message-container terminal-scrollbars overflow-y-auto px-3 pb-[300px]" data-controller="scroll" data-scroll-target="container" data-action="scroll->scroll#load_messages">
+      <%= yield %>
+    </div>
 
-      <div class="grid-in-sidebar border-l-2 border-l-terminal-green border-dashed terminal-scrollbars overflow-y-auto px-3">
-        <turbo-frame id="sidebar">
-          <%= yield :sidebar %>
-        </turbo-frame>
-      </div>
+    <div class="grid-in-message-form terminal-scrollbars px-3 border-t-2 border-t-terminal-green border-dashed">
+      <turbo-frame id="text_form">
+        <%= yield :text_form %>
+      </turbo-frame>
+    </div>
 
-      
-      <footer class="grid-in-footer grid grid-cols-3 border-t-2 border-t-terminal-green px-3">
-        <%= render "footer" %>
-      </footer>
+    <div class="grid-in-sidebar border-l-2 border-l-terminal-green border-dashed terminal-scrollbars overflow-y-auto px-3">
+      <turbo-frame id="sidebar">
+        <%= yield :sidebar %>
+      </turbo-frame>
+    </div>
 
+    
+    <footer class="grid-in-footer grid grid-cols-3 border-t-2 border-t-terminal-green px-3">
+      <%= render "footer" %>
+    </footer>
   </body>
 </html>

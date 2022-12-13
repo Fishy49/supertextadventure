@@ -12,6 +12,26 @@
       display: none;
   }
 
+  [multiple], [type=date], [type=datetime-local], [type=email], [type=month], [type=number], [type=password], [type=search], [type=tel], [type=text], [type=time], [type=url], [type=week], select, textarea {
+    background-color: transparent;
+    color: #8fe86b;
+    outline: none;
+    font-size: 1em;
+    width: 100%;
+    border: solid 1px #8fe86b;
+    height: 44px;
+  }
+
+  [multiple]:focus, [type=date]:focus, [type=datetime-local]:focus, [type=email]:focus, [type=month]:focus, [type=number]:focus, [type=password]:focus, [type=search]:focus, [type=tel]:focus, [type=text]:focus, [type=time]:focus, [type=url]:focus, [type=week]:focus, select:focus, textarea:focus {
+    outline: none;
+    border: solid 2px #8fe86b;
+    box-shadow: none;
+  }
+
+  select option {
+    background: #000;
+  }
+
   /* From https://grid.layoutit.com/?id=0CRgQUm */
   .grid-areas-layout {
     grid-template-columns: 1fr 1fr 1fr;

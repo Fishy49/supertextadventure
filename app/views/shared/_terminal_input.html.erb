@@ -31,11 +31,7 @@
        <% end %>
        <%
          actions = controllers.map do |c|
-           if c == "terminal"
-             "keydown->terminal#default_input_handling"
-           else
-             "keydown->#{c}#capture_input"
-           end
+           "keydown->#{c}#capture_input"
          end.join(" ")
        %>
        data-action="<%= actions %>"

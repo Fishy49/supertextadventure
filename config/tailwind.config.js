@@ -33,6 +33,7 @@ module.exports = {
       },
       animation: {
         blink: 'blink 1s steps(5, start) infinite',
+        spin: 'spin 3s steps(10, start) infinite'
       },
       colors: {
         'terminal-green': '#8fe86b',

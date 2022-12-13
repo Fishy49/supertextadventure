@@ -5,9 +5,9 @@ class DiceRoll
   attr_accessor :result_dice, :modifiers
 
   def initialize(argument_string)
-    arguments = argument_string.scan(/(\dd\d{1,2})|([-+]\d{1,2})/)
-    dice_strings = arguments.map(&:first).compact
-    modifiers = arguments.map(&:last).compact
+    arguments = argument_string.scan(/(\d{1,2}d\d{1,2})|([-+]\d{1,2})/)
+    dice_strings = arguments.filter_map(&:first)
+    modifiers = arguments.filter_map(&:last)
 
     @modifiers = modifiers.presence || []
     @result_dice = parse_dice_strings(dice_strings)
@@ -37,6 +37,7 @@ class DiceRoll
 
   def modifiers_total
     return 0 if @modifiers.nil?
+
     @modifiers.sum(&:to_i)
   end
 

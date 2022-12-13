@@ -3,7 +3,7 @@
 		<div class="w-fit text-center px-4 mx-auto mt-[-18px] bg-stone-800">
 			<span class="font-bold"><%= @message.display_name %></span> rolled some dice
 		</div>
-		<div class="flex justify-center w-full gap-x-3">
+		<div class="flex flex-wrap justify-center w-full gap-x-3">
 			<% @message.event_data.result_dice.each do |die| %>
 				<pre class="text-xs"><%= render "/ascii/d#{die.last}", value: die.first %></pre>
 			<% end %>

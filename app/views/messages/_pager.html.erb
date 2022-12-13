@@ -6,10 +6,17 @@
         messages_path(game_id: game.uuid, page: pagy.next),
         class: "button",
         data: {
-          turbo_stream: ""
+          turbo_stream: "",
+          turbo_cache: "false",
+          scroll_target: "button",
+          controller: "disable-with",
+          disable_with_html_param: "<div class='animate-spin px-20'>|</div>",
+          action: "click->disable-with#html"
         },
         remote: true
       ) %>
+    <% else %>
+      <div class="text-terminal-green uppercase">-- And So It Begins --</div>
     <% end %>
   </div>
 </div>

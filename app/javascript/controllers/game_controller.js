@@ -17,7 +17,9 @@ export default class extends Controller {
     let game_messages = targetNode.querySelectorAll('.game-message')
 
     this.message_count = game_messages.length
-    game_messages[game_messages.length - 1].scrollIntoView();
+    if(game_messages.length > 0){
+      game_messages[game_messages.length - 1].scrollIntoView();
+    }
 
     setTimeout(() => {      
       document.getElementById('loading-modal').remove();
@@ -40,7 +42,7 @@ export default class extends Controller {
       for(const mutation of mutationsList) {
         if (mutation.type === 'childList' && game_messages.length != this.message_count) {
           this.message_count = game_messages.length
-          if(this.scrollPosition == 'last'){
+          if(this.scrollPosition == 'last' && game_messages.length > 0){
             game_messages[game_messages.length - 1].scrollIntoView();
           } else {
             let calculated_scroll = document.getElementById('game-messages').getBoundingClientRect().height - this.scrollPosition

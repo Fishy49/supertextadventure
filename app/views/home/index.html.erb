@@ -1,11 +1,11 @@
-<h2 class="text-center">Welcome, Ye Adventurer</h2>
+<h2 class="text-center font-medium text-lg my-5">Welcome, Ye Adventurer</h2>
 
-<div class="notice blink text-center"><%= notice %></div>
+<%= render(NoticeComponent.new(message: notice)) %>
 
 <% if !logged_in? %>
-  <p><b>SUPER</b> Text Adventure combines the free-form joy of a session of D&D, with the interface limitations of the old text-based adventure games. Join a game as an adventurer, or host a game to create your own world...</p>
+  <p><span class="font-bold">SUPER</span> Text Adventure combines the free-form joy of a session of D&D, with the interface limitations of the old text-based adventure games. Join a game as an adventurer, or host a game to create your own world...</p>
 
-  <p class="text-center"><b>Type. Your. Story.</b></p>
+  <p class="text-center"><span class="font-bold">Type. Your. Story.</span></p>
   <%= ascii("knight") %>
 <% else %>
   <p>Ye stand on a dirt path in the midst of a field. The sun is bright and the breeze pleasant.</p>

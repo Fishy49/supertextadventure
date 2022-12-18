@@ -2,6 +2,8 @@
 
 class MessageComponent < ViewComponent::Base
   def initialize(message:, current_user:)
+    super
+
     @message = message
     @user = current_user
   end

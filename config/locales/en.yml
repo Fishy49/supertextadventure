@@ -30,4 +30,15 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  away_with_ye: "Away with ye! The tavern is for adventurers only!"
+  ye_joined: "Ye joined."
+  join_failed: "Ye cannot join yon game."
+  game_destroyed: "Game was successfully destroyed."
+  inventory_item_created: "Inventory item was successfully created."
+  inventory_item_updated: "Inventory item was successfully updated."
+  inventory_item_destroyed: "Inventory item was successfully destroyed."
+  login_successful: "Thou hath loggethed in!"
+  invalid_login: "Thy name is unknown or thy password is rank!"
+  logged_out: "Away With Ye!"
+  user_updated: "User was successfully updated."
+  user_destroyed: "User was successfully destroyed."

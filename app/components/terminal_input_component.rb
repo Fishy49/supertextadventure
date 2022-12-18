@@ -22,25 +22,12 @@ class TerminalInputComponent < ViewComponent::Base
 
     def input_classes
       classes(
-        "terminal-input",
-        "inline-block",
-        "min-w-[5px]",
-        "max-w-full",
-        "uppercase",
-        "caret-transparent",
-        "relative",
-        "outline-none",
-        "align-bottom",
-        "after:bg-terminal-green",
-        "after:w-[12px]",
-        "after:h-[24px]",
-        "after:absolute",
-        "after:bottom-[2px]",
-        "after:hidden",
-        "after:animate-blink",
-        "after:focus:inline-block",
-        "focus-visible:outline-none",
-        "after:focus-visible:outline-none"
+        "terminal-input", "inline-block", "min-w-[5px]", "max-w-full",
+        "uppercase", "caret-transparent", "relative", "outline-none",
+        "align-bottom", "after:bg-terminal-green", "after:w-[12px]",
+        "after:h-[24px]", "after:absolute", "after:bottom-[2px]",
+        "after:hidden", "after:animate-blink", "after:focus:inline-block",
+        "focus-visible:outline-none", "after:focus-visible:outline-none"
       )
     end
 end

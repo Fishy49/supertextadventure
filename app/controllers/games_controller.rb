@@ -35,9 +35,9 @@ class GamesController < ApplicationController
 
     respond_to do |format|
       if @game_user.valid?
-        format.html { redirect_to game_url(id: @game.uuid), notice: "You joined." }
+        format.html { redirect_to game_url(id: @game.uuid), notice: t(:ye_joined) }
       else
-        format.html { redirect_to tavern_url, notice: "Game could not be joined" }
+        format.html { redirect_to tavern_url, notice: t(:join_failed) }
       end
     end
   end
@@ -107,7 +107,7 @@ class GamesController < ApplicationController
     @game.destroy
 
     respond_to do |format|
-      format.html { redirect_to games_url, notice: "Game was successfully destroyed." }
+      format.html { redirect_to games_url, notice: t(:game_destroyed) }
       format.json { head :no_content }
     end
   end

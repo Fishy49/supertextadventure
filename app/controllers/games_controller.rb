@@ -2,7 +2,8 @@
 
 # rubocop:disable Metrics/ClassLength
 class GamesController < ApplicationController
-  before_action :authorize!
+  load_and_authorize_resource
+
   before_action :set_turbo_frame_id
   before_action :set_game, except: %i[index list new create]
   before_action :load_games, only: %i[index list]

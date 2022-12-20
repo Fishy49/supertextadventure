@@ -1,1 +1,6 @@
-<li><%= game_user.character_name %></li>
+<li id="<%= dom_id game_user %>">
+	<%= game_user.character_name %>
+	<% if game_user.game.enable_hp? %>
+		<span class="font-medium text-sm">(<%= game_user.current_health %>/<%= game_user.max_health %>)</span>
+	<% end %>
+</li>

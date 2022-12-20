@@ -11,6 +11,7 @@ class GameUser < ApplicationRecord
   scope :typing, -> { where(is_typing: true) }
 
   before_create :check_game_users_count
+  before_create :set_starting_health
 
   private
 
@@ -19,5 +20,12 @@ class GameUser < ApplicationRecord
 
       errors.add(:base, "Game is full.")
       raise ActiveRecord::RecordInvalid, self
+    end
+
+    def set_starting_health
+      if game.enable_hp?
+        self.max_health = game.starting_hp
+        self.current_health = game.starting_hp
+      end
     end
 end

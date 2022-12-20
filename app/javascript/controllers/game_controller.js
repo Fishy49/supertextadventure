@@ -40,10 +40,10 @@ export default class extends Controller {
 
     const callback = (mutationsList, observer) => {
       for(const mutation of mutationsList) {
-        if (mutation.type === 'childList' && game_messages.length != this.message_count) {
-          this.message_count = game_messages.length
-          if(this.scrollPosition == 'last' && game_messages.length > 0){
-            game_messages[game_messages.length - 1].scrollIntoView();
+        if (mutation.type === 'childList' && targetNode.querySelectorAll('.game-message').length != this.message_count) {
+          this.message_count = targetNode.querySelectorAll('.game-message').length
+          if(this.scrollPosition == 'last' && targetNode.querySelectorAll('.game-message').length > 0){
+            targetNode.querySelectorAll('.game-message')[targetNode.querySelectorAll('.game-message').length - 1].scrollIntoView();
           } else {
             let calculated_scroll = document.getElementById('game-messages').getBoundingClientRect().height - this.scrollPosition
             targetNode.scrollTo(0, (calculated_scroll));

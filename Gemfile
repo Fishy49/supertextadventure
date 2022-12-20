@@ -94,3 +94,5 @@ gem "better_errors", "~> 2.9"
 gem "binding_of_caller", "~> 1.0"
 
 gem "pagy", "~> 5.10"
+
+gem "cancancan", "~> 3.4"

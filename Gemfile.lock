@@ -80,6 +80,7 @@ GEM
     bootsnap (1.15.0)
       msgpack (~> 1.2)
     builder (3.2.4)
+    cancancan (3.4.0)
     capybara (3.38.0)
       addressable
       matrix
@@ -270,6 +271,7 @@ DEPENDENCIES
   better_errors (~> 2.9)
   binding_of_caller (~> 1.0)
   bootsnap
+  cancancan (~> 3.4)
   capybara
   classes (~> 0.1.0)
   clockwork (~> 3.0)

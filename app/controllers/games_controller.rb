@@ -25,8 +25,6 @@ class GamesController < ApplicationController
           character_name: params[:character_name]
         }
 
-        game_user_params.merge(max_health: @game.starting_hp, current_health: @game.starting_hp) if @game.enable_hp?
-
         @game_user = @game.game_users.create(game_user_params)
       end
 

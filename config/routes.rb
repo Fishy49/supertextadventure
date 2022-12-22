@@ -27,6 +27,7 @@ Rails.application.routes.draw do
   patch "game_users/:id/offline", to: "game_users#offline"
   patch "game_users/:id/typing", to: "game_users#typing"
   patch "game_users/:id/stop-typing", to: "game_users#stop_typing"
+  patch "game_users/:id/update-health", to: "game_users#update_health", as: :game_user_update_health
 
   get "messages", to: "messages#index", as: :messages
   post "messages", to: "messages#create", as: :create_message

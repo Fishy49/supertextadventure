@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
     current_user.present?
   end
 
-  def authorize!
-    redirect_to root_url, notice: t(:away_with_ye) unless logged_in?
-  end
+  # def authorize!
+  #   redirect_to root_url, notice: t(:away_with_ye) unless logged_in?
+  # end
 end

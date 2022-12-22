@@ -23,9 +23,9 @@ class GameUser < ApplicationRecord
     end
 
     def set_starting_health
-      if game.enable_hp?
-        self.max_health = game.starting_hp
-        self.current_health = game.starting_hp
-      end
+      return unless game.enable_hp?
+
+      self.max_health = game.starting_hp
+      self.current_health = game.starting_hp
     end
 end

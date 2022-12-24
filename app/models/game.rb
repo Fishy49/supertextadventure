@@ -9,6 +9,7 @@ class Game < ApplicationRecord
                     optional: true
 
   has_many :game_users, inverse_of: :game, dependent: :nullify
+  has_many :users, through: :game_users
 
   has_many :messages, inverse_of: :game, dependent: :nullify
 

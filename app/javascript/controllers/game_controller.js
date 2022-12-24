@@ -17,8 +17,8 @@ export default class extends Controller {
     let game_messages = targetNode.querySelectorAll('.game-message')
 
     this.message_count = game_messages.length
-    if(game_messages.length > 0){
-      game_messages[game_messages.length - 1].scrollIntoView();
+    if(this.message_count > 0) {
+      targetNode.scrollTo(0, targetNode.scrollHeight)
     }
 
     setTimeout(() => {      
@@ -43,7 +43,7 @@ export default class extends Controller {
         if (mutation.type === 'childList' && targetNode.querySelectorAll('.game-message').length != this.message_count) {
           this.message_count = targetNode.querySelectorAll('.game-message').length
           if(this.scrollPosition == 'last' && targetNode.querySelectorAll('.game-message').length > 0){
-            targetNode.querySelectorAll('.game-message')[targetNode.querySelectorAll('.game-message').length - 1].scrollIntoView();
+            targetNode.scrollTo(0, targetNode.scrollHeight)
           } else {
             let calculated_scroll = document.getElementById('game-messages').getBoundingClientRect().height - this.scrollPosition
             targetNode.scrollTo(0, (calculated_scroll));

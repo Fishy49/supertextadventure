@@ -6,10 +6,10 @@ class Ability
   def initialize(user)
     return if user.blank?
 
-    can :read, Game do |game|
-      game.game_users.include?(user)
-    end
+    can [:index, :list, :lobby], Game
+
     can :manage, Game, host: user
+    can :show, Game, { game_users: { user: user } }
 
     can :create, GameUser
     can :update, GameUser, { game: { host: user } }

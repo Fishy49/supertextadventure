@@ -44,6 +44,7 @@ class GamesController < ApplicationController
   # rubocop:enable Metrics/MethodLength
 
   def lobby
+    authorize! :lobby, @game
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "lobby")

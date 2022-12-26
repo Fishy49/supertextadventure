@@ -35,7 +35,7 @@ class Message < ApplicationRecord
   private
 
     def parse_dice_rolls
-      return unless content.downcase.starts_with?("roll ")
+      return unless content&.downcase&.starts_with?("roll ")
 
       self.event_type = "roll"
 

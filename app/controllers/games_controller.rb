@@ -20,6 +20,8 @@ class GamesController < ApplicationController
 
   # rubocop:disable Metrics/MethodLength
   def join
+    authorize! :join, @game
+
     @game.with_lock do
       if @game.can_user_join?(current_user)
         game_user_params = {

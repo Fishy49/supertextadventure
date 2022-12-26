@@ -8,7 +8,7 @@
 
 <% if @game.can_user_join?(current_user) %>
   <h3 class="text-center">Join Game</h3>
-  <%= form_with(url: join_game_path(@game), method: :patch, data: { "turbo-frame": "_top" }) do |form| %>
+  <%= form_with(url: join_game_path(id: @game.uuid), method: :patch, data: { "turbo-frame": "_top" }) do |form| %>
     <%= form.hidden_field :user_id, value: current_user.id %>
 
     <div class="form-group">

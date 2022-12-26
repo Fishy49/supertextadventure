@@ -3,29 +3,29 @@
 class GameUsersController < ApplicationController
   before_action :set_game_user
 
-  def online
-    @game_user.update(is_online: true, online_at: DateTime.now)
-    head :ok
-  end
+  def update_health
+    heal = game_user_params[:heal].presence&.to_i || 0
+    damage = game_user_params[:damage].presence&.to_i || 0
+    total_health_change = heal - damage
 
-  def offline
-    @game_user.update(is_online: false, is_typing: false)
-    head :ok
-  end
+    @game_user.update(current_health: @game_user.current_health + total_health_change)
 
-  def typing
-    @game_user.update(is_typing: true, typing_at: DateTime.now)
-    head :ok
-  end
-
-  def stop_typing
-    @game_user.update(is_typing: false)
-    head :ok
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("game_user_#{@game_user.id}", partial: "/games/player",
+                                                                                locals: { game_user: @game_user })
+      end
+      format.html
+    end
   end
 
   private
 
     def set_game_user
       @game_user = GameUser.find(params[:id])
+    end
+
+    def game_user_params
+      params.require(:game_user).permit(:heal, :damage)
     end
 end

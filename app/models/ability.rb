@@ -6,8 +6,8 @@ class Ability
   def initialize(user)
     return if user.blank?
 
-    can [:index, :list, :lobby], Game
-
+    can %i[index list lobby], Game
+    can :join, Game, status: "open"
     can :manage, Game, host: user
     can :show, Game, { game_users: { user: user } }
 

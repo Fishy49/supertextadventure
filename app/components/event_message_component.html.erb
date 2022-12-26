@@ -17,4 +17,13 @@
 			TOTAL: <span class="font-bold animate-blink"><%= @message.event_data.total %></span>
 		</div>
 	<% end %>
+
+	<% if @message.event_type == "health_change" %>
+		<div class="w-fit text-center px-4 mx-auto mt-[-18px] bg-stone-800">
+			<span class="font-bold"><%= @message.event_data[:game_user].character_name %></span> <%= @message.event_data[:game_user].current_health > @message.event_data[:previous_health] ? "was healed" : "took some damage" %>
+		</div>
+		<div class="flex flex-wrap justify-center w-full gap-x-3">
+			<%= @message.event_data[:game_user].current_health > @message.event_data[:previous_health] ? "Healed by " : "Damaged by " %> <%= @message.event_data[:game_user].current_health - @message.event_data[:previous_health] %>
+		</div>
+	<% end %>
 </div>

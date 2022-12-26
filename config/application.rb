@@ -3,7 +3,7 @@
 require_relative "boot"
 
 require "rails/all"
-require "./app/lib/dice_roll"
+# require "./app/lib/dice_roll"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -22,6 +22,16 @@ module Supertextadventure
     config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    config.active_record.yaml_column_permitted_classes = [Symbol, DiceRoll]
+    config.after_initialize do
+      # Allow Serialization
+      ActiveRecord.yaml_column_permitted_classes = [
+        Symbol,
+        DiceRoll,
+        ActiveSupport::HashWithIndifferentAccess,
+        ActiveModel::Attribute.const_get(:FromDatabase),
+        GameUser,
+        Time
+      ]
+    end
   end
 end

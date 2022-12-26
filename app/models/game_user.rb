@@ -13,6 +13,10 @@ class GameUser < ApplicationRecord
   before_create :check_game_users_count
   before_create :set_starting_health
 
+  after_create_commit :broadcast_new_player
+
+  after_update_commit :create_health_change_event_message, if: :saved_change_to_current_health?
+
   private
 
     def check_game_users_count
@@ -27,5 +31,18 @@ class GameUser < ApplicationRecord
 
       self.max_health = game.starting_hp
       self.current_health = game.starting_hp
+    end
+
+    def broadcast_new_player
+      broadcast_replace_to(game, :players, target: :players, partial: "/games/players",
+                                           locals: { game_users: game.game_users })
+    end
+
+    def create_health_change_event_message
+      game.messages.create(
+        game_user_id: game.created_by,
+        event_type: "health_change",
+        event_data: { previous_health: current_health_before_last_save, game_user: self }
+      )
     end
 end

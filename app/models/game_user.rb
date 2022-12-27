@@ -34,7 +34,7 @@ class GameUser < ApplicationRecord
       broadcast_replace_to(game, :players, target: :players, partial: "/games/players",
                                            locals: { game_users: game.game_users, for_host: false })
       broadcast_replace_to(game, :host_players, target: :players, partial: "/games/players",
-                                           locals: { game_users: game.game_users, for_host: true })
+                                                locals: { game_users: game.game_users, for_host: true })
     end
 
     def create_health_change_event_message

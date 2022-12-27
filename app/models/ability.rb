@@ -6,6 +6,8 @@ class Ability
   def initialize(user)
     return if user.blank?
 
+    can %i[new create], User, UserRegistration.allowed?
+
     can %i[index list lobby], Game
     can :join, Game, status: "open"
     can :manage, Game, host: user

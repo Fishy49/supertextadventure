@@ -5,22 +5,22 @@
     <% end %>
   <% end %>
 
-  <div class="field">
+  <div>
     <%= form.label :username %>
     <%= form.text_field :username %>
   </div>
 
-  <div class="field">
+  <div>
     <%= form.label :password %>
-    <%= form.password_field :password %>
+    <%= form.password_field :password, minlength: 10 %>
   </div>
 
-  <div class="field">
+  <div>
     <%= form.label :confirm %>
-    <%= form.password_field :password_confirmation %>
+    <%= form.password_field :password_confirmation, minlength: 10 %>
   </div>
 
-  <div class="actions">
+  <div>
     <%= form.submit "Register", class: "button" %>
   </div>
 <% end %>

@@ -1,0 +1,33 @@
+<h3 class="text-center mb-5 text-2xl">Setup Subroutine</h3>
+
+<%= render(NoticeComponent.new(message: notice)) %>
+
+<p class="mt-5 text-xl">Thou art one lucky rapscallion! This be an unconfigured installation of SuperTextAdventure. Enter your username and password below to become the owner.</p>
+
+<p class="mt-5 text-xl">Finders keepers, say we...</p>
+
+<%= form_with(url: save_setup_path, class:"mt-5 pt-5 border-t-2 border-terminal-green") do |form| %>
+  <div>
+    <%= form.label :username %>
+    <%= form.text_field :username %>
+  </div>
+
+  <div>
+    <%= form.label :password %>
+    <%= form.password_field :password, minlength: 10 %>
+  </div>
+
+  <div>
+    <%= form.label :confirm %>
+    <%= form.password_field :password_confirmation, minlength: 10 %>
+  </div>
+
+  <div>
+    <%= form.submit "Become The Owner", class: "button mt-5 w-full text-center" %>
+  </div>
+<% end %>
+
+
+<% content_for :sidebar do %>
+  <%= ascii("bricks") %>
+<% end %>

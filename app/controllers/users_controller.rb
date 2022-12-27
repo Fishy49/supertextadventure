@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
+  load_and_authorize_resource
+  skip_authorize_resource only: %i[index show edit update destroy]
+
   before_action :set_user, only: %i[show edit update destroy]
 
   # GET /users or /users.json

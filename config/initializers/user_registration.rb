@@ -2,6 +2,6 @@
 
 class UserRegistration
   def self.allowed?
-    ENV.fetch("ALLOW_USER_REGISTRATION", "true") == "true"
+    ENV.fetch("ALLOW_USER_REGISTRATION", "false") == "true"
   end
 end

@@ -3,6 +3,12 @@
 Rails.application.routes.draw do
   root "home#index"
 
+  get 'setup', to: "setup#index", as: :setup
+  post 'setup/save', to: "setup#save", as: :save_setup
+  get 'setup/list_tokens'
+  post 'setup/create_token'
+  delete 'setup/delete_token'
+
   resources :users
 
   resources :sessions, only: %i[new create destroy]

@@ -1,7 +1,7 @@
 <%= turbo_frame_tag(:players) do %>
   <ul class="list-square list-inside">
     <% game_users.each do |game_user| %>
-      <%= render "/games/player", game_user: game_user %>
+      <%= render "/games/player", game_user: game_user, for_host: for_host %>
     <% end %>
   </ul>
 <% end %>

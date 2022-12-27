@@ -16,6 +16,7 @@ class GameUser < ApplicationRecord
   after_create_commit :broadcast_new_player
 
   after_update_commit :create_health_change_event_message, if: :saved_change_to_current_health?
+  after_update_commit :broadcast_updated_player_health, if: :saved_change_to_current_health?
 
   private
 
@@ -35,7 +36,9 @@ class GameUser < ApplicationRecord
 
     def broadcast_new_player
       broadcast_replace_to(game, :players, target: :players, partial: "/games/players",
-                                           locals: { game_users: game.game_users })
+                                           locals: { game_users: game.game_users, for_host: false })
+      broadcast_replace_to(game, :host_players, target: :players, partial: "/games/players",
+                                           locals: { game_users: game.game_users, for_host: true })
     end
 
     def create_health_change_event_message
@@ -44,5 +47,10 @@ class GameUser < ApplicationRecord
         event_type: "health_change",
         event_data: { previous_health: current_health_before_last_save, game_user: self }
       )
+    end
+
+    def broadcast_updated_player_health
+      broadcast_replace_to(game, :players, target: "game_user_#{id}", partial: "/games/player",
+                                           locals: { game_user: self, for_host: false })
     end
 end

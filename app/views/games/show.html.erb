@@ -1,6 +1,10 @@
 <%= turbo_stream_from(@game, :messages) %>
 <%= turbo_stream_from(@game, :state) %>
-<%= turbo_stream_from(@game, :players) %>
+<% if @game.host?(current_user) %>
+  <%= turbo_stream_from(@game, :host_players) %>
+<% else %>
+  <%= turbo_stream_from(@game, :players) %>
+<% end %>
 
 <div id="message-content-wrapper" class="invisible">
   <%= render "/messages/pager", game: @game, pagy: @pagy %>
@@ -25,7 +29,7 @@
   </div>
 
   <h4 class="text-center mb-0 mt-3">PLAYERS</h4>
-  <%= render "players", game_users: @game.game_users.order(:id) %>
+  <%= render "players", game_users: @game.game_users.order(:id), for_host: @game.host?(current_user) %>
 <% end %>
 
 <% content_for :loading_modal do %>

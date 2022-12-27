@@ -45,7 +45,7 @@ export default class extends Controller {
           if(this.scrollPosition == 'last' && targetNode.querySelectorAll('.game-message').length > 0){
             targetNode.scrollTo(0, targetNode.scrollHeight)
           } else {
-            let calculated_scroll = document.getElementById('game-messages').getBoundingClientRect().height - this.scrollPosition
+            let calculated_scroll = (this.scrollPosition - document.getElementById('game-messages').getBoundingClientRect().height) * -1
             targetNode.scrollTo(0, (calculated_scroll));
           }
         }

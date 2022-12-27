@@ -1,8 +1,8 @@
-<%= tag.li id: dom_id(game_user), class: classes("cursor-pointer": game_user.game.host?(current_user)), data: { controller: "game-user", action: "click->game-user#health_form" } do %>
+<%= tag.li id: dom_id(game_user), class: classes("cursor-pointer": for_host), data: { controller: "game-user", action: "click->game-user#health_form" } do %>
 	<%= game_user.character_name %>
 	<% if game_user.game.enable_hp? %>
 		<span class="font-medium text-sm">(<%= game_user.current_health %>/<%= game_user.max_health %>)</span>
-		<% if game_user.game.host?(current_user) %>
+		<% if for_host %>
 			<div class="fixed inset-0 z-10 overflow-y-auto bg-stone-800 bg-opacity-25 hidden" data-game-user-target="healthForm">
 				<div class="flex min-h-full items-end justify-center sm:items-center">
 					<%= form_with(model: game_user, url: game_user_update_health_path(id: game_user), method: :patch, class: "bg-stone-900 shadow-[-20px_25px_0px_0px_#000000] border-terminal-green border-dashed border-2 p-5", data: { "turbo-frame": "player" }) do |form| %>

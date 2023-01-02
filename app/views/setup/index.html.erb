@@ -6,7 +6,7 @@
 
 <p class="mt-5 text-xl">Finders keepers, say we...</p>
 
-<%= form_with(url: save_setup_path, class:"mt-5 pt-5 border-t-2 border-terminal-green") do |form| %>
+<%= form_with(scope: :setup, url: save_setup_path, class:"mt-5 pt-5 border-t-2 border-terminal-green", data: { turbo: "false" }) do |form| %>
   <div>
     <%= form.label :username %>
     <%= form.text_field :username %>

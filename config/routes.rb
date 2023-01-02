@@ -5,9 +5,9 @@ Rails.application.routes.draw do
 
   get 'setup', to: "setup#index", as: :setup
   post 'setup/save', to: "setup#save", as: :save_setup
-  get 'setup/list_tokens'
-  post 'setup/create_token'
-  delete 'setup/delete_token'
+  get 'setup/list-tokens', to: "setup#list_tokens"
+  post 'setup/create-token', to: "setup#create_token"
+  delete 'setup/delete-token', to: "setup#delete_token"
 
   resources :users
 

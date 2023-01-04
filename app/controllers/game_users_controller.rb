@@ -13,7 +13,7 @@ class GameUsersController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("game_user_#{@game_user.id}", partial: "/games/player",
-                                                                                locals: { 
+                                                                                locals: {
                                                                                   game_user: @game_user,
                                                                                   for_host: true
                                                                                 })

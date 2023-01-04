@@ -4,6 +4,9 @@
 
 <p class="mb-6">Here you can generate links to send to your friends. This will allow them to create a username and a password and join your game(s).</p>
 
+<%= form_with(model: SetupToken.new) do |f| %>
+  <%= f.submit class: "button" %>
+<% end %>
 
 <% content_for :sidebar do %>
   <%= ascii("bricks") %>

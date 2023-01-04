@@ -2,13 +2,18 @@
 
 class UsersController < ApplicationController
   load_and_authorize_resource
-  skip_authorize_resource only: %i[index show edit update destroy]
+  skip_authorize_resource only: %i[index activate show edit update destroy]
 
   before_action :set_user, only: %i[show edit update destroy]
 
   # GET /users or /users.json
   def index
     @users = User.all
+  end
+
+  # GET /users/activate
+  def activate
+    @token = SetupToken.find_by(uuid: params[:code])
   end
 
   # GET /users/1 or /users/1.json

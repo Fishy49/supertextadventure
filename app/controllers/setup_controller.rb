@@ -11,18 +11,12 @@ class SetupController < ApplicationController
     respond_to do |format|
       if user.save
         session[:user_id] = user.id
-        format.html { redirect_to setup_list_tokens_path, notice: "#{user.username} is now the owner!" }
+        format.html { redirect_to setup_tokens_path, notice: "#{user.username} is now the owner!" }
       else
         format.html { render :index, notice: "Error Setting Up Owner" }
       end
     end
   end
-
-  def list_tokens; end
-
-  def create_token; end
-
-  def delete_token; end
 
   private
 

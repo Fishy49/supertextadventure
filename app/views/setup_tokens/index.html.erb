@@ -4,9 +4,17 @@
 
 <p class="mb-6">Here you can generate links to send to your friends. This will allow them to create a username and a password and join your game(s).</p>
 
-<%= form_with(model: SetupToken.new) do |f| %>
-  <%= f.submit class: "button" %>
+<%= form_with(model: SetupToken.new, class: "py-5") do |f| %>
+  <%= f.submit class: "button w-full" %>
 <% end %>
+
+<div class="border-t-2 border-dashed border-terminal-green pt-5 px-2">
+  <%= turbo_frame_tag(:setup_tokens) do %>
+    <% @tokens.each do |token| %>
+      <%= render "setup_token", token: token %>
+    <% end %>
+  <% end %>
+</div>
 
 <% content_for :sidebar do %>
   <%= ascii("bricks") %>

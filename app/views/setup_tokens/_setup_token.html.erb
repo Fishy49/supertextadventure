@@ -1,0 +1,12 @@
+<div class="w-full border-b-2 border-terminal-green flex items-center py-5 gap-5" id="<%= dom_id(token) %>">
+  <div class="whitespace-nowrap"><span class="text-sm"><%= user_activation_url(code: token.uuid) %></span></div>
+  <div class="whitespace-nowrap"><%= token.is_active? ? "Not Used" : "Used" %></div>
+  <div>
+    <div class="button" data-controller="copy" data-copy-text-value="<%= user_activation_url(code: token.uuid) %>" data-action="click->copy#to_clipboard">Copy</div>
+  </div>
+  <div>
+    <%= form_with(url: setup_token_path(id: token), method: :delete) do |f| %>
+      <%= f.submit class: "button", value: "Delete" %>
+    <% end %>
+  </div>
+</div>

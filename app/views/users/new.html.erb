@@ -1,14 +1,10 @@
 <%= ascii("castle") %>
 
-<% content_for :text_form do %>
-  <% unless @user&.errors.any? %>
-    <div class="text-center">Register for Possible Adventure</div>
-  <% end %>
-
-  <%= render 'form', user: @user %>
-
-  <%= link_to 'Back', root_path %>
+<% unless @user&.errors.any? %>
+  <div class="text-center">Register for Possible Adventure</div>
 <% end %>
+
+<%= render 'form', user: @user %>
 
 <% content_for :sidebar do %>
   <%= ascii("troll") %>

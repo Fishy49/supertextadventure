@@ -4,11 +4,11 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
+    can %i[new create], User
+
     return if user.blank?
 
     can :manage, SetupToken if user.is_owner?
-
-    can %i[new create], User, UserRegistration.allowed?
 
     can %i[index list lobby], Game
     can :join, Game, status: "open"

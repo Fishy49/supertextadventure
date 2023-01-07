@@ -33,10 +33,6 @@ en:
   unauthorized:
     index:
       game: "Away with ye! The tavern is for adventurers only!"
-    create:
-      user: "Super Text Adventure does not allow registrations at this time."
-    new:
-      user: "Super Text Adventure does not allow registrations at this time."
   away_with_ye: "Away with ye! The tavern is for adventurers only!"
   ye_joined: "Ye joined."
   join_failed: "Ye cannot join yon game."
@@ -49,3 +45,4 @@ en:
   logged_out: "Away With Ye!"
   user_updated: "User was successfully updated."
   user_destroyed: "User was successfully destroyed."
+  token_link_invalid: "Thou Riff Raff! That link hast doth expired'th. Get you gone!"

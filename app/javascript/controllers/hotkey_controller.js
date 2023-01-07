@@ -31,6 +31,11 @@ export default class extends Controller {
       case 'a':
         Turbo.visit('/about')
         break;
+      case 'i':
+        if(document.getElementById('owner-invite-hotkey')){
+          Turbo.visit('/setup_tokens')
+        }
+        break
     }
   }
 }

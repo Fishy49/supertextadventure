@@ -25,6 +25,13 @@
     <span>
       <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>A</span>bout
     </span>
+
+    <% if current_user.is_owner? %>
+      <span class="mx-1">|</span>
+      <span id="owner-invite-hotkey">
+        <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>I</span>nvites
+      </span>
+    <% end %>
   <% end %>
 </div>
 

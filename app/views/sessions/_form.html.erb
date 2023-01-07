@@ -4,11 +4,6 @@
     <%= password_field_tag :password, "", placeholder: "PASSWORD", class: "mx-auto text-center input w-full" %>
     <div class="mx-auto text-center pt-1">
       <%= submit_tag "Login", class: "button" %>
-      <% if UserRegistration.allowed? %>
-        <%= link_to signup_path, class: "button", data: { "turbo-frame": "_top" } do %>
-          Sign Up
-        <% end %>
-      <% end %>
     </div>
   </div>
 <% end %>

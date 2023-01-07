@@ -1,0 +1,11 @@
+<h3 class="text-center my-5 text-2xl">Activate Thyself</h3>
+
+<%= render(NoticeComponent.new(message: notice)) %>
+
+<p class="mt-5 text-xl">Thou shoulds't submitteth yon form belowst to get thine access to thine adventure!</p>
+
+<%= render "form", user: @user %>
+
+<% content_for :sidebar do %>
+  <%= ascii("village") %>
+<% end %>

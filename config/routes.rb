@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   resources :users
   get "activate/:code", to: "users#activate", as: :user_activation
+  post "users/create-from-activation", to: "users#create_from_activation", as: :users_activation_path
 
   resources :sessions, only: %i[new create destroy]
 

@@ -13,7 +13,16 @@ class UsersController < ApplicationController
 
   # GET /users/activate
   def activate
-    @token = SetupToken.find_by(uuid: params[:code])
+    @token = SetupToken.active.find_by(uuid: params[:code])
+
+    respond_to do |format|
+      if @token.blank?
+        format.html { redirect_to root_url, notice: t(:token_link_invalid) }
+      else
+        @user = User.new
+        format.html { render :new }
+      end
+    end
   end
 
   # GET /users/1 or /users/1.json
@@ -30,14 +39,16 @@ class UsersController < ApplicationController
   # POST /users or /users.json
   def create
     @user = User.new(user_params)
+    token = SetupToken.active.find_by(uuid: params[:code])
 
     respond_to do |format|
-      if @user.save
+      if token.blank?
+        format.html { redirect_to root_url, notice: t(:token_link_invalid) }
+      elsif @user.save
+        token.update(user_id: @user.id)
         format.html { redirect_to root_url, notice: "#{@user.username} is now registered for adventure." }
-        format.json { render :show, status: :created, location: @user }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -74,6 +85,6 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:username, :password, :password_confirmation)
+      params.require(:user).permit(:username, :password, :password_confirmation, :code)
     end
 end

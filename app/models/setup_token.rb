@@ -5,6 +5,12 @@ class SetupToken < ApplicationRecord
 
   before_create :set_uuid
 
+  scope :active, -> { where(user_id: nil) }
+
+  def active?
+    user_id.nil?
+  end
+
   private
 
     def set_uuid

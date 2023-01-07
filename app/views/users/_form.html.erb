@@ -5,6 +5,10 @@
     <% end %>
   <% end %>
 
+  <% if @token.present? %>
+    <%= hidden_field_tag :code, @token.uuid %>
+  <% end %>
+
   <div>
     <%= form.label :username %>
     <%= form.text_field :username %>
@@ -21,6 +25,6 @@
   </div>
 
   <div>
-    <%= form.submit "Register", class: "button" %>
+    <%= form.submit "Register", class: "button w-full mt-2" %>
   </div>
 <% end %>

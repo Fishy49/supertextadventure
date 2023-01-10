@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  get 'setup_tokens/index'
-  get 'setup_tokens/create'
-  get 'setup_tokens/delete'
   root "home#index"
+
+  get "setup_tokens/index"
+  get "setup_tokens/create"
+  get "setup_tokens/delete"
 
   get "setup", to: "setup#index", as: :setup
   post "setup/save", to: "setup#save", as: :save_setup
@@ -28,7 +29,6 @@ Rails.application.routes.draw do
     patch "host/typing", to: "games/host#typing"
     patch "host/stop-typing", to: "games/host#stop_typing"
   end
-  resources :inventory_items
 
   get "games/:id/lobby", to: "games#lobby", as: :game_lobby
   patch "games/:id/join", to: "games#join", as: :join_game

@@ -53,17 +53,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_02_171244) do
     t.index ["uuid"], name: "index_games_on_uuid", unique: true
   end
 
-  create_table "inventory_items", force: :cascade do |t|
-    t.bigint "game_user_id", null: false
-    t.string "name"
-    t.integer "quantity"
-    t.text "description"
-    t.text "ascii"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["game_user_id"], name: "index_inventory_items_on_game_user_id"
-  end
-
   create_table "messages", force: :cascade do |t|
     t.bigint "game_id", null: false
     t.bigint "game_user_id"
@@ -96,6 +85,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_02_171244) do
 
   add_foreign_key "game_users", "games"
   add_foreign_key "game_users", "users"
-  add_foreign_key "inventory_items", "game_users"
   add_foreign_key "messages", "games"
 end

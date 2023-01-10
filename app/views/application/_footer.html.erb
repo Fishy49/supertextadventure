@@ -1,35 +1,28 @@
 <div class="col-span-3 md:col-span-2 text-center md:text-left" data-controller="hotkey">
   <span>
-    <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>H</span>ome
+    <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-h" data-hotkey-path-param="/"><span class="text-xl">&#x2387;</span>H</span>ome
   </span>
-
-  <% if !logged_in? %>
-    <span class="mx-1">|</span>
-    <span>
-      <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>R</span>egister
-    </span>
-  <% end %>
 
   <% if logged_in? %>
     <span class="mx-1">|</span>
     <span>
-      <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>L</span>ogout
+      <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-l" data-hotkey-path-param="/logout"><span class="text-xl">&#x2387;</span>L</span>ogout
     </span>
 
     <span class="mx-1">|</span>
     <span>
-      <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>T</span>avern
+      <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-t" data-hotkey-path-param="/tavern"><span class="text-xl">&#x2387;</span>T</span>avern
     </span>
 
     <span class="mx-1">|</span>
     <span>
-      <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>A</span>bout
+      <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-a" data-hotkey-path-param="/about"><span class="text-xl">&#x2387;</span>A</span>bout
     </span>
 
     <% if current_user.is_owner? %>
       <span class="mx-1">|</span>
       <span id="owner-invite-hotkey">
-        <span class="bg-terminal-green text-stone-800 font-bold pr-1"><span class="text-xl">&#x2387;</span>I</span>nvites
+        <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-i" data-hotkey-path-param="/setup_tokens"><span class="text-xl">&#x2387;</span>I</span>nvites
       </span>
     <% end %>
   <% end %>

@@ -2,40 +2,49 @@ import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
   connect() {
-    window.addEventListener('keydown', this.trigger_hotkey, false);
+    window.addEventListener('keydown', this.triggerHotkeyFromKeydown, false);
   }
 
-  trigger_hotkey(e) {
+  initialize() {
+    this.path = '';
+  }
+
+  vistPath() {
+    if(this.path == '/logout'){
+      if(confirm('Logout?')){
+        Turbo.visit('/logout')
+      }
+    } else if(this.path == '/setup_tokens' && document.getElementById('owner-invite-hotkey')) {
+      Turbo.visit('/setup_tokens')
+    } else {
+      Turbo.visit(this.path);
+    }
+  }
+
+  triggerHotkeyFromKeydown(e) {
     if (!e.altKey) return;
 
-    e.preventDefault()
+    e.preventDefault();
     e.stopPropagation();
-    switch(e.key) {
-      case 'h':
-        Turbo.visit('/')
-        break;
-      case 'r':
-        Turbo.visit('/signup')
-        break;
-      case 'l':
-        if(confirm('Logout?')){
-          Turbo.visit('/logout')
-        }
-        break;
-      case 't':
-        Turbo.visit('/tavern')
-        break;
-      case 'c':
-        Turbo.visit('/characters')
-        break;
-      case 'a':
-        Turbo.visit('/about')
-        break;
-      case 'i':
-        if(document.getElementById('owner-invite-hotkey')){
-          Turbo.visit('/setup_tokens')
-        }
-        break
+
+    let hotkey_element = document.getElementById(`hotkey-${e.key}`);
+
+    console.log(hotkey_element);
+
+    if(hotkey_element){
+      let path = hotkey_element.getAttribute('data-hotkey-path-param');
+      this.path = path;
+      console.log(this);
+      console.log(this.path);
+      this.vistPath();
     }
+
+  }
+
+  triggerHotkey(e) {
+    if (e.params == {}) return;
+
+    this.path = e.params.path;
+    this.vistPath();
   }
 }

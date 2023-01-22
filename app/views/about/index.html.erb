@@ -1,16 +1,20 @@
-<h3 class="text-center my-5 text-2xl">About</h3>
+<h1 class="text-center my-5 text-2xl">About</h1>
 
-<p class="mb-6"><span class="font-bold">"What is this?"</span> - <span class="italic">You, probably.</span></p>
+<p class="mb-6 text-xl text-center"><span class="font-bold">"What is this?"</span> - <span class="italic">You, probably.</span></p>
 
-<p class="mb-6">I'm glad you asked! Super Text Adventure is a few things:</p>
+<p class="mb-6 text-center">I'm glad you asked! Super Text Adventure is a few things:</p>
 
-<ol class="list-decimal list-inside">
-  <li class="mb-1"><span class="font-bold">It's an unglorified chat application</span>. Pretty much all that's provided is a specific way to send messages to your friends while the "gameplay" aspect was intentionally left to you. The main goal was to blend an even mix of text-adventure and D&D session.</li>
-  <li class="mb-1"><span class="font-bold">A way to play an asynchronous game with your friends</span>. Pick up and leave off whenever you like. It'll always be waiting.</li>
-  <li class="mb-1"><span class="font-bold">The passion-project of a Ruby on Rails nerd</span>. The site is <span class="underline"><a href="https://github.com/Fishy49/supertextadventure">open source</a></span> and built with <span class="underline"><a href="https://rubyonrails.org/2021/12/15/Rails-7-fulfilling-a-vision">Rails 7</a></span>. I love Rails and hope this can demonstrate its capabilities.</li>
-</ol>
+<h2 class="text-center font-bold mb-1 text-lg">It's an unglorified chat application</h2>
+<p class="mb-5 text-center">Pretty much all that's provided is a specific way to send messages to your friends while the "gameplay" aspect was intentionally left to you. The main goal was to blend an even mix of text-adventure and D&D session.</p>
 
-<p class="mb-6">Have fun! - <span class="italic">Richard Cagle</span></p>
+<h2 class="text-center font-bold mb-1 text-lg">A way to play an asynchronous game with your friends</h2>
+<p class="mb-5 text-center">Pick up and leave off whenever you like. It'll always be waiting.</p>
+
+<h2 class="text-center font-bold mb-1 text-lg">The passion-project of a Ruby on Rails nerd</h2>
+<p class="mb-5 text-center">This application is <span class="underline"><a href="https://github.com/Fishy49/supertextadventure">open source</a></span> and built with <span class="underline"><a href="https://rubyonrails.org/2021/12/15/Rails-7-fulfilling-a-vision">Rails 7</a></span>. I love Rails and believe this to be a fun way of demonstrating what's possible.</p>
+
+
+<p class="my-6 text-right">Have fun! - <span class="italic">Richard Cagle</span></p>
 
 <% content_for :text_form do %>
   <%= render "/shared/terminal_input", prompt: "About", controllers: ["about"] %>

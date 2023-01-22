@@ -11,6 +11,7 @@ export default class extends Controller {
   observer = null
   scrollPosition = 'last'
   message_count = 0
+  first_load = true
 
   connect(){
     const targetNode = document.querySelector('.grid-in-message-container');
@@ -44,7 +45,8 @@ export default class extends Controller {
           this.message_count = targetNode.querySelectorAll('.game-message').length
           if(this.scrollPosition == 'last' && targetNode.querySelectorAll('.game-message').length > 0){
             targetNode.scrollTo(0, targetNode.scrollHeight)
-          } else {
+          } else if(!this.first_load) {
+            this.first_load = false
             let calculated_scroll = (this.scrollPosition - document.getElementById('game-messages').getBoundingClientRect().height) * -1
             targetNode.scrollTo(0, (calculated_scroll));
           }

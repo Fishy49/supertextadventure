@@ -1,15 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-  connect() {
-    window.addEventListener('keydown', this.triggerHotkeyFromKeydown, false);
-  }
-
   initialize() {
     this.path = '';
   }
 
-  vistPath() {
+  visitPath() {
     if(this.path == '/logout'){
       if(confirm('Logout?')){
         Turbo.visit('/logout')
@@ -29,14 +25,9 @@ export default class extends Controller {
 
     let hotkey_element = document.getElementById(`hotkey-${e.key}`);
 
-    console.log(hotkey_element);
-
     if(hotkey_element){
-      let path = hotkey_element.getAttribute('data-hotkey-path-param');
-      this.path = path;
-      console.log(this);
-      console.log(this.path);
-      this.vistPath();
+      this.path = hotkey_element.getAttribute('data-hotkey-path-param');
+      this.visitPath();
     }
 
   }
@@ -45,6 +36,6 @@ export default class extends Controller {
     if (e.params == {}) return;
 
     this.path = e.params.path;
-    this.vistPath();
+    this.visitPath();
   }
 }

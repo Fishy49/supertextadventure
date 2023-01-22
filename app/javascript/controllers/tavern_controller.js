@@ -37,13 +37,22 @@ export default class extends Controller {
 
       } else if (inputText.startsWith("JOIN TABLE")) {
         let tableNumber = this.extract_argument(inputText, "JOIN TABLE")
-        let gameListElement = document.getElementById('game-join-element-' + tableNumber)
+        let gameListElement = document.getElementById('table-join-element-' + tableNumber)
 
         if(!gameListElement){
           let error_text = 'Could not find a table for #' + tableNumber + '!'
           this.show_error(error_text, false)
         } else {
           get('/games/' + gameListElement.dataset.gameId + '/lobby', { responseKind: "turbo-stream" })
+        }
+      } else if (inputText.startsWith("JOIN GAME")) {
+        let gameJoinButton = document.getElementById('game-join-element')
+
+        if(!gameJoinButton){
+          let error_text = 'JOIN a TABLE first!'
+          this.show_error(error_text, false)
+        } else {
+          Turbo.visit('/games/' + gameJoinButton.dataset.uuid, { frame: "_top" })
         }
       } else {
         let error_text = 'What Doth "' + inputText + '" Imply!?'

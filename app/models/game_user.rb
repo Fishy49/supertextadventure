@@ -57,6 +57,6 @@ class GameUser < ApplicationRecord
       broadcast_replace_to(game, :players, target: "game_user_#{id}", partial: "/games/player",
                                            locals: { game_user: self, for_host: false })
       broadcast_replace_to(game, :host_players, target: "game_user_#{id}", partial: "/games/player",
-                                           locals: { game_user: self, for_host: true })
+                                                locals: { game_user: self, for_host: true })
     end
 end

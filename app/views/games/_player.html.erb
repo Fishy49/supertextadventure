@@ -2,7 +2,7 @@
 	<%= game_user.character_name %>
 	<% if game_user.game.enable_hp? %>
 		<span class="font-medium text-sm nowr">(<%= game_user.current_health %>/<%= game_user.max_health %>)</span><br>
-	  <span class="text-xs font-italic ml-10">Active <%= game_user.active_at.strftime("%a %b %e %r") %></span>
+	  <span class="text-xs font-italic ml-10">Active <%= game_user.active_at&.strftime("%a %b %e %r") %></span>
 		<% if for_host %>
 			<div class="fixed inset-0 z-10 overflow-y-auto bg-stone-800 bg-opacity-25 hidden" data-game-user-target="healthForm">
 				<div class="flex min-h-full items-end justify-center sm:items-center">

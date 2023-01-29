@@ -6,7 +6,7 @@ class GameUser < ApplicationRecord
   has_many :messages, inverse_of: :game_user, dependent: :destroy
   has_many :inventory, class_name: "InventoryItem", inverse_of: :game_user, dependent: :destroy
 
-  scope :joined, -> { sort(:id, :asc) }
+  scope :joined, -> { order(id: :asc) }
 
   before_create :check_game_users_count
   before_create :set_starting_health

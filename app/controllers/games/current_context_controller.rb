@@ -2,7 +2,6 @@
 
 module Games
   class CurrentContextController < ApplicationController
-    before_action :authorize!
     before_action :set_game
 
     def edit

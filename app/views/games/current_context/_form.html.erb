@@ -1,17 +1,64 @@
-<%= form_with(model: game, url: game_update_context_path(game_id: game.id), method: :patch, data: { "turbo-frame": "context" }) do |form| %>
-  <div class="form-group">
+<%= form_with(model: game, url: game_update_context_path(game_id: game.id), method: :patch, data: { "turbo-frame": "context", controller: "generate-text" }) do |form| %>
+  <div class="mb-3">
     <%= form.label :current_context, style: "display: block" %>
-    <%= form.text_area :current_context, value: game.current_context %>
+    <%= form.text_area :current_context, value: game.current_context, data: { "generate-text-target": "currentContextInput" } %>
   </div>
 
-  <div class="form-group">
+  <div class="mb-3">
     <%= form.label :is_current_context_ascii do %>
       ASCII?
     <% end %>
     <%= form.check_box :is_current_context_ascii %>
   </div>
 
-  <div>
-    <%= form.submit class: "button" %>
+  <div class="mb-3">
+    <div data-action="click->generate-text#open_modal" class="button">Generate Text</div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto bg-stone-800 bg-opacity-25 hidden" data-generate-text-target="modal">
+      <div class="flex min-h-full items-end justify-center sm:items-center">
+        <div class="bg-stone-900 shadow-[-20px_25px_0px_0px_#000000] border-terminal-green border-dashed border-2 p-5">
+          <div data-generate-text-target="form">
+            <div class="mb-3">
+              <%= label_tag :prompt, "Prompt", class: "block uppercase mb-3", min: 0 %>
+              <%= text_field_tag :prompt, "", data: { "generate-text-target": "promptInput" } %>
+            </div>
+
+            <div class="mb3">
+              <label>
+                <input type="radio" value="brief" name="length" data-generate-text-target="lengthInput" checked="checked"> Short
+              </label>
+              <label>
+                <input type="radio" value="long" name="length" data-generate-text-target="lengthInput">
+                Long
+              </label>
+            </div>
+
+            <div class="mb3">
+              <label>
+                <input type="radio" value="a D&D Game Master" name="style" data-generate-text-target="styleInput" checked="checked"> D&D
+              </label>
+              <label>
+                <input type="radio" value="King James English" name="style" data-generate-text-target="styleInput">
+                Older English
+              </label>
+              <label>
+                <input type="radio" value="a Shakespearean play" name="style" data-generate-text-target="styleInput">
+                Shakespearean
+              </label>
+            </div>
+
+            <div class="grid grid-cols-2 mt-5">
+              <button class="button p-3" data-action="click->generate-text#get_text" type="button">GENERATE TEXT</button>
+              <button class="button border-red-500 text-red-500 hover:text-red-100 hover:border-red-900 hover:bg-red-900 p-3" data-action="click->generate-text#close_modal" type="button">Cancel</button>
+            </div>
+          </div>
+          <div class="hidden" data-generate-text-target="loadingIndicator">
+            <h3 class="text-lg text-center font-medium leading-6 text-terminal-green" >Generating Text<div class="animate-spin inline-block ml-3">|</div></h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%= form.submit class: "button", value: "Update Context" %>
   </div>
 <% end %>

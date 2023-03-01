@@ -50,4 +50,6 @@ Rails.application.routes.draw do
   get "tavern", to: "games#index", as: :tavern
 
   get "about", to: "about#index"
+
+  get "generate-text", to: "generate_text#text"
 end

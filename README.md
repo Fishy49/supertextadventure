@@ -16,8 +16,7 @@ When running a game, you can use the `completions` API to generate text for your
 
 For Fly.io you can add this to your launched instance with
 ```
-flyctl secrets set OPENAI_ACCESS_TOKEN=<TOKEN>
-flyctl secrets set OPENAI_ORGANIZATION_ID=<ORGANIZATION_ID>
+flyctl secrets set OPENAI_ACCESS_TOKEN=<TOKEN> OPENAI_ORGANIZATION_ID=<ORGANIZATION_ID>
 ```
 
 ## Running Locally

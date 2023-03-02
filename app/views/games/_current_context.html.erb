@@ -1,6 +1,6 @@
 <%= turbo_frame_tag(:context) do %>
   <%= turbo_frame_tag(:context_content) do %>
-    <div class="text-center border-double border-2 border-terminal-green py-2 px-1 overflow-x-auto terminal-scrollbars">
+    <div class="text-center border-double border-8 border-terminal-green py-2 px-1 overflow-x-auto terminal-scrollbars">
       <% if game.current_context.present? %>
         <% if game.is_current_context_ascii?  %>
           <pre class="text-xs">

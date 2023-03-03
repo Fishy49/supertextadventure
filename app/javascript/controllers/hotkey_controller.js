@@ -18,7 +18,7 @@ export default class extends Controller {
   }
 
   triggerHotkeyFromKeydown(e) {
-    if (!e.altKey) return;
+    if (!e.getModifierState("Alt")) return;
 
     e.preventDefault();
     e.stopPropagation();

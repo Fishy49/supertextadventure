@@ -98,3 +98,5 @@ gem "cancancan", "~> 3.4"
 gem "dockerfile-rails", ">= 1.2", group: :development
 
 gem "ruby-openai", "~> 3.3"
+
+gem "browser", "~> 5.3"

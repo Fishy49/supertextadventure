@@ -2,7 +2,6 @@
   <h3 class="text-center text-xl"><%= @game.name %></h3>
   <p class="text-center mt-2 mb-5"><%= @game.description %></p>
 
-
   <p>Host: <strong><%= @game.host.username %></strong></p>
   <p>Players: <strong><%= @game.game_users.count %> / <%= @game.max_players %></strong></p>
   <p class="mb-2">Type: <strong><%= @game.game_type.titleize %></strong></p>
@@ -16,6 +15,13 @@
         <%= form.label :character_name, style: "display: block" %>
         <%= form.text_field :character_name %>
       </div>
+
+      <% if @game.game_type == "chatgpt" %>
+        <div class="form-group">
+          <%= form.label :character_description, style: "display: block" %>
+          <%= form.text_area :character_description %>
+        </div>
+      <% end %>
 
       <div class="text-center w-full">
         <%= form.submit class: "button w-full", value: "Join Table" %>

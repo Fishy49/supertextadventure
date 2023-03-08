@@ -4,7 +4,7 @@ module GamesHelper
   def game_type_options
     [
       %w[Free-Form freeform],
-      ["Strict Terminal", "strict"]
+      %w[ChatGPT chatgpt]
     ]
   end
 

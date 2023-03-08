@@ -46,3 +46,4 @@ en:
   user_updated: "User was successfully updated."
   user_destroyed: "User was successfully destroyed."
   token_link_invalid: "Thou Riff Raff! That link hast doth expired'th. Get you gone!"
+  game_created_successfully: "Game Created Successfully"

@@ -26,7 +26,8 @@ class GamesController < ApplicationController
       if @game.can_user_join?(current_user)
         game_user_params = {
           user_id: current_user.id,
-          character_name: params[:character_name]
+          character_name: params[:character_name],
+          character_description: params[:character_description]
         }
 
         @game_user = @game.game_users.create(game_user_params)
@@ -88,7 +89,11 @@ class GamesController < ApplicationController
 
     respond_to do |format|
       if @game.save
-        format.html { redirect_to game_url(@game) }
+        if @game.game_type == "chatgpt"
+          format.html { redirect_to tavern_url, notice: t(:game_created_successfully) }
+        else
+          format.html { redirect_to game_url(@game) }
+        end
       else
         format.html { render :new, status: :unprocessable_entity }
       end

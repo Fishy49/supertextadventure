@@ -3,8 +3,8 @@
 class GameUser < ApplicationRecord
   belongs_to :game, inverse_of: :game_users
   belongs_to :user, inverse_of: :game_users
-  has_many :messages, inverse_of: :game_user, dependent: :destroy
-  has_many :inventory, class_name: "InventoryItem", inverse_of: :game_user, dependent: :destroy
+  has_many :messages, inverse_of: :game_user, dependent: :nullify
+  # has_many :inventory, class_name: "InventoryItem", inverse_of: :game_user, dependent: :destroy
 
   scope :joined, -> { order(id: :asc) }
 
@@ -12,6 +12,7 @@ class GameUser < ApplicationRecord
   before_create :set_starting_health
 
   after_create_commit :broadcast_new_player
+  after_create_commit :inform_ai_of_player, if: proc { game.game_type == "chatgpt" }
 
   after_update_commit :create_health_change_event_message, if: :saved_change_to_current_health?
   after_update_commit :broadcast_updated_player_health, if: :saved_change_to_current_health?
@@ -58,5 +59,30 @@ class GameUser < ApplicationRecord
                                            locals: { game_user: self, for_host: false })
       broadcast_replace_to(game, :host_players, target: "game_user_#{id}", partial: "/games/player",
                                                 locals: { game_user: self, for_host: true })
+    end
+
+    def inform_ai_of_player
+      Message.create(
+        game_id: game.id,
+        is_system_message: true,
+        content: "A player with the name \"#{character_name}\" has joined the game.
+        They are described as follows: \"#{character_description}\""
+      )
+
+      chat_log = game.messages_for_ai
+      chat_log << { role: "user",
+                    content: "Please introduce the character named \"#{character_name}\"
+                    that just joined the game to the rest of the players." }
+
+      client = OpenAI::Client.new
+      response = client.chat(
+        parameters: {
+          model: "gpt-3.5-turbo",
+          messages: game.messages_for_ai
+        }
+      )
+      ai_response = response.dig("choices", 0, "message", "content")
+
+      Message.create(game_id: game.id, content: ai_response)
     end
 end

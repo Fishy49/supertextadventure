@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_02_171244) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_08_042836) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -25,6 +25,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_02_171244) do
     t.integer "max_health"
     t.integer "current_health"
     t.datetime "active_at"
+    t.text "character_description"
     t.index ["game_id", "user_id"], name: "index_game_users_on_game_id_and_user_id", unique: true
     t.index ["game_id"], name: "index_game_users_on_game_id"
     t.index ["user_id"], name: "index_game_users_on_user_id"
@@ -62,6 +63,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_02_171244) do
     t.datetime "updated_at", null: false
     t.string "event_type"
     t.text "event_data"
+    t.boolean "is_system_message", default: false
     t.index ["game_id"], name: "index_messages_on_game_id"
     t.index ["game_user_id"], name: "index_messages_on_game_user_id"
   end

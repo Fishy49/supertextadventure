@@ -7,12 +7,15 @@ class Message < ApplicationRecord
   serialize :event_data
 
   scope :latest, -> { order(id: :desc) }
-  scope :for_game, ->(game) { where(game_id: game.id).latest }
+  scope :oldest, -> { order(id: :asc) }
+  scope :for_game, ->(game) { where(game_id: game.id, is_system_message: false).latest }
+  scope :for_ai, -> { where(event_type: nil).oldest }
 
   before_create :parse_dice_rolls
 
-  after_create_commit -> { broadcast_append_to(game, :messages) }
-  after_create_commit :set_user_active_at
+  after_create_commit -> { broadcast_append_to(game, :messages) }, unless: proc { is_system_message? }
+  after_create_commit :set_user_active_at, unless: proc { is_system_message? }
+  after_create_commit :create_ai_response, if: proc { player_message? }
 
   def event?
     event_type.present?
@@ -23,7 +26,7 @@ class Message < ApplicationRecord
   end
 
   def player_message?
-    !event? && !host_message?
+    !event? && !host_message? && !is_system_message?
   end
 
   def display_name
@@ -46,5 +49,9 @@ class Message < ApplicationRecord
 
     def set_user_active_at
       game_user.update(active_at: DateTime.now) unless host_message?
+    end
+
+    def create_ai_response
+      ChatMessageJob.perform_async(game.id)
     end
 end

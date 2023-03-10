@@ -1,24 +1,29 @@
-<%= tag.li id: dom_id(game_user), class: classes("mb-5 leading-3 whitespace-nowrap", "cursor-pointer": for_host), data: { controller: "game-user", action: "click->game-user#health_form" } do %>
-	<%= game_user.character_name %>
+<%= tag.li id: dom_id(game_user), class: classes("mb-5 leading-3 whitespace-nowrap game-user", "cursor-pointer": for_host), data: { controller: "game-user", action: "click->game-user#health_form", "game-user-muted-value": !game_user.can_message, "game-user-id-value": game_user.id } do %>
+	<span class="<%= classes("opacity-50": !game_user.can_message) %>"><%= game_user.character_name %></span>
 	<% if game_user.game.enable_hp? %>
 		<span class="font-medium text-sm nowr">(<%= game_user.current_health %>/<%= game_user.max_health %>)</span><br>
 	  <span class="text-xs font-italic ml-10">Active <%= game_user.active_at&.strftime("%a %b %e %r") %></span>
 		<% if for_host %>
 			<div class="fixed inset-0 z-10 overflow-y-auto bg-stone-800 bg-opacity-25 hidden" data-game-user-target="healthForm">
 				<div class="flex min-h-full items-end justify-center sm:items-center">
-					<%= form_with(model: game_user, url: game_user_update_health_path(id: game_user), method: :patch, class: "bg-stone-900 shadow-[-20px_25px_0px_0px_#000000] border-terminal-green border-dashed border-2 p-5", data: { "turbo-frame": "player" }) do |form| %>
-					  <div class="form-group mb-3">
+					<%= form_with(model: game_user, url: game_user_path(id: game_user), method: :patch, class: "bg-stone-900 shadow-[-20px_25px_0px_0px_#000000] border-terminal-green border-dashed border-2 p-5", data: { "turbo-frame": "player" }) do |form| %>
+					  <div class="mb-3">
 					    <%= form.label :heal, class: "block uppercase mb-3", min: 0 %>
 					    <%= form.number_field :heal %>
 					  </div>
 
-					  <div class="form-group mb-3">
+					  <div class="mb-3">
 					    <%= form.label :damage, class: "block uppercase mb-3", min: 0 %>
 					    <%= form.number_field :damage %>
 					  </div>
 
+					  <div class="mb-3">
+					  	<label for="can_message">Mute</label>
+					    <%= form.check_box :can_message, { checked: !game_user.can_message }, false, true %>
+					  </div>
+
 					  <div class="grid grid-cols-2 mt-5">
-					    <%= form.submit class: "button p-3", value: "GIVETH / TAKETH" %>
+					    <%= form.submit class: "button p-3", value: "APPLY" %>
 					    <button class="button border-red-500 text-red-500 hover:text-red-100 hover:border-red-900 hover:bg-red-900 p-3" data-action="click->game-user#close_health_form" type="button">Cancel</button>
 					  </div>
 					<% end %>

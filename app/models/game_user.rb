@@ -16,6 +16,7 @@ class GameUser < ApplicationRecord
 
   after_update_commit :create_health_change_event_message, if: :saved_change_to_current_health?
   after_update_commit :broadcast_updated_player_health, if: :saved_change_to_current_health?
+  after_update_commit :broadcast_updated_player_mute, if: :saved_change_to_can_message?
   after_update_commit :broadcast_updated_player_active, if: :saved_change_to_active_at?
 
   private
@@ -54,11 +55,23 @@ class GameUser < ApplicationRecord
                                            locals: { game_user: self, for_host: false })
     end
 
+    def broadcast_updated_player_mute
+      broadcast_replace_to(game, :players, target: "game_user_#{id}", partial: "/games/player",
+                                           locals: { game_user: self, for_host: false })
+    end
+
     def broadcast_updated_player_active
       broadcast_replace_to(game, :players, target: "game_user_#{id}", partial: "/games/player",
                                            locals: { game_user: self, for_host: false })
       broadcast_replace_to(game, :host_players, target: "game_user_#{id}", partial: "/games/player",
                                                 locals: { game_user: self, for_host: true })
+    end
+
+    def chat_log_with_intro_request
+      chat_log = game.messages_for_ai
+      chat_log << { role: "user",
+                    content: "Please introduce the character named \"#{character_name}\"
+                    that just joined the game to the rest of the players." }
     end
 
     def inform_ai_of_player
@@ -69,16 +82,11 @@ class GameUser < ApplicationRecord
         They are described as follows: \"#{character_description}\""
       )
 
-      chat_log = game.messages_for_ai
-      chat_log << { role: "user",
-                    content: "Please introduce the character named \"#{character_name}\"
-                    that just joined the game to the rest of the players." }
-
       client = OpenAI::Client.new
       response = client.chat(
         parameters: {
           model: "gpt-3.5-turbo",
-          messages: game.messages_for_ai
+          messages: chat_log_with_intro_request
         }
       )
       ai_response = response.dig("choices", 0, "message", "content")

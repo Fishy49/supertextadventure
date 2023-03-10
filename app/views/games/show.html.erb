@@ -30,6 +30,18 @@
   </div>
 
   <h4 class="text-center mb-0 mt-3">PLAYERS</h4>
+  <% if @game.host?(current_user) %>
+    <div class="grid grid-cols-2 mb-3">
+      <%= form_with(scope: :game_user, url: game_users_mute_or_unmute_path(game_id: @game.id), method: :patch) do |form| %>
+        <%= form.hidden_field :can_message, value: false %>
+        <%= form.submit class: "button w-full text-sm", value: "Mute All" %>
+      <% end %>
+      <%= form_with(scope: :game_user, url: game_users_mute_or_unmute_path(game_id: @game.id), method: :patch) do |form| %>
+        <%= form.hidden_field :can_message, value: true %>
+        <%= form.submit class: "button w-full text-sm", value: "Unmute All" %>
+      <% end %>
+    </div>
+  <% end %>
   <%= render "players", game_users: @game.game_users.order(:id), for_host: @game.host?(current_user) %>
 <% end %>
 

@@ -6,6 +6,9 @@
       	data-<%= value_key %>-value="<%= value %>" 
       <% end %>
      <% end %>
+     <% if @stimulus_controllers.include?("game") %>
+       data-game-game-user-outlet=".game-user"
+     <% end %>
 >
   <div class="hidden text-white uppercase w-full before:content-['*** SYNTAX ERROR: ']" <%= stimulus_targets_for("error") %>></div>
 

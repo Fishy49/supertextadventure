@@ -72,6 +72,11 @@ class Game < ApplicationRecord
     chat_log_for_ai
   end
 
+  def broadcast_updated_player_list
+    broadcast_replace_to(self, :players, target: :players, partial: "/games/players",
+                                         locals: { game_users: game_users.joined, for_host: false })
+  end
+
   private
 
     def set_uuid

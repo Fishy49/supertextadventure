@@ -3,6 +3,7 @@ import { get, post, patch } from '@rails/request.js'
 
 export default class extends Controller {
   static targets = [ "prompt", "input", "error" ]
+  static outlets = [ "game-user" ]
   static values = {
     id: Number,
     userId: String
@@ -71,6 +72,21 @@ export default class extends Controller {
     if(e.keyCode == 13){
       e.preventDefault()
 
+      let error_for_mute_flag = false;
+
+      if(!this.is_host()){
+        this.gameUserOutlets.forEach(player => {
+          if(player.idValue.toString() == this.userIdValue && player.mutedValue == true){
+            error_for_mute_flag = true;
+          }
+        })
+      }
+
+      if(error_for_mute_flag){
+        this.show_error("You are muted!", true)
+        return false;
+      }
+
       let inputText = e.target.textContent.trim().toUpperCase()
 
       if(inputText === ""){ return false; }
@@ -91,5 +107,9 @@ export default class extends Controller {
         post("/messages", { body: game_payload, responseKind: "turbo-stream" })
       }
     }
+  }
+
+  show_error(text, fade){
+    window.stimulus_controller("terminalInput", "terminal").show_error(text, fade)
   }
 }

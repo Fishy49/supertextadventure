@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_08_042836) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_09_235436) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -26,6 +26,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_08_042836) do
     t.integer "current_health"
     t.datetime "active_at"
     t.text "character_description"
+    t.boolean "can_message", default: true
     t.index ["game_id", "user_id"], name: "index_game_users_on_game_id_and_user_id", unique: true
     t.index ["game_id"], name: "index_game_users_on_game_id"
     t.index ["user_id"], name: "index_game_users_on_user_id"

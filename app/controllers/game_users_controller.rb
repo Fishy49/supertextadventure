@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 class GameUsersController < ApplicationController
-  before_action :set_game_user
+  before_action :set_game_user, except: :mute_or_unmute_all_players
 
-  def update_health
+  def update
     heal = game_user_params[:heal].presence&.to_i || 0
     damage = game_user_params[:damage].presence&.to_i || 0
     total_health_change = heal - damage
 
-    @game_user.update(current_health: @game_user.current_health + total_health_change)
+    @game_user.update(current_health: @game_user.current_health + total_health_change,
+                      can_message: game_user_params[:can_message] == "true")
 
     respond_to do |format|
       format.turbo_stream do
@@ -22,6 +23,26 @@ class GameUsersController < ApplicationController
     end
   end
 
+  def mute_or_unmute_all_players
+    game = Game.find(params[:game_id])
+
+    game.game_users.update_all(can_message: game_user_params[:can_message] == "true") # rubocop:disable Rails/SkipsModelValidations
+
+    game.broadcast_updated_player_list
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(:players,
+                                                  partial: "/games/players",
+                                                  locals: {
+                                                    game_users: game.game_users.joined,
+                                                    for_host: true
+                                                  })
+      end
+      format.html
+    end
+  end
+
   private
 
     def set_game_user
@@ -29,6 +50,6 @@ class GameUsersController < ApplicationController
     end
 
     def game_user_params
-      params.require(:game_user).permit(:heal, :damage)
+      params.require(:game_user).permit(:heal, :damage, :can_message)
     end
 end

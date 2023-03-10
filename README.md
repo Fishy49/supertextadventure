@@ -32,7 +32,8 @@ The application can be run with `bundle exec ./bin/dev`.
 - ~Add dice roller~
 - ~Add loading of past message on scroll~ <-- (Launchable version!)
 - ~Use OpenAI Completions to build prompts/descriptions~
-- Add ability for host to control who can type
+- ~Create ChatGTP game mode and let ChatGPT run your game~
+- ~Add ability for host to control who can type~
 - Add basic inventory system
 - Add ability for host to edit their messages or delete others
 - Add browsable ASCII library

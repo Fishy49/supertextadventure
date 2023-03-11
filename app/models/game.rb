@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 
 class Game < ApplicationRecord
-  CHATGPT_SYSTEM_PROMPT = "You are a D&D game master. You will respond helpfully and creatively to user responses. You will always respond in the style of a D&D game master. All users will be players in the game. You will create the game world, scenery, characters, and descriptions."
+  CHATGPT_SYSTEM_PROMPT = <<-PROMPT
+  You are a D&D game master.
+  You will respond helpfully and creatively to user responses.
+  You will always respond in the style of a D&D game master.
+  All users will be players in the game.
+  You will create the game world, scenery, characters, and descriptions.
+  PROMPT
 
   belongs_to :host, class_name: "User",
                     foreign_key: :created_by,
@@ -47,6 +53,13 @@ class Game < ApplicationRecord
     game_users.count == max_players
   end
 
+  def role_for_ai_message(message)
+    role = "user" if message.player_message?
+    role = "assistant" if message.host_message?
+    role = "system" if message.is_system_message?
+    role
+  end
+
   def messages_for_ai
     chat_log_for_ai = [
       { role: "system", content: "#{CHATGPT_SYSTEM_PROMPT} The name of this D&D campaign is #{name}." }
@@ -55,10 +68,6 @@ class Game < ApplicationRecord
     messages.for_ai.each do |m|
       next if m.event?
 
-      role = "user" if m.player_message?
-      role = "assistant" if m.host_message?
-      role = "system" if m.is_system_message?
-
       content = if m.player_message?
                   "The following message is from the player named \"#{m.display_name}\": #{m.content}"
                 else
@@ -66,7 +75,7 @@ class Game < ApplicationRecord
                 end
 
       chat_log_for_ai << {
-        role: role, content: content
+        role: role_for_ai_message(m), content: content
       }
     end
     chat_log_for_ai
@@ -93,13 +102,12 @@ class Game < ApplicationRecord
 
       chat_log = messages_for_ai
       chat_log << { role: "user",
-                    content: "Please create a brief description of the game world and describe the opening scene the players will see." }
-      response = client.chat(
-        parameters: {
-          model: "gpt-3.5-turbo",
-          messages: chat_log
-        }
-      )
+                    content: <<-INSTRUCTION
+                    Please create a brief description of the game world.
+                    Also describe the opening scene the players will see.
+                    INSTRUCTION
+                  }
+      response = client.chat(parameters: { model: "gpt-3.5-turbo", messages: chat_log })
       ai_response = response.dig("choices", 0, "message", "content")
 
       Message.create(game_id: id, content: ai_response)

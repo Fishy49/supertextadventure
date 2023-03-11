@@ -1,22 +1,22 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  uuid: MyString
-  name: MyString
-  game_type: MyString
+  uuid: MyString1
+  name: MyString1
+  game_type: MyString1
   created_by: 1
-  status: MyString
+  status: MyString1
   opened_at: 2022-01-11 23:35:17
   closed_at: 2022-01-11 23:35:17
   is_friends_only: false
   max_players: 1
 
 two:
-  uuid: MyString
-  name: MyString
-  game_type: MyString
+  uuid: MyString2
+  name: MyString2
+  game_type: MyString2
   created_by: 1
-  status: MyString
+  status: MyString2
   opened_at: 2022-01-11 23:35:17
   closed_at: 2022-01-11 23:35:17
   is_friends_only: false

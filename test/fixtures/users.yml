@@ -1,11 +1,31 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-# column: value
+owner:
+  id: 1
+  username: "Owner The User"
+  password_digest: <%= BCrypt::Password.create('testpassword', cost: 5) %>
+  is_owner: true
+
+player1:
+  id: 2
+  username: "Player1 The User"
+  password_digest: <%= BCrypt::Password.create('testpassword', cost: 5) %>
+  is_owner: false
+
+player2:
+  id: 3
+  username: "Player2 The User"
+  password_digest: <%= BCrypt::Password.create('testpassword', cost: 5) %>
+  is_owner: false
+
+player3:
+  id: 4
+  username: "Player3 The User"
+  password_digest: <%= BCrypt::Password.create('testpassword', cost: 5) %>
+  is_owner: false
+
+player4:
+  id: 5
+  username: "Player4 The User"
+  password_digest: <%= BCrypt::Password.create('testpassword', cost: 5) %>
+  is_owner: false

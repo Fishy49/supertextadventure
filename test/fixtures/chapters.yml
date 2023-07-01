@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  game: one
+  number: 1
+  summary: MyText
+
+two:
+  game: two
+  number: 1
+  summary: MyText

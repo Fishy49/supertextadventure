@@ -10,10 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_09_235436) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_27_031318) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
+
+  create_table "chapters", force: :cascade do |t|
+    t.bigint "game_id", null: false
+    t.bigint "first_message_id"
+    t.bigint "last_message_id"
+    t.integer "number"
+    t.text "name"
+    t.text "summary"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["first_message_id"], name: "index_chapters_on_first_message_id"
+    t.index ["game_id"], name: "index_chapters_on_game_id"
+    t.index ["last_message_id"], name: "index_chapters_on_last_message_id"
+  end
 
   create_table "game_users", force: :cascade do |t|
     t.bigint "game_id", null: false
@@ -86,6 +100,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_09_235436) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "chapters", "games"
+  add_foreign_key "chapters", "messages", column: "first_message_id"
+  add_foreign_key "chapters", "messages", column: "last_message_id"
   add_foreign_key "game_users", "games"
   add_foreign_key "game_users", "users"
   add_foreign_key "messages", "games"

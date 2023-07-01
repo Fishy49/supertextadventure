@@ -85,7 +85,7 @@ class GameUser < ApplicationRecord
       client = OpenAI::Client.new
       response = client.chat(
         parameters: {
-          model: "gpt-3.5-turbo",
+          model: "gpt-4",
           messages: chat_log_with_intro_request
         }
       )

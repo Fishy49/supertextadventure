@@ -28,3 +28,6 @@ Style/StringLiterals:
 
 Style/Documentation:
   Enabled: false
+
+Rails/ThreeStateBooleanColumn:
+  Enabled: false

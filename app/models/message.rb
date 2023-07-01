@@ -17,6 +17,10 @@ class Message < ApplicationRecord
   after_create_commit :set_user_active_at, unless: proc { is_system_message? }
   after_create_commit :create_ai_response, if: proc { player_message? }
 
+  def chapter
+    Chapter.where(first_message_id: id).or(Chapter.where(last_message_id: id)).first
+  end
+
   def event?
     event_type.present?
   end
@@ -52,6 +56,6 @@ class Message < ApplicationRecord
     end
 
     def create_ai_response
-      ChatMessageJob.perform_async(game.id)
+      AiChatMessageJob.perform_async(game.id)
     end
 end

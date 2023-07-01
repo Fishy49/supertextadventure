@@ -1,13 +1,16 @@
 # frozen_string_literal: true
 
 class Game < ApplicationRecord
-  CHATGPT_SYSTEM_PROMPT = <<-PROMPT
-  You are a D&D game master.
-  You will respond helpfully and creatively to user responses.
-  You will always respond in the style of a D&D game master.
-  All users will be players in the game.
-  You will create the game world, scenery, characters, and descriptions.
+  CHATGPT_SYSTEM_PROMPT = <<-PROMPT.freeze
+  You are now taking on the role of a Dungeon Master (DM) for a Dungeons & Dragons (D&D) game.
+  As the DM, you will create a dynamic and engaging world, describe the environment,
+  control non-player characters (NPCs),#{' '}
+  and narrate the outcomes of players' actions.
+  Your goal is to provide a fun and immersive experience, while ensuring that you follow the rules of the game and maintain a fair and balanced play environment.
+  If a player asks to do something, ask them to make an appropriate ability with a dice roll.
   PROMPT
+
+  MAX_TOKENS_FOR_AI_CHAPTER = 7000
 
   belongs_to :host, class_name: "User",
                     foreign_key: :created_by,
@@ -18,6 +21,8 @@ class Game < ApplicationRecord
 
   has_many :game_users, inverse_of: :game, dependent: :destroy
   has_many :users, through: :game_users
+
+  has_many :chapters, inverse_of: :game, dependent: :destroy
 
   has_many :messages, inverse_of: :game, dependent: :destroy
 
@@ -30,6 +35,22 @@ class Game < ApplicationRecord
   after_create_commit :setup_ai, if: proc { game_type == "chatgpt" }
 
   validates :created_by, presence: true
+
+  def complete_chapters
+    chapters.order(:id).where.not(last_message_id: nil)
+  end
+
+  def current_chapter
+    chapters.where(last_message_id: nil).last
+  end
+
+  def current_messages
+    messages.where("id > ?", current_chapter&.first_message_id || 0)
+  end
+
+  def current_token_count
+    TOKENIZER.encode(messages_for_ai.select { |m| m[:content] }.join).tokens.count
+  end
 
   def game_user(user)
     game_users.find_by(user_id: user.id)
@@ -65,11 +86,19 @@ class Game < ApplicationRecord
       { role: "system", content: "#{CHATGPT_SYSTEM_PROMPT} The name of this D&D campaign is #{name}." }
     ]
 
-    messages.for_ai.each do |m|
+    if complete_chapters.present?
+      complete_chapters.each do |chapter|
+        chat_log_for_ai << {
+          role: "assistant", content: chapter.summary
+        }
+      end
+    end
+
+    current_messages.for_ai.each do |m|
       next if m.event?
 
       content = if m.player_message?
-                  "The following message is from the player named \"#{m.display_name}\": #{m.content}"
+                  "[#{m.display_name}] #{m.content}"
                 else
                   m.content
                 end
@@ -103,11 +132,11 @@ class Game < ApplicationRecord
       chat_log = messages_for_ai
       chat_log << { role: "user",
                     content: <<-INSTRUCTION
-                    Please create a brief description of the game world.
-                    Also describe the opening scene the players will see.
+                    Please create a brief description of the game world. No players have joined yet.
+                    Also describe the opening scene the players will once they join the game.
                     INSTRUCTION
                   }
-      response = client.chat(parameters: { model: "gpt-3.5-turbo", messages: chat_log })
+      response = client.chat(parameters: { model: "gpt-4", messages: chat_log })
       ai_response = response.dig("choices", 0, "message", "content")
 
       Message.create(game_id: id, content: ai_response)

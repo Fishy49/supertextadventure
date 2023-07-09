@@ -14,6 +14,7 @@ class Message < ApplicationRecord
   before_create :parse_dice_rolls
 
   after_create_commit -> { broadcast_append_to(game, :messages) }, unless: proc { is_system_message? }
+  after_update_commit -> { broadcast_replace_to(game, :messages) }, unless: proc { is_system_message? }
   after_create_commit :set_user_active_at, unless: proc { is_system_message? }
   after_create_commit :create_ai_response, if: proc { player_message? }
 
@@ -56,6 +57,9 @@ class Message < ApplicationRecord
     end
 
     def create_ai_response
+      # Time to close a chapter
+      game.current_chapter.close! if game.current_token_count >= Game::MAX_TOKENS_FOR_AI_CHAPTER
+
       AiChatMessageJob.perform_async(game.id)
     end
 end

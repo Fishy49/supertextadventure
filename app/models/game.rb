@@ -86,13 +86,7 @@ class Game < ApplicationRecord
       { role: "system", content: "#{CHATGPT_SYSTEM_PROMPT} The name of this D&D campaign is #{name}." }
     ]
 
-    if complete_chapters.present?
-      complete_chapters.each do |chapter|
-        chat_log_for_ai << {
-          role: "assistant", content: chapter.summary
-        }
-      end
-    end
+    chat_log_for_ai += chapter_summaries
 
     current_messages.for_ai.each do |m|
       next if m.event?
@@ -103,11 +97,21 @@ class Game < ApplicationRecord
                   m.content
                 end
 
-      chat_log_for_ai << {
-        role: role_for_ai_message(m), content: content
-      }
+      chat_log_for_ai << { role: role_for_ai_message(m), content: content }
     end
     chat_log_for_ai
+  end
+
+  def chapter_summaries
+    summaries = []
+    if complete_chapters.present?
+      complete_chapters.each do |chapter|
+        summaries << {
+          role: "assistant", content: chapter.summary
+        }
+      end
+    end
+    summaries
   end
 
   def broadcast_updated_player_list
@@ -139,6 +143,8 @@ class Game < ApplicationRecord
       response = client.chat(parameters: { model: "gpt-4", messages: chat_log })
       ai_response = response.dig("choices", 0, "message", "content")
 
-      Message.create(game_id: id, content: ai_response)
+      message = Message.create(game_id: id, content: ai_response)
+
+      Chapter.create(game_id: id, number: 1, first_message_id: message.id)
     end
 end

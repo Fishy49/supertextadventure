@@ -7,22 +7,18 @@ class AiChatMessageJob
     ActiveRecord::Base.connection_pool.with_connection do
       game = Game.find(game_id)
 
-      # Time to close a a chapter
-      # no chapter created yet - let's do that first
-      if game.current_token_count > Game::MAX_TOKENS_FOR_AI_CHAPTER && game.current_chapter.nil?
-        # no chapter created yet - let's do that first
-      end
-
+      ai_message = Message.create(game_id: game_id, content: " ")
       client = OpenAI::Client.new
-      response = client.chat(
+      client.chat(
         parameters: {
           model: "gpt-4",
-          messages: game.messages_for_ai
+          messages: game.messages_for_ai,
+          stream: proc do |chunk, _bytesize|
+            next_chunk = chunk.dig("choices", 0, "delta", "content")
+            ai_message.update(content: next_chunk)
+          end
         }
       )
-      ai_response = response.dig("choices", 0, "message", "content")
-
-      Message.create(game_id: game_id, content: ai_response)
     end
   end
 end

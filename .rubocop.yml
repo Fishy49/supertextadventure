@@ -31,3 +31,6 @@ Style/Documentation:
 
 Rails/ThreeStateBooleanColumn:
   Enabled: false
+
+Metrics/ClassLength:
+  Max: 115

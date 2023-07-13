@@ -7,15 +7,15 @@ class AiChatMessageJob
     ActiveRecord::Base.connection_pool.with_connection do
       game = Game.find(game_id)
 
-      ai_message = Message.create(game_id: game_id, content: " ")
-      client = OpenAI::Client.new
-      client.chat(
+      ai_message = Message.create(game_id: game_id, content: "...")
+      total_message = ""
+      OpenAI::Client.new.chat(
         parameters: {
-          model: "gpt-4",
-          messages: game.messages_for_ai,
+          model: "gpt-4", messages: game.messages_for_ai,
           stream: proc do |chunk, _bytesize|
             next_chunk = chunk.dig("choices", 0, "delta", "content")
-            ai_message.update(content: next_chunk)
+            total_message = "#{total_message}#{next_chunk}"
+            ai_message.update(content: total_message)
           end
         }
       )

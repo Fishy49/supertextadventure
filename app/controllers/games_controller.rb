@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
 class GamesController < ApplicationController
   load_resource find_by: :uuid
   authorize_resource
@@ -142,4 +141,3 @@ class GamesController < ApplicationController
       @turbo_frame_id = params[:turbo_frame_id].presence&.to_sym || :sidebar
     end
 end
-# rubocop:enable Metrics/ClassLength

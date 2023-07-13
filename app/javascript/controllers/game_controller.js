@@ -31,7 +31,7 @@ export default class extends Controller {
     // If messages are being loaded from scrolling "up", we want the 
     // mutation observer to scroll the view to 0, otherwise all the way down
     document.addEventListener('turbo:before-stream-render', (event) => {
-      if(event.detail.newStream.target == 'messages') {
+      if(event.detail.newStream.target == 'messages' || event.detail.newStream.target.indexOf("message_") === 0) {
         if(event.detail.newStream.action == 'prepend') {
           this.scrollPosition = document.getElementById('game-messages').getBoundingClientRect().height
         } else {

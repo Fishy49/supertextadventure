@@ -107,7 +107,7 @@ class Game < ApplicationRecord
     if complete_chapters.present?
       complete_chapters.each do |chapter|
         summaries << {
-          role: "assistant", content: chapter.summary
+          role: "assistant", content: "#{chapter.name} #{chapter.summary}"
         }
       end
     end

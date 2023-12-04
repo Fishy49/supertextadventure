@@ -11,7 +11,7 @@ class AiChatMessageJob
       total_message = ""
       OpenAI::Client.new.chat(
         parameters: {
-          model: "gpt-4", messages: game.messages_for_ai,
+          model: "gpt-4-1106-preview", messages: game.messages_for_ai,
           stream: proc do |chunk, _bytesize|
             next_chunk = chunk.dig("choices", 0, "delta", "content")
             total_message = "#{total_message}#{next_chunk}"

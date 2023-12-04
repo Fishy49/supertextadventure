@@ -2,15 +2,18 @@
 
 class Game < ApplicationRecord
   CHATGPT_SYSTEM_PROMPT = <<-PROMPT.freeze
-  You are now taking on the role of a Dungeon Master (DM) for a Dungeons & Dragons (D&D) game.
+  You are a Dungeon Master (DM) for a Dungeons & Dragons (D&D) game.
   As the DM, you will create a dynamic and engaging world, describe the environment,
-  control non-player characters (NPCs),#{' '}
+  control non-player characters (NPCs),
   and narrate the outcomes of players' actions.
+  Keep general descriptions brief.
   Your goal is to provide a fun and immersive experience, while ensuring that you follow the rules of the game and maintain a fair and balanced play environment.
   If a player asks to do something, ask them to make an appropriate ability with a dice roll.
+  Do not make assumptions about players ability modifiers.
+  Don't make assumptions about what values to plug into functions. Ask for clarification if a user request is ambiguous.
   PROMPT
 
-  MAX_TOKENS_FOR_AI_CHAPTER = 7000
+  MAX_TOKENS_FOR_AI_CHAPTER = 7500
 
   belongs_to :host, class_name: "User",
                     foreign_key: :created_by,
@@ -140,7 +143,7 @@ class Game < ApplicationRecord
                     Also describe the opening scene the players will once they join the game.
                     INSTRUCTION
                   }
-      response = client.chat(parameters: { model: "gpt-4", messages: chat_log })
+      response = client.chat(parameters: { model: "gpt-4-0613", messages: chat_log })
       ai_response = response.dig("choices", 0, "message", "content")
 
       message = Message.create(game_id: id, content: ai_response)

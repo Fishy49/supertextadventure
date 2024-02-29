@@ -312,7 +312,7 @@ DEPENDENCIES
   jbuilder
   pagy (~> 5.10)
   pg (~> 1.1)
-  puma (~> 6.0)
+  puma (~> 6.4)
   rails (~> 7.0.0)
   redis (~> 4.0)
   rubocop (~> 1.24)
@@ -326,7 +326,7 @@ DEPENDENCIES
   tailwindcss-rails (~> 2.0)
   tokenizers (~> 0.3.3)
   turbo-rails
-  view_component (~> 2.78)
+  view_component (~> 2.83)
   web-console
   webdrivers
 

@@ -51,6 +51,8 @@ export default class extends Controller {
             let calculated_scroll = (this.scrollPosition - document.getElementById('game-messages').getBoundingClientRect().height) * -1
             targetNode.scrollTo(0, (calculated_scroll));
           }
+        } else if (mutation.type == 'childList' && this.scrollPosition == 'last') {
+          targetNode.scrollTo(0, targetNode.scrollHeight)
         }
       }
     }

@@ -1,19 +1,21 @@
 # frozen_string_literal: true
 
 class Game < ApplicationRecord
-  CHATGPT_SYSTEM_PROMPT = <<-PROMPT.freeze
-  You are a Dungeon Master (DM) for a Dungeons & Dragons (D&D) game.
-  As the DM, you will create a dynamic and engaging world, describe the environment,
+  CHATGPT_SYSTEM_PROMPT = <<-PROMPT
+  You are acting as the text-parser in a text-based adventure game.
+  As the game, you will create a dynamic and engaging world, describe the environment,
   control non-player characters (NPCs),
   and narrate the outcomes of players' actions.
-  Keep general descriptions brief.
+  Keep all responses brief and minimal.
   Your goal is to provide a fun and immersive experience, while ensuring that you follow the rules of the game and maintain a fair and balanced play environment.
   If a player asks to do something, ask them to make an appropriate ability with a dice roll.
-  Do not make assumptions about players ability modifiers.
+  There are no player modifiers.
+  If you ask a player to make a roll, and they do not respond with a number or a valid roll, admonish them and ask for the roll again.
   Don't make assumptions about what values to plug into functions. Ask for clarification if a user request is ambiguous.
+  Do not tell the players what they are doing, ask them what they would like to do.
   PROMPT
 
-  MAX_TOKENS_FOR_AI_CHAPTER = 7500
+  MAX_TOKENS_FOR_AI_CHAPTER = 126_000
 
   belongs_to :host, class_name: "User",
                     foreign_key: :created_by,
@@ -96,6 +98,8 @@ class Game < ApplicationRecord
 
       content = if m.player_message?
                   "[#{m.display_name}] #{m.content}"
+                elsif m.event_type == "roll"
+                  m.roll_result_message_for_ai
                 else
                   m.content
                 end
@@ -139,7 +143,7 @@ class Game < ApplicationRecord
       chat_log = messages_for_ai
       chat_log << { role: "user",
                     content: <<-INSTRUCTION
-                    Please create a brief description of the game world. No players have joined yet.
+                    Please create a very brief description of the game world. No players have joined yet.
                     Also describe the opening scene the players will once they join the game.
                     INSTRUCTION
                   }

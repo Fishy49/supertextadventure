@@ -70,7 +70,7 @@ class GameUser < ApplicationRecord
     def chat_log_with_intro_request
       chat_log = game.messages_for_ai
       chat_log << { role: "user",
-                    content: "Please introduce the character named \"#{character_name}\"
+                    content: "Please briefly introduce the character named \"#{character_name}\"
                     that just joined the game to the rest of the players." }
     end
 

@@ -16,7 +16,7 @@ class Message < ApplicationRecord
   after_create_commit -> { broadcast_append_to(game, :messages) }, unless: proc { is_system_message? }
   after_update_commit -> { broadcast_replace_to(game, :messages) }, unless: proc { is_system_message? }
   after_create_commit :set_user_active_at, unless: proc { is_system_message? }
-  after_create_commit :create_ai_response, if: proc { player_message? }
+  after_create_commit :create_ai_response, if: proc { player_message? || event_type == "roll" }
 
   def chapter
     Chapter.where(first_message_id: id).or(Chapter.where(last_message_id: id)).first
@@ -38,6 +38,14 @@ class Message < ApplicationRecord
     return sender_name if sender_name.present?
 
     game_user&.character_name || game.host_display_name
+  end
+
+  def roll_result_message_for_ai
+    msg = "#{display_name} rolled the following dice:"
+    event_data.result_dice.each do |result, dice_type|
+      msg << " A D#{dice_type} die that rolled a #{result}"
+    end
+    msg
   end
 
   private

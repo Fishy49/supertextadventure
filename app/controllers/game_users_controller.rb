@@ -4,8 +4,8 @@ class GameUsersController < ApplicationController
   before_action :set_game_user, except: :mute_or_unmute_all_players
 
   def update
-    heal = game_user_params[:heal].presence&.to_i || 0
-    damage = game_user_params[:damage].presence&.to_i || 0
+    heal = game_user_params[:heal].presence.to_i
+    damage = game_user_params[:damage].presence.to_i
     total_health_change = heal - damage
 
     @game_user.update(current_health: @game_user.current_health + total_health_change,

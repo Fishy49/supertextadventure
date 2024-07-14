@@ -14,8 +14,8 @@ class Chapter < ApplicationRecord
   def all_messages
     Message.for_ai
            .where(game_id: game.id)
-           .where("id >= ?", first_message.id)
-           .where("id <= ?", last_message&.id || 9_999_999)
+           .where(id: first_message.id..)
+           .where(id: ..(last_message&.id || 9_999_999))
            .order(id: :asc)
   end
 

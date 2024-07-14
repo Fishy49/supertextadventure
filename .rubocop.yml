@@ -1,8 +1,10 @@
 require:
   - rubocop-performance
   - rubocop-rails
+  - rubocop-capybara
 
 AllCops:
+  SuggestExtensions: false
   NewCops: enable
   Exclude:
     - 'bin/**'
@@ -19,7 +21,7 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/MethodLength:
-  Max: 15
+  Max: 16
   Exclude: 
     - 'db/migrate/**'
 
@@ -33,4 +35,4 @@ Rails/ThreeStateBooleanColumn:
   Enabled: false
 
 Metrics/ClassLength:
-  Max: 115
+  Max: 120

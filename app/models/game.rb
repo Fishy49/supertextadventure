@@ -15,7 +15,7 @@ class Game < ApplicationRecord
   Do not tell the players what they are doing, ask them what they would like to do.
   PROMPT
 
-  MAX_TOKENS_FOR_AI_CHAPTER = 126_000
+  MAX_TOKENS_FOR_AI_CHAPTER = 7500
 
   belongs_to :host, class_name: "User",
                     foreign_key: :created_by,
@@ -147,7 +147,7 @@ class Game < ApplicationRecord
                     Also describe the opening scene the players will once they join the game.
                     INSTRUCTION
                   }
-      response = client.chat(parameters: { model: "gpt-4-0613", messages: chat_log })
+      response = client.chat(parameters: { model: "gpt-4o", messages: chat_log })
       ai_response = response.dig("choices", 0, "message", "content")
 
       message = Message.create(game_id: id, content: ai_response)

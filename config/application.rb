@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative "boot"
 
 require "rails/all"
@@ -23,21 +21,7 @@ module Supertextadventure
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    config.time_zone = "Central Time (US & Canada)"
+    # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
-
-    config.active_support.cache_format_version = 7.1
-
-    config.after_initialize do
-      # Allow Serialization
-      ActiveRecord.yaml_column_permitted_classes = [
-        Symbol,
-        DiceRoll,
-        ActiveSupport::HashWithIndifferentAccess,
-        ActiveModel::Attribute.const_get(:FromDatabase),
-        GameUser,
-        Time
-      ]
-    end
   end
 end

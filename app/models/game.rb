@@ -54,7 +54,9 @@ class Game < ApplicationRecord
   end
 
   def current_token_count
-    TOKENIZER.encode(messages_for_ai.select { |m| m[:content] }.join).tokens.count
+    # Approximate token count: ~4 characters per token for GPT models
+    text = messages_for_ai.map { |m| m[:content] }.join
+    (text.length / 4.0).ceil
   end
 
   def game_user(user)

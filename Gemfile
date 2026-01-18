@@ -97,8 +97,6 @@ gem "cancancan", "~> 3.4"
 
 gem "browser", "~> 5.3"
 
-gem "tokenizers", "~> 0.5.4"
-
 gem "ruby-openai", "~> 7.0"
 
 gem "rubocop-capybara", "~> 2.21"

@@ -97,7 +97,7 @@ gem "cancancan", "~> 3.4"
 
 gem "browser", "~> 5.3"
 
-gem "ruby-openai", "~> 7.0"
+gem "openai", "~> 0.43.0"
 
 gem "rubocop-capybara", "~> 2.21"
 

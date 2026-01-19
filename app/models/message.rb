@@ -9,7 +9,7 @@ class Message < ApplicationRecord
   scope :latest, -> { order(id: :desc) }
   scope :oldest, -> { order(id: :asc) }
   scope :for_game, ->(game) { where(game_id: game.id, is_system_message: false).latest }
-  scope :for_ai, -> { where(event_type: nil).oldest }
+  scope :for_ai, -> { where(event_type: [nil, "roll"]).oldest }
 
   before_create :parse_dice_rolls
 

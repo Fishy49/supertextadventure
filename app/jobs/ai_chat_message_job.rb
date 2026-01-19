@@ -10,16 +10,20 @@ class AiChatMessageJob
 
       ai_message = Message.create(game_id: game_id, content: "...")
       total_message = ""
-      OpenAI::Client.new.chat(
-        parameters: {
-          model: "gpt-4o", messages: game.messages_for_ai,
-          stream: proc do |chunk, _bytesize|
-            next_chunk = chunk.dig("choices", 0, "delta", "content")
-            total_message = "#{total_message}#{next_chunk}"
-            ai_message.update(content: total_message)
-          end
-        }
+
+      client = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"])
+      stream = client.responses.stream(
+        model: "gpt-5-mini",
+        input: game.messages_for_ai
       )
+
+      stream.each do |event|
+        next unless event.type.to_s == "response.output_text.delta"
+
+        text_delta = event.delta
+        total_message += text_delta if text_delta
+        ai_message.update(content: total_message)
+      end
     end
   end
 end

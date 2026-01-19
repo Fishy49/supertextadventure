@@ -85,6 +85,7 @@ class Game < ApplicationRecord
     role = "user" if message.player_message?
     role = "assistant" if message.host_message?
     role = "system" if message.is_system_message?
+    role = "user" if message.event_type == "roll"  # Roll events are user actions
     role
   end
 
@@ -96,7 +97,8 @@ class Game < ApplicationRecord
     chat_log_for_ai += chapter_summaries
 
     current_messages.for_ai.each do |m|
-      next if m.event?
+      # Skip events except for roll events
+      next if m.event? && m.event_type != "roll"
 
       content = if m.player_message?
                   "[#{m.display_name}] #{m.content}"
@@ -140,7 +142,7 @@ class Game < ApplicationRecord
     end
 
     def setup_ai
-      client = OpenAI::Client.new
+      client = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"])
 
       chat_log = messages_for_ai
       chat_log << { role: "user",
@@ -149,8 +151,8 @@ class Game < ApplicationRecord
                     Also describe the opening scene the players will once they join the game.
                     INSTRUCTION
                   }
-      response = client.chat(parameters: { model: "gpt-4o", messages: chat_log })
-      ai_response = response.dig("choices", 0, "message", "content")
+      response = client.responses.create(model: "gpt-5-mini", input: chat_log)
+      ai_response = response.output_text
 
       message = Message.create(game_id: id, content: ai_response)
 

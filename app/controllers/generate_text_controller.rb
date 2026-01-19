@@ -4,13 +4,12 @@ class GenerateTextController < ApplicationController
   before_action :promptify
 
   def text
-    response = OpenAI::Client.new.chat(
-        parameters: {
-          model: "gpt-4o",
-          messages: [{ role: "user", content: @prompt }]
-        }
-      )
-    render json: { generated_text: response.dig("choices", 0, "message", "content") }
+    client = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"])
+    response = client.responses.create(
+      model: "gpt-5-mini",
+      input: @prompt
+    )
+    render json: { generated_text: response.output_text }
   end
 
   private

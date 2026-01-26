@@ -1,0 +1,40 @@
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-3xl mb-6">Create New World</h1>
+
+  <%= form_with model: @world, class: "space-y-4" do |f| %>
+    <% if @world.errors.any? %>
+      <div class="border-2 border-red-500 p-4 mb-4">
+        <h3 class="text-red-500 mb-2">Errors:</h3>
+        <ul class="list-disc list-inside text-sm">
+          <% @world.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :name, class: "block mb-2" %>
+      <%= f.text_field :name, class: "w-full bg-stone-900 border-2 border-terminal-green p-2 text-terminal-green focus:outline-none focus:border-terminal-green", placeholder: "My Adventure World" %>
+    </div>
+
+    <div>
+      <%= f.label :description, class: "block mb-2" %>
+      <%= f.text_area :description, rows: 3, class: "w-full bg-stone-900 border-2 border-terminal-green p-2 text-terminal-green focus:outline-none focus:border-terminal-green", placeholder: "A thrilling adventure awaits..." %>
+    </div>
+
+    <div class="flex gap-2">
+      <%= f.submit "Create World", class: "px-4 py-2 border-2 border-terminal-green hover:bg-terminal-green hover:text-stone-800 transition-colors cursor-pointer" %>
+      <%= link_to "Cancel", worlds_path, class: "px-4 py-2 border-2 border-terminal-green hover:bg-terminal-green hover:text-stone-800 transition-colors" %>
+    </div>
+  <% end %>
+</div>
+
+<% content_for :sidebar do %>
+  <div class="p-4">
+    <h3 class="text-xl mb-4">New World</h3>
+    <p class="text-sm opacity-80">
+      Give your world a name and description. You'll be able to define rooms, items, NPCs, and creatures in the editor after creation.
+    </p>
+  </div>
+<% end %>

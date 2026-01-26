@@ -26,10 +26,13 @@ class Chapter < ApplicationRecord
 
     client = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"])
 
-    chat_log = all_messages.map { |m| { role: game.role_for_ai_message(m), content: m.content } }
+    chat_log = all_messages.map do |m|
+      role = determine_message_role(m)
+      { role: role, content: m.content }
+    end
     chat_log << { role: "user", content: CHAPTER_PROMPT }
 
-    response = client.responses.create(model: "gpt-5-mini", input: chat_log)
+    response = client.responses.create(model: game.ai_config.model_name, input: chat_log)
     ai_response = response.output_text
 
     chapter_name, summary = parse_chapter_info(ai_response)
@@ -41,6 +44,15 @@ class Chapter < ApplicationRecord
   end
 
   private
+
+    def determine_message_role(message)
+      return "user" if message.player_message?
+      return "assistant" if message.host_message?
+      return "system" if message.is_system_message?
+      return "user" if message.event_type == "roll"
+
+      "user" # default
+    end
 
     def parse_chapter_info(ai_response)
       response_parts = ai_response.split(":")

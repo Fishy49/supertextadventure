@@ -2,7 +2,7 @@
 	<% if @message.event? %>
 		<%= render(EventMessageComponent.new(@message)) %>
 	<% elsif @message.host_message? %>
-		<%= @message.content %>
+		<%= simple_format(@message.content) %>
 	<% elsif @message.player_message? %>
 		<%= @message.display_name %> /&gt; <%= @message.content %>
 	<% end %>

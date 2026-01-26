@@ -1,0 +1,30 @@
+<div class="space-y-4">
+  <div>
+    <label class="block mb-1 text-sm font-bold">Name *</label>
+    <%= text_field_tag :name, entity_data["name"],
+        required: true,
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">Description *</label>
+    <%= text_area_tag :description, entity_data["description"],
+        rows: 3,
+        required: true,
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">Keywords (comma-separated)</label>
+    <%= text_field_tag :keywords, (entity_data["keywords"] || []).join(", "),
+        placeholder: "book, tome, ancient",
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="flex items-center gap-2">
+      <%= check_box_tag :takeable, "1", entity_data["takeable"], class: "w-4 h-4" %>
+      <span class="text-sm font-bold">Takeable</span>
+    </label>
+  </div>
+</div>

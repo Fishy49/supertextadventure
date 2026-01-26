@@ -10,10 +10,7 @@ class MessagesController < ApplicationController
     message = Message.create(message_params)
 
     respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.append(:messages, partial: "messages/message",
-                                                            locals: { message: message })
-      end
+      format.turbo_stream { head :ok }
     end
   end
 

@@ -88,7 +88,7 @@ class GamesController < ApplicationController
 
     respond_to do |format|
       if @game.save
-        if @game.game_type == "chatgpt"
+        if @game.chat_ai?
           format.html { redirect_to tavern_url, notice: t(:game_created_successfully) }
         else
           format.html { redirect_to game_url(@game) }
@@ -134,7 +134,7 @@ class GamesController < ApplicationController
     def game_params
       params.require(:game).permit(:uuid, :name, :game_type, :created_by, :status, :opened_at, :closed_at,
                                    :is_friends_only, :max_players, :description, :host_display_name,
-                                   :current_context, :is_current_context_ascii, :enable_hp, :starting_hp)
+                                   :current_context, :is_current_context_ascii, :enable_hp, :starting_hp, :world_id)
     end
 
     def set_turbo_frame_id

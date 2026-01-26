@@ -1,0 +1,31 @@
+<div class="space-y-4">
+  <div>
+    <label class="block mb-1 text-sm font-bold">Name *</label>
+    <%= text_field_tag :name, entity_data["name"],
+        required: true,
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">Description *</label>
+    <%= text_area_tag :description, entity_data["description"],
+        rows: 3,
+        required: true,
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="block mb-1 text-sm font-bold">Health</label>
+      <%= number_field_tag :health, entity_data["health"] || 10,
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+    </div>
+
+    <div>
+      <label class="flex items-center gap-2 mt-6">
+        <%= check_box_tag :hostile, "1", entity_data["hostile"], class: "w-4 h-4" %>
+        <span class="text-sm font-bold">Hostile</span>
+      </label>
+    </div>
+  </div>
+</div>

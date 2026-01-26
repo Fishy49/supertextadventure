@@ -13,7 +13,7 @@ class AiChatMessageJob
 
       client = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"])
       stream = client.responses.stream(
-        model: "gpt-5-mini",
+        model: game.ai_config.model_name,
         input: game.messages_for_ai
       )
 

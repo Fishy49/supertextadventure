@@ -53,4 +53,14 @@ Rails.application.routes.draw do
   get "about", to: "about#index"
 
   get "generate-text", to: "generate_text#text"
+
+  resources :worlds do
+    member do
+      post :preview
+      get :entity_form
+      post :create_entity
+      patch :update_entity
+      delete :delete_entity
+    end
+  end
 end

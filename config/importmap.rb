@@ -13,19 +13,20 @@ pin "@hotwired/turbo", to: "https://ga.jspm.io/npm:@hotwired/turbo@7.2.4/dist/tu
 pin "@rails/actioncable/src", to: "https://ga.jspm.io/npm:@rails/actioncable@7.0.4/src/index.js"
 
 # CodeMirror 6 for JSON editing with syntax highlighting and folding
-pin "codemirror", to: "https://ga.jspm.io/npm:codemirror@6.0.1/dist/index.js"
+pin "codemirror" # @6.0.2
 pin "@codemirror/lang-json", to: "https://ga.jspm.io/npm:@codemirror/lang-json@6.0.1/dist/index.js"
-pin "@codemirror/language", to: "https://ga.jspm.io/npm:@codemirror/language@6.10.3/dist/index.js"
-pin "@codemirror/state", to: "https://ga.jspm.io/npm:@codemirror/state@6.4.1/dist/index.js"
-pin "@codemirror/view", to: "https://ga.jspm.io/npm:@codemirror/view@6.34.1/dist/index.js"
-pin "@codemirror/commands", to: "https://ga.jspm.io/npm:@codemirror/commands@6.7.1/dist/index.js"
-pin "@codemirror/search", to: "https://ga.jspm.io/npm:@codemirror/search@6.5.7/dist/index.js"
-pin "@codemirror/autocomplete", to: "https://ga.jspm.io/npm:@codemirror/autocomplete@6.18.1/dist/index.js"
-pin "@codemirror/lint", to: "https://ga.jspm.io/npm:@codemirror/lint@6.8.2/dist/index.js"
-pin "@lezer/common", to: "https://ga.jspm.io/npm:@lezer/common@1.2.2/dist/index.js"
-pin "@lezer/highlight", to: "https://ga.jspm.io/npm:@lezer/highlight@1.2.1/dist/index.js"
+pin "@codemirror/language", to: "@codemirror--language.js" # @6.12.1
+pin "@codemirror/state", to: "@codemirror--state.js" # @6.5.4
+pin "@codemirror/view", to: "@codemirror--view.js" # @6.39.11
+pin "@codemirror/commands", to: "@codemirror--commands.js" # @6.10.1
+pin "@codemirror/search", to: "@codemirror--search.js" # @6.6.0
+pin "@codemirror/autocomplete", to: "@codemirror--autocomplete.js" # @6.20.0
+pin "@codemirror/lint", to: "@codemirror--lint.js" # @6.9.2
+pin "@lezer/common", to: "@lezer--common.js" # @1.5.0
+pin "@lezer/highlight", to: "@lezer--highlight.js" # @1.2.3
 pin "@lezer/lr", to: "https://ga.jspm.io/npm:@lezer/lr@1.4.2/dist/index.js"
 pin "@lezer/json", to: "https://ga.jspm.io/npm:@lezer/json@1.0.2/dist/index.js"
-pin "style-mod", to: "https://ga.jspm.io/npm:style-mod@4.1.2/src/style-mod.js"
-pin "w3c-keyname", to: "https://ga.jspm.io/npm:w3c-keyname@2.2.8/index.js"
-pin "crelt", to: "https://ga.jspm.io/npm:crelt@1.0.6/index.js"
+pin "style-mod" # @4.1.3
+pin "w3c-keyname" # @2.2.8
+pin "crelt" # @1.0.6
+pin "@marijn/find-cluster-break", to: "@marijn--find-cluster-break.js" # @1.0.2

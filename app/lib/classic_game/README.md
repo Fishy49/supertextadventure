@@ -1,6 +1,6 @@
 # Classic Text Adventure Engine
 
-A complete text adventure game engine for creating classic dungeon-crawl and exploration games.
+A complete text adventure game engine for creating classic dungeon-crawl and exploration games with support for puzzles, hidden passages, locked doors, NPCs, quests, and complex world interactions.
 
 ## Architecture
 
@@ -37,7 +37,19 @@ Worlds are defined in JSONB with the following structure:
         "east": {
           "to": "locked_room",
           "requires": "key_id",
-          "locked_msg": "The door is locked."
+          "locked_msg": "The door is locked.",
+          "unlocked_msg": "The unlocked door stands open to the east."
+        },
+        "secret": {
+          "to": "hidden_chamber",
+          "hidden": true,
+          "requires_flag": "bookcase_moved",
+          "reveal_msg": "You notice a dark passage!",
+          "use_item": "iron_key",
+          "on_unlock": "You turn the key and the door unlocks.",
+          "permanently_unlock": true,
+          "consume_item": false,
+          "sets_flag": "secret_door_open"
         }
       },
       "items": ["item_id"],
@@ -59,6 +71,14 @@ Worlds are defined in JSONB with the following structure:
         "requires_target": true,
         "sets_flag": "door_unlocked",
         "success_msg": "You unlock the door!"
+      },
+      "reveals_exit": {
+        "direction": "down",
+        "message": "You pull the lever and a trapdoor opens!"
+      },
+      "on_examine": {
+        "reveals_exit": "secret",
+        "text": "Looking closely, you notice something hidden..."
       }
     }
   },
@@ -95,7 +115,8 @@ Worlds are defined in JSONB with the following structure:
 ### Items
 - `TAKE/GET/GRAB [item]` - Pick up an item
 - `DROP [item]` - Drop an item
-- `USE [item] ON [target]` - Use an item on something
+- `USE [item]` - Use an item (triggers on_use or reveals_exit)
+- `USE [item] ON [direction]` - Use an item on an exit (e.g., "use key on north")
 
 ### Interaction
 - `TALK TO [npc]` - Talk to an NPC
@@ -134,6 +155,14 @@ Stored in `Game#game_state` JSONB column:
   "global_flags": {
     "gate_opened": false,
     "quest_complete": true
+  },
+  "unlocked_exits": {
+    "entrance_north": true,
+    "vault_east": true
+  },
+  "revealed_exits": {
+    "library_secret": true,
+    "study_hidden": true
   }
 }
 ```
@@ -180,6 +209,104 @@ game = Game.create!(
 
 ## Features
 
+### Advanced Exit System
+
+#### Simple Exits
+Basic string format for open passages:
+```json
+"exits": {
+  "north": "room_id"
+}
+```
+
+#### Locked Exits
+Exits can be locked with multiple unlock mechanisms:
+
+**Inventory-Based Locking** - Requires item in inventory:
+```json
+"north": {
+  "to": "vault",
+  "requires": "gold_key",
+  "locked_msg": "You need a key to unlock this vault door."
+}
+```
+
+**Flag-Based Locking** - Requires global flag to be set:
+```json
+"east": {
+  "to": "treasure_room",
+  "requires_flag": "lever_pulled",
+  "locked_msg": "A massive gate blocks the way.",
+  "unlocked_msg": "The gate stands open."
+}
+```
+
+**Interactive Unlocking** - Use specific item on exit:
+```json
+"north": {
+  "to": "cell",
+  "use_item": "iron_key",
+  "on_unlock": "You turn the key. The door unlocks with a CLUNK!",
+  "permanently_unlock": true,
+  "consume_item": false
+}
+```
+
+#### Hidden Exits
+Secret exits that must be discovered through various methods:
+
+**Pattern 1: Flag-Based Revelation**
+Exit reveals when a flag is set (e.g., lever pulled elsewhere):
+```json
+"secret": {
+  "to": "hidden_vault",
+  "hidden": true,
+  "requires_flag": "bookcase_moved",
+  "reveal_msg": "You notice a dark passage!"
+}
+```
+
+**Pattern 2: Item Use Revelation**
+Using an item reveals the exit:
+```json
+// In items section:
+"lever": {
+  "name": "wall lever",
+  "takeable": false,
+  "reveals_exit": {
+    "direction": "down",
+    "message": "You pull the lever and a trapdoor opens!"
+  }
+}
+```
+
+**Pattern 3: Examine-Based Discovery**
+Examining an object reveals the exit:
+```json
+"painting": {
+  "name": "portrait",
+  "takeable": false,
+  "on_examine": {
+    "reveals_exit": "secret",
+    "text": "Behind the painting, you notice the wall seems hollow..."
+  }
+}
+```
+
+#### Exit Properties
+- `to` - Destination room ID
+- `requires` - Item ID needed in inventory
+- `requires_flag` - Global flag that must be true
+- `locked_msg` - Message when exit is locked
+- `unlocked_msg` - Message when passing through unlocked exit
+- `hidden` - Exit won't show in list until revealed
+- `reveal_msg` - Message when exit is first revealed
+- `use_item` - Item ID that unlocks this exit
+- `on_unlock` - Message when unlocking with item
+- `permanently_unlock` - Stays unlocked after first use
+- `consume_item` - Remove item when used on exit
+- `sets_flag` - Set global flag when unlocked/revealed
+
 ### Smart Item/NPC Finding
 - Fuzzy matching by keywords
 - Partial name matching
@@ -198,14 +325,17 @@ game = Game.create!(
 
 ## Future Enhancements
 
-- Combat system with creatures
+- Combat system with creatures (placeholder exists)
 - Player stats (strength, intelligence, etc.)
 - Magic system
 - Complex dialogue trees
 - Random encounters
 - Procedural generation
-- Save/load game state
 - Achievement system
+- Timed events and puzzles
+- Light/darkness mechanics
+- Inventory weight limits
+- Item combining/crafting
 
 ## Example Session
 
@@ -241,6 +371,35 @@ Player: i
 System: You are carrying:
           - Rusty Torch
           - Iron Key
+
+Player: use key on north
+System: You turn the key and hear a loud CLUNK as the door unlocks.
+
+Player: go north
+System: === Treasure Chamber ===
+        Gold coins glitter in the torchlight...
+        Exits: SOUTH
+
+Player: look
+System: === Treasure Chamber ===
+        Gold coins glitter in the torchlight...
+        You see: Ancient Painting
+        Exits: SOUTH
+
+Player: examine painting
+System: Looking closely at the painting, you notice the wall behind seems hollow...
+
+        Behind the painting, you spot a small hidden door!
+
+Player: look
+System: === Treasure Chamber ===
+        Gold coins glitter in the torchlight...
+        You see: Ancient Painting
+        Exits: SOUTH, SECRET
+
+Player: go secret
+System: === Hidden Vault ===
+        A secret chamber filled with ancient artifacts...
 ```
 
 ## Testing
@@ -257,3 +416,10 @@ The sample world "The Forgotten Crypt" is created by default and includes:
 - A locked door requiring a key
 - An NPC to interact with
 - Hidden treasure to discover
+
+Try creating worlds with:
+- Hidden exits revealed by examining objects
+- Levers and switches that open doors in other rooms
+- Keys that permanently unlock doors
+- Secret passages behind moveable objects
+- Multi-step puzzles requiring flag chaining

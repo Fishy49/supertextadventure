@@ -14,34 +14,21 @@
         class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
   </div>
 
-  <div>
+  <div data-controller="exit-form">
     <label class="block mb-2 text-sm font-bold">Exits</label>
-    <div id="exits-container" class="space-y-2">
+    <div data-exit-form-target="container" class="space-y-3">
       <% exits = entity_data["exits"] || {} %>
       <% if exits.any? %>
-        <% exits.each do |direction, room| %>
-          <div class="flex gap-2">
-            <%= text_field_tag "exit_directions[]", direction,
-                placeholder: "Direction (e.g., north)",
-                class: "w-1/3 bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
-            <%= text_field_tag "exit_rooms[]", room,
-                placeholder: "Room ID",
-                class: "flex-1 bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
-          </div>
+        <% exits.each_with_index do |(direction, exit_data), index| %>
+          <%= render "worlds/forms/exit_fields", direction: direction, exit_data: exit_data, index: index %>
         <% end %>
       <% else %>
-        <div class="flex gap-2">
-          <%= text_field_tag "exit_directions[]", "",
-              placeholder: "Direction (e.g., north)",
-              class: "w-1/3 bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
-          <%= text_field_tag "exit_rooms[]", "",
-              placeholder: "Room ID",
-              class: "flex-1 bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
-        </div>
+        <%= render "worlds/forms/exit_fields", direction: "", exit_data: "", index: 0 %>
       <% end %>
     </div>
-    <button type="button" onclick="this.previousElementSibling.insertAdjacentHTML('beforeend', this.previousElementSibling.lastElementChild.outerHTML)"
-      class="mt-2 text-xs border border-terminal-green px-2 py-1 hover:bg-terminal-green hover:text-stone-800">
+    <button type="button"
+            data-action="click->exit-form#add"
+            class="mt-2 text-xs border border-terminal-green px-2 py-1 hover:bg-terminal-green hover:text-stone-800">
       + Add Exit
     </button>
   </div>

@@ -34,12 +34,26 @@ module ClassicGame
         # Try to find in room items
         item_id, item_def = find_item(target)
         if item_def && item_in_room?(item_id)
-          return success(item_def["description"] || "You see nothing special about the #{item_def['name']}.")
+          description = item_def["description"] || "You see nothing special about the #{item_def['name']}."
+
+          # Check if examining reveals an exit
+          if item_def["on_examine"]&.dig("reveals_exit")
+            return handle_examine_reveals_exit(item_def, description)
+          end
+
+          return success(description)
         end
 
         # Try to find in inventory
         if item_def && has_item?(item_id)
-          return success(item_def["description"] || "You see nothing special about the #{item_def['name']}.")
+          description = item_def["description"] || "You see nothing special about the #{item_def['name']}."
+
+          # Check if examining reveals an exit (can work from inventory too)
+          if item_def["on_examine"]&.dig("reveals_exit")
+            return handle_examine_reveals_exit(item_def, description)
+          end
+
+          return success(description)
         end
 
         # Try to find NPC
@@ -54,6 +68,36 @@ module ClassicGame
         end
 
         failure("You don't see that here.")
+      end
+
+      def handle_examine_reveals_exit(item_def, base_description)
+        on_examine = item_def["on_examine"]
+        direction = on_examine["reveals_exit"]
+        reveal_text = on_examine["text"] || base_description
+
+        # Check if exit exists in current room
+        exit_data = current_room_def.dig("exits", direction.to_s) || current_room_def.dig("exits", direction.to_sym)
+
+        # If exit doesn't exist, just show the description
+        return success(base_description) unless exit_data
+
+        # Check if already revealed
+        if game.exit_revealed?(player_state["current_room"], direction)
+          return success(base_description)
+        end
+
+        # Reveal the exit
+        game.reveal_exit(player_state["current_room"], direction)
+
+        # Build response with reveal message
+        lines = [reveal_text]
+
+        if exit_data.is_a?(Hash) && exit_data["reveal_msg"]
+          lines << ""
+          lines << exit_data["reveal_msg"]
+        end
+
+        success(lines.join("\n"))
       end
 
       def handle_inventory
@@ -101,11 +145,21 @@ module ClassicGame
           lines << "Present: #{npc_names.join(', ')}"
         end
 
-        # List exits
+        # List exits (filter out hidden unrevealed exits)
         exits = room_def["exits"] || {}
-        if exits.any?
+        room_id = player_state["current_room"]
+        visible_exits = exits.select do |direction, exit_data|
+          if exit_data.is_a?(Hash) && exit_data["hidden"]
+            # Check if revealed
+            game.exit_revealed?(room_id, direction.to_s)
+          else
+            true
+          end
+        end
+
+        if visible_exits.any?
           lines << ""
-          lines << "Exits: #{exits.keys.map(&:to_s).map(&:upcase).join(', ')}"
+          lines << "Exits: #{visible_exits.keys.map(&:to_s).map(&:upcase).join(', ')}"
         end
 
         success(lines.join("\n"))

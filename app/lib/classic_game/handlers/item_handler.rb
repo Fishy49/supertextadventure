@@ -86,6 +86,11 @@ module ClassicGame
           return handle_use_on_exit(item_id, item_def, modifier)
         end
 
+        # Check if item reveals an exit
+        if item_def["reveals_exit"]
+          return handle_reveal_exit(item_id, item_def, item_def["reveals_exit"])
+        end
+
         # Check if it has a use action
         use_action = item_def["on_use"]
 
@@ -122,6 +127,25 @@ module ClassicGame
         end
 
         success(use_action["success_msg"] || "You use the #{item_def['name']}.")
+      end
+
+      def handle_reveal_exit(item_id, item_def, reveal_data)
+        direction = reveal_data["direction"]
+        message = reveal_data["message"] || "You notice something new!"
+
+        # Check if exit exists in current room
+        exit_data = current_room_def.dig("exits", direction.to_s) || current_room_def.dig("exits", direction.to_sym)
+        return failure("Nothing happens.") unless exit_data
+
+        # Check if already revealed
+        if game.exit_revealed?(player_state["current_room"], direction)
+          return failure("You've already discovered that.")
+        end
+
+        # Reveal the exit
+        game.reveal_exit(player_state["current_room"], direction)
+
+        success(message)
       end
 
       def is_direction?(word)

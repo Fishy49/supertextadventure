@@ -153,6 +153,19 @@ class Game < ApplicationRecord
     game_state.dig("unlocked_exits", exit_key) || false
   end
 
+  def reveal_exit(room_id, direction)
+    self.game_state ||= {}
+    self.game_state["revealed_exits"] ||= {}
+    exit_key = "#{room_id}_#{direction}"
+    self.game_state["revealed_exits"][exit_key] = true
+    save!
+  end
+
+  def exit_revealed?(room_id, direction)
+    exit_key = "#{room_id}_#{direction}"
+    game_state.dig("revealed_exits", exit_key) || false
+  end
+
   private
 
     def initialize_player_state(user_id)

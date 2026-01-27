@@ -30,11 +30,35 @@ module ClassicGame
         locked_msg = exit_data["locked_msg"] || "That way is blocked."
         unlocked_msg = exit_data["unlocked_msg"]
         permanently_unlock = exit_data["permanently_unlock"]
+        hidden = exit_data["hidden"]
+        reveal_msg = exit_data["reveal_msg"]
+
+        # Check if exit is hidden and not yet revealed
+        if hidden && direction
+          unless game.exit_revealed?(player_state["current_room"], direction)
+            # Check if it should be auto-revealed by flag
+            if requires_flag && game.get_flag(requires_flag)
+              game.reveal_exit(player_state["current_room"], direction)
+              return success(reveal_msg) if reveal_msg
+            else
+              return failure("You can't go that way.")
+            end
+          end
+        end
 
         # Check if exit is permanently unlocked
         if permanently_unlock && direction && game.exit_unlocked?(player_state["current_room"], direction)
           # Already unlocked, show unlocked message if first time seeing it
           return move_to_room(destination, unlocked_msg)
+        end
+
+        # Check if exit requires using an item on it (interactive unlocking)
+        use_item = exit_data["use_item"]
+        if use_item.present?
+          # Exit requires interactive unlocking - check if it's been unlocked
+          unless direction && game.exit_unlocked?(player_state["current_room"], direction)
+            return failure(locked_msg)
+          end
         end
 
         # Check flag requirement
@@ -113,11 +137,20 @@ module ClassicGame
           lines << "Present: #{npc_names.join(', ')}"
         end
 
-        # List exits
+        # List exits (filter out hidden unrevealed exits)
         exits = room_def["exits"] || {}
-        if exits.any?
+        visible_exits = exits.select do |direction, exit_data|
+          if exit_data.is_a?(Hash) && exit_data["hidden"]
+            # Check if revealed
+            game.exit_revealed?(room_id, direction.to_s)
+          else
+            true
+          end
+        end
+
+        if visible_exits.any?
           lines << ""
-          lines << "Exits: #{exits.keys.map(&:to_s).map(&:upcase).join(', ')}"
+          lines << "Exits: #{visible_exits.keys.map(&:to_s).map(&:upcase).join(', ')}"
         end
 
         lines.join("\n")

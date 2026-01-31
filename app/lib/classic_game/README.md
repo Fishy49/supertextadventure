@@ -103,7 +103,7 @@ Worlds are defined in JSONB with the following structure:
 ## Supported Commands
 
 ### Movement
-- `GO/MOVE/WALK [direction]` - Move in a direction
+- `GO/MOVE/WALK [direction/keyword]` - Move in a direction or use exit keyword (e.g., "go north" or "go door")
 - `N/S/E/W/NE/NW/SE/SW/U/D` - Quick direction shortcuts
 - `ENTER`, `LEAVE`, `CLIMB`
 
@@ -116,7 +116,7 @@ Worlds are defined in JSONB with the following structure:
 - `TAKE/GET/GRAB [item]` - Pick up an item
 - `DROP [item]` - Drop an item
 - `USE [item]` - Use an item (triggers on_use or reveals_exit)
-- `USE [item] ON [direction]` - Use an item on an exit (e.g., "use key on north")
+- `USE [item] ON [direction/keyword]` - Use an item on an exit (e.g., "use key on north" or "use key on door")
 
 ### Interaction
 - `TALK TO [npc]` - Talk to an NPC
@@ -245,12 +245,47 @@ Exits can be locked with multiple unlock mechanisms:
 ```json
 "north": {
   "to": "cell",
+  "keywords": ["door", "iron door", "cell door"],
   "use_item": "iron_key",
   "on_unlock": "You turn the key. The door unlocks with a CLUNK!",
   "permanently_unlock": true,
   "consume_item": false
 }
 ```
+
+#### Exit Keywords for Natural Language
+
+The `keywords` property allows players to reference exits using natural language instead of just compass directions. This makes commands more intuitive and immersive.
+
+**How it works:**
+- Add a `keywords` array to any exit (works with both simple and complex exits)
+- Players can use these keywords in place of directions in commands
+- Keywords are matched case-insensitively and support multi-word phrases
+- Keywords work with any command that targets exits: `USE [item] ON [keyword]`, `GO [keyword]`, etc.
+
+**Example:**
+```json
+"north": {
+  "to": "shop",
+  "keywords": ["door", "shop door", "wooden door"],
+  "use_item": "crowbar",
+  "on_unlock": "You pry the boards off with the crowbar!",
+  "permanently_unlock": true
+}
+```
+
+**Player commands that work:**
+- `use crowbar on north` (direction)
+- `use crowbar on door` (keyword)
+- `use crowbar on shop door` (multi-word keyword)
+- `use crowbar on wooden door` (alternative keyword)
+- `go door` (movement via keyword)
+
+**Benefits:**
+- More natural and immersive gameplay ("use key on gate" vs "use key on north")
+- Allows descriptive exit names that match the narrative
+- Multiple keywords give players flexibility in how they refer to exits
+- Makes puzzles more intuitive (players think "the locked door" not "the north exit")
 
 #### Hidden Exits
 Secret exits that must be discovered through various methods:
@@ -295,6 +330,7 @@ Examining an object reveals the exit:
 
 #### Exit Properties
 - `to` - Destination room ID
+- `keywords` - **[NEW]** Array of alternative names for the exit (e.g., `["door", "shop door", "wooden door"]`). Allows natural commands like `use crowbar on door` instead of `use crowbar on north`. Works with all exit types (simple, locked, hidden). Keywords are case-insensitive and support multi-word phrases.
 - `requires` - Item ID needed in inventory
 - `requires_flag` - Global flag that must be true
 - `locked_msg` - Message when exit is locked
@@ -372,7 +408,7 @@ System: You are carrying:
           - Rusty Torch
           - Iron Key
 
-Player: use key on north
+Player: use key on door
 System: You turn the key and hear a loud CLUNK as the door unlocks.
 
 Player: go north

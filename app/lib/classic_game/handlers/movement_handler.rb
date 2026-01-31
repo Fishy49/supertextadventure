@@ -48,8 +48,8 @@ module ClassicGame
 
         # Check if exit is permanently unlocked
         if permanently_unlock && direction && game.exit_unlocked?(player_state["current_room"], direction)
-          # Already unlocked, show unlocked message if first time seeing it
-          return move_to_room(destination, unlocked_msg)
+          # Already unlocked, can pass through
+          return move_to_room(destination)
         end
 
         # Check if exit requires using an item on it (interactive unlocking)
@@ -72,10 +72,10 @@ module ClassicGame
         end
 
         # All checks passed, can move
-        move_to_room(destination, unlocked_msg)
+        move_to_room(destination)
       end
 
-      def move_to_room(room_id, unlocked_msg = nil)
+      def move_to_room(room_id)
         new_room_def = world_snapshot.dig("rooms", room_id)
         return failure("Error: Room '#{room_id}' not found.") unless new_room_def
 
@@ -90,19 +90,13 @@ module ClassicGame
         update_player_state(new_state)
 
         # Generate room description
-        description = generate_room_description(room_id, new_room_def, first_visit, unlocked_msg)
+        description = generate_room_description(room_id, new_room_def, first_visit)
 
         success(description, state_changes: { moved: true, room: room_id })
       end
 
-      def generate_room_description(room_id, room_def, first_visit, unlocked_msg = nil)
+      def generate_room_description(room_id, room_def, first_visit)
         lines = []
-
-        # Show unlocked message if present
-        if unlocked_msg
-          lines << unlocked_msg
-          lines << ""
-        end
 
         # Room name
         lines << "=== #{room_def['name']} ==="
@@ -150,6 +144,24 @@ module ClassicGame
 
         if visible_exits.any?
           lines << ""
+
+          # Check if any exits have unlocked messages to show
+          exit_descriptions = []
+          visible_exits.each do |direction, exit_data|
+            if exit_data.is_a?(Hash)
+              # Check if this exit has been unlocked and has an unlocked_msg
+              if exit_data["unlocked_msg"].present? && game.exit_unlocked?(room_id, direction.to_s)
+                exit_descriptions << exit_data["unlocked_msg"]
+              end
+            end
+          end
+
+          # Show exit descriptions if any
+          if exit_descriptions.any?
+            exit_descriptions.each { |desc| lines << desc }
+            lines << ""
+          end
+
           lines << "Exits: #{visible_exits.keys.map(&:to_s).map(&:upcase).join(', ')}"
         end
 

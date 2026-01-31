@@ -81,9 +81,12 @@ module ClassicGame
         return failure("You don't have that item.") unless item_def
         return failure("You don't have that item.") unless has_item?(item_id)
 
-        # First check if using item on an exit
-        if modifier && is_direction?(modifier)
-          return handle_use_on_exit(item_id, item_def, modifier)
+        # First check if using item on an exit (by direction or keyword)
+        if modifier
+          exit_direction = find_exit_by_keyword_or_direction(modifier)
+          if exit_direction
+            return handle_use_on_exit(item_id, item_def, exit_direction)
+          end
         end
 
         # Check if item reveals an exit
@@ -146,6 +149,39 @@ module ClassicGame
         game.reveal_exit(player_state["current_room"], direction)
 
         success(message)
+      end
+
+      def find_exit_by_keyword_or_direction(target)
+        target_lower = target.to_s.downcase
+        exits = current_room_def["exits"] || {}
+
+        # First, check if it's a direct direction match
+        exits.each do |direction, exit_data|
+          return direction if direction.to_s.downcase == target_lower
+        end
+
+        # Then check exit keywords
+        exits.each do |direction, exit_data|
+          next unless exit_data.is_a?(Hash)
+          keywords = exit_data["keywords"] || []
+          keywords.each do |keyword|
+            return direction if keyword.downcase == target_lower
+          end
+        end
+
+        # Finally, check if it's a common direction abbreviation
+        direction_map = {
+          "n" => "north", "s" => "south", "e" => "east", "w" => "west",
+          "ne" => "northeast", "nw" => "northwest", "se" => "southeast", "sw" => "southwest",
+          "u" => "up", "d" => "down"
+        }
+
+        if direction_map[target_lower]
+          full_direction = direction_map[target_lower]
+          return full_direction if exits.key?(full_direction) || exits.key?(full_direction.to_sym)
+        end
+
+        nil
       end
 
       def is_direction?(word)

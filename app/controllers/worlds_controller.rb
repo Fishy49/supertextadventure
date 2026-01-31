@@ -240,12 +240,19 @@ class WorldsController < ApplicationController
       # Check if this is a simple exit or complex
       show_advanced = exit_info[:show_advanced] == "1"
 
-      if !show_advanced
-        # Simple string exit
+      # Add keywords if present (works for both simple and complex)
+      keywords = exit_info[:keywords]
+      keywords_array = keywords.present? ? keywords.split(",").map(&:strip).reject(&:blank?) : nil
+
+      if !show_advanced && keywords_array.nil?
+        # Simple string exit with no keywords
         exits[direction] = destination
       else
-        # Complex exit object
+        # Complex exit object (or simple with keywords)
         exit_obj = { "to" => destination }
+
+        # Add keywords
+        exit_obj["keywords"] = keywords_array if keywords_array.present?
 
         # Determine unlock type and add appropriate fields
         unlock_type = exit_info[:unlock_type]

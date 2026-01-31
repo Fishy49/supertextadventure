@@ -8,6 +8,8 @@ class GamesController < ApplicationController
   before_action :set_game, except: %i[index list new create]
   before_action :load_games, only: %i[index list]
 
+  rescue_from CanCan::AccessDenied, with: :handle_access_denied
+
   def index; end
 
   def list
@@ -116,6 +118,10 @@ class GamesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to games_url, notice: t(:game_destroyed) }
       format.json { head :no_content }
+      format.turbo_stream do
+        load_games
+        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "list")
+      end
     end
   end
 
@@ -139,5 +145,14 @@ class GamesController < ApplicationController
 
     def set_turbo_frame_id
       @turbo_frame_id = params[:turbo_frame_id].presence&.to_sym || :sidebar
+    end
+
+    def handle_access_denied(exception)
+      respond_to do |format|
+        format.html { redirect_to root_path, alert: exception.message }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.append("body", "<script>window.stimulus_controller('terminalInput', 'terminal').show_error('Ye cannot KICK OVER a table ye didn\\'t create!', false)</script>".html_safe)
+        end
+      end
     end
 end

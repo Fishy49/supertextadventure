@@ -159,6 +159,24 @@ module ClassicGame
 
         if visible_exits.any?
           lines << ""
+
+          # Check if any exits have unlocked messages to show
+          exit_descriptions = []
+          visible_exits.each do |direction, exit_data|
+            if exit_data.is_a?(Hash)
+              # Check if this exit has been unlocked and has an unlocked_msg
+              if exit_data["unlocked_msg"].present? && game.exit_unlocked?(room_id, direction.to_s)
+                exit_descriptions << exit_data["unlocked_msg"]
+              end
+            end
+          end
+
+          # Show exit descriptions if any
+          if exit_descriptions.any?
+            exit_descriptions.each { |desc| lines << desc }
+            lines << ""
+          end
+
           lines << "Exits: #{visible_exits.keys.map(&:to_s).map(&:upcase).join(', ')}"
         end
 

@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { get, post } from '@rails/request.js'
+import { get, post, destroy } from '@rails/request.js'
 
 export default class extends Controller {
   static targets = [ "prompt", "input", "error" ]
@@ -53,6 +53,35 @@ export default class extends Controller {
           this.show_error(error_text, false)
         } else {
           Turbo.visit('/games/' + gameJoinButton.dataset.uuid, { frame: "_top" })
+        }
+      } else if (inputText.startsWith("KICK OVER TABLE")) {
+        let tableNumber = this.extract_argument(inputText, "KICK OVER TABLE")
+
+        if(!tableNumber){
+          this.show_error("Which table number? Try KICK OVER TABLE 1", false)
+          return
+        }
+
+        let gameListElement = document.getElementById('table-join-element-' + tableNumber)
+
+        if(!gameListElement){
+          let error_text = 'Could not find a table for #' + tableNumber + '!'
+          this.show_error(error_text, false)
+        } else {
+          let gameUuid = gameListElement.dataset.gameId
+
+          if(!gameUuid){
+            this.show_error("Something went wrong finding that table!", false)
+            return
+          }
+
+          // Get game name from the element
+          let titleElement = gameListElement.querySelector('.title')
+          let gameName = titleElement ? titleElement.textContent.trim() : 'Table #' + tableNumber
+
+          if(confirm(`Are ye sure ye want to KICK OVER ${gameName}? This action cannot be undone!`)){
+            destroy('/games/' + gameUuid, { responseKind: "turbo-stream" })
+          }
         }
       } else {
         let error_text = 'What Doth "' + inputText + '" Imply!?'

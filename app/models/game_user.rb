@@ -82,7 +82,7 @@ class GameUser < ApplicationRecord
         They are described as follows: \"#{character_description}\""
       )
 
-      client = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"])
+      client = OpenAI::Client.new(api_key: ENV.fetch("OPENAI_API_KEY", nil))
       response = client.responses.create(
         model: game.ai_config.model_name,
         input: chat_log_with_intro_request

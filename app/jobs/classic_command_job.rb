@@ -23,7 +23,7 @@ class ClassicCommandJob
       Message.create!(
         game: game,
         content: result[:response]
-        # Note: no game_user_id, so it's a "host" message from the game engine
+        # NOTE: no game_user_id, so it's a "host" message from the game engine
       )
     end
   end

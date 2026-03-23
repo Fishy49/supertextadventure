@@ -101,10 +101,10 @@ gem "openai", "~> 0.43.0"
 
 gem "rubocop-capybara", "~> 2.21"
 
-gem "benchmark", "~> 0.4.0"
-gem "mutex_m", "~> 0.2.0"
-gem "csv", "~> 3.3"
-gem "ostruct", "~> 0.6.1"
 gem "base64", "~> 0.2.0"
+gem "benchmark", "~> 0.4.0"
+gem "csv", "~> 3.3"
+gem "mutex_m", "~> 0.2.0"
+gem "ostruct", "~> 0.6.1"
 
 gem "openssl", "~> 4.0"

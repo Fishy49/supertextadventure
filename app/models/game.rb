@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Game < ApplicationRecord
-
   belongs_to :host, class_name: "User",
                     foreign_key: :created_by,
                     primary_key: :id,
@@ -59,13 +58,11 @@ class Game < ApplicationRecord
                    end
   end
 
-  def messages_for_ai
-    ai_config.messages_for_ai
-  end
+  delegate :messages_for_ai, to: :ai_config
 
   def current_token_count
     # Approximate token count: ~4 characters per token for GPT models
-    text = messages_for_ai.map { |m| m[:content] }.join
+    text = messages_for_ai.pluck(:content).join
     (text.length / 4.0).ceil
   end
 
@@ -91,19 +88,18 @@ class Game < ApplicationRecord
     game_users.count == max_players
   end
 
-
   def broadcast_updated_player_list
     broadcast_replace_to(self, :players, target: :players, partial: "/games/players",
                                          locals: { game_users: game_users.joined, for_host: false })
   end
 
   def ai_game?
-    [:chat_ai, :classic_ai].include?(game_type)
+    %i[chat_ai classic_ai].include?(game_type)
   end
 
   # Classic game state methods
   def world_snapshot
-    game_state.dig("world_snapshot") || {}
+    game_state["world_snapshot"] || {}
   end
 
   def player_state(user_id)
@@ -227,8 +223,8 @@ class Game < ApplicationRecord
 
   private
 
-    def initialize_player_state(user_id)
-      starting_room = world_snapshot.dig("meta", "starting_room") || world_snapshot.dig("rooms")&.keys&.first
+    def initialize_player_state(_user_id)
+      starting_room = world_snapshot.dig("meta", "starting_room") || world_snapshot["rooms"]&.keys&.first
 
       {
         "current_room" => starting_room,
@@ -252,8 +248,6 @@ class Game < ApplicationRecord
       }
     end
 
-  private
-
     def set_uuid
       self.uuid = SecureRandom.uuid
     end
@@ -264,7 +258,7 @@ class Game < ApplicationRecord
     end
 
     def setup_ai
-      client = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"])
+      client = OpenAI::Client.new(api_key: ENV.fetch("OPENAI_API_KEY", nil))
 
       chat_log = messages_for_ai
       chat_log << { role: "user",
@@ -285,21 +279,19 @@ class Game < ApplicationRecord
       # Use the selected world, or fall back to the first available
       selected_world = world || World.first
 
-      unless selected_world
-        raise "No worlds available! Please create a world first."
-      end
+      raise "No worlds available! Please create a world first." unless selected_world
 
       # Update game to use this world if not already set
       update!(world: selected_world) unless world
 
       # Snapshot the world data into game_state to isolate from future world changes
       update!(game_state: {
-        "world_snapshot" => selected_world.world_data.deep_dup,
-        "player_states" => {},
-        "room_states" => {},
-        "global_flags" => {},
-        "container_states" => {}
-      })
+                "world_snapshot" => selected_world.world_data.deep_dup,
+                "player_states" => {},
+                "room_states" => {},
+                "global_flags" => {},
+                "container_states" => {}
+              })
 
       # Generate starting room description
       starting_room_description = generate_starting_room_description
@@ -308,12 +300,12 @@ class Game < ApplicationRecord
       Message.create!(
         game: self,
         content: starting_room_description
-        # Note: no game_user_id, so it's a "host" message that will broadcast
+        # NOTE: no game_user_id, so it's a "host" message that will broadcast
       )
     end
 
     def generate_starting_room_description
-      starting_room_id = world_snapshot.dig("meta", "starting_room") || world_snapshot.dig("rooms")&.keys&.first
+      starting_room_id = world_snapshot.dig("meta", "starting_room") || world_snapshot["rooms"]&.keys&.first
       room_def = world_snapshot.dig("rooms", starting_room_id)
 
       return "Error: Starting room not found." unless room_def
@@ -356,7 +348,7 @@ class Game < ApplicationRecord
       exits = room_def["exits"] || {}
       if exits.any?
         lines << ""
-        lines << "Exits: #{exits.keys.map(&:to_s).map(&:upcase).join(', ')}"
+        lines << "Exits: #{exits.keys.map { |k| k.to_s.upcase }.join(', ')}"
       end
 
       lines << ""
@@ -373,7 +365,7 @@ class Game < ApplicationRecord
     end
 
     def dump_game_state_to_file
-      sync_dir = Rails.root.join("tmp", "games")
+      sync_dir = Rails.root.join("tmp/games")
       FileUtils.mkdir_p(sync_dir)
 
       file_path = sync_dir.join("#{id}.json")

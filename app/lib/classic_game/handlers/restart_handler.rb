@@ -4,10 +4,10 @@ module ClassicGame
   module Handlers
     class RestartHandler < BaseHandler
       def self.keywords
-        ["restart", "reset"]
+        %w[restart reset]
       end
 
-      def handle(command)
+      def handle(_command)
         # Set pending restart flag in game state
         game.game_state["pending_restart"] = true
         game.save!

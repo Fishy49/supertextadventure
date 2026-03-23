@@ -77,86 +77,79 @@ module ClassicGame
 
       private
 
-      def extract_parts(text)
-        words = text.split(/\s+/)
+        def extract_parts(text)
+          words = text.split(/\s+/)
 
-        # Check for direction-only commands (n, s, e, w, etc.)
-        if words.length == 1 && find_direction(words[0])
-          return [:go, find_direction(words[0]), nil]
+          # Check for direction-only commands (n, s, e, w, etc.)
+          return [:go, find_direction(words[0]), nil] if words.length == 1 && find_direction(words[0])
+
+          # Extract verb
+          first_word = words.shift
+          verb = find_verb(first_word) || :unknown
+
+          # Handle special cases
+          case verb
+          when :go, :enter, :leave, :climb
+            # Remove prepositions for movement
+            cleaned_words = words.reject { |w| PREPOSITIONS.include?(w) }
+            direction = find_direction(cleaned_words.first)
+            [verb, direction || cleaned_words.join(" "), nil]
+
+          when :look, :examine
+            # Remove prepositions for observation
+            cleaned_words = words.reject { |w| PREPOSITIONS.include?(w) }
+            target = cleaned_words.empty? ? nil : cleaned_words.join(" ")
+            [verb, target, nil]
+
+          when :inventory, :help, :save, :quit, :restart, :defend, :flee
+            [verb, nil, nil]
+
+          when :use, :give, :attack, :talk
+            # DON'T remove prepositions - we need them to split target/modifier
+            target, modifier = extract_target_and_modifier(words)
+            [verb, target, modifier]
+
+          else
+            # Remove prepositions for simple item commands and unknown commands
+            cleaned_words = words.reject { |w| PREPOSITIONS.include?(w) }
+            [verb, cleaned_words.join(" "), nil]
+          end
         end
 
-        # Extract verb
-        first_word = words.shift
-        verb = find_verb(first_word) || :unknown
-
-        # Handle special cases
-        case verb
-        when :go, :enter, :leave, :climb
-          # Remove prepositions for movement
-          cleaned_words = words.reject { |w| PREPOSITIONS.include?(w) }
-          direction = find_direction(cleaned_words.first)
-          return [verb, direction || cleaned_words.join(" "), nil]
-
-        when :look, :examine
-          # Remove prepositions for observation
-          cleaned_words = words.reject { |w| PREPOSITIONS.include?(w) }
-          target = cleaned_words.empty? ? nil : cleaned_words.join(" ")
-          return [verb, target, nil]
-
-        when :inventory, :help, :save, :quit, :restart, :defend, :flee
-          return [verb, nil, nil]
-
-        when :use, :give, :attack, :talk
-          # DON'T remove prepositions - we need them to split target/modifier
-          target, modifier = extract_target_and_modifier(words)
-          return [verb, target, modifier]
-
-        when :take, :drop, :open, :close
-          # Remove prepositions for simple item commands
-          cleaned_words = words.reject { |w| PREPOSITIONS.include?(w) }
-          return [verb, cleaned_words.join(" "), nil]
-
-        else
-          # Remove prepositions for unknown commands
-          cleaned_words = words.reject { |w| PREPOSITIONS.include?(w) }
-          return [verb, cleaned_words.join(" "), nil]
+        def find_verb(word)
+          VERBS.each do |verb, synonyms|
+            return verb if synonyms.include?(word)
+          end
+          nil
         end
-      end
 
-      def find_verb(word)
-        VERBS.each do |verb, synonyms|
-          return verb if synonyms.include?(word)
+        def find_direction(word)
+          return nil if word.nil?
+
+          DIRECTIONS.each do |direction, synonyms|
+            return direction if synonyms.include?(word)
+          end
+          nil
         end
-        nil
-      end
 
-      def find_direction(word)
-        return nil if word.nil?
+        def extract_target_and_modifier(words)
+          # Look for prepositions that indicate a modifier
+          connector_index = words.index { |w| %w[on with to].include?(w) }
 
-        DIRECTIONS.each do |direction, synonyms|
-          return direction if synonyms.include?(word)
+          if connector_index
+            # Get target and modifier, filtering out articles
+            target_words = words[0...connector_index].reject { |w| %w[the a an].include?(w) }
+            modifier_words = words[(connector_index + 1)..]&.reject { |w| %w[the a an].include?(w) }
+
+            target = target_words.join(" ")
+            modifier = modifier_words&.join(" ")
+            [target, modifier]
+          else
+            # No connector found, filter out articles
+            cleaned = words.reject { |w| %w[the a an].include?(w) }
+            [cleaned.join(" "), nil]
+          end
         end
-        nil
-      end
-
-      def extract_target_and_modifier(words)
-        # Look for prepositions that indicate a modifier
-        connector_index = words.index { |w| %w[on with to].include?(w) }
-
-        if connector_index
-          # Get target and modifier, filtering out articles
-          target_words = words[0...connector_index].reject { |w| %w[the a an].include?(w) }
-          modifier_words = words[(connector_index + 1)..-1]&.reject { |w| %w[the a an].include?(w) }
-
-          target = target_words.join(" ")
-          modifier = modifier_words&.join(" ")
-          [target, modifier]
-        else
-          # No connector found, filter out articles
-          cleaned = words.reject { |w| %w[the a an].include?(w) }
-          [cleaned.join(" "), nil]
-        end
-      end
     end
   end
 end

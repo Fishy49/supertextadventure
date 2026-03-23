@@ -20,7 +20,6 @@ class GamesController < ApplicationController
     end
   end
 
-  # rubocop:disable Metrics/MethodLength
   def join
     authorize! :join, @game
 
@@ -46,7 +45,6 @@ class GamesController < ApplicationController
       end
     end
   end
-  # rubocop:enable Metrics/MethodLength
 
   def lobby
     authorize! :lobby, @game
@@ -97,7 +95,7 @@ class GamesController < ApplicationController
           format.html { redirect_to game_url(@game) }
         end
       else
-        format.html { render :new, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
       end
     end
   end
@@ -107,8 +105,8 @@ class GamesController < ApplicationController
       if @game.update(game_params)
         format.turbo_stream { render turbo_stream: turbo_stream.update(@turbo_frame_id, template: "games/show") }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @game.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @game.errors, status: :unprocessable_content }
       end
     end
   end
@@ -152,9 +150,9 @@ class GamesController < ApplicationController
     end
 
     def game_params
-      params.require(:game).permit(:uuid, :name, :game_type, :created_by, :status, :opened_at, :closed_at,
-                                   :is_friends_only, :max_players, :description, :host_display_name,
-                                   :current_context, :is_current_context_ascii, :enable_hp, :starting_hp, :world_id)
+      params.expect(game: %i[uuid name game_type created_by status opened_at closed_at
+                             is_friends_only max_players description host_display_name
+                             current_context is_current_context_ascii enable_hp starting_hp world_id])
     end
 
     def set_turbo_frame_id
@@ -165,7 +163,9 @@ class GamesController < ApplicationController
       respond_to do |format|
         format.html { redirect_to root_path, alert: exception.message }
         format.turbo_stream do
-          render turbo_stream: turbo_stream.append("body", "<script>window.stimulus_controller('terminalInput', 'terminal').show_error('Ye cannot KICK OVER a table ye didn\\'t create!', false)</script>".html_safe)
+          msg = "<script>window.stimulus_controller('terminalInput', 'terminal')" \
+                ".show_error('Ye cannot KICK OVER a table ye didn\\'t create!', false)</script>"
+          render turbo_stream: turbo_stream.append("body", msg.html_safe) # rubocop:disable Rails/OutputSafety
         end
       end
     end

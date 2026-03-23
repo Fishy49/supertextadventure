@@ -15,20 +15,21 @@ class ItemHandlerTest < ActiveSupport::TestCase
           "name" => "Test Room",
           "description" => "A plain room.",
           "exits" => {},
-          "items" => ["sword", "chest"]
+          "items" => %w[sword chest]
         }
       },
       items: {
-        "sword" => { "name" => "Iron Sword", "keywords" => ["sword", "iron"], "takeable" => true },
+        "sword" => { "name" => "Iron Sword", "keywords" => %w[sword iron], "takeable" => true },
         "shield" => { "name" => "Wooden Shield", "keywords" => ["shield"], "takeable" => true },
-        "boulder" => { "name" => "Heavy Boulder", "keywords" => ["boulder"], "takeable" => false, "cant_take_msg" => "It's too heavy to lift." },
+        "boulder" => { "name" => "Heavy Boulder", "keywords" => ["boulder"], "takeable" => false,
+                       "cant_take_msg" => "It's too heavy to lift." },
         "chest" => {
           "name" => "Wooden Chest", "keywords" => ["chest"], "is_container" => true,
           "starts_closed" => false, "contents" => ["gold_coin"]
         },
-        "gold_coin" => { "name" => "Gold Coin", "keywords" => ["coin", "gold"], "takeable" => true },
+        "gold_coin" => { "name" => "Gold Coin", "keywords" => %w[coin gold], "takeable" => true },
         "key" => {
-          "name" => "Brass Key", "keywords" => ["key", "brass"], "takeable" => true,
+          "name" => "Brass Key", "keywords" => %w[key brass], "takeable" => true,
           "on_use" => { "type" => "unlock", "sets_flag" => "gate_unlocked", "success_msg" => "The gate clicks open." }
         },
         "torch" => {
@@ -188,7 +189,7 @@ class ItemHandlerTest < ActiveSupport::TestCase
         },
         "room2" => { "name" => "Room 2", "description" => "Another room.", "exits" => {} }
       },
-      items: { "magic_key" => { "name" => "Magic Key", "keywords" => ["key", "magic"] } }
+      items: { "magic_key" => { "name" => "Magic Key", "keywords" => %w[key magic] } }
     )
     game = build_game(world_data: world, player_id: USER_ID,
                       player_state: player_state_in("room1", inventory: ["magic_key"]))
@@ -203,8 +204,8 @@ class ItemHandlerTest < ActiveSupport::TestCase
 
   private
 
-  def execute(input)
-    command = ClassicGame::CommandParser.parse(input)
-    ClassicGame::Handlers::ItemHandler.new(game: @game, user_id: USER_ID).handle(command)
-  end
+    def execute(input)
+      command = ClassicGame::CommandParser.parse(input)
+      ClassicGame::Handlers::ItemHandler.new(game: @game, user_id: USER_ID).handle(command)
+    end
 end

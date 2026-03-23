@@ -10,9 +10,7 @@ class JsonDiff
     return [[path_string(path), "removed", old_obj, nil]] if new_obj.nil?
 
     # Different types
-    if old_obj.class != new_obj.class
-      return [[path_string(path), "changed", old_obj, new_obj]]
-    end
+    return [[path_string(path), "changed", old_obj, new_obj]] if old_obj.class != new_obj.class
 
     # Hash comparison
     if old_obj.is_a?(Hash) && new_obj.is_a?(Hash)
@@ -49,9 +47,7 @@ class JsonDiff
     end
 
     # Primitive comparison
-    if old_obj != new_obj
-      changes << [path_string(path), "changed", old_obj, new_obj]
-    end
+    changes << [path_string(path), "changed", old_obj, new_obj] if old_obj != new_obj
 
     changes
   end
@@ -62,7 +58,7 @@ class JsonDiff
     output = []
 
     # Group changes by their parent path
-    grouped_changes = changes.group_by do |path, action, old_val, new_val|
+    grouped_changes = changes.group_by do |path, _action, _old_val, _new_val|
       # Get the parent path (e.g., "room_states.library" from "room_states.library.items")
       parts = path.split(".")
       parts.length > 1 ? parts[0..-2].join(".") : nil
@@ -83,15 +79,15 @@ class JsonDiff
       end
 
       # Show final state of parent if available and there are nested changes
-      if parent_path && new_obj
-        parent_value = dig_path(new_obj, parent_path)
-        if parent_value.is_a?(Hash) || parent_value.is_a?(Array)
-          output << ""
-          output << "  Final state of #{parent_path}:"
-          output << indent_json(parent_value, 4)
-          output << ""
-        end
-      end
+      next unless parent_path && new_obj
+
+      parent_value = dig_path(new_obj, parent_path)
+      next unless parent_value.is_a?(Hash) || parent_value.is_a?(Array)
+
+      output << ""
+      output << "  Final state of #{parent_path}:"
+      output << indent_json(parent_value, 4)
+      output << ""
     end
 
     output.join("\n")
@@ -105,7 +101,7 @@ class JsonDiff
   end
 
   def self.indent_json(value, indent_level)
-    JSON.pretty_generate(value).lines.map { |line| " " * indent_level + line.chomp }.join("\n")
+    JSON.pretty_generate(value).lines.map { |line| (" " * indent_level) + line.chomp }.join("\n")
   end
 
   def self.path_string(path)

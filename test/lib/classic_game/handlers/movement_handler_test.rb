@@ -193,53 +193,53 @@ class MovementHandlerTest < ActiveSupport::TestCase
 
   private
 
-  def execute(input)
-    command = ClassicGame::CommandParser.parse(input)
-    ClassicGame::Handlers::MovementHandler.new(game: @game, user_id: USER_ID).handle(command)
-  end
+    def execute(input)
+      command = ClassicGame::CommandParser.parse(input)
+      ClassicGame::Handlers::MovementHandler.new(game: @game, user_id: USER_ID).handle(command)
+    end
 
-  def move_north(game)
-    command = ClassicGame::CommandParser.parse("go north")
-    ClassicGame::Handlers::MovementHandler.new(game: game, user_id: USER_ID).handle(command)
-  end
+    def move_north(game)
+      command = ClassicGame::CommandParser.parse("go north")
+      ClassicGame::Handlers::MovementHandler.new(game: game, user_id: USER_ID).handle(command)
+    end
 
-  def locked_vault_world(require_item:)
-    build_world(
-      starting_room: "entrance",
-      rooms: {
-        "entrance" => {
-          "name" => "Entrance", "description" => "A hall.",
-          "exits" => { "north" => { "to" => "vault", "requires" => require_item, "locked_msg" => "The vault is locked." } }
+    def locked_vault_world(require_item:)
+      build_world(
+        starting_room: "entrance",
+        rooms: {
+          "entrance" => {
+            "name" => "Entrance", "description" => "A hall.",
+            "exits" => { "north" => { "to" => "vault", "requires" => require_item, "locked_msg" => "The vault is locked." } }
+          },
+          "vault" => { "name" => "Vault", "description" => "Treasure!", "exits" => {} }
         },
-        "vault" => { "name" => "Vault", "description" => "Treasure!", "exits" => {} }
-      },
-      items: { require_item => { "name" => "Golden Key", "keywords" => ["key"] } }
-    )
-  end
+        items: { require_item => { "name" => "Golden Key", "keywords" => ["key"] } }
+      )
+    end
 
-  def flagged_door_world(flag:)
-    build_world(
-      starting_room: "entrance",
-      rooms: {
-        "entrance" => {
-          "name" => "Entrance", "description" => "A hall.",
-          "exits" => { "north" => { "to" => "vault", "requires_flag" => flag, "locked_msg" => "The door is sealed." } }
-        },
-        "vault" => { "name" => "Vault", "description" => "Treasure!", "exits" => {} }
-      }
-    )
-  end
+    def flagged_door_world(flag:)
+      build_world(
+        starting_room: "entrance",
+        rooms: {
+          "entrance" => {
+            "name" => "Entrance", "description" => "A hall.",
+            "exits" => { "north" => { "to" => "vault", "requires_flag" => flag, "locked_msg" => "The door is sealed." } }
+          },
+          "vault" => { "name" => "Vault", "description" => "Treasure!", "exits" => {} }
+        }
+      )
+    end
 
-  def hidden_exit_world
-    build_world(
-      starting_room: "entrance",
-      rooms: {
-        "entrance" => {
-          "name" => "Entrance", "description" => "A hall.",
-          "exits" => { "north" => { "to" => "vault", "hidden" => true } }
-        },
-        "vault" => { "name" => "Vault", "description" => "Treasure!", "exits" => {} }
-      }
-    )
-  end
+    def hidden_exit_world
+      build_world(
+        starting_room: "entrance",
+        rooms: {
+          "entrance" => {
+            "name" => "Entrance", "description" => "A hall.",
+            "exits" => { "north" => { "to" => "vault", "hidden" => true } }
+          },
+          "vault" => { "name" => "Vault", "description" => "Treasure!", "exits" => {} }
+        }
+      )
+    end
 end

@@ -24,7 +24,7 @@ class Chapter < ApplicationRecord
 
     update(last_message_id: game.messages.last.id)
 
-    client = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"])
+    client = OpenAI::Client.new(api_key: ENV.fetch("OPENAI_API_KEY", nil))
 
     chat_log = all_messages.map do |m|
       role = determine_message_role(m)

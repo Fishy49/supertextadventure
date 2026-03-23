@@ -55,52 +55,52 @@ module AiConfigs
 
     private
 
-    def chapter_summaries
-      summaries = []
-      return summaries unless @game.complete_chapters.present?
+      def chapter_summaries
+        summaries = []
+        return summaries if @game.complete_chapters.blank?
 
-      @game.complete_chapters.each do |chapter|
-        summaries << {
-          role: "assistant",
-          content: "#{chapter.name}: #{chapter.summary}"
-        }
-      end
-      summaries
-    end
-
-    def current_messages_formatted
-      formatted = []
-
-      @game.current_messages.for_ai.each do |message|
-        # Skip events except for roll events
-        next if message.event? && message.event_type != "roll"
-
-        content = format_message_content(message)
-        role = determine_role(message)
-
-        formatted << { role: role, content: content }
+        @game.complete_chapters.each do |chapter|
+          summaries << {
+            role: "assistant",
+            content: "#{chapter.name}: #{chapter.summary}"
+          }
+        end
+        summaries
       end
 
-      formatted
-    end
+      def current_messages_formatted
+        formatted = []
 
-    def format_message_content(message)
-      if message.player_message?
-        "[#{message.display_name}] #{message.content}"
-      elsif message.event_type == "roll"
-        message.roll_result_message_for_ai
-      else
-        message.content
+        @game.current_messages.for_ai.each do |message|
+          # Skip events except for roll events
+          next if message.event? && message.event_type != "roll"
+
+          content = format_message_content(message)
+          role = determine_role(message)
+
+          formatted << { role: role, content: content }
+        end
+
+        formatted
       end
-    end
 
-    def determine_role(message)
-      return "user" if message.player_message?
-      return "assistant" if message.host_message?
-      return "system" if message.is_system_message?
-      return "user" if message.event_type == "roll"
+      def format_message_content(message)
+        if message.player_message?
+          "[#{message.display_name}] #{message.content}"
+        elsif message.event_type == "roll"
+          message.roll_result_message_for_ai
+        else
+          message.content
+        end
+      end
 
-      "user" # default
-    end
+      def determine_role(message)
+        return "user" if message.player_message?
+        return "assistant" if message.host_message?
+        return "system" if message.is_system_message?
+        return "user" if message.event_type == "roll"
+
+        "user" # default
+      end
   end
 end

@@ -9,4 +9,4 @@
 #   Character.create(name: "Luke", movie: movies.first)
 
 # Load sample dungeon world
-load Rails.root.join("db", "seeds", "sample_dungeon.rb")
+load Rails.root.join("db/seeds/sample_dungeon.rb")

@@ -161,7 +161,7 @@ class CombatHandlerTest < ActiveSupport::TestCase
 
   test "flee always produces a coherent game state" do
     game = in_combat_game(creature_id: "goblin", creature_health: 50, player_health: 10)
-    result = handle(game, "flee")
+    handle(game, "flee")
 
     combat = game.player_state(USER_ID)["combat"]
     health = game.player_state(USER_ID)["health"]
@@ -202,25 +202,25 @@ class CombatHandlerTest < ActiveSupport::TestCase
 
   private
 
-  def handle(game, input)
-    command = ClassicGame::CommandParser.parse(input)
-    ClassicGame::Handlers::CombatHandler.new(game: game, user_id: USER_ID).handle(command)
-  end
+    def handle(game, input)
+      command = ClassicGame::CommandParser.parse(input)
+      ClassicGame::Handlers::CombatHandler.new(game: game, user_id: USER_ID).handle(command)
+    end
 
-  def in_combat_game(creature_id:, creature_health:, world: nil, player_health: 10, inventory: [])
-    world ||= @world
-    combat_state = {
-      "active" => true,
-      "creature_id" => creature_id,
-      "creature_health" => creature_health,
-      "creature_max_health" => creature_health,
-      "round_number" => 1,
-      "defending" => false
-    }
-    build_game(
-      world_data: world, player_id: USER_ID,
-      player_state: player_state_in("arena", health: player_health, max_health: 10,
-                                             inventory: inventory, combat: combat_state)
-    )
-  end
+    def in_combat_game(creature_id:, creature_health:, world: nil, player_health: 10, inventory: [])
+      world ||= @world
+      combat_state = {
+        "active" => true,
+        "creature_id" => creature_id,
+        "creature_health" => creature_health,
+        "creature_max_health" => creature_health,
+        "round_number" => 1,
+        "defending" => false
+      }
+      build_game(
+        world_data: world, player_id: USER_ID,
+        player_state: player_state_in("arena", health: player_health, max_health: 10,
+                                               inventory: inventory, combat: combat_state)
+      )
+    end
 end

@@ -4,7 +4,7 @@ class GenerateTextController < ApplicationController
   before_action :promptify
 
   def text
-    client = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"])
+    client = OpenAI::Client.new(api_key: ENV.fetch("OPENAI_API_KEY", nil))
     # This controller doesn't have a game context, so we hardcode the model for now
     response = client.responses.create(
       model: "gpt-5-mini",

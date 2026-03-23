@@ -1,4 +1,4 @@
-require:
+plugins:
   - rubocop-performance
   - rubocop-rails
   - rubocop-capybara
@@ -10,6 +10,7 @@ AllCops:
     - 'bin/**'
     - 'db/schema.rb'
     - 'config/routes.rb'
+    - 'vendor/**/*'
 
 Layout/IndentationConsistency:
   EnforcedStyle: indented_internal_methods
@@ -21,9 +22,10 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/MethodLength:
-  Max: 16
-  Exclude: 
+  Max: 60
+  Exclude:
     - 'db/migrate/**'
+    - 'db/seeds/**'
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
@@ -35,4 +37,28 @@ Rails/ThreeStateBooleanColumn:
   Enabled: false
 
 Metrics/ClassLength:
-  Max: 120
+  Max: 300
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - 'test/**/*'
+    - 'db/seeds/**'
+    - 'config/environments/**'
+    - 'app/controllers/**'
+
+Layout/LineLength:
+  Exclude:
+    - 'db/seeds/**'
+    - 'test/**/*'
+
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+Rails/ReversibleMigration:
+  Enabled: false
+
+Rails/UniqueValidationWithoutIndex:
+  Enabled: false

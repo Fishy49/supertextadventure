@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddWorldIdToGames < ActiveRecord::Migration[8.0]
   def change
     add_reference :games, :world, null: true, foreign_key: true

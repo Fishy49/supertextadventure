@@ -106,41 +106,41 @@ module ClassicGameTestHelper
 
     private
 
-    def initialize_player_state(user_id)
-      starting_room = world_snapshot.dig("meta", "starting_room") ||
-                      world_snapshot.dig("rooms")&.keys&.first
-      state = {
-        "current_room" => starting_room,
-        "inventory" => [],
-        "health" => 10,
-        "max_health" => 10,
-        "visited_rooms" => [],
-        "flags" => {}
-      }
-      @game_state["player_states"][user_id.to_s] = state
-      state
-    end
+      def initialize_player_state(user_id)
+        starting_room = world_snapshot.dig("meta", "starting_room") ||
+                        world_snapshot["rooms"]&.keys&.first
+        state = {
+          "current_room" => starting_room,
+          "inventory" => [],
+          "health" => 10,
+          "max_health" => 10,
+          "visited_rooms" => [],
+          "flags" => {}
+        }
+        @game_state["player_states"][user_id.to_s] = state
+        state
+      end
 
-    def initialize_room_state(room_id)
-      room_def = world_snapshot.dig("rooms", room_id.to_s)
-      return {} unless room_def
+      def initialize_room_state(room_id)
+        room_def = world_snapshot.dig("rooms", room_id.to_s)
+        return {} unless room_def
 
-      state = {
-        "items" => (room_def["items"] || []).dup,
-        "npcs" => (room_def["npcs"] || []).dup,
-        "creatures" => (room_def["creatures"] || []).dup,
-        "modified" => false
-      }
-      @game_state["room_states"][room_id.to_s] = state
-      state
-    end
+        state = {
+          "items" => (room_def["items"] || []).dup,
+          "npcs" => (room_def["npcs"] || []).dup,
+          "creatures" => (room_def["creatures"] || []).dup,
+          "modified" => false
+        }
+        @game_state["room_states"][room_id.to_s] = state
+        state
+      end
   end
 
   # ─── Builders ──────────────────────────────────────────────────────────────
 
   def build_world(rooms: {}, items: {}, npcs: {}, creatures: {}, starting_room: nil)
     {
-      "meta" => { "starting_room" => (starting_room || rooms.keys.first&.to_s) },
+      "meta" => { "starting_room" => starting_room || rooms.keys.first&.to_s },
       "rooms" => rooms,
       "items" => items,
       "npcs" => npcs,

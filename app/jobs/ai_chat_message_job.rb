@@ -11,7 +11,7 @@ class AiChatMessageJob
       ai_message = Message.create(game_id: game_id, content: "...")
       total_message = ""
 
-      client = OpenAI::Client.new(api_key: ENV["OPENAI_API_KEY"])
+      client = OpenAI::Client.new(api_key: ENV.fetch("OPENAI_API_KEY", nil))
       stream = client.responses.stream(
         model: game.ai_config.model_name,
         input: game.messages_for_ai

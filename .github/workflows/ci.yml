@@ -26,6 +26,7 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/supertextadventure_test
+      PARALLEL_WORKERS: 1
 
     steps:
       - uses: actions/checkout@v4

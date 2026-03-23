@@ -1,0 +1,21 @@
+<div class="space-y-4">
+  <div>
+    <label class="block mb-1 text-sm font-bold">Starting Room *</label>
+    <%= text_field_tag :starting_room, entity_data["starting_room"],
+        required: true,
+        placeholder: "entrance",
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">Version</label>
+    <%= text_field_tag :version, entity_data["version"] || "1.0",
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">Author</label>
+    <%= text_field_tag :author, entity_data["author"],
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+</div>

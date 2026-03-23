@@ -24,7 +24,7 @@
 
 <% content_for :sidebar do %>
   <h3 class="text-center mb-2"><strong><%= @game.name %></strong></h3>
-  
+
   <div class="mb-5">
     <%= render "current_context", game: @game %>
   </div>
@@ -48,5 +48,51 @@
 <% content_for :loading_modal do %>
   <%= render "/shared/loading_modal", options: { id: "loading-modal" } do %>
     <h3 class="text-lg text-center font-medium leading-6 text-terminal-green" ><%= loading_message %><div class="animate-spin inline-block ml-3">|</div></h3>
+  <% end %>
+
+  <% if Rails.env.development? %>
+    <div data-controller="game-state-debugger" data-game-state-debugger-game-id-value="<%= @game.uuid %>">
+      <!-- Floating debug button -->
+      <button
+        type="button"
+        class="fixed bottom-5 right-5 w-12 h-12 rounded-full bg-stone-900 border-2 border-terminal-green text-terminal-green flex items-center justify-center font-mono font-bold text-lg hover:bg-terminal-green hover:text-stone-900 transition-all duration-200 shadow-lg z-[9998] nowrap"
+        data-action="click->game-state-debugger#toggle"
+        title="Debug Game State">
+        <span>{}</span>
+      </button>
+
+      <!-- Slide-out panel -->
+      <div
+        data-game-state-debugger-target="panel"
+        class="fixed top-0 right-0 w-3/4 h-screen bg-stone-800 border-l-2 border-terminal-green flex flex-col z-[9999] shadow-2xl transition-transform duration-300 translate-x-full">
+        <!-- Header -->
+        <div class="flex justify-between items-center p-4 bg-stone-900 border-b-2 border-terminal-green">
+          <h3 class="text-terminal-green font-mono font-bold text-xl uppercase m-0">Game State JSON</h3>
+          <button
+            type="button"
+            class="bg-transparent border-0 text-terminal-green text-3xl cursor-pointer leading-none p-0 w-8 h-8 hover:text-red-500 font-bold"
+            data-action="click->game-state-debugger#close">×</button>
+        </div>
+
+        <!-- Editor -->
+        <div data-game-state-debugger-target="editor" class="flex-1 overflow-auto bg-stone-800"></div>
+
+        <!-- Footer -->
+        <div class="flex gap-2 p-4 bg-stone-900 border-t-2 border-terminal-green">
+          <button
+            type="button"
+            class="button flex-1 m-0 bg-stone-800 text-terminal-green border border-terminal-green font-mono font-bold hover:bg-terminal-green hover:text-stone-900"
+            data-action="click->game-state-debugger#save">
+            Save & Reload
+          </button>
+          <button
+            type="button"
+            class="button flex-1 m-0 bg-stone-800 text-terminal-green border border-terminal-green font-mono font-bold hover:bg-terminal-green hover:text-stone-900"
+            data-action="click->game-state-debugger#close">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   <% end %>
 <% end %>

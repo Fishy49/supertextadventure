@@ -6,7 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby "3.4.2"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.1"
+gem "rails", "~> 8.1"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
@@ -97,14 +97,14 @@ gem "cancancan", "~> 3.4"
 
 gem "browser", "~> 5.3"
 
-gem "tokenizers", "~> 0.5.4"
-
-gem "ruby-openai", "~> 7.0"
+gem "openai", "~> 0.43.0"
 
 gem "rubocop-capybara", "~> 2.21"
 
-gem "benchmark", "~> 0.4.0"
-gem "mutex_m", "~> 0.2.0"
-gem "csv", "~> 3.3"
-gem "ostruct", "~> 0.6.1"
 gem "base64", "~> 0.2.0"
+gem "benchmark", "~> 0.4.0"
+gem "csv", "~> 3.3"
+gem "mutex_m", "~> 0.2.0"
+gem "ostruct", "~> 0.6.1"
+
+gem "openssl", "~> 4.0"

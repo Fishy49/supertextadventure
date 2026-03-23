@@ -3,8 +3,10 @@
 module GamesHelper
   def game_type_options
     [
-      %w[Free-Form freeform],
-      %w[ChatGPT chatgpt]
+      ["Chat Mode", "chat"],
+      ["Chat (AI)", "chat_ai"],
+      ["Classic Mode", "classic"],
+      ["Classic Mode (AI)", "classic_ai"]
     ]
   end
 
@@ -13,5 +15,9 @@ module GamesHelper
       %w[Open open],
       %w[Closed closed]
     ]
+  end
+
+  def world_options
+    World.all.map { |world| [world.name, world.id] }
   end
 end

@@ -25,6 +25,11 @@
       <span id="owner-invite-hotkey">
         <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-i" data-hotkey-path-param="/setup_tokens"><span class="text-xl"><%= symbol.html_safe %></span>I</span>nvites
       </span>
+
+      <span class="mx-1">|</span>
+      <span>
+        <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-w" data-hotkey-path-param="/worlds"><span class="text-xl"><%= symbol.html_safe %></span>W</span>orlds
+      </span>
     <% end %>
   <% end %>
 </div>

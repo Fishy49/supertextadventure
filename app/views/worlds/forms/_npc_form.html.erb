@@ -1,0 +1,60 @@
+<div class="space-y-4">
+  <div>
+    <label class="block mb-1 text-sm font-bold">Name *</label>
+    <%= text_field_tag :name, entity_data["name"],
+        required: true,
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">Description *</label>
+    <%= text_area_tag :description, entity_data["description"],
+        rows: 3,
+        required: true,
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="block mb-2 text-sm font-bold">Dialogue Options</label>
+    <div id="dialogue-container" class="space-y-2">
+      <% dialogue = entity_data["dialogue"] || {} %>
+      <% if dialogue.any? %>
+        <% dialogue.each do |key, text| %>
+          <div class="space-y-1">
+            <%= text_field_tag "dialogue_keys[]", key,
+                placeholder: "Topic/Key",
+                class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+            <%= text_area_tag "dialogue_texts[]", text,
+                rows: 2,
+                placeholder: "Response text",
+                class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="space-y-1">
+          <%= text_field_tag "dialogue_keys[]", "default",
+              placeholder: "default",
+              class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+          <%= text_area_tag "dialogue_texts[]", "",
+              rows: 2,
+              placeholder: "What the NPC says...",
+              class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="block mb-1 text-sm font-bold">Accepts Item</label>
+      <%= text_field_tag :accepts_item, entity_data["accepts_item"],
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-bold">Gives Item</label>
+      <%= text_field_tag :gives_item, entity_data["gives_item"],
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+    </div>
+  </div>
+</div>

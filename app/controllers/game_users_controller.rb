@@ -50,6 +50,6 @@ class GameUsersController < ApplicationController
     end
 
     def game_user_params
-      params.require(:game_user).permit(:heal, :damage, :can_message)
+      params.expect(game_user: %i[heal damage can_message])
     end
 end

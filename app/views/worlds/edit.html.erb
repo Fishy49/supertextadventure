@@ -1,0 +1,84 @@
+<div class="flex flex-col h-screen" data-controller="world-editor world-preview" data-world-preview-world-id-value="<%= @world.id %>">
+  <!-- Hidden element for JSON updates from backend -->
+  <div id="editor-json-update" class="hidden"></div>
+
+  <!-- Entity Modal (Turbo Frame) -->
+  <%= turbo_frame_tag "entity-modal" %>
+
+  <!-- Top Header -->
+  <div class="flex-none bg-stone-900 border-b-2 border-terminal-green px-4 py-2">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <%= link_to "← Worlds", worlds_path, class: "text-sm hover:underline" %>
+        <span class="text-lg font-bold"><%= @world.name %></span>
+        <span class="text-xs opacity-60"><%= @world.description %></span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs" data-world-editor-target="status">Ready</span>
+        <button data-action="click->world-editor#formatJson" class="px-3 py-1 border border-terminal-green hover:bg-terminal-green hover:text-stone-800 text-sm">
+          Format
+        </button>
+        <button data-action="click->world-editor#saveWorld" class="px-4 py-2 border-2 border-terminal-green hover:bg-terminal-green hover:text-stone-800">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Split View -->
+  <div class="flex-1 flex min-h-0">
+    <!-- Left: JSON Editor -->
+    <div class="w-1/2 flex flex-col border-r-2 border-terminal-green">
+      <div class="flex-none bg-stone-900 border-b-2 border-terminal-green px-3 py-2">
+        <div class="flex justify-between items-center">
+          <span class="text-sm font-bold">JSON Editor</span>
+          <span class="text-xs opacity-60">Click arrows in gutter to collapse sections</span>
+        </div>
+      </div>
+      <div class="flex-1 min-h-0">
+        <textarea
+          id="json-editor"
+          data-world-editor-target="jsonInput"
+          class="hidden"><%= JSON.pretty_generate(@world.world_data) %></textarea>
+        <div data-world-editor-target="editor" class="h-full w-full"></div>
+      </div>
+    </div>
+
+    <!-- Right: Preview -->
+    <div class="w-1/2 flex flex-col">
+      <div class="flex-none bg-stone-900 border-b-2 border-terminal-green px-3 py-2">
+        <div class="flex justify-between items-center">
+          <span class="text-sm font-bold">Preview</span>
+          <span class="text-xs opacity-60" data-world-preview-target="stats">
+            Rooms: <span data-world-preview-target="roomCount"><%= @world.rooms.count %></span> |
+            Items: <span data-world-preview-target="itemCount"><%= @world.items.count %></span> |
+            NPCs: <span data-world-preview-target="npcCount"><%= @world.npcs.count %></span> |
+            Creatures: <span data-world-preview-target="creatureCount"><%= @world.creatures.count %></span>
+          </span>
+        </div>
+      </div>
+      <div class="flex-1 overflow-y-auto terminal-scrollbars p-4" data-world-preview-target="container">
+        <%= render "worlds/preview", world_data: @world.world_data, world: @world %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Footer -->
+  <div class="flex-none bg-stone-900 border-t-2 border-terminal-green px-4 py-2">
+    <div class="flex justify-between items-center text-xs">
+      <div>
+        <% if logged_in? %>
+          <span><%= current_user.username %></span>
+          <span class="mx-2">|</span>
+          <%= link_to "Logout", logout_path, class: "hover:underline" %>
+        <% end %>
+      </div>
+      <div>&copy; <%= Date.today.year %> Richard Cagle</div>
+    </div>
+  </div>
+
+  <!-- Hidden form -->
+  <%= form_with model: @world, html: { data: { world_editor_target: "form" } } do |f| %>
+    <%= f.hidden_field :world_data, data: { world_editor_target: "worldDataField" } %>
+  <% end %>
+</div>

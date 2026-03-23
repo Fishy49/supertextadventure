@@ -16,7 +16,7 @@
         <%= form.text_field :character_name %>
       </div>
 
-      <% if @game.game_type == "chatgpt" %>
+      <% if @game.chat_ai? %>
         <div class="form-group">
           <%= form.label :character_description, style: "display: block" %>
           <%= form.text_area :character_description %>

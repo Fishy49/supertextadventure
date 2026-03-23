@@ -20,7 +20,7 @@ class DiceRoll
       next unless dice_string.include?("d")
 
       count, die = dice_string.split("d")
-      next unless VALID_DICE.include?(die) || count.to_i&.zero?
+      next unless VALID_DICE.include?(die) || count.to_i.zero?
 
       rolls << [count, die]
     end

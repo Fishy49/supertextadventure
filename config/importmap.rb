@@ -4,8 +4,8 @@
 
 pin "application", preload: true
 pin "@hotwired/turbo-rails", to: "https://ga.jspm.io/npm:@hotwired/turbo-rails@7.2.4/app/javascript/turbo/index.js"
-pin "@hotwired/stimulus", to: "https://ga.jspm.io/npm:@hotwired/stimulus@3.2.1/dist/stimulus.js"
-pin "@hotwired/stimulus-loading", to: "stimulus-loading.js", preload: true
+pin "@hotwired/stimulus", to: "stimulus.min.js"
+pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin "@rails/request.js", to: "https://ga.jspm.io/npm:@rails/request.js@0.0.8/src/index.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "lodash.debounce", to: "https://ga.jspm.io/npm:lodash.debounce@4.0.8/index.js"
@@ -21,7 +21,7 @@ pin "@codemirror/view", to: "@codemirror--view.js" # @6.39.11
 pin "@codemirror/commands", to: "@codemirror--commands.js" # @6.10.1
 pin "@codemirror/search", to: "@codemirror--search.js" # @6.6.0
 pin "@codemirror/autocomplete", to: "@codemirror--autocomplete.js" # @6.20.0
-pin "@codemirror/lint", to: "@codemirror--lint.js" # @6.9.2
+pin "@codemirror/lint", to: "@codemirror--lint.js" # @6.9.3
 pin "@lezer/common", to: "@lezer--common.js" # @1.5.0
 pin "@lezer/highlight", to: "@lezer--highlight.js" # @1.2.3
 pin "@lezer/lr", to: "https://ga.jspm.io/npm:@lezer/lr@1.4.2/dist/index.js"

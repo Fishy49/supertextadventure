@@ -31,28 +31,22 @@ module ClassicGame
       def handle_examine(target)
         return failure("Examine what?") unless target
 
-        # Try to find in room items
+        # Try to find in room items or open containers
         item_id, item_def = find_item(target)
-        if item_def && item_in_room?(item_id)
-          description = item_def["description"] || "You see nothing special about the #{item_def['name']}."
-
+        if item_def && item_accessible?(item_id)
           # Check if examining reveals an exit
           if item_def["on_examine"]&.dig("reveals_exit")
+            description = item_def["description"] || "You see nothing special about the #{item_def['name']}."
             return handle_examine_reveals_exit(item_def, description)
           end
 
-          return success(description)
-        end
+          # Check if it's a container
+          if item_def["is_container"]
+            return handle_examine_container(item_id, item_def)
+          end
 
-        # Try to find in inventory
-        if item_def && has_item?(item_id)
+          # Regular item examination
           description = item_def["description"] || "You see nothing special about the #{item_def['name']}."
-
-          # Check if examining reveals an exit (can work from inventory too)
-          if item_def["on_examine"]&.dig("reveals_exit")
-            return handle_examine_reveals_exit(item_def, description)
-          end
-
           return success(description)
         end
 
@@ -60,6 +54,21 @@ module ClassicGame
         npc_id, npc_def = find_npc(target)
         if npc_def && npc_in_room?(npc_id)
           return success(npc_def["description"] || "You see #{npc_def['name']}.")
+        end
+
+        # Try to find creature
+        creature_id, creature_def = find_creature(target)
+        if creature_def && creature_in_room?(creature_id)
+          description = creature_def["description"] || "You see #{creature_def['name']}."
+
+          # Show health if in combat with this creature
+          if in_combat_with?(creature_id)
+            combat = player_state["combat"]
+            health_pct = (combat["creature_health"].to_f / combat["creature_max_health"] * 100).round
+            description += "\n\nThe creature appears to be at #{health_pct}% health."
+          end
+
+          return success(description)
         end
 
         # Check if it's a room feature mentioned in description
@@ -98,6 +107,61 @@ module ClassicGame
         end
 
         success(lines.join("\n"))
+      end
+
+      def handle_examine_container(container_id, container_def)
+        is_open = game.container_open?(container_id)
+
+        # Get appropriate description based on state
+        if is_open
+          description = container_def["open_description"] || container_def["description"] || "The #{container_def['name']} is open."
+        else
+          description = container_def["closed_description"] || container_def["description"] || "The #{container_def['name']} is closed."
+        end
+
+        # If open, list contents
+        if is_open
+          contents = game.container_contents(container_id)
+          if contents.any?
+            content_names = contents.map { |item_id| world_snapshot.dig("items", item_id, "name") || item_id }
+            description += "\n\nInside you see: #{content_names.join(', ')}"
+          elsif container_def["empty_message"]
+            description += "\n\n#{container_def['empty_message']}"
+          else
+            description += "\n\nIt's empty."
+          end
+        end
+
+        success(description)
+      end
+
+      def item_accessible?(item_id)
+        item_in_room?(item_id) || has_item?(item_id) || item_in_open_container?(item_id)
+      end
+
+      def item_in_open_container?(item_id)
+        # Check all items in room and inventory for containers
+        accessible_items = (current_room_state["items"] || []) + (player_state["inventory"] || [])
+
+        accessible_items.each do |potential_container_id|
+          container_def = world_snapshot.dig("items", potential_container_id)
+          next unless container_def&.dig("is_container")
+          next unless game.container_open?(potential_container_id)
+
+          contents = game.container_contents(potential_container_id)
+          return true if contents.include?(item_id)
+
+          # Recursively check nested containers
+          contents.each do |nested_item_id|
+            nested_def = world_snapshot.dig("items", nested_item_id)
+            if nested_def&.dig("is_container") && game.container_open?(nested_item_id)
+              nested_contents = game.container_contents(nested_item_id)
+              return true if nested_contents.include?(item_id)
+            end
+          end
+        end
+
+        false
       end
 
       def handle_inventory
@@ -143,6 +207,16 @@ module ClassicGame
           lines << ""
           npc_names = npcs.map { |npc_id| world_snapshot.dig("npcs", npc_id, "name") || npc_id }
           lines << "Present: #{npc_names.join(', ')}"
+        end
+
+        # List creatures
+        creatures = current_room_state["creatures"] || []
+        if creatures.any?
+          lines << ""
+          creature_names = creatures.map do |creature_id|
+            world_snapshot.dig("creatures", creature_id, "name") || creature_id
+          end
+          lines << "Creatures: #{creature_names.join(', ')}"
         end
 
         # List exits (filter out hidden unrevealed exits)

@@ -28,6 +28,11 @@ Rails.application.routes.draw do
     patch "host/offline", to: "games/host#offline"
     patch "host/typing", to: "games/host#typing"
     patch "host/stop-typing", to: "games/host#stop_typing"
+
+    member do
+      get "debug_state"
+      patch "debug_state", action: :update_debug_state
+    end
   end
 
   get "games/:id/lobby", to: "games#lobby", as: :game_lobby

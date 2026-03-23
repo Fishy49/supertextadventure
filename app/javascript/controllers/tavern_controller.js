@@ -69,9 +69,15 @@ export default class extends Controller {
           this.show_error(error_text, false)
         } else {
           let gameUuid = gameListElement.dataset.gameId
+          let isOwner = gameListElement.dataset.isOwner === 'true'
 
           if(!gameUuid){
             this.show_error("Something went wrong finding that table!", false)
+            return
+          }
+
+          if(!isOwner){
+            this.show_error("Ye cannot KICK OVER a table that doth not belong to ye, knave!", false)
             return
           }
 

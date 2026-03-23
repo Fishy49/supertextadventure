@@ -25,7 +25,7 @@ module ClassicGame
         item_id, item_def = find_item(target)
         return failure("You don't see that here.") unless item_def
 
-        # Check if it's in the room
+        # Check if it's in the room (including containers)
         return failure("You don't see that here.") unless item_in_room?(item_id)
 
         # Check if it's takeable
@@ -39,11 +39,18 @@ module ClassicGame
         new_player_state["inventory"] << item_id
         update_player_state(new_player_state)
 
-        # Remove from room
-        new_room_state = current_room_state.dup
-        new_room_state["items"] = (new_room_state["items"] || []) - [item_id]
-        new_room_state["modified"] = true
-        update_room_state(player_state["current_room"], new_room_state)
+        # Remove from room or container
+        container_id = find_item_container(item_id)
+        if container_id
+          # Remove from container
+          game.remove_from_container(container_id, item_id)
+        else
+          # Remove from room
+          new_room_state = current_room_state.dup
+          new_room_state["items"] = (new_room_state["items"] || []) - [item_id]
+          new_room_state["modified"] = true
+          update_room_state(player_state["current_room"], new_room_state)
+        end
 
         success("You take the #{item_def['name']}.")
       end
@@ -188,6 +195,44 @@ module ClassicGame
         # Common directions
         directions = %w[north south east west up down n s e w ne nw se sw northeast northwest southeast southwest in out]
         directions.include?(word.to_s.downcase)
+      end
+
+      def find_item_container(item_id)
+        # Check all items in the room for containers
+        room_items = current_room_state["items"] || []
+        room_items.each do |potential_container_id|
+          container_def = world_snapshot.dig("items", potential_container_id)
+          next unless container_def&.dig("is_container")
+          next unless game.container_open?(potential_container_id)
+
+          contents = game.container_contents(potential_container_id)
+          return potential_container_id if contents.include?(item_id)
+
+          # Recursively check nested containers
+          contents.each do |nested_item_id|
+            nested_container_id = find_item_in_nested_container(item_id, nested_item_id)
+            return nested_container_id if nested_container_id
+          end
+        end
+
+        nil
+      end
+
+      def find_item_in_nested_container(item_id, container_id)
+        container_def = world_snapshot.dig("items", container_id)
+        return nil unless container_def&.dig("is_container")
+        return nil unless game.container_open?(container_id)
+
+        contents = game.container_contents(container_id)
+        return container_id if contents.include?(item_id)
+
+        # Recursively check deeper
+        contents.each do |nested_item_id|
+          nested_container_id = find_item_in_nested_container(item_id, nested_item_id)
+          return nested_container_id if nested_container_id
+        end
+
+        nil
       end
 
       def handle_use_on_exit(item_id, item_def, direction)

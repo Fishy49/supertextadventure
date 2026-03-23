@@ -165,6 +165,66 @@ class Game < ApplicationRecord
     game_state.dig("revealed_exits", exit_key) || false
   end
 
+  # Container state methods
+  def container_state(container_id)
+    game_state.dig("container_states", container_id.to_s)
+  end
+
+  def container_open?(container_id)
+    state = container_state(container_id)
+    return state["open"] if state
+
+    # If no state exists, check if container starts closed
+    item_def = world_snapshot.dig("items", container_id.to_s)
+    return true unless item_def&.dig("starts_closed")
+
+    false
+  end
+
+  def open_container(container_id)
+    self.game_state ||= {}
+    self.game_state["container_states"] ||= {}
+    self.game_state["container_states"][container_id.to_s] = { "open" => true }
+    save!
+  end
+
+  def close_container(container_id)
+    self.game_state ||= {}
+    self.game_state["container_states"] ||= {}
+    self.game_state["container_states"][container_id.to_s] = { "open" => false }
+    save!
+  end
+
+  def container_contents(container_id)
+    # Get original contents from world snapshot
+    original_contents = world_snapshot.dig("items", container_id.to_s, "contents") || []
+
+    # Get removed items from game state
+    removed_items = game_state.dig("container_states", container_id.to_s, "removed_items") || []
+
+    # Return contents minus removed items
+    original_contents - removed_items
+  end
+
+  def remove_from_container(container_id, item_id)
+    self.game_state ||= {}
+    self.game_state["container_states"] ||= {}
+    self.game_state["container_states"][container_id.to_s] ||= {}
+    self.game_state["container_states"][container_id.to_s]["removed_items"] ||= []
+    self.game_state["container_states"][container_id.to_s]["removed_items"] << item_id
+    self.game_state["container_states"][container_id.to_s]["removed_items"].uniq!
+    save!
+  end
+
+  def add_to_container(container_id, item_id)
+    self.game_state ||= {}
+    self.game_state["container_states"] ||= {}
+    self.game_state["container_states"][container_id.to_s] ||= {}
+    self.game_state["container_states"][container_id.to_s]["removed_items"] ||= []
+    self.game_state["container_states"][container_id.to_s]["removed_items"].delete(item_id)
+    save!
+  end
+
   private
 
     def initialize_player_state(user_id)
@@ -173,7 +233,8 @@ class Game < ApplicationRecord
       {
         "current_room" => starting_room,
         "inventory" => [],
-        "health" => 100,
+        "health" => starting_hp || 10,
+        "max_health" => starting_hp || 10,
         "visited_rooms" => [],
         "flags" => {}
       }
@@ -236,7 +297,8 @@ class Game < ApplicationRecord
         "world_snapshot" => selected_world.world_data.deep_dup,
         "player_states" => {},
         "room_states" => {},
-        "global_flags" => {}
+        "global_flags" => {},
+        "container_states" => {}
       })
 
       # Generate starting room description
@@ -278,6 +340,16 @@ class Game < ApplicationRecord
         lines << ""
         npc_names = npcs.map { |npc_id| world_snapshot.dig("npcs", npc_id, "name") || npc_id }
         lines << "Present: #{npc_names.join(', ')}"
+      end
+
+      # List creatures
+      creatures = room_state["creatures"] || []
+      if creatures.any?
+        lines << ""
+        creature_names = creatures.map do |creature_id|
+          world_snapshot.dig("creatures", creature_id, "name") || creature_id
+        end
+        lines << "Creatures: #{creature_names.join(', ')}"
       end
 
       # List exits

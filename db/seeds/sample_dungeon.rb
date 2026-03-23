@@ -29,8 +29,9 @@ World.find_or_create_by!(name: "The Forgotten Crypt") do |world|
         "exits" => {
           "west" => "entrance"
         },
-        "items" => ["chest", "coin"],
-        "npcs" => []
+        "items" => ["chest", "coin", "healing_potion"],
+        "npcs" => [],
+        "creatures" => ["rat"]
       },
 
       "main_hall" => {
@@ -56,8 +57,9 @@ World.find_or_create_by!(name: "The Forgotten Crypt") do |world|
         "exits" => {
           "west" => "main_hall"
         },
-        "items" => ["sword"],
-        "npcs" => []
+        "items" => ["sword", "shield"],
+        "npcs" => [],
+        "creatures" => ["skeleton"]
       },
 
       "library" => {
@@ -117,9 +119,38 @@ World.find_or_create_by!(name: "The Forgotten Crypt") do |world|
 
       "sword" => {
         "name" => "Rusty Sword",
-        "description" => "An old sword, covered in rust but still serviceable.",
+        "description" => "An old sword, covered in rust but still serviceable. It adds 5 damage to your attacks.",
         "keywords" => ["sword", "weapon", "blade"],
-        "takeable" => true
+        "takeable" => true,
+        "weapon_damage" => 5
+      },
+
+      "dagger" => {
+        "name" => "Small Dagger",
+        "description" => "A small but sharp dagger. It adds 3 damage to your attacks.",
+        "keywords" => ["dagger", "knife", "blade"],
+        "takeable" => true,
+        "weapon_damage" => 3
+      },
+
+      "healing_potion" => {
+        "name" => "Healing Potion",
+        "description" => "A small vial containing a glowing red liquid. Drinking it will restore 20 health.",
+        "keywords" => ["potion", "healing", "health", "vial"],
+        "takeable" => true,
+        "consumable" => true,
+        "combat_effect" => {
+          "type" => "heal",
+          "amount" => 20
+        }
+      },
+
+      "shield" => {
+        "name" => "Wooden Shield",
+        "description" => "A sturdy wooden shield. It provides 2 defense.",
+        "keywords" => ["shield", "wood", "defense"],
+        "takeable" => true,
+        "defense_bonus" => 2
       },
 
       "book" => {
@@ -154,7 +185,46 @@ World.find_or_create_by!(name: "The Forgotten Crypt") do |world|
       }
     },
 
-    "creatures" => {}
+    "creatures" => {
+      "rat" => {
+        "name" => "Giant Rat",
+        "description" => "A mangy rat the size of a small dog. Its beady eyes glare at you menacingly, and its yellow teeth are bared.",
+        "keywords" => ["rat", "rodent"],
+        "health" => 15,
+        "attack" => 4,
+        "defense" => 0,
+        "hostile" => true,
+        "loot" => [],
+        "on_defeat_msg" => "The giant rat squeaks pitifully and collapses in a heap.",
+        "on_flee_msg" => "The rat hisses as you retreat."
+      },
+
+      "skeleton" => {
+        "name" => "Skeleton Warrior",
+        "description" => "A reanimated skeleton armed with rusty weapons. Its bones rattle as it moves, and its empty eye sockets seem to follow you.",
+        "keywords" => ["skeleton", "warrior", "undead", "bones"],
+        "health" => 30,
+        "attack" => 8,
+        "defense" => 2,
+        "hostile" => true,
+        "loot" => ["dagger", "coin"],
+        "on_defeat_msg" => "The skeleton collapses into a pile of bones with a final clatter.",
+        "on_flee_msg" => "The skeleton's jaw chatters mockingly as you flee."
+      },
+
+      "goblin" => {
+        "name" => "Goblin Scout",
+        "description" => "A small, green-skinned creature with sharp teeth and beady eyes. It clutches a crude dagger and looks ready for a fight.",
+        "keywords" => ["goblin", "scout"],
+        "health" => 25,
+        "attack" => 6,
+        "defense" => 1,
+        "hostile" => true,
+        "loot" => ["coin", "healing_potion"],
+        "on_defeat_msg" => "The goblin falls to the ground with a final shriek.",
+        "on_flee_msg" => "The goblin hurls insults at you as you retreat!"
+      }
+    }
   }
 end
 

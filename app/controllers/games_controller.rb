@@ -3,6 +3,7 @@
 class GamesController < ApplicationController
   load_resource find_by: :uuid
   authorize_resource
+  skip_authorize_resource only: %i[debug_state update_debug_state]
 
   before_action :set_turbo_frame_id
   before_action :set_game, except: %i[index list new create]
@@ -123,6 +124,19 @@ class GamesController < ApplicationController
         render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "list")
       end
     end
+  end
+
+  def debug_state
+    return head :forbidden unless Rails.env.development?
+
+    render json: { state: @game.game_state }
+  end
+
+  def update_debug_state
+    return head :forbidden unless Rails.env.development?
+
+    @game.update!(game_state: params[:state])
+    render json: { success: true }
   end
 
   private

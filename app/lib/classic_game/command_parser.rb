@@ -5,7 +5,7 @@ module ClassicGame
     # Common verb synonyms
     VERBS = {
       # Movement
-      go: %w[go move walk travel head run],
+      go: %w[go move walk travel head],
       enter: %w[enter],
       leave: %w[leave exit],
       climb: %w[climb scale],
@@ -19,16 +19,23 @@ module ClassicGame
       take: %w[take get grab pickup pick],
       drop: %w[drop discard],
       use: %w[use activate employ apply],
+      open: %w[open unlock],
+      close: %w[close shut],
 
       # Interaction
       talk: %w[talk speak chat ask say],
       attack: %w[attack kill hit strike fight],
       give: %w[give offer hand],
 
+      # Combat
+      defend: %w[defend block guard parry],
+      flee: %w[flee run escape retreat],
+
       # Special
       help: %w[help h ?],
       save: %w[save],
-      quit: %w[quit exit q]
+      quit: %w[quit exit q],
+      restart: %w[restart reset]
     }.freeze
 
     # Direction synonyms
@@ -42,11 +49,13 @@ module ClassicGame
       southeast: %w[southeast se],
       southwest: %w[southwest sw],
       up: %w[up u],
-      down: %w[down d]
+      down: %w[down d],
+      in: %w[in],
+      out: %w[out]
     }.freeze
 
     # Prepositions to filter out
-    PREPOSITIONS = %w[the a an to at on in with from of].freeze
+    PREPOSITIONS = %w[the a an to at on with from of].freeze
 
     class << self
       def parse(input)
@@ -94,7 +103,7 @@ module ClassicGame
           target = cleaned_words.empty? ? nil : cleaned_words.join(" ")
           return [verb, target, nil]
 
-        when :inventory, :help, :save, :quit
+        when :inventory, :help, :save, :quit, :restart, :defend, :flee
           return [verb, nil, nil]
 
         when :use, :give, :attack, :talk
@@ -102,7 +111,7 @@ module ClassicGame
           target, modifier = extract_target_and_modifier(words)
           return [verb, target, modifier]
 
-        when :take, :drop
+        when :take, :drop, :open, :close
           # Remove prepositions for simple item commands
           cleaned_words = words.reject { |w| PREPOSITIONS.include?(w) }
           return [verb, cleaned_words.join(" "), nil]
@@ -122,6 +131,8 @@ module ClassicGame
       end
 
       def find_direction(word)
+        return nil if word.nil?
+
         DIRECTIONS.each do |direction, synonyms|
           return direction if synonyms.include?(word)
         end

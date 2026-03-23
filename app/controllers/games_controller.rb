@@ -3,10 +3,13 @@
 class GamesController < ApplicationController
   load_resource find_by: :uuid
   authorize_resource
+  skip_authorize_resource only: %i[debug_state update_debug_state]
 
   before_action :set_turbo_frame_id
   before_action :set_game, except: %i[index list new create]
   before_action :load_games, only: %i[index list]
+
+  rescue_from CanCan::AccessDenied, with: :handle_access_denied
 
   def index; end
 
@@ -17,7 +20,6 @@ class GamesController < ApplicationController
     end
   end
 
-  # rubocop:disable Metrics/MethodLength
   def join
     authorize! :join, @game
 
@@ -43,7 +45,6 @@ class GamesController < ApplicationController
       end
     end
   end
-  # rubocop:enable Metrics/MethodLength
 
   def lobby
     authorize! :lobby, @game
@@ -88,13 +89,13 @@ class GamesController < ApplicationController
 
     respond_to do |format|
       if @game.save
-        if @game.game_type == "chatgpt"
+        if @game.chat_ai?
           format.html { redirect_to tavern_url, notice: t(:game_created_successfully) }
         else
           format.html { redirect_to game_url(@game) }
         end
       else
-        format.html { render :new, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
       end
     end
   end
@@ -104,8 +105,8 @@ class GamesController < ApplicationController
       if @game.update(game_params)
         format.turbo_stream { render turbo_stream: turbo_stream.update(@turbo_frame_id, template: "games/show") }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @game.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @game.errors, status: :unprocessable_content }
       end
     end
   end
@@ -116,7 +117,24 @@ class GamesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to games_url, notice: t(:game_destroyed) }
       format.json { head :no_content }
+      format.turbo_stream do
+        load_games
+        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "list")
+      end
     end
+  end
+
+  def debug_state
+    return head :forbidden unless Rails.env.development?
+
+    render json: { state: @game.game_state }
+  end
+
+  def update_debug_state
+    return head :forbidden unless Rails.env.development?
+
+    @game.update!(game_state: params[:state])
+    render json: { success: true }
   end
 
   private
@@ -132,12 +150,23 @@ class GamesController < ApplicationController
     end
 
     def game_params
-      params.require(:game).permit(:uuid, :name, :game_type, :created_by, :status, :opened_at, :closed_at,
-                                   :is_friends_only, :max_players, :description, :host_display_name,
-                                   :current_context, :is_current_context_ascii, :enable_hp, :starting_hp)
+      params.expect(game: %i[uuid name game_type created_by status opened_at closed_at
+                             is_friends_only max_players description host_display_name
+                             current_context is_current_context_ascii enable_hp starting_hp world_id])
     end
 
     def set_turbo_frame_id
       @turbo_frame_id = params[:turbo_frame_id].presence&.to_sym || :sidebar
+    end
+
+    def handle_access_denied(exception)
+      respond_to do |format|
+        format.html { redirect_to root_path, alert: exception.message }
+        format.turbo_stream do
+          msg = "<script>window.stimulus_controller('terminalInput', 'terminal')" \
+                ".show_error('Ye cannot KICK OVER a table ye didn\\'t create!', false)</script>"
+          render turbo_stream: turbo_stream.append("body", msg.html_safe) # rubocop:disable Rails/OutputSafety
+        end
+      end
     end
 end

@@ -1,0 +1,44 @@
+<%= turbo_frame_tag "entity-modal" do %>
+  <div class="fixed inset-0 bg-black bg-opacity-50 z-50" data-controller="slide-panel" data-action="click->slide-panel#clickOutside">
+    <div class="absolute right-0 top-0 h-full w-[600px] bg-stone-900 border-l-2 border-terminal-green shadow-2xl transform transition-transform duration-300 ease-out"
+         data-slide-panel-target="panel"
+         style="transform: translateX(100%)">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b-2 border-terminal-green sticky top-0 bg-stone-900 z-10">
+        <h2 class="text-xl font-bold">
+          <%= entity_id.present? ? "Edit" : "Add" %> <%= entity_type.capitalize %>
+        </h2>
+        <button type="button"
+                data-action="click->slide-panel#close"
+                class="text-2xl hover:text-red-500 transition-colors">
+          ✕
+        </button>
+      </div>
+
+      <%= form_with url: entity_id.present? ? update_entity_world_path(world) : create_entity_world_path(world),
+                    method: entity_id.present? ? :patch : :post,
+                    data: { turbo_frame: "_top" } do |f| %>
+        <%= hidden_field_tag :entity_type, entity_type %>
+        <%= hidden_field_tag :entity_id, entity_id if entity_id.present? %>
+
+        <!-- Form Content -->
+        <div class="p-6 overflow-y-auto terminal-scrollbars" style="height: calc(100vh - 140px)">
+          <%= render "worlds/forms/#{entity_type}_form", entity_data: entity_data %>
+        </div>
+
+        <!-- Footer Buttons (fixed at bottom) -->
+        <div class="absolute bottom-0 left-0 right-0 bg-stone-900 border-t-2 border-terminal-green p-4">
+          <div class="flex gap-2 justify-end">
+            <button type="button"
+                    data-action="click->slide-panel#close"
+                    class="px-4 py-2 border border-terminal-green hover:bg-terminal-green hover:text-stone-800">
+              Cancel
+            </button>
+            <%= f.submit "Save", class: "px-4 py-2 border-2 border-terminal-green hover:bg-terminal-green hover:text-stone-800" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

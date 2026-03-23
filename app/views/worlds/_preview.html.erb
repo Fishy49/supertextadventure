@@ -1,0 +1,160 @@
+<div id="world-preview" class="space-y-4">
+  <%# Meta Section %>
+  <% if world_data["meta"] %>
+    <div class="border border-terminal-green p-3">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-bold text-yellow-400">Meta Information</h3>
+        <%= link_to "Edit", entity_form_world_path(world, type: "meta", entity_id: "meta"),
+            data: { turbo_frame: "entity-modal" },
+            class: "text-xs px-2 py-1 border border-terminal-green hover:bg-terminal-green hover:text-stone-800" %>
+      </div>
+      <div class="space-y-1 text-sm">
+        <div><strong>Starting Room:</strong> <%= world_data["meta"]["starting_room"] || "N/A" %></div>
+        <div><strong>Version:</strong> <%= world_data["meta"]["version"] || "N/A" %></div>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Rooms Section %>
+  <div class="border border-terminal-green p-3">
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="text-lg font-bold text-blue-400">Rooms (<%= world_data["rooms"]&.size || 0 %>)</h3>
+      <%= link_to "+ Add Room", entity_form_world_path(world, type: "room"),
+          data: { turbo_frame: "entity-modal" },
+          class: "text-xs px-2 py-1 border border-terminal-green hover:bg-terminal-green hover:text-stone-800" %>
+    </div>
+    <div class="space-y-2 max-h-64 overflow-y-auto terminal-scrollbars">
+      <% if world_data["rooms"].present? %>
+        <% world_data["rooms"].each do |id, room| %>
+          <div class="border border-terminal-green p-2">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="font-bold"><%= room["name"] || id %></div>
+                <div class="text-sm opacity-80 mt-1"><%= room["description"] %></div>
+                <% if room["exits"].present? %>
+                  <div class="text-xs mt-1"><strong>Exits:</strong> <%= room["exits"].keys.join(", ") %></div>
+                <% end %>
+              </div>
+              <div class="flex gap-1 ml-2">
+                <%= link_to "Edit", entity_form_world_path(world, type: "room", entity_id: id),
+                    data: { turbo_frame: "entity-modal" },
+                    class: "text-xs px-2 py-1 border border-terminal-green hover:bg-terminal-green hover:text-stone-800" %>
+                <%= button_to "Del", delete_entity_world_path(world, entity_type: "room", entity_id: id),
+                    method: :delete,
+                    data: { turbo_confirm: "Delete #{room["name"] || id}?" },
+                    class: "text-xs px-2 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-sm opacity-60">No rooms defined</div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Items Section %>
+  <div class="border border-terminal-green p-3">
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="text-lg font-bold text-purple-400">Items (<%= world_data["items"]&.size || 0 %>)</h3>
+      <%= link_to "+ Add Item", entity_form_world_path(world, type: "item"),
+          data: { turbo_frame: "entity-modal" },
+          class: "text-xs px-2 py-1 border border-terminal-green hover:bg-terminal-green hover:text-stone-800" %>
+    </div>
+    <div class="space-y-2 max-h-64 overflow-y-auto terminal-scrollbars">
+      <% if world_data["items"].present? %>
+        <% world_data["items"].each do |id, item| %>
+          <div class="border border-terminal-green p-2">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="font-bold"><%= item["name"] || id %></div>
+                <div class="text-sm opacity-80 mt-1"><%= item["description"] %></div>
+              </div>
+              <div class="flex gap-1 ml-2">
+                <%= link_to "Edit", entity_form_world_path(world, type: "item", entity_id: id),
+                    data: { turbo_frame: "entity-modal" },
+                    class: "text-xs px-2 py-1 border border-terminal-green hover:bg-terminal-green hover:text-stone-800" %>
+                <%= button_to "Del", delete_entity_world_path(world, entity_type: "item", entity_id: id),
+                    method: :delete,
+                    data: { turbo_confirm: "Delete #{item["name"] || id}?" },
+                    class: "text-xs px-2 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-sm opacity-60">No items defined</div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# NPCs Section %>
+  <div class="border border-terminal-green p-3">
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="text-lg font-bold text-cyan-400">NPCs (<%= world_data["npcs"]&.size || 0 %>)</h3>
+      <%= link_to "+ Add NPC", entity_form_world_path(world, type: "npc"),
+          data: { turbo_frame: "entity-modal" },
+          class: "text-xs px-2 py-1 border border-terminal-green hover:bg-terminal-green hover:text-stone-800" %>
+    </div>
+    <div class="space-y-2 max-h-64 overflow-y-auto terminal-scrollbars">
+      <% if world_data["npcs"].present? %>
+        <% world_data["npcs"].each do |id, npc| %>
+          <div class="border border-terminal-green p-2">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="font-bold"><%= npc["name"] || id %></div>
+                <div class="text-sm opacity-80 mt-1"><%= npc["description"] %></div>
+              </div>
+              <div class="flex gap-1 ml-2">
+                <%= link_to "Edit", entity_form_world_path(world, type: "npc", entity_id: id),
+                    data: { turbo_frame: "entity-modal" },
+                    class: "text-xs px-2 py-1 border border-terminal-green hover:bg-terminal-green hover:text-stone-800" %>
+                <%= button_to "Del", delete_entity_world_path(world, entity_type: "npc", entity_id: id),
+                    method: :delete,
+                    data: { turbo_confirm: "Delete #{npc["name"] || id}?" },
+                    class: "text-xs px-2 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-sm opacity-60">No NPCs defined</div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Creatures Section %>
+  <div class="border border-terminal-green p-3">
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="text-lg font-bold text-red-400">Creatures (<%= world_data["creatures"]&.size || 0 %>)</h3>
+      <%= link_to "+ Add Creature", entity_form_world_path(world, type: "creature"),
+          data: { turbo_frame: "entity-modal" },
+          class: "text-xs px-2 py-1 border border-terminal-green hover:bg-terminal-green hover:text-stone-800" %>
+    </div>
+    <div class="space-y-2 max-h-64 overflow-y-auto terminal-scrollbars">
+      <% if world_data["creatures"].present? %>
+        <% world_data["creatures"].each do |id, creature| %>
+          <div class="border border-terminal-green p-2">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="font-bold"><%= creature["name"] || id %></div>
+                <div class="text-sm opacity-80 mt-1"><%= creature["description"] %></div>
+              </div>
+              <div class="flex gap-1 ml-2">
+                <%= link_to "Edit", entity_form_world_path(world, type: "creature", entity_id: id),
+                    data: { turbo_frame: "entity-modal" },
+                    class: "text-xs px-2 py-1 border border-terminal-green hover:bg-terminal-green hover:text-stone-800" %>
+                <%= button_to "Del", delete_entity_world_path(world, entity_type: "creature", entity_id: id),
+                    method: :delete,
+                    data: { turbo_confirm: "Delete #{creature["name"] || id}?" },
+                    class: "text-xs px-2 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-sm opacity-60">No creatures defined</div>
+      <% end %>
+    </div>
+  </div>
+</div>

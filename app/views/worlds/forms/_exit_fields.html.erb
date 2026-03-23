@@ -1,0 +1,173 @@
+<%
+  # Parse exit data - could be string (simple) or hash (complex)
+  is_simple = exit_data.is_a?(String)
+  destination = is_simple ? exit_data : (exit_data["to"] || "")
+
+  # Extract all possible exit properties
+  hidden = is_simple ? false : (exit_data["hidden"] || false)
+  keywords = is_simple ? "" : ((exit_data["keywords"] || []).join(", "))
+
+  # Determine unlock type
+  unlock_type = "none"
+  if !is_simple
+    if exit_data["use_item"].present?
+      unlock_type = "use_item"
+    elsif exit_data["requires_flag"].present?
+      unlock_type = "requires_flag"
+    elsif exit_data["requires"].present?
+      unlock_type = "requires"
+    end
+  end
+
+  requires_item = is_simple ? "" : (exit_data["requires"] || "")
+  requires_flag = is_simple ? "" : (exit_data["requires_flag"] || "")
+  use_item = is_simple ? "" : (exit_data["use_item"] || "")
+  locked_msg = is_simple ? "" : (exit_data["locked_msg"] || "")
+  unlocked_msg = is_simple ? "" : (exit_data["unlocked_msg"] || "")
+  reveal_msg = is_simple ? "" : (exit_data["reveal_msg"] || "")
+  on_unlock = is_simple ? "" : (exit_data["on_unlock"] || "")
+  permanently_unlock = is_simple ? false : (exit_data["permanently_unlock"] || false)
+  consume_item = is_simple ? false : (exit_data["consume_item"] || false)
+  sets_flag = is_simple ? "" : (exit_data["sets_flag"] || "")
+
+  has_advanced = !is_simple && (unlock_type != "none" || hidden)
+%>
+
+<div class="exit-fields border border-terminal-green p-3 space-y-2">
+  <!-- Basic Fields -->
+  <div class="flex gap-2">
+    <%= text_field_tag "exit_data[#{index}][direction]", direction,
+        placeholder: "Direction (e.g., north)",
+        class: "w-1/4 bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+    <%= text_field_tag "exit_data[#{index}][destination]", destination,
+        placeholder: "Room ID",
+        class: "flex-1 bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+    <button type="button"
+            data-action="click->exit-form#remove"
+            class="text-sm px-2 py-1 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white">
+      Remove
+    </button>
+  </div>
+
+  <!-- Keywords -->
+  <div>
+    <label class="block mb-1 text-sm font-bold">Keywords (for natural commands)</label>
+    <%= text_field_tag "exit_data[#{index}][keywords]", keywords,
+        placeholder: "door, wooden door, shop door",
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+    <p class="text-xs opacity-60 mt-1">Allows "use crowbar on door" instead of just "use crowbar on north"</p>
+  </div>
+
+  <!-- Advanced Options Toggle -->
+  <div>
+    <label class="flex items-center gap-2 text-sm">
+      <%= check_box_tag "exit_data[#{index}][show_advanced]", "1", has_advanced,
+          data: { action: "change->exit-form#toggleAdvanced" },
+          class: "w-4 h-4" %>
+      <span>Advanced Options</span>
+    </label>
+  </div>
+
+  <!-- Advanced Section -->
+  <div class="exit-advanced space-y-2 pl-4 border-l-2 border-terminal-green" style="display: <%= has_advanced ? 'block' : 'none' %>">
+
+    <!-- Hidden Exit -->
+    <div>
+      <label class="flex items-center gap-2 text-sm">
+        <%= check_box_tag "exit_data[#{index}][hidden]", "1", hidden, class: "w-4 h-4" %>
+        <span>Hidden (must be discovered)</span>
+      </label>
+    </div>
+
+    <!-- Unlock Type -->
+    <div>
+      <label class="block mb-1 text-sm font-bold">Unlock Type</label>
+      <%= select_tag "exit_data[#{index}][unlock_type]",
+          options_for_select([
+            ["None (Open)", "none"],
+            ["Requires Item in Inventory", "requires"],
+            ["Requires Flag", "requires_flag"],
+            ["Use Item On Exit", "use_item"]
+          ], unlock_type),
+          data: { action: "change->exit-form#toggleUnlockFields" },
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+    </div>
+
+    <!-- Requires Item Field -->
+    <div class="unlock-field unlock-requires" style="display: <%= unlock_type == 'requires' ? 'block' : 'none' %>">
+      <label class="block mb-1 text-sm font-bold">Item ID Required</label>
+      <%= text_field_tag "exit_data[#{index}][requires]", requires_item,
+          placeholder: "key",
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+    </div>
+
+    <!-- Requires Flag Field -->
+    <div class="unlock-field unlock-flag" style="display: <%= unlock_type == 'requires_flag' ? 'block' : 'none' %>">
+      <label class="block mb-1 text-sm font-bold">Flag Required</label>
+      <%= text_field_tag "exit_data[#{index}][requires_flag]", requires_flag,
+          placeholder: "lever_pulled",
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+    </div>
+
+    <!-- Use Item Fields -->
+    <div class="unlock-field unlock-use-item" style="display: <%= unlock_type == 'use_item' ? 'block' : 'none' %>">
+      <label class="block mb-1 text-sm font-bold">Item to Use</label>
+      <%= text_field_tag "exit_data[#{index}][use_item]", use_item,
+          placeholder: "iron_key",
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+    </div>
+
+    <!-- Unlock Options (only for use_item) -->
+    <div class="unlock-field unlock-options space-y-2" style="display: <%= unlock_type == 'use_item' ? 'block' : 'none' %>">
+      <label class="flex items-center gap-2 text-sm">
+        <%= check_box_tag "exit_data[#{index}][permanently_unlock]", "1", permanently_unlock, class: "w-4 h-4" %>
+        <span>Permanently Unlock</span>
+      </label>
+      <label class="flex items-center gap-2 text-sm">
+        <%= check_box_tag "exit_data[#{index}][consume_item]", "1", consume_item, class: "w-4 h-4" %>
+        <span>Consume Item When Used</span>
+      </label>
+    </div>
+
+    <!-- Messages -->
+    <div>
+      <label class="block mb-1 text-sm font-bold">Locked Message</label>
+      <%= text_area_tag "exit_data[#{index}][locked_msg]", locked_msg,
+          rows: 2,
+          placeholder: "The door is locked.",
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-bold">Unlocked Message</label>
+      <%= text_area_tag "exit_data[#{index}][unlocked_msg]", unlocked_msg,
+          rows: 2,
+          placeholder: "The door stands open.",
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-bold">Reveal Message (for hidden exits)</label>
+      <%= text_area_tag "exit_data[#{index}][reveal_msg]", reveal_msg,
+          rows: 2,
+          placeholder: "You notice a hidden passage!",
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-bold">On Unlock Message (use_item only)</label>
+      <%= text_area_tag "exit_data[#{index}][on_unlock]", on_unlock,
+          rows: 2,
+          placeholder: "You turn the key and hear a CLUNK!",
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+    </div>
+
+    <!-- Set Flag -->
+    <div>
+      <label class="block mb-1 text-sm font-bold">Set Flag (when unlocked/revealed)</label>
+      <%= text_field_tag "exit_data[#{index}][sets_flag]", sets_flag,
+          placeholder: "door_opened",
+          class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none text-sm" %>
+    </div>
+  </div>
+</div>

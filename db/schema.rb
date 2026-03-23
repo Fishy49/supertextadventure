@@ -10,10 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_13_223626) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_24_052533) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "chapters", force: :cascade do |t|
     t.bigint "game_id", null: false
@@ -65,8 +65,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_13_223626) do
     t.datetime "host_active_at"
     t.boolean "enable_hp", default: true
     t.integer "starting_hp", default: 10
+    t.bigint "world_id"
+    t.jsonb "game_state", default: {}, null: false
     t.index ["name"], name: "index_games_on_name", unique: true
     t.index ["uuid"], name: "index_games_on_uuid", unique: true
+    t.index ["world_id"], name: "index_games_on_world_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -100,10 +103,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_13_223626) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  create_table "worlds", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.jsonb "world_data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   add_foreign_key "chapters", "games"
   add_foreign_key "chapters", "messages", column: "first_message_id"
   add_foreign_key "chapters", "messages", column: "last_message_id"
   add_foreign_key "game_users", "games"
   add_foreign_key "game_users", "users"
+  add_foreign_key "games", "worlds"
   add_foreign_key "messages", "games"
 end

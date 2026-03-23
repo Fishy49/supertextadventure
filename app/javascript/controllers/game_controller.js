@@ -96,18 +96,14 @@ export default class extends Controller {
       window.stimulus_controller("terminalInput", "terminal").clear_input()
       this.errorTarget.style.display = "none"
 
-      if(inputText == "I" || inputText == "INV" || inputText == "INVENTORY") {
-
-      } else {
-        let game_payload = {
-          message: {
-            game_id: this.idValue,
-            game_user_id: this.userIdValue,
-            content: inputText
-          }
+      let game_payload = {
+        message: {
+          game_id: this.idValue,
+          game_user_id: this.userIdValue,
+          content: inputText
         }
-        post("/messages", { body: game_payload, responseKind: "turbo-stream" })
       }
+      post("/messages", { body: game_payload, responseKind: "turbo-stream" })
     }
   }
 

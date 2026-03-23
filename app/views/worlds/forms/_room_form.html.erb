@@ -1,0 +1,49 @@
+<div class="space-y-4">
+  <div>
+    <label class="block mb-1 text-sm font-bold">Name *</label>
+    <%= text_field_tag :name, entity_data["name"],
+        required: true,
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">Description *</label>
+    <%= text_area_tag :description, entity_data["description"],
+        rows: 3,
+        required: true,
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div data-controller="exit-form">
+    <label class="block mb-2 text-sm font-bold">Exits</label>
+    <div data-exit-form-target="container" class="space-y-3">
+      <% exits = entity_data["exits"] || {} %>
+      <% if exits.any? %>
+        <% exits.each_with_index do |(direction, exit_data), index| %>
+          <%= render "worlds/forms/exit_fields", direction: direction, exit_data: exit_data, index: index %>
+        <% end %>
+      <% else %>
+        <%= render "worlds/forms/exit_fields", direction: "", exit_data: "", index: 0 %>
+      <% end %>
+    </div>
+    <button type="button"
+            data-action="click->exit-form#add"
+            class="mt-2 text-xs border border-terminal-green px-2 py-1 hover:bg-terminal-green hover:text-stone-800">
+      + Add Exit
+    </button>
+  </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">Items (comma-separated IDs)</label>
+    <%= text_field_tag :items, (entity_data["items"] || []).join(", "),
+        placeholder: "book, sword, torch",
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">NPCs (comma-separated IDs)</label>
+    <%= text_field_tag :npcs, (entity_data["npcs"] || []).join(", "),
+        placeholder: "ghost, guardian",
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+</div>

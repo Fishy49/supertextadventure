@@ -1,40 +1,51 @@
-<%= form_with(model: game, data: { "turbo-frame": "_top" }) do |form| %>
-  <%= form.hidden_field :created_by %>
-  <% if game.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(game.errors.count, "error") %> prohibited this game from being saved:</h2>
-      <ul>
-        <% game.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+<div data-controller="game-form">
+  <%= form_with(model: game, data: { "turbo-frame": "_top" }) do |form| %>
+    <%= form.hidden_field :created_by %>
+    <% if game.errors.any? %>
+      <div style="color: red">
+        <h2><%= pluralize(game.errors.count, "error") %> prohibited this game from being saved:</h2>
+        <ul>
+          <% game.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-group">
+      <%= form.label :name, style: "display: block" %>
+      <%= form.text_field :name %>
     </div>
-  <% end %>
 
-  <div class="form-group">
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
-  </div>
+    <div class="form-group">
+      <%= form.label :description, style: "display: block" %>
+      <%= form.text_area :description %>
+    </div>
 
-  <div class="form-group">
-    <%= form.label :description, style: "display: block" %>
-    <%= form.text_area :description %>
-  </div>
+    <div class="form-group">
+      <%= form.label :host_display_name, style: "display: block" %>
+      <%= form.text_field :host_display_name, value: game.host_display_name || "Game Master" %>
+    </div>
 
-  <div class="form-group">
-    <%= form.label :host_display_name, style: "display: block" %>
-    <%= form.text_field :host_display_name, value: game.host_display_name || "Game Master" %>
-  </div>
+    <div class="form-group">
+      <%= form.label :game_type, style: "display: block" %>
+      <%= form.select :game_type, options_for_select(game_type_options, "freeform"), {}, {
+        data: {
+          game_form_target: "gameType",
+          action: "change->game-form#toggleWorldSelector"
+        }
+      } %>
+    </div>
 
-  <div class="form-group">
-    <%= form.label :game_type, style: "display: block" %>
-    <%= form.select :game_type, options_for_select(game_type_options, "freeform") %>
-  </div>
+    <div class="form-group" style="display: none;" data-game-form-target="worldSelector">
+      <%= form.label :world_id, "Select World", style: "display: block" %>
+      <%= form.select :world_id, options_for_select(world_options, game.world_id), { include_blank: "Choose a world..." } %>
+    </div>
 
-  <div class="form-group">
-    <%= form.label :status, style: "display: block" %>
-    <%= form.select :status, options_for_select(game_status_options, "closed") %>
-  </div>
+    <div class="form-group">
+      <%= form.label :status, style: "display: block" %>
+      <%= form.select :status, options_for_select(game_status_options, "closed") %>
+    </div>
 
   <div class="form-group" style="display: none;">
     <%= form.label :is_friends_only do %>
@@ -60,7 +71,8 @@
     <%= form.number_field :max_players, { value: (game.max_players || 4), max: 5, min: 1 } %>
   </div>
 
-  <div>
-    <%= form.submit class: "button mt-5 mx-auto" %>
-  </div>
-<% end %>
+    <div>
+      <%= form.submit class: "button mt-5 mx-auto" %>
+    </div>
+  <% end %>
+</div>

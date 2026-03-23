@@ -21,6 +21,6 @@ class SetupController < ApplicationController
   private
 
     def setup_params
-      params.require(:setup).permit(:username, :password, :password_confirmation)
+      params.expect(setup: %i[username password password_confirmation])
     end
 end

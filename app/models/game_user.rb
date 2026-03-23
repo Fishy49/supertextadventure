@@ -12,7 +12,7 @@ class GameUser < ApplicationRecord
   before_create :set_starting_health
 
   after_create_commit :broadcast_new_player
-  after_create_commit :inform_ai_of_player, if: proc { game.game_type == "chatgpt" }
+  after_create_commit :inform_ai_of_player, if: proc { game.chat_ai? }
 
   after_update_commit :create_health_change_event_message, if: :saved_change_to_current_health?
   after_update_commit :broadcast_updated_player_health, if: :saved_change_to_current_health?
@@ -82,14 +82,12 @@ class GameUser < ApplicationRecord
         They are described as follows: \"#{character_description}\""
       )
 
-      client = OpenAI::Client.new
-      response = client.chat(
-        parameters: {
-          model: "gpt-4",
-          messages: chat_log_with_intro_request
-        }
+      client = OpenAI::Client.new(api_key: ENV.fetch("OPENAI_API_KEY", nil))
+      response = client.responses.create(
+        model: game.ai_config.model_name,
+        input: chat_log_with_intro_request
       )
-      ai_response = response.dig("choices", 0, "message", "content")
+      ai_response = response.output_text
 
       Message.create(game_id: game.id, content: ai_response)
     end

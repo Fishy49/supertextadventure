@@ -21,8 +21,8 @@ module Games
                                                                 locals: { game: @game })
           end
         else
-          format.html { render :edit, status: :unprocessable_entity }
-          format.json { render json: @game.errors, status: :unprocessable_entity }
+          format.html { render :edit, status: :unprocessable_content }
+          format.json { render json: @game.errors, status: :unprocessable_content }
         end
       end
     end
@@ -34,7 +34,7 @@ module Games
       end
 
       def current_context_params
-        params.require(:game).permit(:current_context, :is_current_context_ascii)
+        params.expect(game: %i[current_context is_current_context_ascii])
       end
   end
 end

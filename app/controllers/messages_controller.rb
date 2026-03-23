@@ -7,19 +7,16 @@ class MessagesController < ApplicationController
   end
 
   def create
-    message = Message.create(message_params)
+    Message.create(message_params)
 
     respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.append(:messages, partial: "messages/message",
-                                                            locals: { message: message })
-      end
+      format.turbo_stream { head :ok }
     end
   end
 
   private
 
     def message_params
-      params.require(:message).permit(:game_id, :game_user_id, :content)
+      params.expect(message: %i[game_id game_user_id content])
     end
 end

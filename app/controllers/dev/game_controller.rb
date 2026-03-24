@@ -23,6 +23,10 @@ module Dev
         status: "open"
       )
 
+      GameUser.find_or_create_by!(game: game, user: dev_user) do |gu|
+        gu.character_name = "Dev Player"
+      end
+
       session[:dev_game_id] = game.id
 
       redirect_to game_path(id: game.uuid)

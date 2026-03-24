@@ -10,3 +10,6 @@
 
 # Load sample dungeon world
 load Rails.root.join("db/seeds/sample_dungeon.rb")
+
+# Load QA test world (used by /dev/game debug mode)
+load Rails.root.join("db/seeds/feature_test_world.rb")

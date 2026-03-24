@@ -62,7 +62,7 @@ class Game < ApplicationRecord
 
   def current_token_count
     # Approximate token count: ~4 characters per token for GPT models
-    text = messages_for_ai.map { |m| m[:content] }.join
+    text = messages_for_ai.pluck(:content).join
     (text.length / 4.0).ceil
   end
 

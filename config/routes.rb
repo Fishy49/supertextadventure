@@ -68,4 +68,10 @@ Rails.application.routes.draw do
       delete :delete_entity
     end
   end
+
+  unless Rails.env.production?
+    namespace :dev do
+      resource :game, only: %i[show destroy], controller: "game"
+    end
+  end
 end

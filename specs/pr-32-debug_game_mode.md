@@ -1,3 +1,5 @@
+> PR: https://github.com/Fishy49/supertextadventure/pull/32
+
 # Debug Game Mode
 
 A special route available only in development that drops a developer directly

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(gh *)",
+      "Bash(bundle exec rubocop*)",
+      "Bash(bundle install*)",
+      "Bash(PARALLEL_WORKERS=1 bin/rails test*)",
+      "Bash(bin/rails test*)",
+      "Bash(bin/rails db:*)",
+      "Bash(bin/rails routes*)",
+      "Bash(mv specs/*)",
+      "Bash(mkdir -p .claude/skills/*)"
+    ]
+  }
+}

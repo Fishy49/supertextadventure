@@ -6,7 +6,7 @@ module ClassicGame
       def handle(command)
         case command[:verb]
         when :talk
-          handle_talk(command[:target])
+          handle_talk(command[:target], command[:modifier])
         when :give
           handle_give(command[:target], command[:modifier])
         when :attack
@@ -18,23 +18,102 @@ module ClassicGame
 
       private
 
-        def handle_talk(target)
-          return failure("Talk to whom?") unless target
+        def handle_talk(target, modifier)
+          # modifier holds "npc_name" or "npc_name about topic_words"
+          raw = modifier.presence || target.presence
+          return failure("Talk to whom?") unless raw
 
-          # Find the NPC
-          npc_id, npc_def = find_npc(target)
+          # split on " about " to separate npc from topic
+          parts = raw.split(/\s+about\s+/, 2)
+          npc_input   = parts[0].strip
+          topic_input = parts[1]&.strip
+
+          npc_id, npc_def = find_npc(npc_input)
           return failure("You don't see anyone like that here.") unless npc_def
           return failure("You don't see anyone like that here.") unless npc_in_room?(npc_id)
 
-          # Get dialogue
           dialogue = npc_def["dialogue"]
           return failure("#{npc_def['name']} doesn't seem interested in talking.") unless dialogue
 
-          # For now, return default dialogue
-          # Future: could implement conversation trees, quest states, etc.
-          response = dialogue["default"] || "#{npc_def['name']} nods at you."
+          return handle_greeting(npc_def) unless topic_input
 
-          success("#{npc_def['name']} says: \"#{response}\"")
+          handle_topic(npc_id, npc_def, topic_input)
+        end
+
+        def handle_greeting(npc_def)
+          greeting = npc_def.dig("dialogue", "greeting") ||
+                     npc_def.dig("dialogue", "default") ||
+                     "#{npc_def['name']} nods at you."
+          npc_says(npc_def, greeting)
+        end
+
+        def handle_topic(npc_id, npc_def, topic_input)
+          dialogue = npc_def["dialogue"]
+          topics   = dialogue["topics"] || {}
+          words    = topic_input.downcase.split
+
+          matched_id, matched_def = topics.find do |_tid, tdef|
+            keywords = (tdef["keywords"] || []).map(&:downcase)
+            words.any? { |w| keywords.include?(w) }
+          end
+
+          unless matched_def
+            default_text = dialogue["default"] || "#{npc_def['name']} shrugs."
+            return npc_says(npc_def, default_text)
+          end
+
+          unless topic_unlocked?(npc_id, matched_id, matched_def, topics)
+            locked = matched_def["locked_text"] || dialogue["default"] || "#{npc_def['name']} shrugs."
+            return npc_says(npc_def, locked)
+          end
+
+          locked_response = locked_response_for(npc_def, matched_def, dialogue)
+          return locked_response if locked_response
+
+          game.set_flag(matched_def["sets_flag"], true) if matched_def["sets_flag"]
+          record_leads_to_unlocks(npc_id, matched_def)
+          npc_says(npc_def, matched_def["text"])
+        end
+
+        def locked_response_for(npc_def, topic_def, dialogue)
+          if (req_flag = topic_def["requires_flag"]) && !game.get_flag(req_flag)
+            locked = topic_def["locked_text"] || dialogue["default"] || "#{npc_def['name']} shrugs."
+            return npc_says(npc_def, locked)
+          end
+
+          if (req_item = topic_def["requires_item"]) && !item?(req_item)
+            locked = topic_def["locked_text"] || dialogue["default"] || "#{npc_def['name']} shrugs."
+            return npc_says(npc_def, locked)
+          end
+
+          nil
+        end
+
+        def topic_unlocked?(npc_id, topic_id, _topic_def, all_topics)
+          gated = all_topics.any? do |_tid, tdef|
+            (tdef["leads_to"] || []).include?(topic_id)
+          end
+          return true unless gated
+
+          unlocked = player_state.dig("dialogue_unlocked", npc_id) || []
+          unlocked.include?(topic_id)
+        end
+
+        def record_leads_to_unlocks(npc_id, topic_def)
+          leads_to = topic_def["leads_to"]
+          return unless leads_to&.any?
+
+          new_state = player_state.dup
+          new_state["dialogue_unlocked"] = (player_state["dialogue_unlocked"] || {}).dup
+          new_state["dialogue_unlocked"][npc_id] ||= []
+          new_state["dialogue_unlocked"][npc_id] = (
+            new_state["dialogue_unlocked"][npc_id] + leads_to
+          ).uniq
+          update_player_state(new_state)
+        end
+
+        def npc_says(npc_def, text)
+          success("#{npc_def['name']} says: \"#{text}\"")
         end
 
         def handle_give(item_target, npc_target)

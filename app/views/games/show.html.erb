@@ -1,3 +1,6 @@
+<% if Rails.env.development? && session[:dev_game_id].present? && session[:dev_game_id] == @game.id %>
+  <%= render "debug_bar", game: @game, dev_user_id: Dev::GameController::DEV_USER_ID %>
+<% end %>
 <%= turbo_stream_from(@game, :messages) %>
 <%= turbo_stream_from(@game, :state) %>
 <% if @game.host?(current_user) %>

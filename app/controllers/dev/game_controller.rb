@@ -2,22 +2,26 @@
 
 module Dev
   class GameController < ApplicationController
-    DEV_USER_ID = 999_999
+    DEV_USERNAME = "dev_player"
 
     before_action :require_development!
 
     # GET /dev/game
     def show
-      session[:user_id] = DEV_USER_ID
+      dev_user = find_or_create_dev_user
+      session[:user_id] = dev_user.id
 
       world = World.find_by(name: "QA Test World")
       return render :missing_world, status: :ok if world.nil?
 
-      game = Game.find_or_create_by!(created_by: DEV_USER_ID, game_type: :classic) do |g|
-        g.name = "Dev Game"
-        g.world = world
-        g.status = "open"
-      end
+      game = Game.find_by(created_by: dev_user.id, game_type: :classic)
+      game ||= Game.create!(
+        created_by: dev_user.id,
+        game_type: :classic,
+        name: "Dev Game [#{dev_user.id}]",
+        world: world,
+        status: "open"
+      )
 
       session[:dev_game_id] = game.id
 
@@ -26,7 +30,8 @@ module Dev
 
     # DELETE /dev/game
     def destroy
-      game = Game.find_by(created_by: DEV_USER_ID, game_type: :classic)
+      dev_user = User.find_by(username: DEV_USERNAME)
+      game = Game.find_by(created_by: dev_user&.id, game_type: :classic)
       game&.destroy
 
       session.delete(:dev_game_id)
@@ -34,21 +39,13 @@ module Dev
       redirect_to dev_game_path
     end
 
-    # Override current_user so that User.find is never called for the spoofed id.
-    # This prevents ActiveRecord::RecordNotFound when navigating to /dev/game.
-    def current_user
-      if session[:user_id] == DEV_USER_ID
-        @current_user ||= OpenStruct.new( # rubocop:disable Style/OpenStructUse
-          id: DEV_USER_ID,
-          username: "Dev Player",
-          is_owner?: false
-        )
-      else
-        super
-      end
-    end
-
     private
+
+      def find_or_create_dev_user
+        User.find_or_create_by!(username: DEV_USERNAME) do |u|
+          u.password = SecureRandom.hex(16)
+        end
+      end
 
       def require_development!
         raise ActionController::RoutingError, "Not Found" if rails_env.production?

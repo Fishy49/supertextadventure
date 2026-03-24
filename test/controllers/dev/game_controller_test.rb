@@ -4,7 +4,7 @@ require "test_helper"
 
 module Dev
   class GameControllerTest < ActionDispatch::IntegrationTest
-    DEV_USER_ID = Dev::GameController::DEV_USER_ID
+    DEV_USERNAME = Dev::GameController::DEV_USERNAME
 
     QA_WORLD_DATA = {
       "meta" => { "starting_room" => "start", "version" => "1.0" },
@@ -24,10 +24,14 @@ module Dev
       @qa_world = World.find_or_create_by!(name: "QA Test World") do |w|
         w.world_data = QA_WORLD_DATA.deep_dup
       end
+      @dev_user = User.find_or_create_by!(username: DEV_USERNAME) do |u|
+        u.password = SecureRandom.hex(16)
+      end
     end
 
     teardown do
-      Game.where(created_by: DEV_USER_ID).destroy_all
+      Game.where(created_by: @dev_user.id).destroy_all
+      @dev_user.destroy
       World.where(name: "QA Test World").destroy_all
     end
 
@@ -38,11 +42,11 @@ module Dev
 
       assert_response :redirect
       assert_match %r{/games/}, response.location
-      assert_equal DEV_USER_ID, session[:user_id]
+      assert_equal User.find_by(username: DEV_USERNAME).id, session[:user_id]
     end
 
     test "GET /dev/game creates a game on first visit" do
-      assert_difference "Game.where(created_by: #{DEV_USER_ID}).count", 1 do
+      assert_difference "Game.where(created_by: #{@dev_user.id}).count", 1 do
         get "/dev/game"
       end
     end
@@ -50,7 +54,7 @@ module Dev
     test "GET /dev/game reuses existing dev game and does not duplicate" do
       get "/dev/game"
 
-      assert_no_difference "Game.where(created_by: #{DEV_USER_ID}).count" do
+      assert_no_difference "Game.where(created_by: #{@dev_user.id}).count" do
         get "/dev/game"
       end
     end
@@ -58,7 +62,7 @@ module Dev
     test "GET /dev/game stores dev_game_id in session" do
       get "/dev/game"
 
-      game = Game.find_by!(created_by: DEV_USER_ID, game_type: "classic")
+      game = Game.find_by!(created_by: @dev_user.id, game_type: "classic")
       assert_equal game.id, session[:dev_game_id]
     end
 
@@ -75,12 +79,12 @@ module Dev
 
     test "DELETE /dev/game destroys dev game and redirects back to /dev/game" do
       get "/dev/game"
-      assert Game.find_by(created_by: DEV_USER_ID, game_type: "classic")
+      assert Game.find_by(created_by: @dev_user.id, game_type: "classic")
 
       delete "/dev/game"
 
       assert_redirected_to "/dev/game"
-      assert_nil Game.find_by(created_by: DEV_USER_ID, game_type: "classic")
+      assert_nil Game.find_by(created_by: @dev_user.id, game_type: "classic")
     end
 
     test "DELETE /dev/game clears dev_game_id from session" do

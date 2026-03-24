@@ -1,4 +1,4 @@
-<% player = game.player_state(dev_user_id) %>
+<% player = game.player_state(current_user.id) %>
 <% inventory_display = player["inventory"].presence&.join(", ") || "(empty)" %>
 <% flags_display = player["flags"].presence&.map { |k, v| "#{k}: #{v}" }&.join(", ") || "(none)" %>
 

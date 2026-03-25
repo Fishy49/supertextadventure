@@ -52,4 +52,10 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Do not block system test visits waiting for Turbo Cable Stream Sources to
+  # connect. System tests interact with the real browser and Turbo Streams are
+  # delivered synchronously via the async Action Cable adapter, so automatic
+  # connection-waiting is not needed and causes spurious timeouts.
+  config.turbo.test_connect_after_actions = []
 end

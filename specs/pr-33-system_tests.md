@@ -4,7 +4,7 @@
 
 ## Acceptance Criteria
 
-- Cuprite replaces Selenium as the system test driver; existing login test still passes
+- Cuprite is the sole system test driver; `selenium-webdriver` and `webdrivers` gems are removed
 - `bin/rails test:system` runs all system tests headlessly in CI and passes on a clean checkout
 - System tests cover: auth (login/logout), game lobby (browse/join), game hosting (create/start), classic game play via `/dev/game` (load, send command, reset), world editor (view/edit), and edge cases (404, unauthenticated redirect)
 - A failing system test blocks CI (PR cannot be merged)
@@ -14,20 +14,18 @@
 
 Add a comprehensive system test suite that exercises the full browser stack using Capybara + Cuprite (Chrome DevTools Protocol, no Node/chromedriver process). These tests run in CI and catch regressions that unit/controller tests miss — things like Turbo Stream wiring, Stimulus controller behaviour, and multi-step user flows.
 
-The existing `test/system/login_test.rb` uses Selenium + Chrome and is a good starting point, but we need broader coverage and a faster driver.
+The existing `test/system/login_test.rb` uses Selenium + Chrome and will be migrated to Cuprite as part of this work.
 
 ## Goals
 
-- Replace the Selenium driver with Cuprite (CDP-based, faster, no chromedriver required)
+- Use Cuprite as the sole system test driver (CDP-based, faster, no chromedriver required)
 - Add system tests for all critical user-facing flows
 - Run headlessly in CI (`CI=true` or `HEADLESS=true` env var)
 - Tests must be self-contained — no reliance on pre-existing DB rows beyond fixtures
 
 ## Driver: Cuprite
 
-Add `cuprite` and `capybara-cuprite` gems to the `:test` group. Update `ApplicationSystemTestCase` to use Cuprite when `ENV["CI"]` is set or always. Cuprite connects directly to Chrome via CDP — no `webdrivers` or `chromedriver-helper` needed.
-
-Keep the existing Selenium path as a fallback so developers can still run with `driven_by :selenium` locally if they prefer.
+Add `cuprite` and `capybara-cuprite` gems to the `:test` group. Remove `selenium-webdriver` and `webdrivers`. Update `ApplicationSystemTestCase` to always use Cuprite. Cuprite connects directly to Chrome via CDP — no chromedriver process needed. Chrome runs headlessly when `CI=true` or `HEADLESS=true`.
 
 ## Test Cases
 
@@ -115,7 +113,7 @@ Set `HEADLESS=true` (or rely on `CI=true`) so Chrome runs headlessly. The job sh
 
 | Path | Specific changes |
 |------|-----------------|
-| `Gemfile` | Add `gem "cuprite"` and `gem "capybara-cuprite"` to the `:test` group; remove `gem "webdrivers"` |
+| `Gemfile` | Add `gem "cuprite"` and `gem "capybara-cuprite"` to the `:test` group; remove `gem "webdrivers"` and `gem "selenium-webdriver"` |
 | `test/application_system_test_case.rb` | Replace `driven_by :selenium` default with Cuprite when `ENV["CI"]` or `ENV["HEADLESS"]` is set; set `Capybara.default_max_wait_time = 5`; add `driven_by :cuprite` path |
 | `.github/workflows/ci.yml` | Add a second job step (after "Run tests") that runs `bin/rails test:system` with `HEADLESS=true`; add Chrome setup step using `actions/setup-chrome@v1` |
 | `test/fixtures/worlds.yml` | Add a `qa_test_world` fixture entry with minimal valid `world_data` JSON so `classic_game_test.rb` does not depend on `db:seed` |
@@ -125,12 +123,12 @@ Set `HEADLESS=true` (or rely on `CI=true`) so Chrome runs headlessly. The job sh
 
 ### 3. Implementation steps
 
-**Step 1 — Add Cuprite gems**
+**Step 1 — Swap gems**
 
 In `Gemfile`, inside `group :test do`:
 - Add `gem "cuprite"` (headless Chrome via CDP, no chromedriver)
 - Add `gem "capybara-cuprite"` (Capybara driver registration)
-- Remove `gem "webdrivers"` (no longer needed)
+- Remove `gem "selenium-webdriver"` and `gem "webdrivers"` (no longer needed)
 
 Run `bundle install` after editing.
 
@@ -144,20 +142,18 @@ Replace the entire file body with:
 # frozen_string_literal: true
 
 require "test_helper"
+require "capybara/cuprite"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  if ENV["CI"] || ENV["HEADLESS"]
-    driven_by :cuprite, using: :chrome, screen_size: [1400, 1400],
-                        options: { headless: true }
-  else
-    driven_by :selenium, using: :chrome, screen_size: [1400, 1400]
-  end
+  driven_by :cuprite, using: :chrome, screen_size: [1400, 1400],
+                      options: { headless: ENV["CI"].present? || ENV["HEADLESS"].present?,
+                                 browser_options: { "no-sandbox" => nil } }
 
   Capybara.default_max_wait_time = 5
 end
 ```
 
-Why: Cuprite registers as `:cuprite` driver through `capybara-cuprite`. The fallback keeps developer local workflow intact.
+Why: Cuprite is always used. Headless mode activates automatically in CI or when `HEADLESS=true`. The `no-sandbox` flag is required on Linux CI runners.
 
 **Step 3 — Add `system_test_helper.rb`**
 
@@ -322,7 +318,7 @@ Two tests.
 
 ### 4. Test plan
 
-**AC: Cuprite replaces Selenium as the system test driver; existing login test still passes**
+**AC: Cuprite is the sole system test driver**
 
 - **Test name**: `AuthTest#test_login_with_valid_credentials`
 - **Setup**: `ENV["CI"] = "true"` (set in CI workflow); `users(:owner)` fixture present

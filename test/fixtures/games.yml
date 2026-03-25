@@ -21,3 +21,17 @@ two:
   closed_at: 2022-01-11 23:35:17
   is_friends_only: false
   max_players: 1
+
+classic_open:
+  uuid: "classic-open-uuid-001"
+  name: "Classic Open Game"
+  game_type: "classic"
+  created_by: 1
+  status: "open"
+  is_friends_only: false
+  max_players: 4
+  world: qa_test_world
+  game_state: <%= {
+    "world_snapshot" => { "meta" => { "starting_room" => "test_room" }, "rooms" => { "test_room" => { "name" => "Test Chamber", "description" => "A bare stone chamber.", "exits" => {}, "items" => [], "npcs" => [] } }, "items" => {}, "npcs" => {}, "creatures" => {} },
+    "player_states" => {}, "room_states" => {}, "global_flags" => {}, "container_states" => {}
+  }.to_json %>

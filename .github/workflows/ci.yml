@@ -42,5 +42,13 @@ jobs:
       - name: Run tests
         run: bin/rails test
 
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Run system tests
+        run: bin/rails test:system
+        env:
+          HEADLESS: "true"
+
       - name: Run RuboCop
         run: bundle exec rubocop --parallel

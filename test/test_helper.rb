@@ -3,6 +3,7 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "sucker_punch/testing/inline"
 
 Dir[File.join(__dir__, "support", "**", "*.rb")].each { |f| require f }
 

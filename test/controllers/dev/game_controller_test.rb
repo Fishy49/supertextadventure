@@ -32,7 +32,6 @@ module Dev
     teardown do
       Game.where(created_by: @dev_user.id).destroy_all
       @dev_user.destroy
-      World.where(name: "QA Test World").destroy_all
     end
 
     # ─── GET /dev/game ────────────────────────────────────────────────────────
@@ -67,6 +66,8 @@ module Dev
     end
 
     test "GET /dev/game shows missing world error when QA Test World does not exist" do
+      # Remove games referencing the QA world before destroying it
+      Game.where(world: @qa_world).destroy_all
       @qa_world.destroy
 
       get "/dev/game"

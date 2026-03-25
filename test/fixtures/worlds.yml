@@ -3,9 +3,18 @@
 one:
   name: MyString
   description: MyText
-  world_data: 
+  world_data:
 
 two:
   name: MyString
   description: MyText
-  world_data: 
+  world_data:
+
+qa_test_world:
+  name: "QA Test World"
+  description: "A minimal world for QA / developer testing"
+  world_data: <%= {
+    "meta" => { "starting_room" => "test_room", "version" => "1.0", "author" => "SuperTextAdventure" },
+    "rooms" => { "test_room" => { "name" => "Test Chamber", "description" => "A bare stone chamber used for developer testing. Nothing of interest here.", "exits" => {}, "items" => [], "npcs" => [] } },
+    "items" => {}, "npcs" => {}, "creatures" => {}
+  }.to_json %>

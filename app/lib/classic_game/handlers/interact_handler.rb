@@ -64,7 +64,7 @@ module ClassicGame
 
         def handle_talk_topic(npc_def, dialogue, topic_name)
           topics = dialogue["topics"]
-          return failure("#{npc_def['name']} doesn't know about that.") unless topics
+          return handle_no_topic_match(npc_def, dialogue) unless topics
 
           topic_id, topic = find_topic_by_keyword(topics, topic_name)
           return handle_no_topic_match(npc_def, dialogue) unless topic

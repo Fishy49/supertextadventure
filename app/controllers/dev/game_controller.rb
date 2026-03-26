@@ -38,12 +38,22 @@ module Dev
       game = Game.find_by(created_by: dev_user&.id, game_type: :classic)
       game&.destroy
 
+      refresh_qa_world
+
       session.delete(:dev_game_id)
 
       redirect_to dev_game_path
     end
 
     private
+
+      def refresh_qa_world
+        require Rails.root.join("test/support/qa_world_data")
+        world = World.find_by(name: "QA Test World")
+        return unless world
+
+        world.update!(world_data: TestSupport::QaWorldData.data)
+      end
 
       def find_or_create_dev_user
         User.find_or_create_by!(username: DEV_USERNAME) do |u|

@@ -293,7 +293,22 @@ module ClassicGame
           update_player_state(new_player_state)
 
           # Set defeat flag if specified
-          game.set_flag(creature_def["sets_flag_on_defeat"], true) if creature_def["sets_flag_on_defeat"]
+          if creature_def["sets_flag_on_defeat"]
+            flag_name = creature_def["sets_flag_on_defeat"]
+            game.set_flag(flag_name, true)
+
+            # Auto-reveal any hidden exits now unlocked by this flag
+            room_id = player_state["current_room"]
+            room_def = world_snapshot.dig("rooms", room_id)
+            (room_def["exits"] || {}).each do |direction, exit_data|
+              next unless exit_data.is_a?(Hash) && exit_data["hidden"]
+              next if game.exit_revealed?(room_id, direction.to_s)
+              next unless exit_data["requires_flag"] == flag_name
+
+              game.reveal_exit(room_id, direction.to_s)
+              lines << "" << (exit_data["reveal_msg"] || "A new passage has been revealed to the #{direction}.")
+            end
+          end
 
           success(lines.join("\n"))
         end

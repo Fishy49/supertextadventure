@@ -16,7 +16,8 @@ module TestSupport
       {
         "starting_room" => "town_square",
         "version" => "2.0",
-        "author" => "SuperTextAdventure"
+        "author" => "SuperTextAdventure",
+        "description" => "A QA world that has lots of things to test"
       }
     end
 
@@ -104,7 +105,7 @@ module TestSupport
         "name" => "Secret Alcove",
         "description" => "A small hidden chamber carved into the rock. Glittering crystals line the walls.",
         "exits" => { "west" => "cave" },
-        "items" => ["shield"],
+        "items" => [],
         "npcs" => []
       }
     end

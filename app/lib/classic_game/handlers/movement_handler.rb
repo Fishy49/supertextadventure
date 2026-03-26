@@ -31,7 +31,6 @@ module ClassicGame
           exit_data["unlocked_msg"]
           permanently_unlock = exit_data["permanently_unlock"]
           hidden = exit_data["hidden"]
-          reveal_msg = exit_data["reveal_msg"]
 
           # Check if exit is hidden and not yet revealed
           if hidden && direction && !game.exit_revealed?(player_state["current_room"], direction)
@@ -39,8 +38,6 @@ module ClassicGame
             return failure("You can't go that way.") unless requires_flag && game.get_flag(requires_flag)
 
             game.reveal_exit(player_state["current_room"], direction)
-            return success(reveal_msg) if reveal_msg
-
           end
 
           # Check if exit is permanently unlocked
@@ -122,6 +119,16 @@ module ClassicGame
             lines << "Present: #{npc_names.join(', ')}"
           end
 
+          # List creatures
+          creatures = room_state["creatures"] || []
+          if creatures.any?
+            lines << ""
+            creature_names = creatures.map do |creature_id|
+              world_snapshot.dig("creatures", creature_id, "name") || creature_id
+            end
+            lines << "Creatures: #{creature_names.join(', ')}"
+          end
+
           # List exits (filter out hidden unrevealed exits)
           exits = room_def["exits"] || {}
           visible_exits = exits.select do |direction, exit_data|
@@ -136,12 +143,17 @@ module ClassicGame
           if visible_exits.any?
             lines << ""
 
-            # Check if any exits have unlocked messages to show
+            # Check if any exits have descriptive messages to show
             exit_descriptions = []
             visible_exits.each do |direction, exit_data|
               next unless exit_data.is_a?(Hash)
 
-              # Check if this exit has been unlocked and has an unlocked_msg
+              # Show reveal_msg for revealed hidden exits
+              if exit_data["hidden"] && exit_data["reveal_msg"].present? && game.exit_revealed?(room_id, direction.to_s)
+                exit_descriptions << exit_data["reveal_msg"]
+              end
+
+              # Show unlocked_msg for unlocked exits
               if exit_data["unlocked_msg"].present? && game.exit_unlocked?(room_id, direction.to_s)
                 exit_descriptions << exit_data["unlocked_msg"]
               end

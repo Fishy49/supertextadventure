@@ -54,7 +54,7 @@ module ClassicGame
         end
 
         def handle_talk_greeting(npc_def, dialogue)
-          response = dialogue["default"] || "#{npc_def['name']} nods at you."
+          response = dialogue["greeting"] || dialogue["default"] || "#{npc_def['name']} nods at you."
 
           # Set flag if specified on greeting
           game.set_flag(dialogue["sets_flag"], true) if dialogue["sets_flag"]
@@ -66,29 +66,78 @@ module ClassicGame
           topics = dialogue["topics"]
           return failure("#{npc_def['name']} doesn't know about that.") unless topics
 
-          topic = topics[topic_name]
-          return failure("#{npc_def['name']} doesn't know about that.") unless topic
+          topic_id, topic = find_topic_by_keyword(topics, topic_name)
+          return handle_no_topic_match(npc_def, dialogue) unless topic
+
+          # Check leads_to locking
+          if topic_locked_by_leads_to?(topic_id, topics)
+            locked_response = topic["locked_text"] || dialogue["default"] || "I wouldn't know anything about that."
+            return success("#{npc_def['name']} says: \"#{locked_response}\"")
+          end
 
           # Check flag requirement
           if topic["requires_flag"] && !game.get_flag(topic["requires_flag"])
-            return failure("#{npc_def['name']} says: \"#{topic['locked_text']}\"")
+            locked_response = topic["locked_text"] || dialogue["default"] || "I wouldn't know anything about that."
+            return success("#{npc_def['name']} says: \"#{locked_response}\"")
           end
 
           # Check item requirement
           if topic["requires_item"] && !item?(topic["requires_item"])
-            return failure("#{npc_def['name']} says: \"#{topic['locked_text']}\"")
+            locked_response = topic["locked_text"] || dialogue["default"] || "I wouldn't know anything about that."
+            return success("#{npc_def['name']} says: \"#{locked_response}\"")
           end
 
           # Set flag if specified
           game.set_flag(topic["sets_flag"], true) if topic["sets_flag"]
 
+          # Unlock subtopics via leads_to
+          if topic["leads_to"]
+            Array(topic["leads_to"]).each do |subtopic_id|
+              game.set_flag("dialogue_unlocked_#{subtopic_id}", true)
+            end
+          end
+
           # Build response
           response = "#{npc_def['name']} says: \"#{topic['text']}\""
 
           # Append leads_to hint
-          response += "\n\nYou could ask about '#{topic['leads_to']}'." if topic["leads_to"]
+          if topic["leads_to"]
+            subtopic_names = Array(topic["leads_to"]).join(", ")
+            response += "\n\nYou could ask about: #{subtopic_names}."
+          end
 
           success(response)
+        end
+
+        def find_topic_by_keyword(topics, input)
+          input_words = input.downcase.split(/\s+/)
+
+          # Try keyword match
+          topics.each do |topic_id, topic_def|
+            keywords = topic_def["keywords"] || []
+            return [topic_id, topic_def] if input_words.any? { |word| keywords.any? { |kw| kw.downcase == word } }
+          end
+
+          # Fall back to exact topic key match
+          topic_def = topics[input.downcase]
+          return [input.downcase, topic_def] if topic_def
+
+          [nil, nil]
+        end
+
+        def topic_locked_by_leads_to?(topic_id, topics)
+          topics.each_value do |other_topic|
+            leads_to = other_topic["leads_to"] || []
+            next unless Array(leads_to).include?(topic_id)
+
+            return true unless game.get_flag("dialogue_unlocked_#{topic_id}")
+          end
+          false
+        end
+
+        def handle_no_topic_match(npc_def, dialogue)
+          default_text = dialogue["default"] || "I wouldn't know anything about that."
+          success("#{npc_def['name']} says: \"#{default_text}\"")
         end
 
         def handle_give(item_target, npc_target)

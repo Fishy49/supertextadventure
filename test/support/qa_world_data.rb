@@ -176,6 +176,8 @@ module TestSupport
           "keywords" => ["crier", "town crier"],
           "description" => "A loud man in official garb.",
           "dialogue" => {
+            "greeting" => "Hear ye! The innkeeper at the tavern knows many secrets. " \
+                          "The tower is locked by ancient magic!",
             "default" => "Hear ye! The innkeeper at the tavern knows many secrets. " \
                          "The tower is locked by ancient magic!",
             "sets_flag" => "spoke_to_crier"
@@ -192,18 +194,30 @@ module TestSupport
         "keywords" => %w[innkeeper keeper],
         "description" => "A jovial woman behind the bar.",
         "dialogue" => {
+          "greeting" => "Welcome to the tavern! What would you like to know?",
           "default" => "Welcome to the tavern! What would you like to know?",
           "topics" => {
             "rooms" => {
+              "keywords" => %w[rooms areas room],
               "text" => "There are five main areas in this town. " \
-                        "The square, the tavern, the market, the cave, and the tower.",
-              "leads_to" => "tower"
+                        "The square, the tavern, the market, the cave, and the tower."
             },
             "tower" => innkeeper_tower_topic,
             "supplies" => {
+              "keywords" => %w[supplies chest],
               "text" => "Ah, you have the key! The chest in the corner holds a potion that might help you.",
               "requires_item" => "rusty_key",
               "locked_text" => "The innkeeper glances at the chest. 'That chest needs a special key to open.'"
+            },
+            "rumors" => {
+              "keywords" => %w[rumors rumor gossip],
+              "text" => "Folk say there's something lurking in the cellar beneath the tavern.",
+              "leads_to" => ["cellar"]
+            },
+            "cellar" => {
+              "keywords" => %w[cellar basement below],
+              "text" => "The cellar entrance is behind the bar. Be careful down there.",
+              "locked_text" => "The innkeeper shrugs. 'What cellar? I don't know what you mean.'"
             }
           }
         }
@@ -212,6 +226,7 @@ module TestSupport
 
     def self.innkeeper_tower_topic
       {
+        "keywords" => ["tower"],
         "text" => "The tower can be unlocked with the right knowledge. " \
                   "I've done it for you — the gate should open now.",
         "requires_flag" => "spoke_to_crier",
@@ -230,6 +245,7 @@ module TestSupport
         "gives_item" => "enchanted_sword",
         "accept_message" => "The merchant's eyes light up! 'A gem! Here, take this enchanted sword in return.'",
         "dialogue" => {
+          "greeting" => "Looking to trade? I'm after a sparkling gem. Bring me one and I'll make it worth your while.",
           "default" => "Looking to trade? I'm after a sparkling gem. Bring me one and I'll make it worth your while."
         }
       }

@@ -9,6 +9,7 @@ module QaWorld
       find(".terminal-input").click
       find(".terminal-input").send_keys("go south", :return)
       assert_text "The Cave"
+      assert_text "Cave Spider"
     end
 
     test "move east from town_square to tavern" do

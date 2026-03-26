@@ -1,27 +1,11 @@
 # frozen_string_literal: true
 
 # QA Test World — used by the debug game mode route (/dev/game).
-# Minimal world with a single room to keep tests fast.
+# Full-featured world for manual QA and system tests.
 
-World.find_or_create_by!(name: "QA Test World") do |world|
-  world.description = "A minimal world for QA / developer testing"
-  world.world_data = {
-    "meta" => {
-      "starting_room" => "test_room",
-      "version" => "1.0",
-      "author" => "SuperTextAdventure"
-    },
-    "rooms" => {
-      "test_room" => {
-        "name" => "Test Chamber",
-        "description" => "A bare stone chamber used for developer testing. Nothing of interest here.",
-        "exits" => {},
-        "items" => [],
-        "npcs" => []
-      }
-    },
-    "items" => {},
-    "npcs" => {},
-    "creatures" => {}
-  }
-end
+require_relative "../../test/support/qa_world_data"
+
+world = World.find_or_initialize_by(name: "QA Test World")
+world.description = "A full-featured world for QA / developer testing"
+world.world_data = TestSupport::QaWorldData.data
+world.save!

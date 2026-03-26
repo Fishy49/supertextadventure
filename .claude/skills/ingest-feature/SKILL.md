@@ -3,6 +3,8 @@ name: ingest-feature
 description: Ingest a feature spec from specs/, create a branch and draft PR, rename the spec file with the PR number, and add a PR link to the top of the file.
 argument-hint: [spec-filename]
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(git *), Bash(gh *)
+model: sonnet
+effort: low
 context: fork
 ---
 

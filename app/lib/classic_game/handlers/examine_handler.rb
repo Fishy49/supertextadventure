@@ -226,12 +226,17 @@ module ClassicGame
           if visible_exits.any?
             lines << ""
 
-            # Check if any exits have unlocked messages to show
+            # Check if any exits have descriptive messages to show
             exit_descriptions = []
             visible_exits.each do |direction, exit_data|
               next unless exit_data.is_a?(Hash)
 
-              # Check if this exit has been unlocked and has an unlocked_msg
+              # Show reveal_msg for revealed hidden exits
+              if exit_data["hidden"] && exit_data["reveal_msg"].present? && game.exit_revealed?(room_id, direction.to_s)
+                exit_descriptions << exit_data["reveal_msg"]
+              end
+
+              # Show unlocked_msg for unlocked exits
               if exit_data["unlocked_msg"].present? && game.exit_unlocked?(room_id, direction.to_s)
                 exit_descriptions << exit_data["unlocked_msg"]
               end

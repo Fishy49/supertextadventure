@@ -106,6 +106,8 @@ module ClassicGame
             handle_unlock(item_id, item_def, use_action, modifier)
           when "message"
             success(use_action["text"])
+          when "heal"
+            handle_heal(item_id, item_def, use_action)
           when "script"
             # For future: custom script execution
             failure("That doesn't do anything right now.")
@@ -127,6 +129,25 @@ module ClassicGame
           end
 
           success(use_action["success_msg"] || "You use the #{item_def['name']}.")
+        end
+
+        def handle_heal(item_id, item_def, use_action)
+          heal_amount = use_action["amount"] || 5
+          new_player_state = player_state.dup
+          current_health = new_player_state["health"] || 10
+          max_health = new_player_state["max_health"] || 10
+
+          new_health = [current_health + heal_amount, max_health].min
+          new_player_state["health"] = new_health
+
+          # Remove item if consumable
+          new_player_state["inventory"] = (new_player_state["inventory"] || []) - [item_id] if item_def["consumable"]
+
+          update_player_state(new_player_state)
+
+          actual_heal = new_health - current_health
+          message = use_action["text"] || "You use the #{item_def['name']} and recover #{actual_heal} health!"
+          success(message)
         end
 
         def handle_reveal_exit(_item_id, _item_def, reveal_data)

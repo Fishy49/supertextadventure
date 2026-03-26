@@ -26,7 +26,7 @@ class HostTest < ApplicationSystemTestCase
     visit game_url(id: games(:classic_open).uuid)
     find(".terminal-input").click
     find(".terminal-input").send_keys("look", :return)
-    assert_text "Test Chamber"
+    assert_text "Town Square"
   end
 
   test "mute all players" do

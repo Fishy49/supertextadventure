@@ -16,7 +16,7 @@ class WorldEditorTest < ApplicationSystemTestCase
   test "edit room description via entity modal" do
     visit edit_world_url(worlds(:qa_test_world))
     # Click the Edit button for the test_room in the preview panel
-    first(:link, "Edit", href: /entity_form.*entity_id=test_room/).click
+    first(:link, "Edit", href: /entity_form.*entity_id=town_square/).click
     # Wait for the entity modal slide panel to appear
     assert_selector "textarea[name='description']"
     fill_in "description", with: "Updated room description for testing"

@@ -1,3 +1,4 @@
+<% require_relative "../support/qa_world_data" %>
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
@@ -32,6 +33,9 @@ classic_open:
   max_players: 4
   world: qa_test_world
   game_state: <%= {
-    "world_snapshot" => { "meta" => { "starting_room" => "test_room" }, "rooms" => { "test_room" => { "name" => "Test Chamber", "description" => "A bare stone chamber.", "exits" => {}, "items" => [], "npcs" => [] } }, "items" => {}, "npcs" => {}, "creatures" => {} },
-    "player_states" => {}, "room_states" => {}, "global_flags" => {}, "container_states" => {}
+    "world_snapshot" => TestSupport::QaWorldData.data,
+    "player_states" => {},
+    "room_states" => {},
+    "global_flags" => {},
+    "container_states" => {}
   }.to_json %>

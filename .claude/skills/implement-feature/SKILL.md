@@ -73,8 +73,28 @@ Run each command as a separate tool call:
 2. `git commit -m "feat: <feature title from spec>"`
 3. `git push`
 4. Run `gh pr view {number} --json body -q .body` — capture the output as the current body
-5. Run `gh pr edit {number} --body "{current body}\n\n## Summary\n\n<2-3 sentences on what was implemented>"`
-   where `{current body}` is the literal text returned in step 4
+5. Append a **Summary** section to the PR body using `gh pr edit`. Structure it as:
+
+   ```markdown
+   ## Summary
+
+   <1-2 sentence high-level description of what changed and why>
+
+   ### Changes
+   - **file_or_area** — what changed and why
+   - **file_or_area** — what changed and why
+   - ...
+
+   ### Test results
+   - Unit: X runs, Y assertions, 0 failures
+   - System: X runs, Y assertions, 0 failures
+   - RuboCop: X files, no offenses
+   ```
+
+   Keep each bullet concise (one line). Group related changes into a single bullet
+   (e.g. one bullet for "fixture + helper + seeds" rather than three separate ones).
+   Use the `--body` flag with the full body (current body + appended summary).
+   Write the body to a temp file and pass it via `--body-file` to avoid shell quoting issues.
 6. `gh pr ready {number}`
 
 ## Output

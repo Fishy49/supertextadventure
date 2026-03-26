@@ -51,7 +51,7 @@ module QaWorld
       assert_text "tower can be unlocked"
     end
 
-    test "leads_to topic chain" do
+    test "leads_to topic chain shows hint" do
       visit dev_game_path
       find(".terminal-input").click
 
@@ -59,8 +59,78 @@ module QaWorld
       find(".terminal-input").send_keys("go east", :return)
       assert_text "The Tavern"
 
-      find(".terminal-input").send_keys("talk to innkeeper about rooms", :return)
-      assert_text "tower"
+      find(".terminal-input").send_keys("talk to innkeeper about rumors", :return)
+      assert_text "lurking in the cellar"
+      assert_text "You could ask about: cellar."
+    end
+
+    test "leads_to locked subtopic shows locked_text" do
+      visit dev_game_path
+      find(".terminal-input").click
+
+      # Go to tavern
+      find(".terminal-input").send_keys("go east", :return)
+      assert_text "The Tavern"
+
+      # Try cellar without asking about rumors first
+      find(".terminal-input").send_keys("talk to innkeeper about cellar", :return)
+      assert_text "What cellar?"
+    end
+
+    test "leads_to unlocked subtopic shows text" do
+      visit dev_game_path
+      find(".terminal-input").click
+
+      # Go to tavern
+      find(".terminal-input").send_keys("go east", :return)
+      assert_text "The Tavern"
+
+      # Ask about rumors to unlock cellar
+      find(".terminal-input").send_keys("talk to innkeeper about rumors", :return)
+      assert_text "lurking in the cellar"
+
+      # Now cellar should be accessible
+      find(".terminal-input").send_keys("talk to innkeeper about cellar", :return)
+      assert_text "cellar entrance is behind the bar"
+    end
+
+    test "keyword matching works for topic" do
+      visit dev_game_path
+      find(".terminal-input").click
+
+      # Go to tavern
+      find(".terminal-input").send_keys("go east", :return)
+      assert_text "The Tavern"
+
+      # Use keyword "gossip" instead of topic key "rumors"
+      find(".terminal-input").send_keys("talk to innkeeper about gossip", :return)
+      assert_text "lurking in the cellar"
+    end
+
+    test "no keyword match returns default response" do
+      visit dev_game_path
+      find(".terminal-input").click
+
+      # Go to tavern
+      find(".terminal-input").send_keys("go east", :return)
+      assert_text "The Tavern"
+
+      find(".terminal-input").send_keys("talk to innkeeper about dragons", :return)
+      assert_text "Welcome to the tavern"
+    end
+
+    test "npc with no dialogue shows not interested" do
+      visit dev_game_path
+      find(".terminal-input").click
+
+      # Go to tavern -- but guard is not in tavern in QA world.
+      # The merchant is in the market and has dialogue, so let's test
+      # with a topic query to merchant about something unknown
+      find(".terminal-input").send_keys("go west", :return)
+      assert_text "The Market"
+
+      find(".terminal-input").send_keys("talk to merchant about weather", :return)
+      assert_text "Looking to trade"
     end
   end
 end

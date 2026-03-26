@@ -3,6 +3,8 @@ name: implement-feature
 description: Read an ingested, planned spec file and implement the feature — tests first, then code, then mark the PR ready for review.
 argument-hint: [pr-X-spec-filename]
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(git *), Bash(gh *), Bash(bin/rails *), Bash(bundle *)
+model: opus
+effort: high
 context: fork
 ---
 

@@ -3,6 +3,8 @@ name: plan-feature
 description: Read an ingested spec file, explore the codebase, write a detailed implementation plan, and append it to the spec file and PR.
 argument-hint: [pr-X-spec-filename]
 allowed-tools: Read, Glob, Grep, Bash(git *), Bash(gh *), Edit
+model: opus
+effort: max
 context: fork
 ---
 

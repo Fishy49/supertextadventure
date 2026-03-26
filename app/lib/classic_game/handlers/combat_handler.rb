@@ -292,6 +292,9 @@ module ClassicGame
           new_player_state["combat"] = nil
           update_player_state(new_player_state)
 
+          # Set defeat flag if specified
+          game.set_flag(creature_def["sets_flag_on_defeat"], true) if creature_def["sets_flag_on_defeat"]
+
           success(lines.join("\n"))
         end
 

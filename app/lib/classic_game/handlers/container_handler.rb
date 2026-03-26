@@ -39,6 +39,14 @@ module ClassicGame
               # Player has the key, unlock and open
               game.open_container(container_id)
               message = container_def["on_open_message"] || "You unlock and open the #{container_def['name']}."
+
+              # Show contents if any
+              contents = game.container_contents(container_id)
+              if contents.any?
+                content_names = contents.map { |item_id| world_snapshot.dig("items", item_id, "name") || item_id }
+                message += "\n\nInside you see: #{content_names.join(', ')}"
+              end
+
               return success(message)
             else
               locked_msg = container_def["locked_message"] || "It's locked."

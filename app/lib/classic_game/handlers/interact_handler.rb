@@ -6,7 +6,7 @@ module ClassicGame
       def handle(command)
         case command[:verb]
         when :talk
-          handle_talk(command[:target])
+          handle_talk(command)
         when :give
           handle_give(command[:target], command[:modifier])
         when :attack
@@ -18,23 +18,77 @@ module ClassicGame
 
       private
 
-        def handle_talk(target)
-          return failure("Talk to whom?") unless target
+        def handle_talk(command)
+          target = command[:target]
+          modifier = command[:modifier]
 
-          # Find the NPC
-          npc_id, npc_def = find_npc(target)
+          # "talk to X" parses as target="" modifier="X"
+          # "talk to X about Y" parses as target="" modifier="X about Y"
+          npc_name, topic_name = resolve_talk_target(target, modifier)
+
+          return failure("Talk to whom?") if npc_name.blank?
+
+          npc_id, npc_def = find_npc(npc_name)
           return failure("You don't see anyone like that here.") unless npc_def
           return failure("You don't see anyone like that here.") unless npc_in_room?(npc_id)
 
-          # Get dialogue
           dialogue = npc_def["dialogue"]
           return failure("#{npc_def['name']} doesn't seem interested in talking.") unless dialogue
 
-          # For now, return default dialogue
-          # Future: could implement conversation trees, quest states, etc.
+          if topic_name.present?
+            handle_talk_topic(npc_def, dialogue, topic_name)
+          else
+            handle_talk_greeting(npc_def, dialogue)
+          end
+        end
+
+        def resolve_talk_target(target, modifier)
+          if target.present?
+            [target, modifier]
+          elsif modifier.present?
+            parts = modifier.split(" about ", 2)
+            [parts[0], parts[1]]
+          else
+            [nil, nil]
+          end
+        end
+
+        def handle_talk_greeting(npc_def, dialogue)
           response = dialogue["default"] || "#{npc_def['name']} nods at you."
 
+          # Set flag if specified on greeting
+          game.set_flag(dialogue["sets_flag"], true) if dialogue["sets_flag"]
+
           success("#{npc_def['name']} says: \"#{response}\"")
+        end
+
+        def handle_talk_topic(npc_def, dialogue, topic_name)
+          topics = dialogue["topics"]
+          return failure("#{npc_def['name']} doesn't know about that.") unless topics
+
+          topic = topics[topic_name]
+          return failure("#{npc_def['name']} doesn't know about that.") unless topic
+
+          # Check flag requirement
+          if topic["requires_flag"] && !game.get_flag(topic["requires_flag"])
+            return failure("#{npc_def['name']} says: \"#{topic['locked_text']}\"")
+          end
+
+          # Check item requirement
+          if topic["requires_item"] && !item?(topic["requires_item"])
+            return failure("#{npc_def['name']} says: \"#{topic['locked_text']}\"")
+          end
+
+          # Set flag if specified
+          game.set_flag(topic["sets_flag"], true) if topic["sets_flag"]
+
+          # Build response
+          response = "#{npc_def['name']} says: \"#{topic['text']}\""
+
+          # Append leads_to hint
+          response += "\n\nYou could ask about '#{topic['leads_to']}'." if topic["leads_to"]
+
+          success(response)
         end
 
         def handle_give(item_target, npc_target)

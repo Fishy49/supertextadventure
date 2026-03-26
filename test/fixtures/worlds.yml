@@ -1,3 +1,4 @@
+<% require_relative "../support/qa_world_data" %>
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
@@ -12,9 +13,5 @@ two:
 
 qa_test_world:
   name: "QA Test World"
-  description: "A minimal world for QA / developer testing"
-  world_data: <%= {
-    "meta" => { "starting_room" => "test_room", "version" => "1.0", "author" => "SuperTextAdventure" },
-    "rooms" => { "test_room" => { "name" => "Test Chamber", "description" => "A bare stone chamber used for developer testing. Nothing of interest here.", "exits" => {}, "items" => [], "npcs" => [] } },
-    "items" => {}, "npcs" => {}, "creatures" => {}
-  }.to_json %>
+  description: "A full-featured world for QA / developer testing"
+  world_data: <%= TestSupport::QaWorldData.data.to_json %>

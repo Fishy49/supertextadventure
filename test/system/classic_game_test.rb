@@ -11,14 +11,14 @@ class ClassicGameTest < ApplicationSystemTestCase
 
   test "initial room description" do
     visit dev_game_path
-    assert_text "Test Chamber"
+    assert_text "Town Square"
   end
 
   test "send look command" do
     visit dev_game_path
     find(".terminal-input").click
     find(".terminal-input").send_keys("look", :return)
-    assert_text "Test Chamber"
+    assert_text "Town Square"
   end
 
   test "unknown command" do
@@ -31,7 +31,7 @@ class ClassicGameTest < ApplicationSystemTestCase
   test "navigation command with no exits" do
     visit dev_game_path
     find(".terminal-input").click
-    find(".terminal-input").send_keys("go north", :return)
+    find(".terminal-input").send_keys("go northeast", :return)
     assert_text "can't go"
   end
 
@@ -41,6 +41,6 @@ class ClassicGameTest < ApplicationSystemTestCase
     click_on "Reset Game"
     # Reset redirects to dev_game_path which then redirects to the new game page
     assert_current_path(%r{/games/})
-    assert_text "Test Chamber"
+    assert_text "Town Square"
   end
 end

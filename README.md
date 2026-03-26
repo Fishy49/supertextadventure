@@ -6,18 +6,10 @@ SuperTextAdventure is three things:
 2. A tool for telling stories with your friends.
 3. The passion-project of a Ruby/Rails nerd.
 
-The hope is that this application can provide a way to have a D&D-like experience in a nostalgic setting like the text-adventures of olde. It's also hoped that this application will provide a great example of what Rails 7 can do!
+The hope is that this application can provide a way to have a D&D-like experience in a nostalgic setting like the text-adventures of olde or even play a classic text-adventure!
 
-## Deploying
-We recommend using [fly.io](https://fly.io/)! Simply clone the repo and run `fly launch` followed by `fly deploy`!
-
-### ChatGPT
-When running a game, you can use the `completions` API to generate text for your game. Simply get an API key from OpenAI.com add an `OPENAI_ACCESS_TOKEN` and an `OPENAI_ORGANIZATION_ID` variable to your `.env` file!
-
-For Fly.io you can add this to your launched instance with
-```
-flyctl secrets set OPENAI_ACCESS_TOKEN=<TOKEN> OPENAI_ORGANIZATION_ID=<ORGANIZATION_ID>
-```
+This app currently supports a JSON format that allows single or multiplyer text adventures.
+Additionally, this app supports a chat-like interface with a few handy tools (Dice rolling, health, inventory) so you can build your own adventure.
 
 ## Running Locally
 ### Setup
@@ -26,17 +18,20 @@ Simply clone the repo and install with `./bin setup && rails db:migrate`.
 ### Running
 The application can be run with `bundle exec ./bin/dev`.
 
-## Roadmap
+## Game Modes
+All modes use the same interface which is a free-text field that allows the player to interact with the game.
 
-- ~Add HP~
-- ~Add dice roller~
-- ~Add loading of past message on scroll~ <-- (Launchable version!)
-- ~Use OpenAI Completions to build prompts/descriptions~
-- ~Create ChatGTP game mode and let ChatGPT run your game~
-- ~Add ability for host to control who can type~
-- Add basic inventory system
-- Add ability for host to edit their messages or delete others
-- Add browsable ASCII library
-- Add "Strict" game mode that allows hosts to provide an allowlist of verbs that the "game" will accept
-- Add friend system
-- Add "Presence/Typing" indicators
+1. **Classic Text Adventure** - a JSON powered text adventure that defines an entire world. Rather than pitting your skills against an AI or a human, this is a deterministic text-adventure and the format of the JSON file supports complex and rich gameplay
+2. **Chat Mode** - A simple chat interface where a "host" is designated and "runs" the game while players talk their way through the game. The idea is that the host will run things similar to a D&D game but role-play as a text-parser.
+3. **AI Host** - This is still a concept-in-progress but the idea is that a Classic Text Adventure game file could be run by an LLM to enrich descriptions and perhaps add content on the fly.
+
+## Current State of Development
+This is an older app that is being rewritten and used as a testbed for agentic development utilizing a software-factory pattern.
+
+Specs are writting in markdown in the `/specs` folder and committed to main. A daily job picks up these specs and processes them into a reviewable PR.
+This is very much a work-in-progress and certain app code might be orphaned/outdated while the application is restructured.
+
+## QA Mode
+Getting the app running and navigating to `/dev/game` will fire up a QA world that is small but representative of a lot of what can be done in the classic game engine. This world isn't really meant to be "fun" but allows you to quickly test things:
+<img width="1645" height="959" alt="image" src="https://github.com/user-attachments/assets/edd9a96d-d224-4347-95d3-539d4de9073d" />
+

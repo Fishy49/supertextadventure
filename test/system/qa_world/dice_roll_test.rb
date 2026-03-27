@@ -39,7 +39,8 @@ module QaWorld
 
       # Roll the dice — outcome is random, but we should see either Success or Failed
       find(".terminal-input").send_keys("roll", :return)
-      assert_selector ".message", text: /Success!|Failed\./
+      assert_text(/Success!|Failed\./)
+
     end
 
     test "non-roll command while roll pending is rejected" do

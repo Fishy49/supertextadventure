@@ -175,9 +175,10 @@ module TestSupport
         "starts_closed" => true,
         "locked" => true,
         "unlock_item" => "rusty_key",
-        "locked_message" => "The chest is locked. It looks like it needs a key.",
+        "unlock_flag" => "tavern_lockpick_success",
+        "locked_message" => "The chest is locked. You could try picking the lock.",
         "contents" => ["health_potion"],
-        "on_open_message" => "You unlock the chest with the rusty key and open it."
+        "on_open_message" => "You unlock the chest and open it."
       }
     end
 

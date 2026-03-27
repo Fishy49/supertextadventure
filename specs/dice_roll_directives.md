@@ -4,13 +4,17 @@ Dice rolls defined in the world JSON can specify branching outcomes — one for
 success, one for failure. This ensures players are never deadlocked: a failed
 roll always opens an alternative path rather than a dead end.
 
+There already exists a dice-rolling mechanism that should be triggerable.
+The game should enter a "Roll" state where the user has to roll a dice by typing "ROLL 1d20" or whatever the roll requires.
+
 ## Player-facing behaviour
 
 ### Succeed a roll — door unlocks
 ```
 > pick lock
-You attempt to pick the lock... [roll: 14 vs DC 12] Success!
-The lock clicks open. The door swings wide.
+You attempt to pick the lock... Roll to determine outcome.
+> roll
+You rolled a 15. Success!
 ```
 
 ### Fail a roll — alternative path opens

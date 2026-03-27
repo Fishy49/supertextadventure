@@ -1,3 +1,5 @@
+> PR: https://github.com/Fishy49/supertextadventure/pull/36
+
 # Dice Roll Directives
 
 Dice rolls defined in the world JSON can specify branching outcomes — one for

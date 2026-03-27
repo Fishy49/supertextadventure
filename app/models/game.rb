@@ -285,8 +285,14 @@ class Game < ApplicationRecord
       update!(world: selected_world) unless world
 
       # Snapshot the world data into game_state to isolate from future world changes
+      world_snapshot_data = selected_world.world_data.deep_dup
+
+      # Validate dice roll directives have both branches
+      validation_errors = ClassicGame::Engine.validate_world_data(world_snapshot_data)
+      raise "Invalid world data: #{validation_errors.join('; ')}" if validation_errors.any?
+
       update!(game_state: {
-                "world_snapshot" => selected_world.world_data.deep_dup,
+                "world_snapshot" => world_snapshot_data,
                 "player_states" => {},
                 "room_states" => {},
                 "global_flags" => {},

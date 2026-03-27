@@ -92,6 +92,9 @@ module ClassicGame
             return handle_use_on_exit(item_id, item_def, exit_direction) if exit_direction
           end
 
+          # Check if item triggers a dice roll
+          return handle_dice_roll_trigger(item_id, item_def) if item_def["dice_roll"]
+
           # Check if item reveals an exit
           return handle_reveal_exit(item_id, item_def, item_def["reveals_exit"]) if item_def["reveals_exit"]
 
@@ -148,6 +151,22 @@ module ClassicGame
           actual_heal = new_health - current_health
           message = use_action["text"] || "You use the #{item_def['name']} and recover #{actual_heal} health!"
           success(message)
+        end
+
+        def handle_dice_roll_trigger(item_id, item_def)
+          roll_data = item_def["dice_roll"]
+
+          unless roll_data["on_success"] && roll_data["on_failure"]
+            return failure("Invalid world data: dice roll missing on_success or on_failure.")
+          end
+
+          new_state = player_state.dup
+          new_state["pending_roll"] = roll_data.merge("source_item" => item_id)
+          update_player_state(new_state)
+
+          attempt_message = roll_data["attempt_message"] ||
+                            "You attempt the action... Roll to determine the outcome."
+          success("#{attempt_message}\nType ROLL to roll the dice.")
         end
 
         def handle_reveal_exit(_item_id, _item_def, reveal_data)

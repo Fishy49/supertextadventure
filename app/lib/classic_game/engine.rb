@@ -7,6 +7,14 @@ module ClassicGame
         # Check if we're waiting for restart confirmation
         return handle_restart_confirmation(game, command_text) if game.game_state["pending_restart"]
 
+        # Check if a dice roll is pending — route all input to RollHandler
+        ps = game.player_state(user.id)
+        if ps["pending_roll"]
+          return ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
+            ClassicGame::CommandParser.parse(command_text)
+          )
+        end
+
         # Parse the command
         command = CommandParser.parse(command_text)
 
@@ -22,6 +30,20 @@ module ClassicGame
         Rails.logger.error("ClassicGame::Engine error: #{e.message}")
         Rails.logger.error(e.backtrace.join("\n"))
         error_response("Something went wrong: #{e.message}")
+      end
+
+      def validate_world_data(world_data)
+        errors = []
+        items = world_data["items"] || {}
+        items.each do |item_id, item_def|
+          next unless item_def.is_a?(Hash) && item_def["dice_roll"]
+
+          roll = item_def["dice_roll"]
+          unless roll["on_success"].is_a?(Hash) && roll["on_failure"].is_a?(Hash)
+            errors << "Item '#{item_id}' has a dice_roll missing on_success or on_failure."
+          end
+        end
+        errors
       end
 
       private
@@ -44,6 +66,8 @@ module ClassicGame
                             ClassicGame::Handlers::ContainerHandler
                           when :talk, :attack, :give
                             ClassicGame::Handlers::InteractHandler
+                          when :roll
+                            ClassicGame::Handlers::RollHandler
                           when :restart
                             ClassicGame::Handlers::RestartHandler
                           when :defend, :flee

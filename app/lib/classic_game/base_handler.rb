@@ -225,6 +225,27 @@ module ClassicGame
         total_defense
       end
 
+      # Check if a dice roll is pending
+      def pending_roll?
+        player_state["pending_roll"].present?
+      end
+
+      # Execute directives from a dice roll branch (on_success or on_failure)
+      def execute_roll_directives(branch, room_id)
+        game.set_flag(branch["sets_flag"], true) if branch["sets_flag"]
+
+        if branch["unlocks_dialogue"]
+          topic = branch["unlocks_dialogue"]["topic"]
+          game.set_flag("dialogue_unlocked_#{topic}", true)
+        end
+
+        return unless branch["unlocks_exit"]
+
+        direction = branch["unlocks_exit"]["direction"]
+        exit_room = branch["unlocks_exit"]["room"] || room_id
+        game.unlock_exit(exit_room, direction)
+      end
+
       # Success response
       def success(message, state_changes: {})
         {

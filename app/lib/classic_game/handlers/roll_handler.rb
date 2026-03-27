@@ -40,7 +40,7 @@ module ClassicGame
           outcome = succeeded ? "Success!" : "Failed."
           response_text = "You rolled a #{rolled}. #{outcome}\n#{branch['message']}"
 
-          success(response_text)
+          success(response_text).merge(dice_roll: result)
         end
     end
   end

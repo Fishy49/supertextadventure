@@ -4,7 +4,7 @@ description: Read an ingested spec file, explore the codebase, write a detailed 
 argument-hint: [pr-X-spec-filename]
 allowed-tools: Read, Glob, Grep, Bash(git *), Bash(gh *), Edit
 model: opus
-effort: max
+effort: high
 context: fork
 ---
 

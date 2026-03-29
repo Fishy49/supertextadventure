@@ -12,7 +12,7 @@
 >
   <div class="hidden text-white uppercase w-full before:content-['*** SYNTAX ERROR: ']" <%= stimulus_targets_for("error") %>></div>
 
-  <span class="inline-block uppercase after:content-['/>']" <%= stimulus_targets_for("prompt") %>>
+  <span class="inline-block uppercase whitespace-nowrap text-sm md:text-base after:content-['/>']" <%= stimulus_targets_for("prompt") %>>
     <%= @terminal_prompt if @terminal_prompt.present? %>
   </span>
   

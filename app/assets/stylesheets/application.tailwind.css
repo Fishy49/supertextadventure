@@ -50,6 +50,15 @@
   .grid-in-message-form { grid-area: message-form; }
   .grid-in-sidebar { grid-area: sidebar; }
   .grid-in-footer { grid-area: footer; }
+
+  .grid-areas-mobile {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "header"
+      "message-container"
+      "message-form";
+  }
 }
 
 @layer utilities {

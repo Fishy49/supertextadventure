@@ -1,0 +1,33 @@
+<div class="md:hidden" data-controller="mobile-nav">
+  <%# Mobile nav drawer - slides up from bottom %>
+  <div data-mobile-nav-target="drawer"
+       class="fixed inset-x-0 bottom-12 bg-stone-900 border-t-2 border-terminal-green z-40 translate-y-full transition-transform duration-300">
+    <nav class="flex flex-col p-4 gap-3">
+      <%= link_to "Home", root_path, class: "button text-center" %>
+      <% if logged_in? %>
+        <%= link_to "Tavern", games_path, class: "button text-center" %>
+        <%= link_to "About", about_path, class: "button text-center" %>
+        <%= link_to "Logout", logout_path, class: "button text-center" %>
+        <% if current_user.is_owner? %>
+          <%= link_to "Invites", setup_tokens_path, class: "button text-center" %>
+          <%= link_to "Worlds", worlds_path, class: "button text-center" %>
+        <% end %>
+      <% end %>
+    </nav>
+  </div>
+
+  <%# Mobile bottom bar %>
+  <div class="fixed inset-x-0 bottom-0 h-12 bg-stone-900 border-t-2 border-terminal-green flex items-center justify-between px-4 z-50">
+    <button type="button"
+            class="button text-sm px-3 py-1"
+            data-action="click->mobile-nav#toggleDrawer">
+      [=]
+    </button>
+    <span class="text-sm font-bold">SuperTextAdventure</span>
+    <button type="button"
+            class="button text-sm px-3 py-1"
+            data-action="click->mobile-nav#toggleSidebar">
+      [i]
+    </button>
+  </div>
+</div>

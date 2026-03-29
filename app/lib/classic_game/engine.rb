@@ -45,9 +45,11 @@ module ClassicGame
             errors << "Item '#{item_id}' has a dice_roll missing on_success or on_failure."
           end
 
-          if roll["consume_on"] && !VALID_CONSUME_ON.include?(roll["consume_on"])
-            errors << "Item '#{item_id}' has invalid consume_on '#{roll['consume_on']}' (must be: #{VALID_CONSUME_ON.join(', ')})."
-          end
+          next unless roll["consume_on"] && VALID_CONSUME_ON.exclude?(roll["consume_on"])
+
+          error_text = "Item '#{item_id}' has invalid consume_on '#{roll['consume_on']}'"
+          error_text += " (must be: #{VALID_CONSUME_ON.join(', ')})."
+          errors << error_text
         end
         errors
       end

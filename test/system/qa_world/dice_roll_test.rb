@@ -129,7 +129,7 @@ module QaWorld
       # Uses message-count sync to avoid stale text matching after restarts.
       def roll_until_outcome(desired, max_attempts: 20)
         max_attempts.times do |i|
-          restart_game if i > 0
+          restart_game if i.positive?
 
           send_and_wait("go east")
           send_and_wait("take lockpick")

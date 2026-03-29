@@ -154,6 +154,8 @@ module TestSupport
           "dc" => 12,
           "stat" => "dexterity",
           "dice" => "1d20",
+          "consume_on" => "failure",
+          "completed_message" => "The chest lock is already open.",
           "attempt_message" => "You carefully insert the lockpick and attempt to pick the lock...",
           "on_success" => {
             "sets_flag" => "tavern_lockpick_success",
@@ -161,7 +163,7 @@ module TestSupport
           },
           "on_failure" => {
             "sets_flag" => "tavern_lockpick_failed",
-            "message" => "The pick slips and bends. You will need another approach."
+            "message" => "The lockpick snaps! You will need another approach."
           }
         }
       }

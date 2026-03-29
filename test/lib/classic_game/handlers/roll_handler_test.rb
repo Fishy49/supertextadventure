@@ -214,6 +214,87 @@ class RollHandlerTest < ActiveSupport::TestCase
     assert_includes result[:response], "Invalid world data"
   end
 
+  # ─── CONSUME_ON DIRECTIVE ─────────────────────────────────────────────────
+
+  test "consume_on failure removes item from inventory on failed roll" do
+    roll_data = guaranteed_failure_roll.merge(
+      "consume_on" => "failure",
+      "on_success" => { "message" => "It works." },
+      "on_failure" => { "message" => "The pick snaps!" }
+    )
+    apply_pending_roll(roll_data)
+
+    result = execute_roll("roll")
+
+    assert result[:success]
+    assert_includes result[:response], "The pick snaps!"
+    assert_not_includes @game.player_state(USER_ID)["inventory"], "lockpick"
+  end
+
+  test "consume_on failure keeps item on successful roll" do
+    roll_data = guaranteed_success_roll.merge(
+      "consume_on" => "failure",
+      "on_success" => { "message" => "It works." },
+      "on_failure" => { "message" => "It breaks." }
+    )
+    apply_pending_roll(roll_data)
+
+    execute_roll("roll")
+
+    assert_includes @game.player_state(USER_ID)["inventory"], "lockpick"
+  end
+
+  test "consume_on success removes item from inventory on successful roll" do
+    roll_data = guaranteed_success_roll.merge(
+      "consume_on" => "success",
+      "on_success" => { "message" => "Used up!" },
+      "on_failure" => { "message" => "Nope." }
+    )
+    apply_pending_roll(roll_data)
+
+    execute_roll("roll")
+
+    assert_not_includes @game.player_state(USER_ID)["inventory"], "lockpick"
+  end
+
+  test "consume_on success keeps item on failed roll" do
+    roll_data = guaranteed_failure_roll.merge(
+      "consume_on" => "success",
+      "on_success" => { "message" => "Used up!" },
+      "on_failure" => { "message" => "Nope." }
+    )
+    apply_pending_roll(roll_data)
+
+    execute_roll("roll")
+
+    assert_includes @game.player_state(USER_ID)["inventory"], "lockpick"
+  end
+
+  test "consume_on any removes item regardless of outcome" do
+    roll_data = guaranteed_success_roll.merge(
+      "consume_on" => "any",
+      "on_success" => { "message" => "Done." },
+      "on_failure" => { "message" => "Nope." }
+    )
+    apply_pending_roll(roll_data)
+
+    execute_roll("roll")
+
+    assert_not_includes @game.player_state(USER_ID)["inventory"], "lockpick"
+  end
+
+  test "no consume_on keeps item in inventory" do
+    roll_data = guaranteed_success_roll.merge(
+      "on_success" => { "message" => "Done." },
+      "on_failure" => { "message" => "Nope." }
+    )
+    apply_pending_roll(roll_data)
+
+    execute_roll("roll")
+
+    assert_includes @game.player_state(USER_ID)["inventory"], "lockpick"
+  end
+
   # ─── PLAYER RECEIVES CORRECT BRANCH MESSAGE ──────────────────────────────
 
   test "player always receives the message from the success branch on success" do

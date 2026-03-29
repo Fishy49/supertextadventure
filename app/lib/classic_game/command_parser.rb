@@ -58,6 +58,9 @@ module ClassicGame
     # Prepositions to filter out
     PREPOSITIONS = %w[the a an to at on with from of].freeze
 
+    # Articles to strip from targets
+    ARTICLES = %w[the a an].freeze
+
     class << self
       def parse(input)
         return { verb: :unknown, raw: input } if input.blank?
@@ -139,15 +142,15 @@ module ClassicGame
 
           if connector_index
             # Get target and modifier, filtering out articles
-            target_words = words[0...connector_index].reject { |w| %w[the a an].include?(w) }
-            modifier_words = words[(connector_index + 1)..]&.reject { |w| %w[the a an].include?(w) }
+            target_words = words[0...connector_index].reject { |w| ARTICLES.include?(w) }
+            modifier_words = words[(connector_index + 1)..]&.reject { |w| ARTICLES.include?(w) }
 
             target = target_words.join(" ")
             modifier = modifier_words&.join(" ")
             [target, modifier]
           else
             # No connector found, filter out articles
-            cleaned = words.reject { |w| %w[the a an].include?(w) }
+            cleaned = words.reject { |w| ARTICLES.include?(w) }
             [cleaned.join(" "), nil]
           end
         end

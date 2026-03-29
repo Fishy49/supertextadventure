@@ -56,7 +56,7 @@ module TestSupport
         "name" => "The Tavern",
         "description" => "A cozy inn with a roaring fireplace. The smell of ale fills the air.",
         "exits" => { "west" => "town_square" },
-        "items" => ["chest"],
+        "items" => %w[chest lockpick],
         "npcs" => ["innkeeper"]
       }
     end
@@ -139,6 +139,32 @@ module TestSupport
           "takeable" => true,
           "defense_bonus" => 3,
           "description" => "A sturdy iron shield."
+        },
+        "lockpick" => lockpick_item
+      }
+    end
+
+    def self.lockpick_item
+      {
+        "name" => "Lockpick",
+        "keywords" => %w[lockpick pick],
+        "takeable" => true,
+        "description" => "A thin metal pick for opening locks.",
+        "dice_roll" => {
+          "dc" => 12,
+          "stat" => "dexterity",
+          "dice" => "1d20",
+          "consume_on" => "failure",
+          "completed_message" => "The chest lock is already open.",
+          "attempt_message" => "You carefully insert the lockpick and attempt to pick the lock...",
+          "on_success" => {
+            "sets_flag" => "tavern_lockpick_success",
+            "message" => "The lock clicks open with a satisfying snap!"
+          },
+          "on_failure" => {
+            "sets_flag" => "tavern_lockpick_failed",
+            "message" => "The lockpick snaps! You will need another approach."
+          }
         }
       }
     end
@@ -151,9 +177,10 @@ module TestSupport
         "starts_closed" => true,
         "locked" => true,
         "unlock_item" => "rusty_key",
-        "locked_message" => "The chest is locked. It looks like it needs a key.",
+        "unlock_flag" => "tavern_lockpick_success",
+        "locked_message" => "The chest is locked. You could try picking the lock.",
         "contents" => ["health_potion"],
-        "on_open_message" => "You unlock the chest with the rusty key and open it."
+        "on_open_message" => "You unlock the chest and open it."
       }
     end
 

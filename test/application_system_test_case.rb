@@ -9,6 +9,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
                       options: { headless: ENV["CI"].present? || ENV["HEADLESS"].present?,
                                  browser_path: ENV.fetch("BROWSER_PATH", nil),
                                  pending_connection_errors: false,
+                                 process_timeout: 30,
                                  browser_options: { "no-sandbox" => nil } }
 
   Capybara.default_max_wait_time = 10

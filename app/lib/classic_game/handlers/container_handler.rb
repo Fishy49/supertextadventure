@@ -35,8 +35,12 @@ module ClassicGame
           # Check if it's locked
           if container_def["locked"]
             unlock_item = container_def["unlock_item"]
-            if unlock_item && item?(unlock_item)
-              # Player has the key, unlock and open
+            unlock_flag = container_def["unlock_flag"]
+            unlocked_by_flag = unlock_flag && game.get_flag(unlock_flag)
+            unlocked_by_item = unlock_item && item?(unlock_item)
+
+            if unlocked_by_flag || unlocked_by_item
+              # Unlocked via flag or key — open the container
               game.open_container(container_id)
               message = container_def["on_open_message"] || "You unlock and open the #{container_def['name']}."
 

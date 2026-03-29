@@ -79,32 +79,46 @@ module QaWorld
 
       # Fight the spider, restarting the game if the player dies.
       # Navigates to the cave and attacks until the spider is defeated.
+      # Grab the rusty key, open the chest for the health potion, then fight.
+      # The potion gives a heal mid-combat, making the fight reliably winnable.
       def defeat_spider
-        3.times do |attempt|
-          find(".terminal-input").send_keys("go south", :return)
-          assert_text "The Cave"
+        # Deterministic setup: key → tavern → open chest → take potion
+        find(".terminal-input").send_keys("take key", :return)
+        assert_text "Rusty Key"
 
-          find(".terminal-input").send_keys("attack spider", :return)
-          assert_text "Cave Spider"
+        find(".terminal-input").send_keys("go east", :return)
+        assert_text "The Tavern"
 
-          defeated = false
-          10.times do
+        find(".terminal-input").send_keys("open chest", :return)
+        assert_text "Health Potion"
+
+        find(".terminal-input").send_keys("take potion", :return)
+        assert_text "You take"
+
+        find(".terminal-input").send_keys("go west", :return)
+        assert_text "Town Square"
+
+        find(".terminal-input").send_keys("go south", :return)
+        assert_text "The Cave"
+
+        find(".terminal-input").send_keys("attack spider", :return)
+        assert_text "Cave Spider"
+
+        # First exchange — take at least one hit so the potion isn't wasted
+        find(".terminal-input").send_keys("attack", :return)
+
+        unless page.has_text?("crumples", wait: 1)
+          # Heal after taking damage, giving us ~15 effective HP
+          find(".terminal-input").send_keys("use potion", :return)
+          assert_text "recover"
+
+          14.times do
             find(".terminal-input").send_keys("attack", :return)
-            if page.has_text?("crumples", wait: 1)
-              defeated = true
-              break
-            end
+            break if page.has_text?("crumples", wait: 1)
           end
-
-          break if defeated
-
-          # Player died — restart and try again
-          assert attempt < 2, "Failed to defeat spider after 3 attempts"
-          find(".terminal-input").send_keys("restart", :return)
-          assert_text "Restart?"
-          find(".terminal-input").send_keys("yes", :return)
-          assert_text "Town Square"
         end
+
+        assert_text "crumples"
       end
   end
 end

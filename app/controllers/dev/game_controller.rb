@@ -48,11 +48,11 @@ module Dev
     private
 
       def refresh_qa_world
-        require Rails.root.join("test/support/qa_world_data")
-        world = World.find_by(name: "QA Test World")
-        return unless world
-
-        world.update!(world_data: TestSupport::QaWorldData.data)
+        load Rails.root.join("test/support/qa_world_data.rb")
+        world = World.find_or_initialize_by(name: "QA Test World")
+        world.description ||= "A full-featured world for QA / developer testing"
+        world.world_data = TestSupport::QaWorldData.data
+        world.save!
       end
 
       def find_or_create_dev_user

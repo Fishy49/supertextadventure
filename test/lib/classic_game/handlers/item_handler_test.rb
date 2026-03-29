@@ -169,6 +169,95 @@ class ItemHandlerTest < ActiveSupport::TestCase
     assert_includes result[:response].downcase, "can't use"
   end
 
+  # ─── DICE ROLL RE-TRIGGER GUARD ──────────────────────────────────────────────
+
+  test "using dice roll item after success flag is set shows completed message" do
+    world = build_world(
+      starting_room: "room1",
+      rooms: {
+        "room1" => { "name" => "Room", "description" => "A room.", "exits" => {}, "items" => [] }
+      },
+      items: {
+        "lockpick" => {
+          "name" => "Lockpick", "keywords" => ["lockpick"], "takeable" => true,
+          "dice_roll" => {
+            "dc" => 12, "dice" => "1d20",
+            "completed_message" => "The chest lock is already open.",
+            "on_success" => { "sets_flag" => "chest_unlocked", "message" => "Click!" },
+            "on_failure" => { "message" => "Nope." }
+          }
+        }
+      }
+    )
+    game = build_game(world_data: world, player_id: USER_ID,
+                      player_state: player_state_in("room1", inventory: ["lockpick"]))
+    game.set_flag("chest_unlocked", true)
+
+    command = ClassicGame::CommandParser.parse("use lockpick")
+    result = ClassicGame::Handlers::ItemHandler.new(game: game, user_id: USER_ID).handle(command)
+
+    assert result[:success]
+    assert_includes result[:response], "The chest lock is already open."
+    assert_nil game.player_state(USER_ID)["pending_roll"]
+  end
+
+  test "using dice roll item after success flag is set uses default message when no completed_message" do
+    world = build_world(
+      starting_room: "room1",
+      rooms: {
+        "room1" => { "name" => "Room", "description" => "A room.", "exits" => {}, "items" => [] }
+      },
+      items: {
+        "lockpick" => {
+          "name" => "Lockpick", "keywords" => ["lockpick"], "takeable" => true,
+          "dice_roll" => {
+            "dc" => 12, "dice" => "1d20",
+            "on_success" => { "sets_flag" => "chest_unlocked", "message" => "Click!" },
+            "on_failure" => { "message" => "Nope." }
+          }
+        }
+      }
+    )
+    game = build_game(world_data: world, player_id: USER_ID,
+                      player_state: player_state_in("room1", inventory: ["lockpick"]))
+    game.set_flag("chest_unlocked", true)
+
+    command = ClassicGame::CommandParser.parse("use lockpick")
+    result = ClassicGame::Handlers::ItemHandler.new(game: game, user_id: USER_ID).handle(command)
+
+    assert result[:success]
+    assert_includes result[:response], "Nothing happens."
+  end
+
+  test "using dice roll item without success flag set triggers roll normally" do
+    world = build_world(
+      starting_room: "room1",
+      rooms: {
+        "room1" => { "name" => "Room", "description" => "A room.", "exits" => {}, "items" => [] }
+      },
+      items: {
+        "lockpick" => {
+          "name" => "Lockpick", "keywords" => ["lockpick"], "takeable" => true,
+          "dice_roll" => {
+            "dc" => 12, "dice" => "1d20",
+            "completed_message" => "Already done.",
+            "on_success" => { "sets_flag" => "chest_unlocked", "message" => "Click!" },
+            "on_failure" => { "message" => "Nope." }
+          }
+        }
+      }
+    )
+    game = build_game(world_data: world, player_id: USER_ID,
+                      player_state: player_state_in("room1", inventory: ["lockpick"]))
+
+    command = ClassicGame::CommandParser.parse("use lockpick")
+    result = ClassicGame::Handlers::ItemHandler.new(game: game, user_id: USER_ID).handle(command)
+
+    assert result[:success]
+    assert_includes result[:response], "Type ROLL"
+    assert game.player_state(USER_ID)["pending_roll"]
+  end
+
   # ─── USE ON EXIT ────────────────────────────────────────────────────────────
 
   test "use item on locked exit unlocks it" do

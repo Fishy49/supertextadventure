@@ -35,7 +35,8 @@ module ClassicGame
       help: %w[help h ?],
       save: %w[save],
       quit: %w[quit exit q],
-      restart: %w[restart reset]
+      restart: %w[restart reset],
+      roll: %w[roll]
     }.freeze
 
     # Direction synonyms
@@ -101,7 +102,7 @@ module ClassicGame
             target = cleaned_words.empty? ? nil : cleaned_words.join(" ")
             [verb, target, nil]
 
-          when :inventory, :help, :save, :quit, :restart, :defend, :flee
+          when :inventory, :help, :save, :quit, :restart, :defend, :flee, :roll
             [verb, nil, nil]
 
           when :use, :give, :attack, :talk

@@ -142,6 +142,12 @@ class CommandParserTest < ActiveSupport::TestCase
     assert_nil result[:target]
   end
 
+  test "roll command parses correctly" do
+    result = ClassicGame::CommandParser.parse("roll")
+    assert_equal :roll, result[:verb]
+    assert_nil result[:target]
+  end
+
   # ─── Edge cases ─────────────────────────────────────────────────────────────
 
   test "blank input returns unknown verb" do

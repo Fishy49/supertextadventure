@@ -19,6 +19,17 @@ class ClassicCommandJob
         command_text: message.content
       )
 
+      # If a dice roll was resolved, broadcast the visual dice event first
+      if result[:dice_roll]
+        Message.create!(
+          game: game,
+          game_user: message.game_user,
+          event_type: "roll",
+          event_data: result[:dice_roll],
+          content: ""
+        )
+      end
+
       # Create response message (will auto-broadcast via callback)
       Message.create!(
         game: game,

@@ -15,4 +15,8 @@ class MobileSystemTestCase < ActionDispatch::SystemTestCase
   Capybara.default_max_wait_time = 10
 
   include SystemTestHelper
+
+  setup do
+    page.driver.resize(375, 667)
+  end
 end

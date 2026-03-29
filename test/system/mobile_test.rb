@@ -11,13 +11,16 @@ class MobileTest < MobileSystemTestCase
   test "home page is navigable on mobile" do
     visit root_path
     assert_text "SuperTextAdventure_v0.1"
-    # Mobile nav bar should be visible (has md:hidden so visible at mobile size)
+    # Mobile nav bar should be visible
     assert_selector "[data-controller='mobile-nav']"
     # Click hamburger to open nav drawer
     find("[data-action*='toggleDrawer']").click
-    assert_selector "[data-mobile-nav-target='drawer']"
-    # Tavern link should be in drawer
-    assert_text "Tavern"
+    # Drawer should be open (translate-y-0)
+    assert_selector "[data-mobile-nav-target='drawer'].translate-y-0"
+    # Nav links should be in drawer (uppercase due to button class)
+    within("[data-mobile-nav-target='drawer']") do
+      assert_link "Tavern"
+    end
   end
 
   test "hotkey footer hidden on mobile" do
@@ -30,19 +33,21 @@ class MobileTest < MobileSystemTestCase
 
   test "mobile nav drawer toggles" do
     visit root_path
-    # Drawer should initially be hidden (translate-y-full)
-    assert_selector "[data-mobile-nav-target='drawer']", visible: false
+    # Drawer should initially be off-screen (translate-y-full)
+    assert_selector "[data-mobile-nav-target='drawer'].translate-y-full"
     # Open it
     find("[data-action*='toggleDrawer']").click
-    assert_selector "[data-mobile-nav-target='drawer']", visible: true
-    # Should have nav links
-    assert_text "Home"
-    assert_text "Tavern"
-    assert_text "About"
-    assert_text "Logout"
+    assert_selector "[data-mobile-nav-target='drawer'].translate-y-0"
+    # Should have nav links (uppercase due to button CSS)
+    within("[data-mobile-nav-target='drawer']") do
+      assert_link "Home"
+      assert_link "Tavern"
+      assert_link "About"
+      assert_link "Logout"
+    end
     # Close it
     find("[data-action*='toggleDrawer']").click
-    assert_selector "[data-mobile-nav-target='drawer']", visible: false
+    assert_selector "[data-mobile-nav-target='drawer'].translate-y-full"
   end
 
   test "ascii art does not overflow on mobile" do
@@ -64,10 +69,11 @@ class MobileTest < MobileSystemTestCase
   test "sidebar toggle works on mobile" do
     visit dev_game_path
     # Sidebar should be hidden by default on mobile
-    assert_selector "[data-mobile-nav-target='sidebar']", visible: false
+    assert_selector "[data-mobile-nav-target='sidebar'].hidden", visible: false
     # Click sidebar toggle button
     find("[data-action*='toggleSidebar']").click
-    # Sidebar should now be visible
+    # Sidebar should now be visible (hidden class removed)
+    assert_no_selector "[data-mobile-nav-target='sidebar'].hidden"
     assert_selector "[data-mobile-nav-target='sidebar']", visible: true
   end
 

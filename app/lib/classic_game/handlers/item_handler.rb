@@ -160,6 +160,13 @@ module ClassicGame
             return failure("Invalid world data: dice roll missing on_success or on_failure.")
           end
 
+          # Prevent re-triggering a roll whose success flag is already set
+          success_flag = roll_data.dig("on_success", "sets_flag")
+          if success_flag && game.get_flag(success_flag)
+            completed_msg = roll_data["completed_message"] || "Nothing happens."
+            return success(completed_msg)
+          end
+
           new_state = player_state.dup
           new_state["pending_roll"] = roll_data.merge("source_item" => item_id)
           update_player_state(new_state)

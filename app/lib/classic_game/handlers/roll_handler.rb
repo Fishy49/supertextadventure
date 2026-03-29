@@ -31,9 +31,12 @@ module ClassicGame
           # Execute directives from the winning branch
           execute_roll_directives(branch, player_state["current_room"])
 
-          # Clear pending roll
+          # Clear pending roll and consume item if applicable
           new_state = player_state.dup
           new_state.delete("pending_roll")
+          if should_consume?(roll_spec, succeeded)
+            new_state["inventory"] = (new_state["inventory"] || []) - [roll_spec["source_item"]]
+          end
           update_player_state(new_state)
 
           # Build response
@@ -41,6 +44,15 @@ module ClassicGame
           response_text = "You rolled a #{rolled}. #{outcome}\n#{branch['message']}"
 
           success(response_text).merge(dice_roll: result)
+        end
+
+        def should_consume?(roll_spec, succeeded)
+          consume_on = roll_spec["consume_on"]
+          return false unless consume_on
+
+          consume_on == "any" ||
+            (consume_on == "failure" && !succeeded) ||
+            (consume_on == "success" && succeeded)
         end
     end
   end

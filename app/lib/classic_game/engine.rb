@@ -32,6 +32,8 @@ module ClassicGame
         error_response("Something went wrong: #{e.message}")
       end
 
+      VALID_CONSUME_ON = %w[failure success any].freeze
+
       def validate_world_data(world_data)
         errors = []
         items = world_data["items"] || {}
@@ -41,6 +43,10 @@ module ClassicGame
           roll = item_def["dice_roll"]
           unless roll["on_success"].is_a?(Hash) && roll["on_failure"].is_a?(Hash)
             errors << "Item '#{item_id}' has a dice_roll missing on_success or on_failure."
+          end
+
+          if roll["consume_on"] && !VALID_CONSUME_ON.include?(roll["consume_on"])
+            errors << "Item '#{item_id}' has invalid consume_on '#{roll['consume_on']}' (must be: #{VALID_CONSUME_ON.join(', ')})."
           end
         end
         errors

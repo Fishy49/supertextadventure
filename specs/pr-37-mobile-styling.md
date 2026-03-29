@@ -1,3 +1,5 @@
+> PR: https://github.com/Fishy49/supertextadventure/pull/37
+
 # Mobile Styline
 
 The UI was designed to fit on a larger screen and does not work well on mobile devices. Ultimately this game should be very easy to play on a phone screen. The Tailwind styling used will need to be modfied so that the ENTIRE app is mobile-friendly.

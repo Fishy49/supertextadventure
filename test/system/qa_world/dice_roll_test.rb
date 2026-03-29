@@ -8,18 +8,15 @@ module QaWorld
       visit dev_game_path
       find(".terminal-input").click
 
-      # Go to tavern, get the lockpick from the innkeeper's storeroom
       find(".terminal-input").send_keys("take key", :return)
       assert_text "Rusty Key"
 
       find(".terminal-input").send_keys("go east", :return)
       assert_text "The Tavern"
 
-      # Pick up the lockpick (placed in tavern by QA world)
       find(".terminal-input").send_keys("take lockpick", :return)
       assert_text "Lockpick"
 
-      # Use the lockpick to trigger a dice roll
       find(".terminal-input").send_keys("use lockpick", :return)
       assert_text "Type ROLL"
     end
@@ -37,7 +34,6 @@ module QaWorld
       find(".terminal-input").send_keys("use lockpick", :return)
       assert_text "Type ROLL"
 
-      # Roll the dice — outcome is random, but we should see either Success or Failed
       find(".terminal-input").send_keys("roll", :return)
       assert_text(/Success!|Failed\./)
     end
@@ -55,7 +51,6 @@ module QaWorld
       find(".terminal-input").send_keys("use lockpick", :return)
       assert_text "Type ROLL"
 
-      # Try a non-roll command
       find(".terminal-input").send_keys("look", :return)
       assert_text "You need to ROLL first"
     end
@@ -64,48 +59,25 @@ module QaWorld
       visit dev_game_path
       find(".terminal-input").click
 
-      find(".terminal-input").send_keys("go east", :return)
-      assert_text "The Tavern"
+      roll_until_outcome("Success!")
 
-      find(".terminal-input").send_keys("take lockpick", :return)
-      assert_text "Lockpick"
-
-      # Retry until we roll a success (DC 12 on 1d20, ~55% chance each attempt)
-      20.times do
-        find(".terminal-input").send_keys("use lockpick", :return)
-        assert_text "Type ROLL"
-        find(".terminal-input").send_keys("roll", :return)
-        break if page.has_text?("Success!", wait: 2)
-      end
-
-      assert_text "Success!"
       assert_text "The lock clicks open"
 
-      # The unlock flag should now allow opening the chest without the key
       find(".terminal-input").send_keys("open chest", :return)
       assert_text "Health Potion"
     end
 
-    test "failed roll shows failure branch message" do
+    test "failed roll shows failure branch message and consumes lockpick" do
       visit dev_game_path
       find(".terminal-input").click
 
-      find(".terminal-input").send_keys("go east", :return)
-      assert_text "The Tavern"
+      roll_until_outcome("Failed.")
 
-      find(".terminal-input").send_keys("take lockpick", :return)
-      assert_text "Lockpick"
+      assert_text "The lockpick snaps!"
 
-      # Retry until we roll a failure (DC 12 on 1d20, ~45% chance each attempt)
-      20.times do
-        find(".terminal-input").send_keys("use lockpick", :return)
-        assert_text "Type ROLL"
-        find(".terminal-input").send_keys("roll", :return)
-        break if page.has_text?("Failed.", wait: 2)
-      end
-
-      assert_text "Failed."
-      assert_text "The pick slips and bends"
+      # Lockpick should be consumed (consume_on: failure)
+      send_and_wait("use lockpick")
+      assert_text "don't have"
     end
 
     test "rolling dice creates a dice event message showing the roll total" do
@@ -124,7 +96,6 @@ module QaWorld
       find(".terminal-input").send_keys("roll", :return)
       assert_text(/Success!|Failed\./)
 
-      # A dice event message with the roll breakdown should appear
       assert_text "TOTAL:"
     end
 
@@ -132,20 +103,7 @@ module QaWorld
       visit dev_game_path
       find(".terminal-input").click
 
-      find(".terminal-input").send_keys("go east", :return)
-      assert_text "The Tavern"
-
-      find(".terminal-input").send_keys("take lockpick", :return)
-      assert_text "Lockpick"
-
-      20.times do
-        find(".terminal-input").send_keys("use lockpick", :return)
-        assert_text "Type ROLL"
-        find(".terminal-input").send_keys("roll", :return)
-        break if page.has_text?("Success!", wait: 2)
-      end
-
-      assert_text "Success!"
+      roll_until_outcome("Success!")
 
       find(".terminal-input").send_keys("open chest", :return)
       assert_text "Health Potion"
@@ -153,5 +111,49 @@ module QaWorld
       find(".terminal-input").send_keys("take potion", :return)
       assert_text "You take the Health Potion"
     end
+
+    test "using lockpick after success shows completed message instead of re-triggering roll" do
+      visit dev_game_path
+      find(".terminal-input").click
+
+      roll_until_outcome("Success!")
+
+      # Lockpick survives success (consume_on: failure) — try to use it again
+      find(".terminal-input").send_keys("use lockpick", :return)
+      assert_text "The chest lock is already open"
+    end
+
+    private
+
+      # Navigate to tavern, take lockpick, use it, and roll.
+      # Uses message-count sync to avoid stale text matching after restarts.
+      def roll_until_outcome(desired, max_attempts: 20)
+        max_attempts.times do |i|
+          restart_game if i > 0
+
+          send_and_wait("go east")
+          send_and_wait("take lockpick")
+          send_and_wait("use lockpick")
+          send_and_wait("roll")
+
+          break if page.has_text?(desired, wait: 3)
+        end
+
+        assert_text desired
+      end
+
+      # Send a command and wait for the engine response to appear by counting
+      # new .game-message elements. This avoids matching stale text from prior
+      # game rounds.
+      def send_and_wait(text)
+        count = all(".game-message", wait: false).count
+        find(".terminal-input").send_keys(text, :return)
+        assert_selector ".game-message", minimum: count + 2, wait: 5
+      end
+
+      def restart_game
+        send_and_wait("restart")
+        send_and_wait("yes")
+      end
   end
 end

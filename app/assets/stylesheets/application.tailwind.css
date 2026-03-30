@@ -50,6 +50,15 @@
   .grid-in-message-form { grid-area: message-form; }
   .grid-in-sidebar { grid-area: sidebar; }
   .grid-in-footer { grid-area: footer; }
+
+  .grid-areas-mobile {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "header"
+      "message-container"
+      "message-form";
+  }
 }
 
 @layer utilities {
@@ -71,7 +80,13 @@
 
 @layer components {
   .button {
-    @apply px-[10px] py-[2px] font-bold border-solid border-2 border-terminal-green text-terminal-green inline-block uppercase cursor-pointer hover:text-stone-800 hover:bg-terminal-green focus-visible:text-stone-800 focus-visible:bg-terminal-green focus-visible:outline-none;
+    @apply px-[10px] py-[2px] font-bold border-solid border-2 border-terminal-green text-terminal-green inline-block uppercase cursor-pointer active:text-stone-800 active:bg-terminal-green focus-visible:text-stone-800 focus-visible:bg-terminal-green focus-visible:outline-none;
+  }
+
+  @media (hover: hover) {
+    .button {
+      @apply hover:text-stone-800 hover:bg-terminal-green;
+    }
   }
 
   .input {

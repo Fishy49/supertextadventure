@@ -24,7 +24,7 @@ export default class extends Controller {
       }
 
       if(getMap.hasOwnProperty(inputText)){
-        get(getMap[inputText], { responseKind: "turbo-stream" })
+        get(getMap[inputText], { responseKind: "turbo-stream" }).then(() => this.openSidebarOnMobile())
       
       } else if (inputText.startsWith("MAKE FRIEND")) {
         let username = this.extract_argument(inputText, "MAKE FRIEND")
@@ -32,7 +32,7 @@ export default class extends Controller {
         if(!username){
           this.show_error("Try typing a username!", false)
         } else {
-          post("/friends/create", { body: { username: username }, responseKind: "turbo-stream" })
+          post("/friends/create", { body: { username: username }, responseKind: "turbo-stream" }).then(() => this.openSidebarOnMobile())
         }
 
       } else if (inputText.startsWith("JOIN TABLE")) {
@@ -43,7 +43,7 @@ export default class extends Controller {
           let error_text = 'Could not find a table for #' + tableNumber + '!'
           this.show_error(error_text, false)
         } else {
-          get('/games/' + gameListElement.dataset.gameId + '/lobby', { responseKind: "turbo-stream" })
+          get('/games/' + gameListElement.dataset.gameId + '/lobby', { responseKind: "turbo-stream" }).then(() => this.openSidebarOnMobile())
         }
       } else if (inputText.startsWith("JOIN GAME")) {
         let gameJoinButton = document.getElementById('game-join-element')
@@ -86,12 +86,23 @@ export default class extends Controller {
           let gameName = titleElement ? titleElement.textContent.trim() : 'Table #' + tableNumber
 
           if(confirm(`Are ye sure ye want to KICK OVER ${gameName}? This action cannot be undone!`)){
-            destroy('/games/' + gameUuid, { responseKind: "turbo-stream" })
+            destroy('/games/' + gameUuid, { responseKind: "turbo-stream" }).then(() => this.openSidebarOnMobile())
           }
         }
       } else {
         let error_text = 'What Doth "' + inputText + '" Imply!?'
         this.show_error(error_text, false)
+      }
+    }
+  }
+
+  openSidebarOnMobile() {
+    if (!window.matchMedia("(min-width: 768px)").matches) {
+      document.activeElement?.blur()
+      const mobileNav = document.querySelector("[data-controller='mobile-nav']")
+      if (mobileNav) {
+        const controller = this.application.getControllerForElementAndIdentifier(mobileNav, "mobile-nav")
+        if (controller) controller.openSidebar()
       }
     }
   }

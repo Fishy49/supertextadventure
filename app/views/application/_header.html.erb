@@ -1,11 +1,11 @@
 <div class="col-span-3 md:col-span-2">
-  <h1 class="text-xl font-bold">
+  <h1 class="text-lg md:text-xl font-bold">
     <%= link_to "SuperTextAdventure_v0.1", root_path %>
   </h1>
 </div>
 <% if logged_in? %>
   <div class="col-span-3 md:col-span-1 md:text-right">
-    <h4 class="text-sm pt-1">
+    <h4 class="text-sm pt-1 truncate">
       <%= greeting %>, <%= current_user.username %>
     </h4>
   </div>

@@ -14,7 +14,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="text-base bg-stone-800 text-terminal-green grid grid-areas-layout grid-flow-row gap-0 h-full">
+  <body class="text-base bg-stone-800 text-terminal-green grid grid-areas-mobile md:grid-areas-layout grid-flow-row gap-0 h-full overflow-hidden pb-12 md:pb-0">
 
     <%= yield :loading_modal %>
 
@@ -22,7 +22,7 @@
       <%= render "header" %>
     </header>
 
-    <div class="grid-in-message-container terminal-scrollbars overflow-y-auto px-3 pb-[150px]" data-controller="scroll" data-scroll-target="container" data-action="scroll->scroll#load_messages">
+    <div class="grid-in-message-container terminal-scrollbars overflow-y-auto px-3 pb-4 md:pb-[150px]" data-controller="scroll" data-scroll-target="container" data-action="scroll->scroll#load_messages">
       <%= yield %>
     </div>
 
@@ -32,15 +32,16 @@
       </turbo-frame>
     </div>
 
-    <div class="grid-in-sidebar border-l-2 border-l-terminal-green border-dashed terminal-scrollbars overflow-y-auto px-3">
+    <div id="sidebar-panel" class="grid-in-sidebar border-l-2 border-l-terminal-green border-dashed terminal-scrollbars overflow-y-auto px-3 hidden md:block" data-mobile-nav-target="sidebar">
       <turbo-frame id="sidebar">
         <%= yield :sidebar %>
       </turbo-frame>
     </div>
 
-    
-    <footer class="grid-in-footer grid grid-cols-3 border-t-2 border-t-terminal-green px-3">
+    <footer class="grid-in-footer grid grid-cols-3 border-t-2 border-t-terminal-green px-3 hidden md:grid">
       <%= render "footer" %>
     </footer>
+
+    <%= render "mobile_nav" %>
   </body>
 </html>

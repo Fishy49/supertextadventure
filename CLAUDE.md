@@ -41,3 +41,7 @@ Add any of these if they help clarify intent:
 1. **`/ingest-feature`** — creates a branch, opens a draft PR, links the spec
 2. **`/plan-feature`** — reads the spec, explores the codebase, writes an implementation plan
 3. **`/implement-feature`** — writes tests first, implements, runs full suite, marks PR ready
+
+## Preferences
+> **Important:** Every shell command must be a single, simple call — no `$()`,
+> no `&&` chains. Use separate tool calls and carry values between them.

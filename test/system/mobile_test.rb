@@ -77,6 +77,31 @@ class MobileTest < MobileSystemTestCase
     assert_selector "[data-mobile-nav-target='sidebar']", visible: true
   end
 
+  test "tavern command opens sidebar on mobile" do
+    visit games_path
+    assert_selector "#sidebar-panel.hidden", visible: false
+    assert_selector "#mobile-sidebar-backdrop.hidden", visible: false
+    # Type a command
+    find(".terminal-input").click
+    find(".terminal-input").send_keys("list tables", :return)
+    # Sidebar should open with backdrop
+    assert_no_selector "#sidebar-panel.hidden"
+    assert_selector "#sidebar-panel", visible: true
+    assert_no_selector "#mobile-sidebar-backdrop.hidden"
+    assert_selector "#mobile-sidebar-backdrop", visible: true
+  end
+
+  test "tapping backdrop closes tavern sidebar on mobile" do
+    visit games_path
+    find(".terminal-input").click
+    find(".terminal-input").send_keys("list tables", :return)
+    assert_selector "#sidebar-panel", visible: true
+    # Tap the backdrop (visible in the left 25% not covered by the 3/4-width sidebar)
+    find_by_id("mobile-sidebar-backdrop").click(x: -150, y: 0)
+    assert_selector "#sidebar-panel.hidden", visible: false
+    assert_selector "#mobile-sidebar-backdrop.hidden", visible: false
+  end
+
   test "can send game command on mobile" do
     visit dev_game_path
     assert_selector ".terminal-input", visible: true

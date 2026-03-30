@@ -17,7 +17,9 @@ export default class extends Controller {
       e.stopPropagation();
     })
 
-    this.inputTarget.focus()
+    if (window.matchMedia("(min-width: 768px)").matches) {
+      this.inputTarget.focus()
+    }
   }
 
   capture_input(e){

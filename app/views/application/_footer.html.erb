@@ -1,38 +1,15 @@
-<% symbol = browser.platform.mac? ? "&#8997;" : "&#x2387;" %>
-<div class="col-span-3 md:col-span-2 text-center md:text-left" data-controller="hotkey" data-action="keydown@window->hotkey#triggerHotkeyFromKeydown">
-  <span>
-    <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-h" data-hotkey-path-param="/"><span class="text-xl"><%= symbol.html_safe %></span>H</span>ome
-  </span>
-
+<nav class="col-span-3 md:col-span-2 flex items-center gap-1 text-sm">
+  <%= link_to "Home", root_path, class: "button px-2 py-0" %>
   <% if logged_in? %>
-    <span class="mx-1">|</span>
-    <span>
-      <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-l" data-hotkey-path-param="/logout"><span class="text-xl"><%= symbol.html_safe %></span>L</span>ogout
-    </span>
-
-    <span class="mx-1">|</span>
-    <span>
-      <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-t" data-hotkey-path-param="/tavern"><span class="text-xl"><%= symbol.html_safe %></span>T</span>avern
-    </span>
-
-    <span class="mx-1">|</span>
-    <span>
-      <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-a" data-hotkey-path-param="/about"><span class="text-xl"><%= symbol.html_safe %></span>A</span>bout
-    </span>
-
+    <%= link_to "Tavern", games_path, class: "button px-2 py-0" %>
+    <%= link_to "About", about_path, class: "button px-2 py-0" %>
+    <%= link_to "Logout", logout_path, class: "button px-2 py-0" %>
     <% if current_user.is_owner? %>
-      <span class="mx-1">|</span>
-      <span id="owner-invite-hotkey">
-        <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-i" data-hotkey-path-param="/setup_tokens"><span class="text-xl"><%= symbol.html_safe %></span>I</span>nvites
-      </span>
-
-      <span class="mx-1">|</span>
-      <span>
-        <span class="bg-terminal-green text-stone-800 font-bold pr-1 cursor-pointer hover:text-white" data-action="click->hotkey#triggerHotkey" id="hotkey-w" data-hotkey-path-param="/worlds"><span class="text-xl"><%= symbol.html_safe %></span>W</span>orlds
-      </span>
+      <%= link_to "Invites", setup_tokens_path, class: "button px-2 py-0" %>
+      <%= link_to "Worlds", worlds_path, class: "button px-2 py-0" %>
     <% end %>
   <% end %>
-</div>
+</nav>
 
 <div class="col-span-3 md:col-span-1 text-center md:text-right text-sm pt-1">
   &copy; <%= Date.today.year == 2022 ? "2022" : "2022 - #{Date.today.year}" %> <a href="https://richardcagle.dev">Richard Cagle</a>

@@ -23,7 +23,7 @@ class MobileTest < MobileSystemTestCase
     end
   end
 
-  test "hotkey footer hidden on mobile" do
+  test "desktop footer hidden on mobile" do
     visit root_path
     # The footer has hidden md:grid — at mobile width it should be hidden
     assert_selector "footer.hidden", visible: false

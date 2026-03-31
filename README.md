@@ -27,7 +27,8 @@ All modes use the same interface which is a free-text field that allows the play
 ## Current State of Development
 This is an older app that is being rewritten and used as a testbed for agentic development utilizing a software-factory pattern.
 
-Specs are writting in markdown in the `/specs` folder and committed to main. A daily job picks up these specs and processes them into a reviewable PR.
+Specs are written in markdown and placed in the `/specs` folder, then committed to main. A daily Claude job picks up these specs and processes them into a reviewable PR via the skills you'll see in the `.claude` folder.
+
 This is very much a work-in-progress and certain app code might be orphaned/outdated while the application is restructured.
 
 ## QA Mode

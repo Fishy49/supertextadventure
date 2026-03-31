@@ -4,9 +4,7 @@ module GamesHelper
   def game_type_options
     [
       ["Chat Mode", "chat"],
-      ["Chat (AI)", "chat_ai"],
-      ["Classic Mode", "classic"],
-      ["Classic Mode (AI)", "classic_ai"]
+      ["Classic Mode", "classic"]
     ]
   end
 

@@ -57,8 +57,6 @@ Rails.application.routes.draw do
 
   get "about", to: "about#index"
 
-  get "generate-text", to: "generate_text#text"
-
   resources :worlds do
     member do
       post :preview

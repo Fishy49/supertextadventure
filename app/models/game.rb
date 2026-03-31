@@ -10,18 +10,14 @@ class Game < ApplicationRecord
   has_many :game_users, inverse_of: :game, dependent: :destroy
   has_many :users, through: :game_users
 
-  has_many :chapters, inverse_of: :game, dependent: :destroy
-
   has_many :messages, inverse_of: :game, dependent: :destroy
 
   belongs_to :world, optional: true
 
   enum :game_type, {
     chat: "chat",
-    chat_ai: "chat_ai",
-    classic: "classic",
-    classic_ai: "classic_ai"
-  }, default: "chat_ai"
+    classic: "classic"
+  }, default: "chat"
 
   scope :joinable_by_user, ->(user) { where(status: :open).where.not(created_by: user.id) }
 
@@ -30,49 +26,17 @@ class Game < ApplicationRecord
   after_save :broadcast_context, if: :saved_change_to_current_context?
   after_save :dump_game_state_to_file, if: :should_dump_game_state?
 
-  after_create_commit :setup_ai, if: :chat_ai?
   after_create_commit :setup_classic_game, if: :classic?
 
   validates :created_by, presence: true
 
   attr_accessor :skip_game_state_dump
 
-  def complete_chapters
-    chapters.order(:id).where.not(last_message_id: nil)
-  end
-
-  def current_chapter
-    chapters.where(last_message_id: nil).last
-  end
-
-  def current_messages
-    messages.where("id > ?", current_chapter&.first_message_id || 0)
-  end
-
-  def ai_config
-    @ai_config ||= case game_type.to_sym
-                   when :chat_ai
-                     AiConfigs::ChatAiConfig.new(self)
-                   else
-                     raise "Unknown game type: #{game_type}"
-                   end
-  end
-
-  delegate :messages_for_ai, to: :ai_config
-
-  def current_token_count
-    # Approximate token count: ~4 characters per token for GPT models
-    text = messages_for_ai.pluck(:content).join
-    (text.length / 4.0).ceil
-  end
-
   def game_user(user)
     game_users.find_by(user_id: user.id)
   end
 
   def host?(user)
-    return false if chat_ai?
-
     created_by == user&.id
   end
 
@@ -91,10 +55,6 @@ class Game < ApplicationRecord
   def broadcast_updated_player_list
     broadcast_replace_to(self, :players, target: :players, partial: "/games/players",
                                          locals: { game_users: game_users.joined, for_host: false })
-  end
-
-  def ai_game?
-    %i[chat_ai classic_ai].include?(game_type)
   end
 
   # Classic game state methods
@@ -257,24 +217,6 @@ class Game < ApplicationRecord
                                          locals: { game: self })
     end
 
-    def setup_ai
-      client = OpenAI::Client.new(api_key: ENV.fetch("OPENAI_API_KEY", nil))
-
-      chat_log = messages_for_ai
-      chat_log << { role: "user",
-                    content: <<-INSTRUCTION
-                    Please create a very brief description of the game world. No players have joined yet.
-                    Also describe the opening scene the players will once they join the game.
-                    INSTRUCTION
-                  }
-      response = client.responses.create(model: ai_config.model_name, input: chat_log)
-      ai_response = response.output_text
-
-      message = Message.create(game_id: id, content: ai_response)
-
-      Chapter.create(game_id: id, number: 1, first_message_id: message.id)
-    end
-
     def setup_classic_game
       # Use the selected world, or fall back to the first available
       selected_world = world || World.first
@@ -367,7 +309,7 @@ class Game < ApplicationRecord
       ENV["ENABLE_WORLD_SYNC"] == "true" &&
         !skip_game_state_dump &&
         saved_change_to_game_state? &&
-        (classic? || classic_ai?)
+        classic?
     end
 
     def dump_game_state_to_file

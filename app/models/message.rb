@@ -9,19 +9,12 @@ class Message < ApplicationRecord
   scope :latest, -> { order(id: :desc) }
   scope :oldest, -> { order(id: :asc) }
   scope :for_game, ->(game) { where(game_id: game.id, is_system_message: false).latest }
-  scope :for_ai, -> { where(event_type: [nil, "roll"]).oldest }
-
   before_create :parse_dice_rolls
 
   after_create_commit -> { broadcast_append_to(game, :messages) }, unless: proc { is_system_message? }
   after_update_commit -> { broadcast_replace_to(game, :messages) }, unless: proc { is_system_message? }
   after_create_commit :set_user_active_at, unless: proc { is_system_message? }
-  after_create_commit :create_ai_response, if: proc { game.ai_game? && (player_message? || event_type == "roll") }
   after_create_commit :enqueue_classic_command, if: proc { game.classic? && player_message? }
-
-  def chapter
-    Chapter.where(first_message_id: id).or(Chapter.where(last_message_id: id)).first
-  end
 
   def event?
     event_type.present?
@@ -41,14 +34,6 @@ class Message < ApplicationRecord
     game_user&.character_name || game.host_display_name
   end
 
-  def roll_result_message_for_ai
-    msg = "#{display_name} rolled the following dice:"
-    event_data.result_dice.each do |result, dice_type|
-      msg << " A D#{dice_type} die that rolled a #{result}"
-    end
-    msg
-  end
-
   private
 
     def parse_dice_rolls
@@ -63,13 +48,6 @@ class Message < ApplicationRecord
 
     def set_user_active_at
       game_user.update(active_at: DateTime.now) unless host_message?
-    end
-
-    def create_ai_response
-      # Time to close a chapter
-      game.current_chapter.close! if game.current_token_count >= game.ai_config.max_tokens_for_chapter
-
-      AiChatMessageJob.perform_async(game.id)
     end
 
     def enqueue_classic_command

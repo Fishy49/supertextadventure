@@ -89,11 +89,7 @@ class GamesController < ApplicationController
 
     respond_to do |format|
       if @game.save
-        if @game.chat_ai?
-          format.html { redirect_to tavern_url, notice: t(:game_created_successfully) }
-        else
-          format.html { redirect_to game_url(@game) }
-        end
+        format.html { redirect_to game_url(@game) }
       else
         format.html { render :new, status: :unprocessable_content }
       end

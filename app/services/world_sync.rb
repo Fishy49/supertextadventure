@@ -17,7 +17,7 @@ class WorldSync
     sync_dir = Rails.root.join("tmp/games")
     FileUtils.mkdir_p(sync_dir)
 
-    Game.where(game_type: %i[classic classic_ai]).find_each do |game|
+    Game.where(game_type: :classic).find_each do |game|
       next if game.game_state.blank?
 
       file_path = sync_dir.join("#{game.id}.json")

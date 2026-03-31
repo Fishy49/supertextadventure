@@ -12,7 +12,6 @@ class GameUser < ApplicationRecord
   before_create :set_starting_health
 
   after_create_commit :broadcast_new_player
-  after_create_commit :inform_ai_of_player, if: proc { game.chat_ai? }
 
   after_update_commit :create_health_change_event_message, if: :saved_change_to_current_health?
   after_update_commit :broadcast_updated_player_health, if: :saved_change_to_current_health?
@@ -65,30 +64,5 @@ class GameUser < ApplicationRecord
                                            locals: { game_user: self, for_host: false })
       broadcast_replace_to(game, :host_players, target: "game_user_#{id}", partial: "/games/player",
                                                 locals: { game_user: self, for_host: true })
-    end
-
-    def chat_log_with_intro_request
-      chat_log = game.messages_for_ai
-      chat_log << { role: "user",
-                    content: "Please briefly introduce the character named \"#{character_name}\"
-                    that just joined the game to the rest of the players." }
-    end
-
-    def inform_ai_of_player
-      Message.create(
-        game_id: game.id,
-        is_system_message: true,
-        content: "A player with the name \"#{character_name}\" has joined the game.
-        They are described as follows: \"#{character_description}\""
-      )
-
-      client = OpenAI::Client.new(api_key: ENV.fetch("OPENAI_API_KEY", nil))
-      response = client.responses.create(
-        model: game.ai_config.model_name,
-        input: chat_log_with_intro_request
-      )
-      ai_response = response.output_text
-
-      Message.create(game_id: game.id, content: ai_response)
     end
 end

@@ -23,7 +23,6 @@ All modes use the same interface which is a free-text field that allows the play
 
 1. **Classic Text Adventure** - a JSON powered text adventure that defines an entire world. Rather than pitting your skills against an AI or a human, this is a deterministic text-adventure and the format of the JSON file supports complex and rich gameplay
 2. **Chat Mode** - A simple chat interface where a "host" is designated and "runs" the game while players talk their way through the game. The idea is that the host will run things similar to a D&D game but role-play as a text-parser.
-3. **AI Host** - This is still a concept-in-progress but the idea is that a Classic Text Adventure game file could be run by an LLM to enrich descriptions and perhaps add content on the fly.
 
 ## Current State of Development
 This is an older app that is being rewritten and used as a testbed for agentic development utilizing a software-factory pattern.

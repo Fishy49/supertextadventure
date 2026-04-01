@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class GamesController < ApplicationController
+  layout "tavern", only: %i[index new create lobby]
+
   load_resource find_by: :uuid
   authorize_resource
   skip_authorize_resource only: %i[debug_state update_debug_state]
@@ -69,6 +71,7 @@ class GamesController < ApplicationController
   def new
     @game = Game.new(created_by: current_user.id)
     respond_to do |format|
+      format.html
       format.turbo_stream do
         render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "games/form", locals: { game: @game })
       end
@@ -89,7 +92,7 @@ class GamesController < ApplicationController
 
     respond_to do |format|
       if @game.save
-        format.html { redirect_to game_url(@game) }
+        format.html { redirect_to game_url(id: @game.uuid) }
       else
         format.html { render :new, status: :unprocessable_content }
       end

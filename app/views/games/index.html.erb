@@ -1,21 +1,26 @@
-<h3 class="text-center mb-0">Ye Olde Tavern</h3>
-<%= ascii("tavern") %>
-<p class="mb-0 mt-2">You see many tables. Some contain adventurers. Others sit empty.</p>
-<p class="mb-0">You may...</p>
-<ul>
-  <li><strong>LIST TABLES</strong> to see a list of joinable games</li>
-  <li><strong>NEW TABLE</strong> to start a new adventure</li>
-  <li><strong>JOIN TABLE &lt;#&gt;</strong> to join a game</li>
-  <li><strong>KICK OVER TABLE &lt;#&gt;</strong> to delete a game</li>
-</ul>
+<div class="text-center">
+  <%= ascii("tavern") %>
+  <h2 class="text-xl font-bold mt-2 mb-0">Ye Olde Tavern</h2>
+  <p class="text-sm opacity-80 mb-4">You see many tables. Some contain adventurers. Others sit empty.</p>
+</div>
 
-<% content_for :text_form do %>
-  <%= render "/shared/terminal_input", prompt: "Tavern", controllers: ["tavern"] %>
-<% end %>
+<%= render(NoticeComponent.new(message: notice)) %>
 
-<% content_for :sidebar do %>
-  <% if notice %>
-    <div class="notice blink text-center"><%= notice %></div>
-  <% end %>
-  <%= render template: "/games/list" %>
+<div class="text-center mb-6">
+  <%= link_to "Start a New Game", new_game_path, class: "button px-6 py-2 text-lg" %>
+</div>
+
+<% all_games = [] %>
+<% @hosted_games.each { |g| all_games << [g, :hosting] } %>
+<% @joined_games.each { |g| all_games << [g, :playing] } %>
+<% @joinable_games.each { |g| all_games << [g, :open] } %>
+
+<% if all_games.any? %>
+  <div class="space-y-3">
+    <% all_games.each do |game, status| %>
+      <%= render "games/tavern_game_card", game: game, status: status %>
+    <% end %>
+  </div>
+<% else %>
+  <p class="text-center opacity-80 mt-6">** No tables yet. Start a new game! **</p>
 <% end %>

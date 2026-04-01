@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
+  layout "portal", only: %i[new activate]
+
   load_and_authorize_resource
   skip_authorize_resource only: %i[index activate show edit update destroy]
 

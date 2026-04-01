@@ -1,0 +1,31 @@
+<%
+  card_path = case status
+              when :hosting then game_path(id: game.uuid)
+              when :playing then game_path(id: game.uuid)
+              when :open    then game_lobby_path(id: game.uuid)
+              end
+
+  badge_class = case status
+                when :hosting then "text-green-400 border-green-400"
+                when :playing then "text-blue-400 border-blue-400"
+                when :open    then "text-yellow-400 border-yellow-400"
+                end
+
+  badge_label = status.to_s.upcase
+%>
+
+<%= link_to card_path, class: "block border-2 border-terminal-green border-dashed p-3 hover:bg-stone-700 transition-colors", data: { "turbo-frame": "_top" } do %>
+  <div class="flex items-center justify-between gap-2 flex-wrap">
+    <h3 class="font-bold text-lg mb-0"><%= game.name %></h3>
+    <span class="text-xs border px-2 py-0.5 <%= badge_class %>"><%= badge_label %></span>
+  </div>
+
+  <% if game.description.present? %>
+    <p class="text-sm opacity-80 mt-1 mb-0 truncate"><%= game.description %></p>
+  <% end %>
+
+  <div class="flex items-center gap-3 mt-2 text-xs opacity-70">
+    <span><%= game.game_type&.titleize || "Unknown" %> Mode</span>
+    <span><%= game.game_users.count %>/<%= game.max_players %> players</span>
+  </div>
+<% end %>

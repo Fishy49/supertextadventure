@@ -1,3 +1,11 @@
-<h1>Login</h1>
+<div class="text-center">
+  <h1 class="text-2xl font-bold mt-4 mb-1">SuperTextAdventure</h1>
+  <p class="text-sm mb-4 opacity-80">A weathered sign reads: "All Who Seek Adventure, Enter Here"</p>
+  <%= ascii("small_village") %>
+</div>
 
-<%= render "form" %>
+<%= render(NoticeComponent.new(message: notice)) %>
+
+<div class="border-2 border-terminal-green border-dashed p-4">
+  <%= render "form" %>
+</div>

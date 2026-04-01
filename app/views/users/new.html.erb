@@ -1,11 +1,11 @@
-<%= ascii("castle") %>
+<div class="text-center">
+  <%= ascii("castle") %>
+</div>
 
 <% unless @user&.errors.any? %>
-  <div class="text-center">Register for Possible Adventure</div>
+  <p class="text-center mb-4">Register for Possible Adventure</p>
 <% end %>
 
-<%= render 'form', user: @user %>
-
-<% content_for :sidebar do %>
-  <%= ascii("troll") %>
-<% end %>
+<div class="border-2 border-terminal-green border-dashed p-4">
+  <%= render 'form', user: @user %>
+</div>

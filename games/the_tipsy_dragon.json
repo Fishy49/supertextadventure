@@ -1,0 +1,275 @@
+{
+  "meta": {
+    "name": "The Tipsy Dragon",
+    "starting_room": "cellar",
+    "version": "1.0",
+    "author": "SuperTextAdventure",
+    "description": "A humorous introductory adventure. You wake up in a tavern cellar with no memory of last night and an enormous tab to settle."
+  },
+
+  "rooms": {
+    "cellar": {
+      "name": "The Tavern Cellar",
+      "description": "You wake up on a pile of empty grain sacks. Your head is pounding and you have absolutely no memory of how you got here. The cellar is damp and smells of old ale and regret. A rickety staircase leads up to the tavern floor. A rat watches you from atop a barrel with what appears to be pity.",
+      "exits": {
+        "up": "tavern_floor"
+      },
+      "items": ["sticky_mug", "crumpled_receipt"],
+      "npcs": [],
+      "creatures": ["judgmental_rat"],
+      "on_enter": {
+        "type": "message",
+        "text": "Your head throbs. Somewhere above, you hear the clinking of mugs and a voice bellowing about an unpaid tab."
+      }
+    },
+
+    "tavern_floor": {
+      "name": "The Tipsy Dragon Tavern",
+      "description": "The tavern is surprisingly cozy despite the sticky floors and questionable stains on the ceiling. A roaring fire crackles in the hearth. The barkeep stands behind the counter, polishing a mug with a rag that somehow makes the mug dirtier. A door leads outside to the village square. The cellar stairs descend back down.",
+      "exits": {
+        "down": "cellar",
+        "south": "village_square"
+      },
+      "items": ["tavern_menu"],
+      "npcs": ["barkeep"]
+    },
+
+    "village_square": {
+      "name": "Village Square",
+      "description": "A modest village square with a cracked fountain that hasn't seen water since the last king's coronation. A notice board stands beside it, covered in overlapping parchments. The tavern door is to the north. A forest path winds eastward, and a rickety bridge crosses a ravine to the west.",
+      "exits": {
+        "north": "tavern_floor",
+        "east": "forest_path",
+        "west": "bridge"
+      },
+      "items": ["notice_board"],
+      "npcs": ["confused_wizard"]
+    },
+
+    "forest_path": {
+      "name": "The Whispering Woods Path",
+      "description": "Tall oaks arch overhead, their leaves rustling with what sounds suspiciously like gossip. The path is well-worn but littered with an unusual number of chicken feathers. A small clearing opens to the north, and the village square lies back to the west.",
+      "exits": {
+        "west": "village_square",
+        "north": "chicken_clearing"
+      },
+      "items": [],
+      "npcs": [],
+      "creatures": ["dust_bunny"]
+    },
+
+    "chicken_clearing": {
+      "name": "The Dreaded Clearing",
+      "description": "A sun-dappled clearing ringed by ancient stones. In the center stands what appears to be a small throne made of twigs and feathers. The surrounding area is littered with the bones of... acorns? The forest path leads south.",
+      "exits": {
+        "south": "forest_path"
+      },
+      "items": ["golden_acorn"],
+      "npcs": [],
+      "creatures": ["el_pollo_terrible"]
+    },
+
+    "bridge": {
+      "name": "The Rickety Bridge",
+      "description": "A bridge made of rope and questionable optimism stretches across a deep ravine. The planks creak ominously with every step. A large figure sits in the middle, blocking passage. The village square lies to the east.",
+      "exits": {
+        "east": "village_square",
+        "west": {
+          "to": "hermit_cave",
+          "requires_flag": "troll_satisfied",
+          "locked_msg": "The troll blocks your path and wags a philosophical finger at you. 'None shall pass without first engaging in meaningful discourse!'"
+        }
+      },
+      "items": [],
+      "npcs": ["philosophical_troll"]
+    },
+
+    "hermit_cave": {
+      "name": "The Hermit's Cave",
+      "description": "A surprisingly well-furnished cave with bookshelves carved into the rock walls, a plush armchair, and a small fire. Someone has been living here quite comfortably. A glittering chest sits in the corner. The bridge lies back to the east.",
+      "exits": {
+        "east": "bridge"
+      },
+      "items": ["treasure_chest"],
+      "npcs": []
+    }
+  },
+
+  "items": {
+    "sticky_mug": {
+      "name": "Suspiciously Sticky Mug",
+      "description": "A tavern mug so sticky it briefly adheres to everything it touches. Whatever was in here last night, it was not entirely liquid. The bottom is engraved with the words 'Property of The Tipsy Dragon — STEAL THIS AND BE CURSED.'",
+      "keywords": ["mug", "sticky mug", "cup"],
+      "takeable": true
+    },
+
+    "crumpled_receipt": {
+      "name": "Crumpled Receipt",
+      "description": "A crumpled piece of parchment. You flatten it out to read: 'TAB FOR THE EVENING: 47 ales, 12 meat pies, 1 whole roast boar (WHY?), 3 bardic performances (unsolicited). TOTAL: 1,000 GOLD PIECES. Payment due: IMMEDIATELY.' At the bottom, someone has drawn a frowny face.",
+      "keywords": ["receipt", "parchment", "note", "tab", "bill"],
+      "takeable": true
+    },
+
+    "tavern_menu": {
+      "name": "Tavern Menu",
+      "description": "A chalkboard menu listing today's specials: 'Mystery Stew (don't ask)', 'Bread (probably)', 'Ale (definitely)', and 'The House Special (we ran out years ago but keep it on the menu for sentimental reasons).'",
+      "keywords": ["menu", "chalkboard", "board"],
+      "takeable": false,
+      "cant_take_msg": "The menu is nailed to the wall. Probably to stop people from using it as a shield."
+    },
+
+    "notice_board": {
+      "name": "Village Notice Board",
+      "description": "A weathered notice board. Most postings are mundane ('Lost cat — answers to Lord Fluffington III'), but one stands out: 'WANTED: Brave adventurer to retrieve the Golden Acorn from the Dreaded Clearing. REWARD: Enough gold to pay off even the most irresponsible tavern tab. Ask the wizard in the square for details.'",
+      "keywords": ["notice board", "board", "notices", "posting"],
+      "takeable": false,
+      "cant_take_msg": "You cannot take the notice board. It is a pillar of the community."
+    },
+
+    "golden_acorn": {
+      "name": "Golden Acorn",
+      "description": "A magnificent acorn made of solid gold. It's surprisingly heavy for something so small. It radiates a warm, faintly nutty glow. This is clearly the treasure mentioned on the notice board.",
+      "keywords": ["acorn", "golden acorn", "gold acorn", "treasure"],
+      "takeable": true
+    },
+
+    "wizard_hat": {
+      "name": "Slightly Singed Wizard Hat",
+      "description": "A tall, pointy hat with scorch marks and what appears to be a small bird's nest in the brim. Despite its condition, it tingles with residual magic. Or maybe static electricity.",
+      "keywords": ["hat", "wizard hat"],
+      "takeable": true,
+      "defense_bonus": 1
+    },
+
+    "rusty_pan": {
+      "name": "Rusty Frying Pan",
+      "description": "A cast-iron frying pan with a loose handle. It has clearly seen better days and better breakfasts. It could serve as a makeshift weapon in a pinch.",
+      "keywords": ["pan", "frying pan", "skillet"],
+      "takeable": true,
+      "weapon_damage": 3
+    },
+
+    "treasure_chest": {
+      "name": "Glittering Chest",
+      "description": "An ornate chest with gold filigree and a suspiciously easy-to-open latch. A small tag reads: 'Congratulations! You found it!'",
+      "keywords": ["chest", "treasure chest", "glittering chest"],
+      "takeable": false,
+      "cant_take_msg": "The chest is bolted to the cave floor. Someone really thought this through.",
+      "is_container": true,
+      "starts_closed": true,
+      "contents": ["gold_pouch"]
+    },
+
+    "gold_pouch": {
+      "name": "Bulging Gold Pouch",
+      "description": "A heavy leather pouch containing exactly 1,000 gold pieces. What are the odds? A note inside reads: 'For services rendered to the Clearing. Spend wisely. (You won't.)'",
+      "keywords": ["pouch", "gold", "gold pouch", "money", "coins"],
+      "takeable": true
+    },
+
+    "healing_herb": {
+      "name": "Suspicious Healing Herb",
+      "description": "A scraggly green plant that the wizard swears has healing properties. It smells like mint mixed with old socks.",
+      "keywords": ["herb", "healing herb", "plant"],
+      "takeable": true,
+      "consumable": true,
+      "combat_effect": {
+        "type": "heal",
+        "amount": 15
+      }
+    }
+  },
+
+  "npcs": {
+    "barkeep": {
+      "name": "Greta the Barkeep",
+      "description": "A formidable woman with arms like tree trunks and a glare that could curdle milk at twenty paces. She is polishing the same mug she's been polishing since you arrived. It is not getting cleaner.",
+      "keywords": ["barkeep", "greta", "bartender", "innkeeper"],
+      "dialogue": {
+        "default": "Greta looks you up and down. 'Oh, you're ALIVE. Good. That means you can PAY. One thousand gold pieces. Don't look at me like that — you ordered a whole boar. A WHOLE BOAR. Who does that?' She gestures vaguely toward the village square. 'The wizard outside might know where to find some coin. Now stop dripping on my floor.'",
+        "ask about tab": "'One. Thousand. Gold. Pieces.' Greta enunciates each word like she's hammering nails. 'You also tried to tip the bard with a live chicken. We had to chase it for an hour.'",
+        "ask about wizard": "'That old fool? He's been standing in the square all morning muttering about acorns. Harmless enough, I suppose. Just don't let him cast anything near the tavern. Last time he set the thatch on fire.'",
+        "ask about boar": "'You stood on a table, pointed at the kitchen, and yelled — and I quote — BRING ME YOUR FINEST SWINE. Then you ate the whole thing. With your hands. The bard wrote a song about it. It was not flattering.'"
+      },
+      "accepts_item": "gold_pouch",
+      "gives_item": "rusty_pan",
+      "accept_message": "Greta snatches the gold pouch and counts every single coin while you stand there awkwardly. '...nine hundred ninety-eight, nine hundred ninety-nine, one thousand. Right then.' Her expression softens almost imperceptibly. 'Debt's paid. And here —' she slides a battered frying pan across the counter '— a souvenir. You used it as a pillow last night. Figured you'd grown attached.' She almost smiles. Almost. 'Now get out of my tavern. Or stay and order something. Just... no more boars.'",
+      "sets_flag": "debt_paid"
+    },
+
+    "confused_wizard": {
+      "name": "Wizbert the Occasionally Accurate",
+      "description": "An elderly wizard in stained robes who keeps adjusting a hat that isn't on his head. His beard has what appear to be breadcrumbs in it. He's muttering something about acorns and destiny.",
+      "keywords": ["wizard", "wizbert", "old man", "mage"],
+      "dialogue": {
+        "default": "'Ah! An adventurer! I can tell by the look of bewildered desperation. You seek GOLD, yes? The Golden Acorn! It lies in the Dreaded Clearing, east through the Whispering Woods. Guarded by a fearsome beast!' He pauses dramatically. 'A chicken. But a VERY fearsome chicken. I lost my hat to that chicken.' He stares into the middle distance. 'I miss that hat.'",
+        "ask about acorn": "'The Golden Acorn! A treasure of immense value! Worth exactly one thousand gold pieces, coincidentally. It sits in the Dreaded Clearing to the east. Just follow the feathers. You'll know you're close when you hear the clucking. The terrible, terrible clucking.'",
+        "ask about chicken": "'El Pollo Terrible! The Scourge of the Clearing! It — it took my hat right off my head. Just... WHOOSH. Gone. The clearing is through the forest path, east of here. Be warned: it fights dirty. Mostly pecking. So much pecking.'",
+        "ask about hat": "The wizard's eyes go misty. 'It was a good hat. Pointy. Traditional. Had a small bird living in it, which in retrospect may have attracted the chicken in the first place. If you happen to find it... no, no. The hat is gone. I must accept this.' He does not look like he has accepted this.",
+        "ask about troll": "'Ah, old Thinksworth! Lovely fellow, really. Lives under the bridge to the west. Won't let anyone pass unless they engage in philosophical debate. Last fellow who tried just said YOLO and the troll sat on him.'"
+      },
+      "accepts_item": "golden_acorn",
+      "gives_item": "healing_herb",
+      "accept_message": "'THE ACORN! You found it! You brave, foolish, wonderful person!' Wizbert does a little jig that makes several concerning popping sounds. 'Here, take this healing herb. You look like you need it. The hermit's cave across the bridge has the gold reward — just get past old Thinksworth first. Try agreeing with him. He likes that.'",
+      "sets_flag": "wizard_helped"
+    },
+
+    "philosophical_troll": {
+      "name": "Thinksworth the Bridge Troll",
+      "description": "An enormous troll wearing tiny spectacles perched on his massive nose. He's sitting cross-legged on the bridge reading a book titled 'Being and Nothingness (For Trolls).' He looks up at your approach with an expression of mild intellectual curiosity.",
+      "keywords": ["troll", "thinksworth", "bridge troll"],
+      "dialogue": {
+        "default": "'Ah, a traveler! Before you cross, tell me: if a troll sits on a bridge and no one is around to cross it, is he still a bridge troll? Or just a troll who happens to be on a bridge?' He adjusts his spectacles. 'Take your time. I have literally nowhere to be.'",
+        "ask about bridge": "'This bridge? It's a metaphor. Also a bridge. It connects where you are to where you want to be. Much like all bridges, really. Also it's quite wobbly, so watch your step.'",
+        "ask about philosophy": "'Philosophy is the pursuit of wisdom through questioning everything. For example: WHY do I sit on this bridge? WHAT is a bridge, really? And WHO keeps leaving chicken feathers everywhere?' He sighs contentedly. 'Beautiful questions, all.'",
+        "ask about meaning of life": "Thinksworth's eyes light up. 'NOW we're talking! The meaning of life is...' He leans in conspiratorially. '...to ask what the meaning of life is. It's meanings all the way down.' He seems enormously pleased with himself. 'You know what? I like you. You may pass.' He scoots aside on the bridge.",
+        "ask about cave": "'The hermit's cave? Oh, the hermit left ages ago. Said something about finding himself. Left all his stuff though. Including, I believe, a rather substantial quantity of gold. Funny how finding yourself requires leaving your gold behind.'"
+      },
+      "accepts_item": "sticky_mug",
+      "gives_item": "wizard_hat",
+      "accept_message": "'A gift? For ME?' Thinksworth examines the sticky mug with delight. 'It's... it's the stickiest mug I've ever seen. This raises so many questions. What MADE it this sticky? Is stickiness an inherent property or an acquired one?' A tear rolls down his massive cheek. 'This is the most thoughtful thing anyone has ever given me. Here, take this hat I found — some wizard lost it ages ago. And please, cross freely!' He tucks the mug into his waistcoat pocket, beaming.",
+      "sets_flag": "troll_satisfied"
+    }
+  },
+
+  "creatures": {
+    "judgmental_rat": {
+      "name": "Judgmental Rat",
+      "description": "A plump rat sitting on a barrel, observing you with an expression that can only be described as disappointed. It shakes its tiny head slowly.",
+      "keywords": ["rat", "rodent"],
+      "health": 5,
+      "attack": 1,
+      "defense": 0,
+      "hostile": false,
+      "loot": [],
+      "on_defeat_msg": "The rat squeaks in outrage and scurries away, but not before giving you one last withering look. You feel slightly worse about yourself.",
+      "on_flee_msg": "The rat watches you leave with an air of 'I expected nothing and I'm still disappointed.'"
+    },
+
+    "dust_bunny": {
+      "name": "Terrifying Dust Bunny",
+      "description": "A creature made entirely of dust, cobwebs, and lost hope. It rolls toward you menacingly, leaving a trail of mild allergens. Despite its fearsome name, it's about the size of a cabbage.",
+      "keywords": ["dust bunny", "bunny", "dust"],
+      "health": 10,
+      "attack": 2,
+      "defense": 0,
+      "hostile": true,
+      "loot": ["healing_herb"],
+      "on_defeat_msg": "The dust bunny explodes in a puff of dust and existential malaise. You sneeze twice. Through the settling dust, you spot something it was guarding.",
+      "on_flee_msg": "The dust bunny rolls after you a few feet, then gives up. Its attention span is as short as its legs (it has no legs)."
+    },
+
+    "el_pollo_terrible": {
+      "name": "El Pollo Terrible",
+      "description": "A chicken of unusual size and temperament. Its feathers are puffed out to maximum intimidation volume, its eyes burn with an ancient fury, and it's wearing what appears to be a wizard's hat as a trophy. It clucks menacingly.",
+      "keywords": ["chicken", "pollo", "el pollo", "hen", "bird"],
+      "health": 25,
+      "attack": 6,
+      "defense": 2,
+      "hostile": true,
+      "loot": ["wizard_hat"],
+      "on_defeat_msg": "El Pollo Terrible lets out one final dramatic BAWK, drops the wizard's hat, and struts away with wounded dignity. It's not defeated — it's simply choosing to leave. There's a difference, and the chicken wants you to know that.",
+      "on_flee_msg": "El Pollo Terrible clucks triumphantly as you retreat, then resumes sitting on its twig throne like the tiny tyrant it is."
+    }
+  }
+}

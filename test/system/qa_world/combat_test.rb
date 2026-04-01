@@ -81,7 +81,22 @@ module QaWorld
       # Navigates to the cave and attacks until the spider is defeated.
       # Grab the rusty key, open the chest for the health potion, then fight.
       # The potion gives a heal mid-combat, making the fight reliably winnable.
+      # If the player dies, RESTART and try again (up to 3 attempts).
+      # rubocop:disable Lint/NonLocalExitFromIterator
       def defeat_spider
+        5.times do |attempt|
+          fight_spider_once
+          return if page.has_text?("crumples", wait: 1)
+
+          # Player died — revisit dev_game_path for a fresh game and retry
+          assert attempt < 4, "Spider fight lost 5 times in a row"
+          visit dev_game_path
+          find(".terminal-input").click
+        end
+      end
+      # rubocop:enable Lint/NonLocalExitFromIterator
+
+      def fight_spider_once
         # Deterministic setup: key → tavern → open chest → take potion
         find(".terminal-input").send_keys("take key", :return)
         assert_text "Rusty Key"
@@ -106,19 +121,18 @@ module QaWorld
 
         # First exchange — take at least one hit so the potion isn't wasted
         find(".terminal-input").send_keys("attack", :return)
+        return if page.has_text?("crumples", wait: 1)
 
-        unless page.has_text?("crumples", wait: 1)
-          # Heal after taking damage, giving us ~15 effective HP
-          find(".terminal-input").send_keys("use potion", :return)
-          assert_text "recover"
+        # Heal after taking damage, giving us ~15 effective HP
+        find(".terminal-input").send_keys("use potion", :return)
+        return if page.has_text?("GAME OVER", wait: 1)
 
-          14.times do
-            find(".terminal-input").send_keys("attack", :return)
-            break if page.has_text?("crumples", wait: 1)
-          end
+        assert_text "recover"
+
+        14.times do
+          find(".terminal-input").send_keys("attack", :return)
+          break if page.has_text?("crumples", wait: 1) || page.has_text?("GAME OVER", wait: 1)
         end
-
-        assert_text "crumples"
       end
   end
 end

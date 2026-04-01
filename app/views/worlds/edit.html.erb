@@ -64,18 +64,9 @@
   </div>
 
   <!-- Bottom Footer -->
-  <div class="flex-none bg-stone-900 border-t-2 border-terminal-green px-4 py-2">
-    <div class="flex justify-between items-center text-xs">
-      <div>
-        <% if logged_in? %>
-          <span><%= current_user.username %></span>
-          <span class="mx-2">|</span>
-          <%= link_to "Logout", logout_path, class: "hover:underline" %>
-        <% end %>
-      </div>
-      <div>&copy; <%= Date.today.year %> Richard Cagle</div>
-    </div>
-  </div>
+  <footer class="flex-none bg-stone-900 border-t-2 border-terminal-green px-3 grid grid-cols-3">
+    <%= render "footer" %>
+  </footer>
 
   <!-- Hidden form -->
   <%= form_with model: @world, html: { data: { world_editor_target: "form" } } do |f| %>

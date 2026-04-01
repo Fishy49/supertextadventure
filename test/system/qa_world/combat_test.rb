@@ -77,12 +77,9 @@ module QaWorld
 
     private
 
-      # Fight the spider, restarting the game if the player dies.
-      # Navigates to the cave and attacks until the spider is defeated.
-      # Grab the rusty key, open the chest for the health potion, then fight.
-      # The potion gives a heal mid-combat, making the fight reliably winnable.
+      # Fight the spider to defeat. Dev game has 50 HP (spider deals max 5/round)
+      # so the player cannot die. Grab the health potion first for extra safety.
       def defeat_spider
-        # Deterministic setup: key → tavern → open chest → take potion
         find(".terminal-input").send_keys("take key", :return)
         assert_text "Rusty Key"
 
@@ -104,18 +101,9 @@ module QaWorld
         find(".terminal-input").send_keys("attack spider", :return)
         assert_text "Cave Spider"
 
-        # First exchange — take at least one hit so the potion isn't wasted
-        find(".terminal-input").send_keys("attack", :return)
-
-        unless page.has_text?("crumples", wait: 1)
-          # Heal after taking damage, giving us ~15 effective HP
-          find(".terminal-input").send_keys("use potion", :return)
-          assert_text "recover"
-
-          14.times do
-            find(".terminal-input").send_keys("attack", :return)
-            break if page.has_text?("crumples", wait: 1)
-          end
+        10.times do
+          find(".terminal-input").send_keys("attack", :return)
+          break if page.has_text?("crumples", wait: 1)
         end
 
         assert_text "crumples"

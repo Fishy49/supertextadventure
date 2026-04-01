@@ -1,6 +1,6 @@
 <div class="col-span-3 md:col-span-2">
   <h1 class="text-lg md:text-xl font-bold">
-    <%= link_to "SuperTextAdventure_v0.1", root_path %>
+    <%= link_to "SuperTextAdventure_v0.1", logged_in? ? tavern_path : root_path %>
   </h1>
 </div>
 <% if logged_in? %>

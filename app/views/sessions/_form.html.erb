@@ -1,9 +1,9 @@
 <%= form_tag sessions_path, data: { "turbo-frame": "_top" } do |form| %>
-  <div class="grid grid-cols-1">
-    <%= text_field_tag :username,"", placeholder: "USERNAME", class: "mx-auto text-center input w-full" %>
-    <%= password_field_tag :password, "", placeholder: "PASSWORD", class: "mx-auto text-center input w-full" %>
-    <div class="mx-auto text-center pt-1">
-      <%= submit_tag "Login", class: "button" %>
+  <div class="grid grid-cols-1 gap-2">
+    <%= text_field_tag :username, "", placeholder: "USERNAME", class: "text-center input w-full" %>
+    <%= password_field_tag :password, "", placeholder: "PASSWORD", class: "text-center input w-full" %>
+    <div class="text-center pt-1">
+      <%= submit_tag "Login", class: "button w-full" %>
     </div>
   </div>
 <% end %>

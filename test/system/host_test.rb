@@ -7,16 +7,12 @@ class HostTest < ApplicationSystemTestCase
     sign_in_as(users(:owner))
   end
 
-  test "create a game via tavern terminal" do
+  test "create a game via tavern" do
     visit tavern_url
-    # Trigger the new game form via the tavern's terminal controller
-    find(".terminal-input").click
-    find(".terminal-input").send_keys("new table", :return)
-    # Wait for the game form to load in the sidebar via turbo-stream
+    click_on "Start a New Game"
     assert_selector "input[name='game[name]']"
     fill_in "game[name]", with: "My New Game"
     select "Classic Mode", from: "game[game_type]"
-    # World selector appears after selecting Classic Mode
     select "QA Test World", from: "game[world_id]"
     click_on "Create Game"
     assert_text "My New Game"

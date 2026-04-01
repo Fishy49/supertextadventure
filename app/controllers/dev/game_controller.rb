@@ -20,7 +20,8 @@ module Dev
         game_type: :classic,
         name: "Dev Game [#{dev_user.id}]",
         world: world,
-        status: "open"
+        status: "open",
+        starting_hp: 50
       )
 
       GameUser.find_or_create_by!(game: game, user: dev_user) do |gu|

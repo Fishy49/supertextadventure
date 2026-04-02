@@ -3,10 +3,11 @@
 class UsersController < ApplicationController
   layout "portal", only: %i[new activate]
 
-  load_and_authorize_resource
-  skip_authorize_resource only: %i[index activate show edit update destroy]
+  skip_before_action :require_login, only: %i[new activate create]
 
   before_action :set_user, only: %i[show edit update destroy]
+  before_action :require_owner, only: %i[index destroy]
+  before_action :require_self_or_owner, only: %i[edit update]
 
   # GET /users or /users.json
   def index
@@ -80,12 +81,16 @@ class UsersController < ApplicationController
 
   private
 
-    # Use callbacks to share common setup or constraints between actions.
     def set_user
       @user = User.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
+    def require_self_or_owner
+      return if @user == current_user || current_user&.is_owner?
+
+      redirect_to root_path, notice: t(:away_with_ye)
+    end
+
     def user_params
       params.expect(user: %i[username password password_confirmation code])
     end

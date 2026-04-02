@@ -55,8 +55,6 @@ Rails.application.routes.draw do
 
   get "tavern", to: "games#index", as: :tavern
 
-  get "about", to: "about#index"
-
   resources :worlds do
     member do
       post :preview

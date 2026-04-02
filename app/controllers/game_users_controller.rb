@@ -2,6 +2,7 @@
 
 class GameUsersController < ApplicationController
   before_action :set_game_user, except: :mute_or_unmute_all_players
+  before_action :require_host
 
   def update
     heal = game_user_params[:heal].presence.to_i
@@ -47,6 +48,11 @@ class GameUsersController < ApplicationController
 
     def set_game_user
       @game_user = GameUser.find(params[:id])
+    end
+
+    def require_host
+      game = @game_user&.game || Game.find(params[:game_id])
+      head :forbidden unless game.host?(current_user)
     end
 
     def game_user_params

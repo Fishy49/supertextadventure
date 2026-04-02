@@ -164,7 +164,7 @@ class GamesController < ApplicationController
         format.turbo_stream do
           render turbo_stream: turbo_stream.append("flash",
                                                    partial: "shared/turbo_flash",
-                                                   locals: { message: "Ye cannot KICK OVER a table ye didn't create!" })
+                                                   locals: { message: "Away with ye! Ye lack the authority for that." })
         end
       end
     end

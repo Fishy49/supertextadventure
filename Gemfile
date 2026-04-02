@@ -52,7 +52,7 @@ gem "bootsnap", require: false
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-  gem "debug", platforms: %i[mri mingw x64_mingw]
+  gem "debug", platforms: %i[mri windows]
 end
 
 group :development do
@@ -64,6 +64,14 @@ group :development do
 
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
+
+  gem "better_errors", "~> 2.9"
+  gem "binding_of_caller", "~> 1.0"
+  gem "foreman", "~> 0.87.2"
+  gem "rubocop", "~> 1.24"
+  gem "rubocop-capybara", "~> 2.21"
+  gem "rubocop-performance", "~> 1.13"
+  gem "rubocop-rails", "~> 2.13"
 end
 
 group :test do
@@ -72,31 +80,19 @@ group :test do
   gem "cuprite"
 end
 
-gem "rubocop", "~> 1.24"
-gem "rubocop-performance", "~> 1.13"
-gem "rubocop-rails", "~> 2.13"
-
 gem "classes", "~> 0.1.0"
 
 gem "sucker_punch", "~> 3.0"
 
 gem "tailwindcss-rails", "~> 2.0"
 
-gem "foreman", "~> 0.87.2"
-
 gem "view_component", "~> 3.21"
-
-gem "better_errors", "~> 2.9"
-
-gem "binding_of_caller", "~> 1.0"
 
 gem "pagy", "~> 5.10"
 
 gem "cancancan", "~> 3.4"
 
 gem "browser", "~> 5.3"
-
-gem "rubocop-capybara", "~> 2.21"
 
 gem "base64", "~> 0.2.0"
 gem "benchmark", "~> 0.4.0"

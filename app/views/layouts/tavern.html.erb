@@ -12,9 +12,10 @@
 
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <script data-site="NTUSEIK" src="https://analytics.richardcagle.dev/script.js" defer></script>
   </head>
 
-  <body class="text-base bg-stone-800 text-terminal-green min-h-screen flex flex-col">
+  <body class="text-base bg-stone-800 text-terminal-green h-screen flex flex-col overflow-hidden pb-12 md:pb-0">
 
     <header class="p-3 border-b-2 border-b-terminal-green flex flex-wrap items-center justify-between gap-2">
       <h1 class="text-lg md:text-xl font-bold">
@@ -25,28 +26,17 @@
       <% end %>
     </header>
 
-    <main class="flex-1 overflow-y-auto terminal-scrollbars p-4">
+    <main class="flex-1 overflow-y-auto terminal-scrollbars p-4 pb-16 md:pb-4">
       <div class="max-w-2xl mx-auto">
         <%= yield %>
       </div>
     </main>
 
-    <footer class="p-3 border-t-2 border-t-terminal-green grid grid-cols-3">
-      <nav class="col-span-2 flex items-center gap-1 py-2 flex-wrap">
-        <% if logged_in? %>
-          <%= link_to "Tavern", tavern_path, class: "button border-none px-2 py-0" %>
-          <% if current_user.is_owner? %>
-            <%= link_to "Invites", setup_tokens_path, class: "button border-none px-2 py-0" %>
-            <%= link_to "Worlds", worlds_path, class: "button border-none px-2 py-0" %>
-          <% end %>
-          <%= link_to "https://supertextadventure.com", class: "button border-none px-2 py-0 inline-flex items-center gap-1", target: "_blank", rel: "noopener" do %>About <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M4.25 5.5a.75.75 0 0 0-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 0 0 .75-.75v-4a.75.75 0 0 1 1.5 0v4A2.25 2.25 0 0 1 12.75 17h-8.5A2.25 2.25 0 0 1 2 14.75v-8.5A2.25 2.25 0 0 1 4.25 4h5a.75.75 0 0 1 0 1.5h-5Z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.194 12.753a.75.75 0 0 0 1.06.053L16.5 4.44v2.81a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-.75-.75h-4.5a.75.75 0 0 0 0 1.5h2.553l-9.056 8.194a.75.75 0 0 0-.053 1.06Z" clip-rule="evenodd"/></svg><% end %>
-          <%= link_to "Logout", logout_path, class: "button border-none px-2 py-0", data: { turbo_method: :get, turbo_confirm: "Are you sure you want to logout?" } %>
-        <% end %>
-      </nav>
-      <div class="col-span-1 text-right text-sm pt-1">
-        &copy; <%= Date.today.year == 2022 ? "2022" : "2022 - #{Date.today.year}" %> <a href="https://richardcagle.dev">Richard Cagle</a>
-      </div>
+    <footer class="p-3 border-t-2 border-t-terminal-green grid grid-cols-3 hidden md:grid">
+      <%= render "footer" %>
     </footer>
+
+    <%= render "mobile_nav", show_sidebar_toggle: false %>
 
   </body>
 </html>

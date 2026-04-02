@@ -187,9 +187,20 @@
       "keywords": ["barkeep", "greta", "bartender", "innkeeper"],
       "dialogue": {
         "default": "Greta looks you up and down. 'Oh, you're ALIVE. Good. That means you can PAY. One thousand gold pieces. Don't look at me like that — you ordered a whole boar. A WHOLE BOAR. Who does that?' She gestures vaguely toward the village square. 'The wizard outside might know where to find some coin. Now stop dripping on my floor.'",
-        "ask about tab": "'One. Thousand. Gold. Pieces.' Greta enunciates each word like she's hammering nails. 'You also tried to tip the bard with a live chicken. We had to chase it for an hour.'",
-        "ask about wizard": "'That old fool? He's been standing in the square all morning muttering about acorns. Harmless enough, I suppose. Just don't let him cast anything near the tavern. Last time he set the thatch on fire.'",
-        "ask about boar": "'You stood on a table, pointed at the kitchen, and yelled — and I quote — BRING ME YOUR FINEST SWINE. Then you ate the whole thing. With your hands. The bard wrote a song about it. It was not flattering.'"
+        "topics": {
+          "tab": {
+            "keywords": ["tab", "bill", "debt", "money", "pay", "receipt"],
+            "text": "One. Thousand. Gold. Pieces.' Greta enunciates each word like she's hammering nails. 'You also tried to tip the bard with a live chicken. We had to chase it for an hour."
+          },
+          "wizard": {
+            "keywords": ["wizard", "wizbert", "mage"],
+            "text": "That old fool? He's been standing in the square all morning muttering about acorns. Harmless enough, I suppose. Just don't let him cast anything near the tavern. Last time he set the thatch on fire."
+          },
+          "boar": {
+            "keywords": ["boar", "pig", "swine", "food"],
+            "text": "You stood on a table, pointed at the kitchen, and yelled — and I quote — BRING ME YOUR FINEST SWINE. Then you ate the whole thing. With your hands. The bard wrote a song about it. It was not flattering."
+          }
+        }
       },
       "accepts_item": "gold_pouch",
       "gives_item": "rusty_pan",
@@ -203,10 +214,24 @@
       "keywords": ["wizard", "wizbert", "old man", "mage"],
       "dialogue": {
         "default": "'Ah! An adventurer! I can tell by the look of bewildered desperation. You seek GOLD, yes? The Golden Acorn! It lies in the Dreaded Clearing, east through the Whispering Woods. Guarded by a fearsome beast!' He pauses dramatically. 'A chicken. But a VERY fearsome chicken. I lost my hat to that chicken.' He stares into the middle distance. 'I miss that hat.'",
-        "ask about acorn": "'The Golden Acorn! A treasure of immense value! Worth exactly one thousand gold pieces, coincidentally. It sits in the Dreaded Clearing to the east. Just follow the feathers. You'll know you're close when you hear the clucking. The terrible, terrible clucking.'",
-        "ask about chicken": "'El Pollo Terrible! The Scourge of the Clearing! It — it took my hat right off my head. Just... WHOOSH. Gone. The clearing is through the forest path, east of here. Be warned: it fights dirty. Mostly pecking. So much pecking.'",
-        "ask about hat": "The wizard's eyes go misty. 'It was a good hat. Pointy. Traditional. Had a small bird living in it, which in retrospect may have attracted the chicken in the first place. If you happen to find it... no, no. The hat is gone. I must accept this.' He does not look like he has accepted this.",
-        "ask about troll": "'Ah, old Thinksworth! Lovely fellow, really. Lives under the bridge to the west. Won't let anyone pass unless they engage in philosophical debate. Last fellow who tried just said YOLO and the troll sat on him.'"
+        "topics": {
+          "acorn": {
+            "keywords": ["acorn", "golden acorn", "treasure", "gold"],
+            "text": "The Golden Acorn! A treasure of immense value! Worth exactly one thousand gold pieces, coincidentally. It sits in the Dreaded Clearing to the east. Just follow the feathers. You'll know you're close when you hear the clucking. The terrible, terrible clucking."
+          },
+          "chicken": {
+            "keywords": ["chicken", "pollo", "el pollo", "bird", "hen"],
+            "text": "El Pollo Terrible! The Scourge of the Clearing! It — it took my hat right off my head. Just... WHOOSH. Gone. The clearing is through the forest path, east of here. Be warned: it fights dirty. Mostly pecking. So much pecking."
+          },
+          "hat": {
+            "keywords": ["hat", "wizard hat"],
+            "text": "The wizard's eyes go misty. 'It was a good hat. Pointy. Traditional. Had a small bird living in it, which in retrospect may have attracted the chicken in the first place. If you happen to find it... no, no. The hat is gone. I must accept this.' He does not look like he has accepted this."
+          },
+          "troll": {
+            "keywords": ["troll", "thinksworth", "bridge"],
+            "text": "Ah, old Thinksworth! Lovely fellow, really. Lives under the bridge to the west. Won't let anyone pass unless they engage in philosophical debate. Last fellow who tried just said YOLO and the troll sat on him."
+          }
+        }
       },
       "accepts_item": "golden_acorn",
       "gives_item": "healing_herb",
@@ -220,10 +245,25 @@
       "keywords": ["troll", "thinksworth", "bridge troll"],
       "dialogue": {
         "default": "'Ah, a traveler! Before you cross, tell me: if a troll sits on a bridge and no one is around to cross it, is he still a bridge troll? Or just a troll who happens to be on a bridge?' He adjusts his spectacles. 'Take your time. I have literally nowhere to be.'",
-        "ask about bridge": "'This bridge? It's a metaphor. Also a bridge. It connects where you are to where you want to be. Much like all bridges, really. Also it's quite wobbly, so watch your step.'",
-        "ask about philosophy": "'Philosophy is the pursuit of wisdom through questioning everything. For example: WHY do I sit on this bridge? WHAT is a bridge, really? And WHO keeps leaving chicken feathers everywhere?' He sighs contentedly. 'Beautiful questions, all.'",
-        "ask about meaning of life": "Thinksworth's eyes light up. 'NOW we're talking! The meaning of life is...' He leans in conspiratorially. '...to ask what the meaning of life is. It's meanings all the way down.' He seems enormously pleased with himself. 'You know what? I like you. You may pass.' He scoots aside on the bridge.",
-        "ask about cave": "'The hermit's cave? Oh, the hermit left ages ago. Said something about finding himself. Left all his stuff though. Including, I believe, a rather substantial quantity of gold. Funny how finding yourself requires leaving your gold behind.'"
+        "topics": {
+          "bridge": {
+            "keywords": ["bridge"],
+            "text": "This bridge? It's a metaphor. Also a bridge. It connects where you are to where you want to be. Much like all bridges, really. Also it's quite wobbly, so watch your step."
+          },
+          "philosophy": {
+            "keywords": ["philosophy", "philosophical", "think", "thinking"],
+            "text": "Philosophy is the pursuit of wisdom through questioning everything. For example: WHY do I sit on this bridge? WHAT is a bridge, really? And WHO keeps leaving chicken feathers everywhere?' He sighs contentedly. 'Beautiful questions, all."
+          },
+          "meaning of life": {
+            "keywords": ["meaning", "life", "meaning of life", "purpose"],
+            "text": "NOW we're talking! The meaning of life is...' He leans in conspiratorially. '...to ask what the meaning of life is. It's meanings all the way down.' He seems enormously pleased with himself. 'You know what? I like you. You may pass.' He scoots aside on the bridge.",
+            "sets_flag": "troll_satisfied"
+          },
+          "cave": {
+            "keywords": ["cave", "hermit", "gold"],
+            "text": "The hermit's cave? Oh, the hermit left ages ago. Said something about finding himself. Left all his stuff though. Including, I believe, a rather substantial quantity of gold. Funny how finding yourself requires leaving your gold behind."
+          }
+        }
       },
       "accepts_item": "sticky_mug",
       "gives_item": "wizard_hat",

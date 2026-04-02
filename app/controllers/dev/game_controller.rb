@@ -21,7 +21,7 @@ module Dev
         game_type: :classic,
         name: "Dev Game [#{dev_user.id}]",
         world: world,
-        status: "open",
+        status: "closed",
         starting_hp: 50
       )
 

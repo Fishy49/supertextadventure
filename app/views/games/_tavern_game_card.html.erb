@@ -14,18 +14,27 @@
   badge_label = status.to_s.upcase
 %>
 
-<%= link_to card_path, class: "block border-2 border-terminal-green border-dashed p-3 hover:bg-stone-700 transition-colors", data: { "turbo-frame": "_top" } do %>
-  <div class="flex items-center justify-between gap-2 flex-wrap">
-    <h3 class="font-bold text-lg mb-0"><%= game.name %></h3>
-    <span class="text-xs border px-2 py-0.5 <%= badge_class %>"><%= badge_label %></span>
-  </div>
+<div class="border-2 border-terminal-green border-dashed p-3 hover:bg-stone-700 transition-colors">
+  <%= link_to card_path, class: "block", data: { "turbo-frame": "_top" } do %>
+    <div class="flex items-center justify-between gap-2 flex-wrap">
+      <h3 class="font-bold text-lg mb-0"><%= game.name %></h3>
+      <span class="text-xs border px-2 py-0.5 <%= badge_class %>"><%= badge_label %></span>
+    </div>
 
-  <% if game.description.present? %>
-    <p class="text-sm opacity-80 mt-1 mb-0 truncate"><%= game.description %></p>
+    <% if game.description.present? %>
+      <p class="text-sm opacity-80 mt-1 mb-0 truncate"><%= game.description %></p>
+    <% end %>
+
+    <div class="flex items-center gap-3 mt-2 text-xs opacity-70">
+      <span><%= game.game_type&.titleize || "Unknown" %> Mode</span>
+      <span><%= game.game_users.count %>/<%= game.max_players %> players</span>
+    </div>
   <% end %>
 
-  <div class="flex items-center gap-3 mt-2 text-xs opacity-70">
-    <span><%= game.game_type&.titleize || "Unknown" %> Mode</span>
-    <span><%= game.game_users.count %>/<%= game.max_players %> players</span>
-  </div>
-<% end %>
+  <% if status == :hosting %>
+    <div class="flex items-center gap-2 mt-2 justify-end [&_form]:-mt-[5px]">
+      <%= link_to "Edit", edit_game_path(id: game.uuid), class: "text-xs border border-terminal-green px-2 py-0.5 hover:bg-terminal-green hover:text-black transition-colors", data: { "turbo-frame": "_top" } %>
+      <%= button_to "Delete", game_path(id: game.uuid), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this game?" }, class: "text-xs border border-red-500 text-red-500 px-2 py-0.5 hover:bg-red-500 hover:text-white transition-colors" %>
+    </div>
+  <% end %>
+</div>

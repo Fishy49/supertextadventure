@@ -45,7 +45,7 @@ class GameUser < ApplicationRecord
       game.messages.create(
         game_user_id: game.created_by,
         event_type: "health_change",
-        event_data: { previous_health: current_health_before_last_save, game_user: self }
+        event_data: { "previous_health" => current_health_before_last_save, "game_user_id" => id }
       )
     end
 

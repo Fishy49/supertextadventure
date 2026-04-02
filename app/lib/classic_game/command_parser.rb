@@ -138,7 +138,7 @@ module ClassicGame
 
         def extract_target_and_modifier(words)
           # Look for prepositions that indicate a modifier
-          connector_index = words.index { |w| %w[on with to].include?(w) }
+          connector_index = words.index { |w| %w[on with to about].include?(w) }
 
           if connector_index
             # Get target and modifier, filtering out articles

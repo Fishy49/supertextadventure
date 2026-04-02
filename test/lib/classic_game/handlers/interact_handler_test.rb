@@ -207,11 +207,11 @@ class InteractHandlerTest < ActiveSupport::TestCase
 
   # ─── DEFAULT RESPONSE ─────────────────────────────────────────────────────
 
-  test "no keyword match returns default" do
+  test "no keyword match returns doesn't know message" do
     result = execute("talk to innkeeper about dragons")
 
-    assert result[:success]
-    assert_includes result[:response], "I wouldn't know anything about that."
+    assert_not result[:success]
+    assert_includes result[:response], "doesn't know anything about that."
   end
 
   # ─── NPC WITH NO DIALOGUE ─────────────────────────────────────────────────
@@ -236,7 +236,7 @@ class InteractHandlerTest < ActiveSupport::TestCase
     result = execute("talk to greeter about anything")
 
     assert_not result[:success]
-    assert_includes result[:response], "doesn't know about that"
+    assert_includes result[:response], "doesn't know anything about that"
   end
 
   # ─── EDGE CASES ────────────────────────────────────────────────────────────

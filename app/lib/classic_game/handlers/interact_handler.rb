@@ -135,12 +135,8 @@ module ClassicGame
           false
         end
 
-        def handle_no_topic_match(npc_def, dialogue)
-          if dialogue["default"]
-            success("#{npc_def['name']} says: \"#{dialogue['default']}\"")
-          else
-            failure("#{npc_def['name']} doesn't know about that.")
-          end
+        def handle_no_topic_match(npc_def, _dialogue)
+          failure("#{npc_def['name']} doesn't know anything about that.")
         end
 
         def handle_give(item_target, npc_target)

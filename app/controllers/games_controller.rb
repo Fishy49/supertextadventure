@@ -140,7 +140,7 @@ class GamesController < ApplicationController
 
     def load_games
       @hosted_games = current_user.hosted_games.load_async
-      @joined_games = current_user.joined_games.load_async
+      @joined_games = current_user.joined_games.where.not(created_by: current_user.id).load_async
       @joinable_games = Game.joinable_by_user(current_user).where.not(id: @joined_games.ids).load_async
     end
 

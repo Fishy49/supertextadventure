@@ -2,7 +2,16 @@
 	<span class="<%= classes("opacity-50": !game_user.can_message) %>"><%= game_user.character_name %></span>
 	<% if game_user.game.enable_hp? %>
 		<span class="font-medium text-sm nowr">(<%= game_user.current_health %>/<%= game_user.max_health %>)</span><br>
-	  <span class="text-xs font-italic ml-10">Active <%= game_user.active_at&.strftime("%a %b %e %r") %></span>
+		<% if game_user.game.classic? %>
+			<% room_id = game_user.game.player_state(game_user.user_id)["current_room"] %>
+			<% room_name = game_user.game.world_snapshot.dig("rooms", room_id, "name") %>
+			<% if room_name %>
+				<span class="text-xs ml-10 opacity-70"><%= room_name %></span><br>
+			<% end %>
+		<% end %>
+		<% if game_user.game.game_users.count > 1 && game_user.active_at.present? %>
+			<span class="text-xs font-italic ml-10">Active <%= time_ago_in_words(game_user.active_at) %> ago</span>
+		<% end %>
 		<% if for_host %>
 			<div class="fixed inset-0 z-10 overflow-y-auto bg-stone-800 bg-opacity-25 hidden" data-game-user-target="healthForm">
 				<div class="flex min-h-full items-end justify-center sm:items-center">

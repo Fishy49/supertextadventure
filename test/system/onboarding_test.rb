@@ -17,7 +17,7 @@ class OnboardingTest < ApplicationSystemTestCase
 
     assert_text "Ye Olde Tavern"
     assert_text "#{player.username}'s First Adventure"
-    assert_selector "span", text: "PLAYING"
+    assert_selector "span", text: "HOSTING"
   end
 
   test "onboarding game is playable" do

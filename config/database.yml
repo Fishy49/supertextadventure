@@ -81,6 +81,4 @@ test:
 #
 production:
   <<: *default
-  database: supertextadventure_production
-  username: supertextadventure
-  password: <%= ENV["SUPERTEXTADVENTURE_DATABASE_PASSWORD"] %>
+  url: <%= ENV["DATABASE_URL"] %>

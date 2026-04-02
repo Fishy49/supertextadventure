@@ -107,7 +107,7 @@ module QaWorld
       assert_text "lurking in the cellar"
     end
 
-    test "no keyword match returns default response" do
+    test "no keyword match returns doesn't know message" do
       visit dev_game_path
       find(".terminal-input").click
 
@@ -116,21 +116,19 @@ module QaWorld
       assert_text "The Tavern"
 
       find(".terminal-input").send_keys("talk to innkeeper about dragons", :return)
-      assert_text "Welcome to the tavern"
+      assert_text "doesn't know anything about that"
     end
 
-    test "npc with no dialogue shows not interested" do
+    test "unknown topic shows doesn't know message" do
       visit dev_game_path
       find(".terminal-input").click
 
-      # Go to tavern -- but guard is not in tavern in QA world.
-      # The merchant is in the market and has dialogue, so let's test
-      # with a topic query to merchant about something unknown
+      # Go to market to test with merchant
       find(".terminal-input").send_keys("go west", :return)
       assert_text "The Market"
 
       find(".terminal-input").send_keys("talk to merchant about weather", :return)
-      assert_text "Looking to trade"
+      assert_text "doesn't know anything about that"
     end
   end
 end

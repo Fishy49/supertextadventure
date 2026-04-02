@@ -26,10 +26,9 @@ class OnboardingService
     return if user_has_games?
 
     world = find_or_create_onboarding_world
-    admin = User.find_by(is_owner: true)
-    return unless admin && world
+    return unless world
 
-    game = create_game(world, admin)
+    game = create_game(world)
     return unless game
 
     create_game_user(game)
@@ -46,11 +45,11 @@ class OnboardingService
       World.find_by(name: ONBOARDING_WORLD_NAME)
     end
 
-    def create_game(world, admin)
+    def create_game(world)
       Game.create!(
         name: "#{@user.username}'s First Adventure",
         description: "You wake up in a tavern cellar with no memory and an enormous tab to settle.",
-        created_by: admin.id,
+        created_by: @user.id,
         game_type: :classic,
         status: :closed,
         max_players: 1,

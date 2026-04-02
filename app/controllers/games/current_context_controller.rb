@@ -3,6 +3,7 @@
 module Games
   class CurrentContextController < ApplicationController
     before_action :set_game
+    before_action :require_host
 
     def edit
       respond_to do |format|
@@ -31,6 +32,10 @@ module Games
 
       def set_game
         @game = Game.where(id: params[:game_id]).or(Game.where(uuid: params[:game_id])).first!
+      end
+
+      def require_host
+        head :forbidden unless @game.host?(current_user)
       end
 
       def current_context_params

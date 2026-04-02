@@ -4,6 +4,7 @@ module Dev
   class GameController < ApplicationController
     DEV_USERNAME = "dev_player"
 
+    skip_before_action :require_login
     before_action :require_development!
 
     # GET /dev/game

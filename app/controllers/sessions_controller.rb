@@ -3,11 +3,14 @@
 class SessionsController < ApplicationController
   layout "portal"
 
+  skip_before_action :require_login
+
   def new; end
 
   def create
     user = User.find_by(username: params[:username])
     if user&.authenticate(params[:password])
+      reset_session
       session[:user_id] = user.id
       OnboardingService.create_for(user)
       redirect_to tavern_url, notice: t(:login_successful)
@@ -17,7 +20,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    session[:user_id] = nil
+    reset_session
     redirect_to root_url, notice: t(:logged_out)
   end
 end

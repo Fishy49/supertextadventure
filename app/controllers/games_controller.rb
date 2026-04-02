@@ -162,9 +162,9 @@ class GamesController < ApplicationController
       respond_to do |format|
         format.html { redirect_to root_path, alert: exception.message }
         format.turbo_stream do
-          msg = "<script>window.stimulus_controller('terminalInput', 'terminal')" \
-                ".show_error('Ye cannot KICK OVER a table ye didn\\'t create!', false)</script>"
-          render turbo_stream: turbo_stream.append("body", msg.html_safe) # rubocop:disable Rails/OutputSafety
+          render turbo_stream: turbo_stream.append("flash",
+                                                   partial: "shared/turbo_flash",
+                                                   locals: { message: "Ye cannot KICK OVER a table ye didn't create!" })
         end
       end
     end

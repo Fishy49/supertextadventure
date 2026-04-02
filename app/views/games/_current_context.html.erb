@@ -4,7 +4,7 @@
       <% if game.current_context.present? %>
         <% if game.is_current_context_ascii?  %>
           <pre class="text-xs">
-            <%= game.current_context.html_safe %>
+            <%= game.current_context %>
           </pre>
         <% else %>
           <p><%= game.current_context %></p>

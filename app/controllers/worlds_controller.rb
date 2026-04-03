@@ -218,12 +218,21 @@ class WorldsController < ApplicationController
           "gives_item" => params[:gives_item].presence
         }.compact
       when "creature"
-        {
+        data = {
           "name" => params[:name],
           "description" => params[:description],
           "health" => params[:health].to_i,
-          "hostile" => params[:hostile] == "1"
-        }.compact
+          "hostile" => params[:hostile] == "1",
+          "talk_text" => params[:talk_text].presence
+        }
+        if params[:attack_condition_json].present?
+          begin
+            data["attack_condition"] = JSON.parse(params[:attack_condition_json])
+          rescue JSON::ParserError
+            # Ignore malformed JSON — field will be omitted
+          end
+        end
+        data.compact
       when "meta"
         {
           "starting_room" => params[:starting_room],

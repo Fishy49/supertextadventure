@@ -21,11 +21,14 @@ module ClassicGame
         # Route to appropriate handler
         handler = get_handler(command[:verb], game: game, user_id: user.id)
 
-        if handler
-          handler.handle(command)
-        else
-          unknown_command_response(command)
-        end
+        result = if handler
+                   handler.handle(command)
+                 else
+                   unknown_command_response(command)
+                 end
+
+        # Check for aggressive creatures after the player acts
+        check_aggressive_creatures(game, user, command, result)
       rescue StandardError => e
         Rails.logger.error("ClassicGame::Engine error: #{e.message}")
         Rails.logger.error(e.backtrace.join("\n"))
@@ -55,6 +58,77 @@ module ClassicGame
       end
 
       private
+
+        def check_aggressive_creatures(game, user, command, result)
+          ps = game.player_state(user.id)
+          return result if ps.dig("combat", "active")
+
+          # Increment room action counter
+          ps["room_actions"] ||= {}
+          room_id = ps["current_room"]
+          ps["room_actions"][room_id] = (ps["room_actions"][room_id] || 0) + 1
+          game.update_player_state(user.id, ps)
+
+          room_state = game.room_state(room_id)
+          creatures = room_state["creatures"] || []
+          world = game.world_snapshot
+
+          creatures.each do |creature_id|
+            creature_def = world.dig("creatures", creature_id)
+            next unless creature_def
+            next unless creature_def["hostile"]
+            next if should_defer_attack?(creature_def, ps, room_id, command, creature_id)
+
+            # Creature attacks — build attack via InteractHandler
+            attack_command = { verb: :attack, target: creature_id, modifier: nil, raw: "attack #{creature_id}" }
+            handler = ClassicGame::Handlers::InteractHandler.new(game: game, user_id: user.id)
+            attack_result = handler.handle(attack_command)
+
+            aggro_text = creature_def["aggro_text"] || "The #{creature_def['name']} attacks you!"
+            combined = "#{result[:response]}\n\n#{aggro_text}\n\n#{attack_result[:response]}"
+            return result.merge(
+              response: combined,
+              state_changes: (result[:state_changes] || {}).merge(attack_result[:state_changes] || {})
+            )
+          end
+
+          result
+        end
+
+        def should_defer_attack?(creature_def, player_state, room_id, command, creature_id)
+          condition = creature_def["attack_condition"]
+
+          # No condition = attack immediately on any action
+          return false unless condition
+
+          if condition["moves"]
+            actions = player_state.dig("room_actions", room_id) || 0
+            return actions < condition["moves"]
+          end
+
+          if condition["room_entries"]
+            entries = player_state.dig("room_entries", room_id) || 0
+            return entries < condition["room_entries"]
+          end
+
+          if condition["on_talk"]
+            return !(command[:verb] == :talk && talk_targets_creature?(command, creature_id, creature_def))
+          end
+
+          # Unknown condition type — don't attack
+          true
+        end
+
+        def talk_targets_creature?(command, creature_id, creature_def)
+          target = command[:modifier].presence || command[:target]
+          return false if target.blank?
+
+          target_lower = target.downcase
+          return true if creature_id.downcase.include?(target_lower) || target_lower.include?(creature_id.downcase)
+
+          keywords = creature_def["keywords"] || []
+          keywords.any? { |kw| kw.downcase.include?(target_lower) || target_lower.include?(kw.downcase) }
+        end
 
         def get_handler(verb, game:, user_id:)
           # PRIORITY: Route to CombatHandler if in combat

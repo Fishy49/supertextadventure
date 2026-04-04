@@ -150,9 +150,7 @@ module ClassicGame
 
           # Check for player-character target before NPC lookup
           target_user_id, target_char_name = find_player_character(npc_target)
-          if target_user_id
-            return handle_give_to_player(item_id, item_def, target_user_id, target_char_name)
-          end
+          return handle_give_to_player(item_id, item_def, target_user_id, target_char_name) if target_user_id
 
           # Find the NPC
           npc_id, npc_def = find_npc(npc_target)
@@ -194,9 +192,7 @@ module ClassicGame
 
         def handle_give_to_player(item_id, item_def, target_user_id, target_name)
           # Target must be in the same room
-          unless other_players_in_room.include?(target_user_id.to_s)
-            return failure("#{target_name} is not here.")
-          end
+          return failure("#{target_name} is not here.") unless other_players_in_room.include?(target_user_id.to_s)
 
           # Remove item from giver
           new_giver_state = player_state.dup

@@ -3,6 +3,9 @@
 # In-memory game double for testing ClassicGame handlers without hitting the database.
 # Implements all game state methods used by BaseHandler and its subclasses.
 module ClassicGameTestHelper
+  FakeGameUser = Struct.new(:user_id, :character_name)
+  FakeUser = Struct.new(:id)
+
   class FakeGame
     attr_accessor :game_state, :game_users
 
@@ -208,9 +211,7 @@ module ClassicGameTestHelper
     game = FakeGame.new(world_data: world_data, game_users: game_users)
 
     player_ids.each do |pid|
-      if player_states.key?(pid)
-        game.game_state["player_states"][pid.to_s] = player_states[pid]
-      end
+      game.game_state["player_states"][pid.to_s] = player_states[pid] if player_states.key?(pid)
     end
 
     room_states.each { |id, state| game.game_state["room_states"][id.to_s] = state }

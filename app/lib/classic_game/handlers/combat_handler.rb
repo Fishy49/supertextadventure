@@ -160,9 +160,7 @@ module ClassicGame
 
           # If other players are still in this room (possibly in combat), mark this player
           # as waiting so the turn manager skips them until combat ends.
-          if other_players_in_room.any?
-            ClassicGame::TurnManager.add_combat_waiter(game, user_id, current_room)
-          end
+          ClassicGame::TurnManager.add_combat_waiter(game, user_id, current_room) if other_players_in_room.any?
 
           lines = []
           lines << "You flee from combat!"

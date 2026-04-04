@@ -25,7 +25,7 @@ class TurnManagerTest < ActiveSupport::TestCase
     ClassicGame::TurnManager.initialize_turns(game, [USER_1, USER_2])
 
     turn_state = game.game_state["turn_state"]
-    assert_equal ["1", "2"], turn_state["order"]
+    assert_equal %w[1 2], turn_state["order"]
     assert_equal 0, turn_state["current_index"]
     assert_equal({}, turn_state["combat_waiters"])
   end
@@ -146,8 +146,8 @@ class TurnManagerTest < ActiveSupport::TestCase
       world_data: @world,
       player_ids: [USER_1, USER_2],
       game_users: [
-        OpenStruct.new(user_id: USER_1, character_name: "Gandalf"),
-        OpenStruct.new(user_id: USER_2, character_name: "Aragorn")
+        FakeGameUser.new(USER_1, "Gandalf"),
+        FakeGameUser.new(USER_2, "Aragorn")
       ]
     )
 

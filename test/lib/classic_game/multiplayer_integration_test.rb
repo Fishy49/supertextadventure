@@ -29,8 +29,8 @@ class MultiplayerIntegrationTest < ActiveSupport::TestCase
     )
 
     @game_users = [
-      OpenStruct.new(user_id: USER_1, character_name: "Gandalf"),
-      OpenStruct.new(user_id: USER_2, character_name: "Aragorn")
+      FakeGameUser.new(USER_1, "Gandalf"),
+      FakeGameUser.new(USER_2, "Aragorn")
     ]
   end
 
@@ -186,14 +186,14 @@ class MultiplayerIntegrationTest < ActiveSupport::TestCase
       player_ids: [USER_1, USER_2],
       player_states: {
         USER_1 => player_state_in("arena", combat: {
-                                             "active" => true,
-                                             "creature_id" => "goblin",
-                                             "creature_health" => 5,
-                                             "creature_max_health" => 10,
-                                             "round_number" => 2,
-                                             "defending" => false,
-                                             "turn_order" => "player"
-                                           }),
+          "active" => true,
+          "creature_id" => "goblin",
+          "creature_health" => 5,
+          "creature_max_health" => 10,
+          "round_number" => 2,
+          "defending" => false,
+          "turn_order" => "player"
+        }),
         USER_2 => player_state_in("arena")
       },
       game_users: @game_users
@@ -211,7 +211,7 @@ class MultiplayerIntegrationTest < ActiveSupport::TestCase
   private
 
     def engine_execute(game, user_id, command_text)
-      user = OpenStruct.new(id: user_id)
+      user = FakeUser.new(user_id)
       ClassicGame::Engine.execute(game: game, user: user, command_text: command_text)
     end
 end

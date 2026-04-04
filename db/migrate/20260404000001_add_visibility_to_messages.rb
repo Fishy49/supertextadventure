@@ -2,7 +2,9 @@
 
 class AddVisibilityToMessages < ActiveRecord::Migration[8.1]
   def change
-    add_column :messages, :visible_to_user_ids, :jsonb, default: [], null: false
-    add_column :messages, :room_id, :string
+    change_table :messages, bulk: true do |t|
+      t.jsonb :visible_to_user_ids, default: [], null: false
+      t.string :room_id
+    end
   end
 end

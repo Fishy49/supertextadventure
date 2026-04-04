@@ -39,8 +39,8 @@ class GiveToPlayerHandlerTest < ActiveSupport::TestCase
     )
 
     @game_users = [
-      OpenStruct.new(user_id: USER_1, character_name: "Gandalf"),
-      OpenStruct.new(user_id: USER_2, character_name: "Aragorn")
+      FakeGameUser.new(USER_1, "Gandalf"),
+      FakeGameUser.new(USER_2, "Aragorn")
     ]
   end
 

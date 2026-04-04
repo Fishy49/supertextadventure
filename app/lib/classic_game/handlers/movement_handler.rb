@@ -157,46 +157,45 @@ module ClassicGame
             end
           end
 
-          # List exits (filter out hidden unrevealed exits)
+          lines.concat(generate_exits_lines(room_id, room_def))
+
+          lines.join("\n")
+        end
+
+        def generate_exits_lines(room_id, room_def)
           exits = room_def["exits"] || {}
           visible_exits = exits.select do |direction, exit_data|
             if exit_data.is_a?(Hash) && exit_data["hidden"]
-              # Check if revealed
               game.exit_revealed?(room_id, direction.to_s)
             else
               true
             end
           end
 
-          if visible_exits.any?
-            lines << ""
+          return [] unless visible_exits.any?
 
-            # Check if any exits have descriptive messages to show
-            exit_descriptions = []
-            visible_exits.each do |direction, exit_data|
-              next unless exit_data.is_a?(Hash)
+          lines = [""]
 
-              # Show reveal_msg for revealed hidden exits
-              if exit_data["hidden"] && exit_data["reveal_msg"].present? && game.exit_revealed?(room_id, direction.to_s)
-                exit_descriptions << exit_data["reveal_msg"]
-              end
+          exit_descriptions = []
+          visible_exits.each do |direction, exit_data|
+            next unless exit_data.is_a?(Hash)
 
-              # Show unlocked_msg for unlocked exits
-              if exit_data["unlocked_msg"].present? && game.exit_unlocked?(room_id, direction.to_s)
-                exit_descriptions << exit_data["unlocked_msg"]
-              end
+            if exit_data["hidden"] && exit_data["reveal_msg"].present? && game.exit_revealed?(room_id, direction.to_s)
+              exit_descriptions << exit_data["reveal_msg"]
             end
 
-            # Show exit descriptions if any
-            if exit_descriptions.any?
-              exit_descriptions.each { |desc| lines << desc }
-              lines << ""
+            if exit_data["unlocked_msg"].present? && game.exit_unlocked?(room_id, direction.to_s)
+              exit_descriptions << exit_data["unlocked_msg"]
             end
-
-            lines << "Exits: #{visible_exits.keys.map { |k| k.to_s.upcase }.join(', ')}"
           end
 
-          lines.join("\n")
+          if exit_descriptions.any?
+            exit_descriptions.each { |desc| lines << desc }
+            lines << ""
+          end
+
+          lines << "Exits: #{visible_exits.keys.map { |k| k.to_s.upcase }.join(', ')}"
+          lines
         end
 
         def acting_character_name
@@ -206,7 +205,7 @@ module ClassicGame
           gu&.character_name
         end
 
-        def build_movement_notifications(old_room_id, old_room_others, _new_room_id, new_room_others)
+        def build_movement_notifications(_old_room_id, old_room_others, _new_room_id, new_room_others)
           secondary = []
           char_name = acting_character_name
 

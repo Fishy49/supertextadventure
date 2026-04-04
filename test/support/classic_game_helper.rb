@@ -14,7 +14,8 @@ module ClassicGameTestHelper
         "global_flags" => {},
         "container_states" => {},
         "unlocked_exits" => {},
-        "revealed_exits" => {}
+        "revealed_exits" => {},
+        "movement_states" => {}
       }
     end
 
@@ -94,6 +95,16 @@ module ClassicGameTestHelper
       @game_state["container_states"][container_id.to_s]["removed_items"].uniq!
     end
 
+    def movement_state(entity_type, entity_id)
+      @game_state.dig("movement_states", "#{entity_type}_#{entity_id}") ||
+        { "step" => 0, "move_counter" => 0, "triggered" => false }
+    end
+
+    def update_movement_state(entity_type, entity_id, new_state)
+      @game_state["movement_states"] ||= {}
+      @game_state["movement_states"]["#{entity_type}_#{entity_id}"] = new_state
+    end
+
     def starting_hp
       10
     end
@@ -153,10 +164,11 @@ module ClassicGameTestHelper
   end
 
   # Returns a FakeGame pre-populated with optional player/room state overrides.
-  def build_game(world_data:, player_id: 1, player_state: nil, room_states: {})
+  def build_game(world_data:, player_id: 1, player_state: nil, room_states: {}, movement_states: {})
     game = FakeGame.new(world_data: world_data)
     game.game_state["player_states"][player_id.to_s] = player_state if player_state
     room_states.each { |id, state| game.game_state["room_states"][id.to_s] = state }
+    movement_states.each { |id, state| game.game_state["movement_states"][id.to_s] = state }
     game
   end
 

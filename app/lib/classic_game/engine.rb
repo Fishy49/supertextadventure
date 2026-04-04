@@ -28,7 +28,16 @@ module ClassicGame
                  end
 
         # Check for aggressive creatures after the player acts
-        check_aggressive_creatures(game, user, command, result)
+        result = check_aggressive_creatures(game, user, command, result)
+
+        # Process NPC/creature movement after the player acts
+        movement_messages = MovementProcessor.process(game: game, user_id: user.id)
+        if movement_messages.any?
+          combined = [result[:response], *movement_messages].join("\n\n")
+          result = result.merge(response: combined)
+        end
+
+        result
       rescue StandardError => e
         Rails.logger.error("ClassicGame::Engine error: #{e.message}")
         Rails.logger.error(e.backtrace.join("\n"))
@@ -54,6 +63,30 @@ module ClassicGame
           error_text += " (must be: #{VALID_CONSUME_ON.join(', ')})."
           errors << error_text
         end
+
+        valid_movement_types = %w[patrol triggered]
+        %w[npcs creatures].each do |collection|
+          label = collection.singularize.capitalize
+          (world_data[collection] || {}).each do |entity_id, entity_def|
+            next unless entity_def.is_a?(Hash) && entity_def["movement"]
+
+            movement = entity_def["movement"]
+            unless valid_movement_types.include?(movement["type"])
+              errors << "#{label} '#{entity_id}' has unknown movement type " \
+                        "'#{movement['type']}'."
+            end
+
+            if movement["type"] == "patrol" && (movement["route"].blank? || !movement["route"].is_a?(Array))
+              errors << "#{label} '#{entity_id}' patrol movement " \
+                        "requires a non-empty route array."
+            end
+
+            if movement["type"] == "triggered" && movement["destination"].blank?
+              errors << "#{label} '#{entity_id}' triggered movement requires a destination."
+            end
+          end
+        end
+
         errors
       end
 
@@ -175,7 +208,8 @@ module ClassicGame
                            "player_states" => {},
                            "room_states" => {},
                            "global_flags" => {},
-                           "container_states" => {}
+                           "container_states" => {},
+                           "movement_states" => {}
                          })
 
             # Generate fresh starting room description

@@ -203,6 +203,13 @@ module TestSupport
           "name" => "Town Crier",
           "keywords" => ["crier", "town crier"],
           "description" => "A loud man in official garb.",
+          "movement" => {
+            "type" => "triggered",
+            "trigger_flag" => "spider_slain",
+            "destination" => "cave",
+            "depart_text" => "The Town Crier rushes off to investigate the cave!",
+            "arrive_text" => "The Town Crier arrives, looking curious."
+          },
           "dialogue" => {
             "greeting" => "Hear ye! The innkeeper at the tavern knows many secrets. " \
                           "The tower is locked by ancient magic!",
@@ -221,6 +228,16 @@ module TestSupport
         "name" => "Innkeeper",
         "keywords" => %w[innkeeper keeper],
         "description" => "A jovial woman behind the bar.",
+        "movement" => {
+          "type" => "patrol",
+          "route" => [
+            { "room" => "tavern", "stay" => 3 },
+            { "room" => "town_square", "stay" => 2 }
+          ],
+          "unless_player_in" => ["tavern"],
+          "depart_text" => "The innkeeper steps out for some fresh air.",
+          "arrive_text" => "The innkeeper strolls in."
+        },
         "dialogue" => {
           "greeting" => "Welcome to the tavern! What would you like to know?",
           "default" => "Welcome to the tavern! What would you like to know?",

@@ -172,6 +172,19 @@ class Game < ApplicationRecord
     save!
   end
 
+  # Movement state methods
+  def movement_state(entity_type, entity_id)
+    game_state.dig("movement_states", "#{entity_type}_#{entity_id}") ||
+      { "step" => 0, "move_counter" => 0, "triggered" => false }
+  end
+
+  def update_movement_state(entity_type, entity_id, new_state)
+    self.game_state ||= {}
+    self.game_state["movement_states"] ||= {}
+    self.game_state["movement_states"]["#{entity_type}_#{entity_id}"] = new_state
+    save!
+  end
+
   def add_to_container(container_id, item_id)
     self.game_state ||= {}
     self.game_state["container_states"] ||= {}
@@ -238,7 +251,8 @@ class Game < ApplicationRecord
                 "player_states" => {},
                 "room_states" => {},
                 "global_flags" => {},
-                "container_states" => {}
+                "container_states" => {},
+                "movement_states" => {}
               })
 
       # Generate starting room description

@@ -99,6 +99,7 @@ class MultiplayerIntegrationTest < ActiveSupport::TestCase
       game_users: @game_users
     )
 
+    engine_execute(game, USER_1, "look") # advance turn to USER_2
     result = engine_execute(game, USER_2, "go north")
 
     assert result[:success]
@@ -117,6 +118,7 @@ class MultiplayerIntegrationTest < ActiveSupport::TestCase
       game_users: @game_users
     )
 
+    engine_execute(game, USER_1, "look") # advance turn to USER_2
     result = engine_execute(game, USER_2, "go north")
 
     secondary = result[:secondary_messages] || []
@@ -199,10 +201,9 @@ class MultiplayerIntegrationTest < ActiveSupport::TestCase
 
     # rand(1..100) > 50 fails the flee; returning 1 means flee succeeds
     handler = ClassicGame::Handlers::CombatHandler.new(game: game, user_id: USER_1)
-    handler.stub(:rand, 1) do
-      command = ClassicGame::CommandParser.parse("flee")
-      handler.handle(command)
-    end
+    handler.define_singleton_method(:rand) { |*_args| 1 }
+    command = ClassicGame::CommandParser.parse("flee")
+    handler.handle(command)
 
     assert game.player_waiting_for_combat?(USER_1)
   end

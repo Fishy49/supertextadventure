@@ -4,9 +4,10 @@
 # Implements all game state methods used by BaseHandler and its subclasses.
 module ClassicGameTestHelper
   class FakeGame
-    attr_accessor :game_state
+    attr_accessor :game_state, :game_users
 
-    def initialize(world_data:)
+    def initialize(world_data:, game_users: [])
+      @game_users = game_users
       @game_state = {
         "world_snapshot" => world_data,
         "player_states" => {},
@@ -98,6 +99,32 @@ module ClassicGameTestHelper
       10
     end
 
+    # ─── Turn state helpers ──────────────────────────────────────────────────
+
+    def current_turn_user_id
+      @game_state.dig("turn_state", "order", @game_state.dig("turn_state", "current_index") || 0)
+    end
+
+    def add_player_to_turn_order(user_id)
+      @game_state["turn_state"] ||= { "order" => [], "current_index" => 0, "combat_waiters" => {} }
+      @game_state["turn_state"]["order"] << user_id.to_s
+      @game_state["turn_state"]["order"].uniq!
+    end
+
+    def player_waiting_for_combat?(user_id)
+      @game_state.dig("turn_state", "combat_waiters", user_id.to_s).present?
+    end
+
+    def set_player_waiting_for_combat(user_id, room_id)
+      @game_state["turn_state"] ||= { "order" => [], "current_index" => 0, "combat_waiters" => {} }
+      @game_state["turn_state"]["combat_waiters"] ||= {}
+      @game_state["turn_state"]["combat_waiters"][user_id.to_s] = room_id.to_s
+    end
+
+    def clear_player_waiting_for_combat(user_id)
+      @game_state.dig("turn_state", "combat_waiters")&.delete(user_id.to_s)
+    end
+
     def save!
       # no-op — state is stored in-memory
     end
@@ -172,5 +199,25 @@ module ClassicGameTestHelper
     }
     state["combat"] = combat if combat
     state
+  end
+
+  # Build a FakeGame configured for multiplayer with turn order initialized.
+  # player_states: hash of { user_id => state_hash } — omit to use defaults.
+  # game_users: array of OpenStruct/objects with #user_id and #character_name.
+  def build_multiplayer_game(world_data:, player_ids:, player_states: {}, room_states: {}, game_users: [])
+    game = FakeGame.new(world_data: world_data, game_users: game_users)
+
+    player_ids.each do |pid|
+      if player_states.key?(pid)
+        game.game_state["player_states"][pid.to_s] = player_states[pid]
+      end
+    end
+
+    room_states.each { |id, state| game.game_state["room_states"][id.to_s] = state }
+
+    # Initialize turn order
+    ClassicGame::TurnManager.initialize_turns(game, player_ids)
+
+    game
   end
 end

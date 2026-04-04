@@ -7,12 +7,19 @@ module ClassicGame
         # Check if we're waiting for restart confirmation
         return handle_restart_confirmation(game, command_text) if game.game_state["pending_restart"]
 
+        # Enforce turn order — reject out-of-turn commands
+        unless TurnManager.user_can_act?(game, user.id)
+          return { success: false, response: TurnManager.waiting_message(game), state_changes: {} }
+        end
+
         # Check if a dice roll is pending — route all input to RollHandler
         ps = game.player_state(user.id)
         if ps["pending_roll"]
-          return ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
+          result = ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
             ClassicGame::CommandParser.parse(command_text)
           )
+          TurnManager.advance(game)
+          return result
         end
 
         # Parse the command
@@ -28,7 +35,12 @@ module ClassicGame
                  end
 
         # Check for aggressive creatures after the player acts
-        check_aggressive_creatures(game, user, command, result)
+        result = check_aggressive_creatures(game, user, command, result)
+
+        # Advance to next player's turn
+        TurnManager.advance(game)
+
+        result
       rescue StandardError => e
         Rails.logger.error("ClassicGame::Engine error: #{e.message}")
         Rails.logger.error(e.backtrace.join("\n"))

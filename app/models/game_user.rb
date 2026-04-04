@@ -12,6 +12,7 @@ class GameUser < ApplicationRecord
   before_create :set_starting_health
 
   after_create_commit :broadcast_new_player
+  after_create_commit :join_classic_turn_order, if: -> { game.classic? }
 
   after_update_commit :create_health_change_event_message, if: :saved_change_to_current_health?
   after_update_commit :broadcast_updated_player_health, if: :saved_change_to_current_health?
@@ -32,6 +33,10 @@ class GameUser < ApplicationRecord
 
       self.max_health = game.starting_hp
       self.current_health = game.starting_hp
+    end
+
+    def join_classic_turn_order
+      game.add_player_to_turn_order(user_id)
     end
 
     def broadcast_new_player

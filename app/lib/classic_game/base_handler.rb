@@ -199,6 +199,38 @@ module ClassicGame
         in_combat? && player_state.dig("combat", "creature_id") == creature_id
       end
 
+      # Returns user_id strings for all players currently in the same room as the acting player.
+      def players_in_current_room
+        current_room = player_state["current_room"]
+        return [] unless current_room
+
+        (game.game_state["player_states"] || {}).filter_map do |uid, state|
+          uid if state["current_room"] == current_room
+        end
+      end
+
+      # All players in the current room except the acting player.
+      def other_players_in_room
+        players_in_current_room - [user_id.to_s]
+      end
+
+      # Find a player character by name (case-insensitive substring match).
+      # Returns [user_id_string, character_name] or [nil, nil].
+      def find_player_character(name)
+        return [nil, nil] if name.blank?
+        return [nil, nil] unless game.respond_to?(:game_users)
+
+        name_lower = name.downcase
+        game.game_users.each do |gu|
+          char_name = gu.character_name.to_s
+          if char_name.downcase.include?(name_lower) || name_lower.include?(char_name.downcase)
+            return [gu.user_id.to_s, char_name]
+          end
+        end
+
+        [nil, nil]
+      end
+
       # Get total weapon damage from inventory
       def get_weapon_damage(inventory)
         max_damage = 0

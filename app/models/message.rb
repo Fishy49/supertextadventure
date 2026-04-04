@@ -9,12 +9,19 @@ class Message < ApplicationRecord
   scope :latest, -> { order(id: :desc) }
   scope :oldest, -> { order(id: :asc) }
   scope :for_game, ->(game) { where(game_id: game.id, is_system_message: false).latest }
+  scope :visible_to, ->(user) {
+    where("visible_to_user_ids = '[]'::jsonb OR visible_to_user_ids @> ?", [user.id].to_json)
+  }
   before_create :parse_dice_rolls
 
-  after_create_commit -> { broadcast_append_to(game, :messages) }, unless: proc { is_system_message? }
+  after_create_commit :broadcast_message, unless: proc { is_system_message? }
   after_update_commit -> { broadcast_replace_to(game, :messages) }, unless: proc { is_system_message? }
   after_create_commit :set_user_active_at, unless: proc { is_system_message? }
   after_create_commit :enqueue_classic_command, if: proc { game.classic? && player_message? }
+
+  def private?
+    visible_to_user_ids.present?
+  end
 
   def event?
     event_type.present?
@@ -35,6 +42,16 @@ class Message < ApplicationRecord
   end
 
   private
+
+    def broadcast_message
+      if private?
+        visible_to_user_ids.each do |user_id|
+          broadcast_append_to(game, :messages, user_id)
+        end
+      else
+        broadcast_append_to(game, :messages)
+      end
+    end
 
     def parse_dice_rolls
       return unless content&.downcase&.starts_with?("/roll ")

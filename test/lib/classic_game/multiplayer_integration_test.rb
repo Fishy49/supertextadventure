@@ -181,19 +181,21 @@ class MultiplayerIntegrationTest < ActiveSupport::TestCase
       }
     )
 
+    combat_state = {
+      "active" => true,
+      "creature_id" => "goblin",
+      "creature_health" => 5,
+      "creature_max_health" => 10,
+      "round_number" => 2,
+      "defending" => false,
+      "turn_order" => "player"
+    }
+
     game = build_multiplayer_game(
       world_data: world_with_creature,
       player_ids: [USER_1, USER_2],
       player_states: {
-        USER_1 => player_state_in("arena", combat: {
-          "active" => true,
-          "creature_id" => "goblin",
-          "creature_health" => 5,
-          "creature_max_health" => 10,
-          "round_number" => 2,
-          "defending" => false,
-          "turn_order" => "player"
-        }),
+        USER_1 => player_state_in("arena", combat: combat_state),
         USER_2 => player_state_in("arena")
       },
       game_users: @game_users

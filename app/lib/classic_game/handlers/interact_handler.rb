@@ -29,8 +29,9 @@ module ClassicGame
           return failure("Talk to whom?") if npc_name.blank?
 
           npc_id, npc_def = find_npc(npc_name)
-          return failure("You don't see anyone like that here.") unless npc_def
-          return failure("You don't see anyone like that here.") unless npc_in_room?(npc_id)
+
+          # If no NPC found or not in room, try creature
+          return handle_talk_to_creature(npc_name) unless npc_def && npc_in_room?(npc_id)
 
           dialogue = npc_def["dialogue"]
           return failure("#{npc_def['name']} doesn't seem interested in talking.") unless dialogue
@@ -183,6 +184,15 @@ module ClassicGame
           end
 
           failure("#{npc_def['name']} doesn't want that.")
+        end
+
+        def handle_talk_to_creature(name)
+          creature_id, creature_def = find_creature(name)
+          return failure("You don't see anyone like that here.") unless creature_def
+          return failure("You don't see anyone like that here.") unless creature_in_room?(creature_id)
+
+          talk_text = creature_def["talk_text"] || "It has no clue what you're saying."
+          success(talk_text)
         end
 
         def handle_attack(target)

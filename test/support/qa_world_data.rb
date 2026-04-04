@@ -57,7 +57,8 @@ module TestSupport
         "description" => "A cozy inn with a roaring fireplace. The smell of ale fills the air.",
         "exits" => { "west" => "town_square" },
         "items" => %w[chest lockpick],
-        "npcs" => ["innkeeper"]
+        "npcs" => ["innkeeper"],
+        "creatures" => ["tavern_rat"]
       }
     end
 
@@ -287,10 +288,23 @@ module TestSupport
           "health" => 8,
           "attack" => 3,
           "defense" => 1,
+          "hostile" => true,
+          "talk_text" => "The spider hisses at you menacingly.",
+          "aggro_text" => "The Cave Spider lunges at you!",
+          "attack_condition" => { "moves" => 3 },
           "loot" => ["shield"],
           "on_defeat_msg" => "The cave spider crumples to the ground!",
           "on_flee_msg" => "The spider hisses as you retreat.",
           "sets_flag_on_defeat" => "spider_slain"
+        },
+        "tavern_rat" => {
+          "name" => "Tavern Rat",
+          "keywords" => ["rat", "tavern rat"],
+          "description" => "A fat, lazy rat lounging near the fireplace.",
+          "health" => 3,
+          "attack" => 1,
+          "hostile" => false,
+          "talk_text" => "The rat squeaks and twitches its whiskers at you."
         }
       }
     end

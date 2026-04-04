@@ -28,4 +28,21 @@
       </label>
     </div>
   </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">Talk Text</label>
+    <%= text_area_tag :talk_text, entity_data["talk_text"],
+        rows: 2,
+        placeholder: "What the creature says when spoken to",
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
+
+  <div>
+    <label class="block mb-1 text-sm font-bold">Attack Condition (JSON)</label>
+    <%= text_area_tag :attack_condition_json,
+        entity_data["attack_condition"] ? entity_data["attack_condition"].to_json : nil,
+        rows: 2,
+        placeholder: '{"moves": 3} or {"on_talk": true} or {"room_entries": 2}',
+        class: "w-full bg-stone-900 border border-terminal-green p-2 text-terminal-green focus:outline-none" %>
+  </div>
 </div>

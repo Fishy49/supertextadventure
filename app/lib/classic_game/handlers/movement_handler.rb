@@ -75,6 +75,9 @@ module ClassicGame
           new_state["visited_rooms"] ||= []
           new_state["visited_rooms"] << room_id unless new_state["visited_rooms"].include?(room_id)
 
+          new_state["room_entries"] ||= {}
+          new_state["room_entries"][room_id] = (new_state["room_entries"][room_id] || 0) + 1
+
           update_player_state(new_state)
 
           # Generate room description

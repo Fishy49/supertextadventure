@@ -94,6 +94,10 @@ module ClassicGameTestHelper
       @game_state["container_states"][container_id.to_s]["removed_items"].uniq!
     end
 
+    def starting_hp
+      10
+    end
+
     def save!
       # no-op — state is stored in-memory
     end

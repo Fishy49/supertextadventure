@@ -68,6 +68,10 @@ module ClassicGame
           return failure("Error: Room '#{room_id}' not found.") unless new_room_def
 
           first_visit = !player_state["visited_rooms"]&.include?(room_id)
+          old_room_id = player_state["current_room"]
+
+          # Collect players in old room before moving (to notify of departure)
+          old_room_others = other_players_in_room
 
           # Update player state
           new_state = player_state.dup
@@ -80,10 +84,18 @@ module ClassicGame
 
           update_player_state(new_state)
 
+          # Collect players in new room after moving (to notify of arrival)
+          new_room_others = other_players_in_room
+
           # Generate room description
           description = generate_room_description(room_id, new_room_def, first_visit)
 
-          success(description, state_changes: { moved: true, room: room_id })
+          # Build secondary messages for room transition notifications
+          secondary = build_movement_notifications(old_room_id, old_room_others, room_id, new_room_others)
+
+          result = success(description, state_changes: { moved: true, room: room_id })
+          result[:secondary_messages] = secondary if secondary.any?
+          result
         end
 
         def generate_room_description(room_id, room_def, first_visit)
@@ -132,46 +144,80 @@ module ClassicGame
             lines << "Creatures: #{creature_names.join(', ')}"
           end
 
-          # List exits (filter out hidden unrevealed exits)
+          # List other players in the room
+          other_player_ids = other_players_in_room
+          if other_player_ids.any? && game.respond_to?(:game_users)
+            player_names = other_player_ids.filter_map do |pid|
+              gu = game.game_users.find { |u| u.user_id.to_s == pid.to_s }
+              gu&.character_name
+            end
+            if player_names.any?
+              lines << ""
+              lines << "Also here: #{player_names.join(', ')}"
+            end
+          end
+
+          lines.concat(generate_exits_lines(room_id, room_def))
+
+          lines.join("\n")
+        end
+
+        def generate_exits_lines(room_id, room_def)
           exits = room_def["exits"] || {}
           visible_exits = exits.select do |direction, exit_data|
             if exit_data.is_a?(Hash) && exit_data["hidden"]
-              # Check if revealed
               game.exit_revealed?(room_id, direction.to_s)
             else
               true
             end
           end
 
-          if visible_exits.any?
-            lines << ""
+          return [] unless visible_exits.any?
 
-            # Check if any exits have descriptive messages to show
-            exit_descriptions = []
-            visible_exits.each do |direction, exit_data|
-              next unless exit_data.is_a?(Hash)
+          lines = [""]
 
-              # Show reveal_msg for revealed hidden exits
-              if exit_data["hidden"] && exit_data["reveal_msg"].present? && game.exit_revealed?(room_id, direction.to_s)
-                exit_descriptions << exit_data["reveal_msg"]
-              end
+          exit_descriptions = []
+          visible_exits.each do |direction, exit_data|
+            next unless exit_data.is_a?(Hash)
 
-              # Show unlocked_msg for unlocked exits
-              if exit_data["unlocked_msg"].present? && game.exit_unlocked?(room_id, direction.to_s)
-                exit_descriptions << exit_data["unlocked_msg"]
-              end
+            if exit_data["hidden"] && exit_data["reveal_msg"].present? && game.exit_revealed?(room_id, direction.to_s)
+              exit_descriptions << exit_data["reveal_msg"]
             end
 
-            # Show exit descriptions if any
-            if exit_descriptions.any?
-              exit_descriptions.each { |desc| lines << desc }
-              lines << ""
+            if exit_data["unlocked_msg"].present? && game.exit_unlocked?(room_id, direction.to_s)
+              exit_descriptions << exit_data["unlocked_msg"]
             end
-
-            lines << "Exits: #{visible_exits.keys.map { |k| k.to_s.upcase }.join(', ')}"
           end
 
-          lines.join("\n")
+          if exit_descriptions.any?
+            exit_descriptions.each { |desc| lines << desc }
+            lines << ""
+          end
+
+          lines << "Exits: #{visible_exits.keys.map { |k| k.to_s.upcase }.join(', ')}"
+          lines
+        end
+
+        def acting_character_name
+          return nil unless game.respond_to?(:game_users)
+
+          gu = game.game_users.find { |u| u.user_id.to_s == user_id.to_s }
+          gu&.character_name
+        end
+
+        def build_movement_notifications(_old_room_id, old_room_others, _new_room_id, new_room_others)
+          secondary = []
+          char_name = acting_character_name
+
+          if char_name && old_room_others.any?
+            secondary << { text: "#{char_name} has left.", visible_to: old_room_others }
+          end
+
+          if char_name && new_room_others.any?
+            secondary << { text: "#{char_name} has arrived.", visible_to: new_room_others }
+          end
+
+          secondary
         end
     end
   end

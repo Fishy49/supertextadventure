@@ -181,6 +181,32 @@ class Game < ApplicationRecord
     save!
   end
 
+  # Turn state helpers
+  def add_player_to_turn_order(user_id)
+    self.game_state ||= {}
+    self.game_state["turn_state"] ||= { "order" => [], "current_index" => 0, "combat_waiters" => {} }
+    self.game_state["turn_state"]["order"] << user_id.to_s
+    self.game_state["turn_state"]["order"].uniq!
+    save!
+  end
+
+  def player_waiting_for_combat?(user_id)
+    game_state.dig("turn_state", "combat_waiters", user_id.to_s).present?
+  end
+
+  def set_player_waiting_for_combat(user_id, room_id)
+    self.game_state ||= {}
+    self.game_state["turn_state"] ||= { "order" => [], "current_index" => 0, "combat_waiters" => {} }
+    self.game_state["turn_state"]["combat_waiters"] ||= {}
+    self.game_state["turn_state"]["combat_waiters"][user_id.to_s] = room_id.to_s
+    save!
+  end
+
+  def clear_player_waiting_for_combat(user_id)
+    self.game_state.dig("turn_state", "combat_waiters")&.delete(user_id.to_s)
+    save!
+  end
+
   private
 
     def initialize_player_state(_user_id)
@@ -238,7 +264,8 @@ class Game < ApplicationRecord
                 "player_states" => {},
                 "room_states" => {},
                 "global_flags" => {},
-                "container_states" => {}
+                "container_states" => {},
+                "turn_state" => { "order" => [created_by.to_s], "current_index" => 0, "combat_waiters" => {} }
               })
 
       # Generate starting room description

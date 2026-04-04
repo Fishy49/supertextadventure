@@ -153,9 +153,14 @@ module ClassicGame
           end
 
           # Successfully fled
+          current_room = player_state["current_room"]
           new_player_state = player_state.dup
           new_player_state["combat"] = nil
           update_player_state(new_player_state)
+
+          # If other players are still in this room (possibly in combat), mark this player
+          # as waiting so the turn manager skips them until combat ends.
+          ClassicGame::TurnManager.add_combat_waiter(game, user_id, current_room) if other_players_in_room.any?
 
           lines = []
           lines << "You flee from combat!"
@@ -288,9 +293,13 @@ module ClassicGame
           update_room_state(player_state["current_room"], new_room_state)
 
           # Clear combat state
+          defeat_room = player_state["current_room"]
           new_player_state = player_state.dup
           new_player_state["combat"] = nil
           update_player_state(new_player_state)
+
+          # Unblock any players who fled from this combat's room
+          ClassicGame::TurnManager.clear_combat_waiters_for_room(game, defeat_room)
 
           # Set defeat flag if specified
           if creature_def["sets_flag_on_defeat"]

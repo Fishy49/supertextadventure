@@ -148,6 +148,10 @@ module ClassicGame
           return failure("You don't have that item.") unless item_def
           return failure("You don't have that item.") unless item?(item_id)
 
+          # Check for player-character target before NPC lookup
+          target_user_id, target_char_name = find_player_character(npc_target)
+          return handle_give_to_player(item_id, item_def, target_user_id, target_char_name) if target_user_id
+
           # Find the NPC
           npc_id, npc_def = find_npc(npc_target)
           return failure("You don't see anyone like that here.") unless npc_def
@@ -184,6 +188,39 @@ module ClassicGame
           end
 
           failure("#{npc_def['name']} doesn't want that.")
+        end
+
+        def handle_give_to_player(item_id, item_def, target_user_id, target_name)
+          # Target must be in the same room
+          return failure("#{target_name} is not here.") unless other_players_in_room.include?(target_user_id.to_s)
+
+          # Remove item from giver
+          new_giver_state = player_state.dup
+          new_giver_state["inventory"] = (new_giver_state["inventory"] || []) - [item_id]
+          update_player_state(new_giver_state)
+
+          # Add item to receiver
+          receiver_state = game.player_state(target_user_id).dup
+          receiver_state["inventory"] ||= []
+          receiver_state["inventory"] << item_id
+          game.update_player_state(target_user_id, receiver_state)
+
+          # Resolve giver's character name for secondary message
+          giver_name = acting_character_name || "Someone"
+          item_name = item_def["name"]
+
+          result = success("You give the #{item_name} to #{target_name}.")
+          result[:secondary_messages] = [
+            { text: "#{giver_name} gives you a #{item_name}.", visible_to: [target_user_id.to_s] }
+          ]
+          result
+        end
+
+        def acting_character_name
+          return nil unless game.respond_to?(:game_users)
+
+          gu = game.game_users.find { |u| u.user_id.to_s == user_id.to_s }
+          gu&.character_name
         end
 
         def handle_talk_to_creature(name)

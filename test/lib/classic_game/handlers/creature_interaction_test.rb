@@ -32,8 +32,7 @@ class CreatureInteractionTest < ActiveSupport::TestCase
     world = build_world(
       starting_room: "room1",
       rooms: { "room1" => { "name" => "Room", "description" => "A room.", "exits" => {}, "creatures" => [] } },
-      creatures: { "rat" => { "name" => "Rat", "keywords" => ["rat"], "hostile" => false, "health" => 5,
-                               "attack" => 1, "talk_text" => "Squeak." } }
+      creatures: { "rat" => { "name" => "Rat", "keywords" => ["rat"], "hostile" => false, "health" => 5, "attack" => 1, "talk_text" => "Squeak." } }
     )
     game = build_game(world_data: world, player_id: USER_ID)
     result = talk("talk to rat", game)
@@ -45,13 +44,9 @@ class CreatureInteractionTest < ActiveSupport::TestCase
   test "talk to NPC takes priority over creature with same keyword" do
     world = build_world(
       starting_room: "room1",
-      rooms: { "room1" => { "name" => "Room", "description" => "A room.", "exits" => {},
-                             "npcs" => ["bob"], "creatures" => ["bob_creature"] } },
-      npcs: { "bob" => { "name" => "Bob", "keywords" => ["bob"],
-                          "dialogue" => { "greeting" => "Hello, friend!" } } },
-      creatures: { "bob_creature" => { "name" => "Bob the Beast", "keywords" => ["bob"],
-                                        "hostile" => false, "health" => 10, "attack" => 2,
-                                        "talk_text" => "Growl." } }
+      rooms: { "room1" => { "name" => "Room", "description" => "A room.", "exits" => {}, "npcs" => ["bob"], "creatures" => ["bob_creature"] } },
+      npcs: { "bob" => { "name" => "Bob", "keywords" => ["bob"], "dialogue" => { "greeting" => "Hello, friend!" } } },
+      creatures: { "bob_creature" => { "name" => "Bob the Beast", "keywords" => ["bob"], "hostile" => false, "health" => 10, "attack" => 2, "talk_text" => "Growl." } }
     )
     game = build_game(world_data: world, player_id: USER_ID)
     result = talk("talk to bob", game)
@@ -71,8 +66,7 @@ class CreatureInteractionTest < ActiveSupport::TestCase
   end
 
   test "hostile creature with moves condition does not attack before threshold" do
-    game, user = build_engine_game("spider", "hostile" => true, "health" => 10, "attack" => 2,
-                                              "attack_condition" => { "moves" => 3 })
+    game, user = build_engine_game("spider", "hostile" => true, "health" => 10, "attack" => 2, "attack_condition" => { "moves" => 3 })
 
     ClassicGame::Engine.execute(game: game, user: user, command_text: "look")
     ClassicGame::Engine.execute(game: game, user: user, command_text: "look")
@@ -82,8 +76,7 @@ class CreatureInteractionTest < ActiveSupport::TestCase
   end
 
   test "hostile creature with moves condition attacks at threshold" do
-    game, user = build_engine_game("spider", "hostile" => true, "health" => 10, "attack" => 2,
-                                              "attack_condition" => { "moves" => 3 })
+    game, user = build_engine_game("spider", "hostile" => true, "health" => 10, "attack" => 2, "attack_condition" => { "moves" => 3 })
 
     ClassicGame::Engine.execute(game: game, user: user, command_text: "look")
     ClassicGame::Engine.execute(game: game, user: user, command_text: "look")
@@ -93,9 +86,7 @@ class CreatureInteractionTest < ActiveSupport::TestCase
   end
 
   test "hostile creature with on_talk condition attacks when talked to" do
-    game, user = build_engine_game("troll", "hostile" => true, "health" => 15, "attack" => 4,
-                                             "talk_text" => "The troll grunts.",
-                                             "attack_condition" => { "on_talk" => true })
+    game, user = build_engine_game("troll", "hostile" => true, "health" => 15, "attack" => 4, "talk_text" => "The troll grunts.", "attack_condition" => { "on_talk" => true })
 
     result = ClassicGame::Engine.execute(game: game, user: user, command_text: "talk to troll")
 
@@ -104,9 +95,7 @@ class CreatureInteractionTest < ActiveSupport::TestCase
   end
 
   test "hostile creature with on_talk condition does not attack on other actions" do
-    game, user = build_engine_game("troll", "hostile" => true, "health" => 15, "attack" => 4,
-                                             "talk_text" => "The troll grunts.",
-                                             "attack_condition" => { "on_talk" => true })
+    game, user = build_engine_game("troll", "hostile" => true, "health" => 15, "attack" => 4, "talk_text" => "The troll grunts.", "attack_condition" => { "on_talk" => true })
 
     ClassicGame::Engine.execute(game: game, user: user, command_text: "look")
 
@@ -127,14 +116,11 @@ class CreatureInteractionTest < ActiveSupport::TestCase
     world = build_world(
       starting_room: "room1",
       rooms: {
-        "room1" => { "name" => "Room 1", "description" => "First room.",
-                      "exits" => { "east" => "room2" } },
-        "room2" => { "name" => "Room 2", "description" => "Second room.",
-                      "exits" => { "west" => "room1" }, "creatures" => ["ghost"] }
+        "room1" => { "name" => "Room 1", "description" => "First room.", "exits" => { "east" => "room2" } },
+        "room2" => { "name" => "Room 2", "description" => "Second room.", "exits" => { "west" => "room1" }, "creatures" => ["ghost"] }
       },
       creatures: {
-        "ghost" => { "name" => "Ghost", "keywords" => ["ghost"], "hostile" => true,
-                      "health" => 12, "attack" => 3, "attack_condition" => { "room_entries" => 2 } }
+        "ghost" => { "name" => "Ghost", "keywords" => ["ghost"], "hostile" => true, "health" => 12, "attack" => 3, "attack_condition" => { "room_entries" => 2 } }
       }
     )
     game = build_game(world_data: world, player_id: USER_ID)
@@ -163,8 +149,7 @@ class CreatureInteractionTest < ActiveSupport::TestCase
       defaults = { "name" => creature_id.capitalize, "keywords" => [creature_id], "health" => 5, "attack" => 1 }
       build_world(
         starting_room: "room1",
-        rooms: { "room1" => { "name" => "Room", "description" => "A room.", "exits" => {},
-                               "creatures" => [creature_id] } },
+        rooms: { "room1" => { "name" => "Room", "description" => "A room.", "exits" => {}, "creatures" => [creature_id] } },
         creatures: { creature_id => defaults.merge(creature_attrs) }
       )
     end

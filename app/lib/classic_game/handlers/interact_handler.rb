@@ -31,9 +31,7 @@ module ClassicGame
           npc_id, npc_def = find_npc(npc_name)
 
           # If no NPC found or not in room, try creature
-          unless npc_def && npc_in_room?(npc_id)
-            return handle_talk_to_creature(npc_name)
-          end
+          return handle_talk_to_creature(npc_name) unless npc_def && npc_in_room?(npc_id)
 
           dialogue = npc_def["dialogue"]
           return failure("#{npc_def['name']} doesn't seem interested in talking.") unless dialogue

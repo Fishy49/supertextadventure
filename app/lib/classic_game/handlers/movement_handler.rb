@@ -83,7 +83,7 @@ module ClassicGame
           # Generate room description
           description = generate_room_description(room_id, new_room_def, first_visit)
 
-          success(description, state_changes: { moved: true, room: room_id })
+          success(description, state_changes: { moved: true, room: room_id, arrived_in_room: room_id })
         end
 
         def generate_room_description(room_id, room_def, first_visit)
@@ -130,6 +130,15 @@ module ClassicGame
               world_snapshot.dig("creatures", creature_id, "name") || creature_id
             end
             lines << "Creatures: #{creature_names.join(', ')}"
+          end
+
+          # List other players present in the room
+          other_player_ids = game.players_in_room(room_id).reject { |uid| uid == user_id.to_s }
+          if other_player_ids.any?
+            player_names_map = game.game_state["player_names"] || {}
+            other_names = other_player_ids.map { |uid| player_names_map[uid] || "Player #{uid}" }
+            lines << ""
+            lines << "Also here: #{other_names.join(', ')}"
           end
 
           # List exits (filter out hidden unrevealed exits)

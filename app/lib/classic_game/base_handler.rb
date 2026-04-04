@@ -189,6 +189,45 @@ module ClassicGame
         current_room_state["creatures"]&.include?(creature_id)
       end
 
+      # Returns user_id strings of other players in this player's current room.
+      def players_in_same_room
+        room_id = player_state["current_room"]
+        game.players_in_room(room_id).reject { |uid| uid == user_id.to_s }
+      end
+
+      # Find a player by character name. Checks game_state["player_names"] first
+      # (for FakeGame tests), then falls back to GameUser records.
+      # Returns [user_id_string, player_state_hash] or [nil, nil].
+      def find_player(name_or_id)
+        return [nil, nil] if name_or_id.blank?
+
+        player_names = game.game_state["player_names"] || {}
+        player_names.each do |uid, char_name|
+          next unless char_name.downcase.include?(name_or_id.downcase) ||
+                      name_or_id.downcase.include?(char_name.downcase)
+
+          return [uid, game.player_state(uid)]
+        end
+
+        if game.respond_to?(:game_users)
+          game.game_users.each do |gu|
+            char = gu.character_name
+            next unless char.downcase.include?(name_or_id.downcase) ||
+                        name_or_id.downcase.include?(char.downcase)
+
+            return [gu.user_id.to_s, game.player_state(gu.user_id)]
+          end
+        end
+
+        [nil, nil]
+      end
+
+      # Returns true if the given player is in the same room as the current player.
+      def player_in_room?(target_user_id)
+        target_state = game.player_state(target_user_id)
+        target_state["current_room"] == player_state["current_room"]
+      end
+
       # Check if player is in active combat
       def in_combat?
         player_state.dig("combat", "active") == true

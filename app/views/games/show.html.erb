@@ -2,7 +2,9 @@
   <%= render "debug_bar", game: @game %>
 <% end %>
 <%= turbo_stream_from(@game, :messages) %>
+<%= turbo_stream_from(@game, :messages, current_user.id) %>
 <%= turbo_stream_from(@game, :state) %>
+<div id="turn-indicator"></div>
 <% if @game.host?(current_user) %>
   <%= turbo_stream_from(@game, :host_players) %>
 <% else %>

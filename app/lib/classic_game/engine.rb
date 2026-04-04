@@ -15,6 +15,18 @@ module ClassicGame
           )
         end
 
+        # Turn order guard — reject commands from off-turn players
+        unless ClassicGame::TurnManager.can_act?(game, user.id)
+          return {
+            success: false,
+            response: ClassicGame::TurnManager.waiting_message(game, user.id),
+            state_changes: {}
+          }
+        end
+
+        # Snapshot global flags before action to detect changes
+        flags_before = (game.game_state["global_flags"] || {}).dup
+
         # Parse the command
         command = CommandParser.parse(command_text)
 
@@ -28,7 +40,25 @@ module ClassicGame
                  end
 
         # Check for aggressive creatures after the player acts
-        check_aggressive_creatures(game, user, command, result)
+        result = check_aggressive_creatures(game, user, command, result)
+
+        # Advance turn order after the full action (including creature reactions)
+        ClassicGame::TurnManager.advance(game)
+
+        # Compute flag changes and attach multiplayer events
+        flags_after = game.game_state["global_flags"] || {}
+        flag_changes = flags_after.reject { |k, v| flags_before[k] == v }
+
+        multiplayer_events = {
+          observer_messages: ClassicGame::MultiplayerNotifier.observer_messages(
+            game, user.id, command_text, result
+          ),
+          global_event_messages: ClassicGame::MultiplayerNotifier.global_event_messages(
+            game, flag_changes, user.id
+          )
+        }
+
+        result.merge(multiplayer_events: multiplayer_events)
       rescue StandardError => e
         Rails.logger.error("ClassicGame::Engine error: #{e.message}")
         Rails.logger.error(e.backtrace.join("\n"))

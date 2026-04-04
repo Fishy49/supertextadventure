@@ -143,6 +143,13 @@ module ClassicGame
         def handle_give(item_target, npc_target)
           return failure("Give what to whom?") unless item_target && npc_target
 
+          # Check if the target resolves to another player in the same room first
+          recipient_user_id, = find_player(npc_target)
+          if recipient_user_id && player_in_room?(recipient_user_id)
+            command = { verb: :give, target: item_target, modifier: npc_target, raw: "give #{item_target} to #{npc_target}" }
+            return ClassicGame::Handlers::GiveHandler.new(game: game, user_id: user_id).handle(command)
+          end
+
           # Find the item
           item_id, item_def = find_item(item_target)
           return failure("You don't have that item.") unless item_def

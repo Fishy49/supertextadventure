@@ -157,6 +157,8 @@ module ClassicGame
           new_player_state["combat"] = nil
           update_player_state(new_player_state)
 
+          ClassicGame::TurnManager.handle_flee(game, user_id)
+
           lines = []
           lines << "You flee from combat!"
           flee_msg = creature_def["on_flee_msg"] || "The #{creature_def['name']} watches you retreat."
@@ -291,6 +293,8 @@ module ClassicGame
           new_player_state = player_state.dup
           new_player_state["combat"] = nil
           update_player_state(new_player_state)
+
+          ClassicGame::TurnManager.handle_combat_end(game)
 
           # Set defeat flag if specified
           if creature_def["sets_flag_on_defeat"]

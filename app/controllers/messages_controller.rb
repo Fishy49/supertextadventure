@@ -5,7 +5,7 @@ class MessagesController < ApplicationController
   before_action :require_game_participant
 
   def index
-    @pagy, @messages = pagy(Message.for_game(@game), items: 10)
+    @pagy, @messages = pagy(Message.for_game(@game).visible_to(current_user), items: 10)
   end
 
   def create

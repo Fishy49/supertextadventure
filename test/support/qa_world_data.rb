@@ -82,7 +82,8 @@ module TestSupport
             "to" => "alcove",
             "hidden" => true,
             "requires_flag" => "spider_slain",
-            "reveal_msg" => "With the spider defeated, you notice a narrow passage to the east."
+            "reveal_msg" => "With the spider defeated, you notice a narrow passage to the east.",
+            "remote_event_msg" => "A rumbling echoes from deep within the cave... a passage has opened."
           }
         },
         "items" => [],

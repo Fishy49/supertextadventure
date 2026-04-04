@@ -211,6 +211,15 @@ module ClassicGame
             lines << "Creatures: #{creature_names.join(', ')}"
           end
 
+          # List other players present in the room
+          other_player_ids = game.players_in_room(player_state["current_room"]).reject { |uid| uid == user_id.to_s }
+          if other_player_ids.any?
+            player_names_map = game.game_state["player_names"] || {}
+            other_names = other_player_ids.map { |uid| player_names_map[uid] || "Player #{uid}" }
+            lines << ""
+            lines << "Also here: #{other_names.join(', ')}"
+          end
+
           # List exits (filter out hidden unrevealed exits)
           exits = room_def["exits"] || {}
           room_id = player_state["current_room"]

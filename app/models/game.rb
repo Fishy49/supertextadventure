@@ -172,6 +172,76 @@ class Game < ApplicationRecord
     save!
   end
 
+  # Turn management methods
+  def turn_order
+    game_state.dig("turn_state", "order") || []
+  end
+
+  def current_turn_user_id
+    game_state.dig("turn_state", "current_user_id")
+  end
+
+  def initialize_turn_order(user_ids)
+    self.game_state ||= {}
+    self.game_state["turn_state"] = {
+      "order" => user_ids.map(&:to_s),
+      "current_user_id" => user_ids.first&.to_s,
+      "combat_waiting" => []
+    }
+    save!
+  end
+
+  def advance_turn
+    ts = game_state["turn_state"]
+    return unless ts
+
+    order = ts["order"]
+    return if order.empty?
+
+    combat_waiting = ts["combat_waiting"] || []
+    current = ts["current_user_id"].to_s
+    current_index = order.index(current) || 0
+
+    next_index = (current_index + 1) % order.length
+    attempts = 0
+
+    while attempts < order.length
+      candidate = order[next_index]
+      dead = game_state.dig("player_states", candidate, "pending_restart")
+      break unless combat_waiting.include?(candidate) || dead
+
+      next_index = (next_index + 1) % order.length
+      attempts += 1
+    end
+
+    ts["current_user_id"] = order[next_index]
+    save!
+  end
+
+  def player_fled_combat(user_id)
+    ts = game_state["turn_state"]
+    return unless ts
+
+    ts["combat_waiting"] ||= []
+    ts["combat_waiting"] << user_id.to_s
+    ts["combat_waiting"].uniq!
+    advance_turn
+  end
+
+  def combat_ended
+    ts = game_state["turn_state"]
+    return unless ts
+
+    ts["combat_waiting"] = []
+    save!
+  end
+
+  def players_in_room(room_id)
+    (game_state["player_states"] || {}).select do |_uid, state|
+      state["current_room"] == room_id.to_s
+    end.keys
+  end
+
   def add_to_container(container_id, item_id)
     self.game_state ||= {}
     self.game_state["container_states"] ||= {}

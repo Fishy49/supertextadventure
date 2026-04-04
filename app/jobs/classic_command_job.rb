@@ -28,6 +28,8 @@ class ClassicCommandJob
         content: result[:response]
         # NOTE: no game_user_id, so it's a "host" message from the game engine
       )
+
+      create_multiplayer_messages(game, user, result)
     end
   end
 
@@ -43,6 +45,43 @@ class ClassicCommandJob
         event_data: result[:dice_roll],
         content: ""
       )
+    end
+
+    def create_multiplayer_messages(game, user, result)
+      events = result[:multiplayer_events]
+      return unless events
+
+      # Observer messages — players in same room who see the action
+      (events[:observer_messages] || []).each do |event|
+        Message.create!(
+          game: game,
+          content: event[:content],
+          visible_to_user_ids: event[:user_ids].map(&:to_i)
+        )
+      end
+
+      # Global event messages — remote players affected by flag changes
+      (events[:global_event_messages] || []).each do |event|
+        Message.create!(
+          game: game,
+          content: event[:content],
+          visible_to_user_ids: event[:user_ids].map(&:to_i)
+        )
+      end
+
+      # Arrival messages when a player moves into a room with others
+      if result.dig(:state_changes, :arrived_in_room)
+        arrival = ClassicGame::MultiplayerNotifier.arrival_message(
+          game, user.id, result.dig(:state_changes, :arrived_in_room)
+        )
+        if arrival
+          Message.create!(
+            game: game,
+            content: arrival[:content],
+            visible_to_user_ids: arrival[:user_ids].map(&:to_i)
+          )
+        end
+      end
     end
 
     def sync_classic_sidebar(game, user, game_user)

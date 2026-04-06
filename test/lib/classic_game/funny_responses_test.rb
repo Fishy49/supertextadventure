@@ -13,7 +13,7 @@ class FunnyResponsesTest < ActiveSupport::TestCase
   end
 
   test "unknown_command varies across calls" do
-    results = 50.times.map { FunnyResponses.unknown_command("x") }.uniq
+    results = Array.new(50) { FunnyResponses.unknown_command("x") }.uniq
     assert results.size > 1, "Expected multiple unique responses but got only #{results.size}"
   end
 

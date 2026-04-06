@@ -252,7 +252,7 @@ module ClassicGame
         def unknown_command_response(command)
           {
             success: false,
-            response: "I don't understand '#{command[:raw]}'. Type HELP for available commands.",
+            response: ClassicGame::FunnyResponses.unknown_command(command[:raw]),
             state_changes: {}
           }
         end

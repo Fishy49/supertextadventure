@@ -17,7 +17,7 @@ module ClassicGame
       private
 
         def handle_open(target)
-          return failure("Open what?") unless target
+          return failure(ClassicGame::FunnyResponses.open_what) unless target
 
           # Find the container
           container_id, container_def = find_item(target)
@@ -73,7 +73,7 @@ module ClassicGame
         end
 
         def handle_close(target)
-          return failure("Close what?") unless target
+          return failure(ClassicGame::FunnyResponses.close_what) unless target
 
           # Find the container
           container_id, container_def = find_item(target)

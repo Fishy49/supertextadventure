@@ -19,14 +19,14 @@ module ClassicGame
       private
 
         def handle_take(target)
-          return failure("Take what?") unless target
+          return failure(ClassicGame::FunnyResponses.take_what) unless target
 
           # Find the item
           item_id, item_def = find_item(target)
-          return failure("You don't see that here.") unless item_def
+          return failure(ClassicGame::FunnyResponses.dont_see_that) unless item_def
 
           # Check if it's in the room (including containers)
-          return failure("You don't see that here.") unless item_in_room?(item_id)
+          return failure(ClassicGame::FunnyResponses.dont_see_that) unless item_in_room?(item_id)
 
           # Check if it's takeable
           return failure(item_def["cant_take_msg"] || "You can't take that.") unless item_def.fetch("takeable", true)
@@ -54,14 +54,14 @@ module ClassicGame
         end
 
         def handle_drop(target)
-          return failure("Drop what?") unless target
+          return failure(ClassicGame::FunnyResponses.drop_what) unless target
 
           # Find the item
           item_id, item_def = find_item(target)
-          return failure("You don't have that.") unless item_def
+          return failure(ClassicGame::FunnyResponses.dont_have_that) unless item_def
 
           # Check if player has it
-          return failure("You don't have that.") unless item?(item_id)
+          return failure(ClassicGame::FunnyResponses.dont_have_that) unless item?(item_id)
 
           # Remove from inventory
           new_player_state = player_state.dup
@@ -79,12 +79,12 @@ module ClassicGame
         end
 
         def handle_use(item_target, modifier)
-          return failure("Use what?") unless item_target
+          return failure(ClassicGame::FunnyResponses.use_what) unless item_target
 
           # Find the item
           item_id, item_def = find_item(item_target)
-          return failure("You don't have that item.") unless item_def
-          return failure("You don't have that item.") unless item?(item_id)
+          return failure(ClassicGame::FunnyResponses.dont_have_that) unless item_def
+          return failure(ClassicGame::FunnyResponses.dont_have_that) unless item?(item_id)
 
           # First check if using item on an exit (by direction or keyword)
           if modifier
@@ -101,7 +101,7 @@ module ClassicGame
           # Check if it has a use action
           use_action = item_def["on_use"]
 
-          return failure("You can't use that here.") if use_action.nil?
+          return failure(ClassicGame::FunnyResponses.cant_use_here) if use_action.nil?
 
           # Handle different types of use actions
           case use_action["type"]
@@ -115,7 +115,7 @@ module ClassicGame
             # For future: custom script execution
             failure("That doesn't do anything right now.")
           else
-            failure("You can't use that here.")
+            failure(ClassicGame::FunnyResponses.cant_use_here)
           end
         end
 

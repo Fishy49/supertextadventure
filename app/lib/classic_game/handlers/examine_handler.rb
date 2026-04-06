@@ -29,7 +29,7 @@ module ClassicGame
         end
 
         def handle_examine(target)
-          return failure("Examine what?") unless target
+          return failure(ClassicGame::FunnyResponses.examine_what) unless target
 
           # Try to find in room items or open containers
           item_id, item_def = find_item(target)
@@ -69,10 +69,10 @@ module ClassicGame
 
           # Check if it's a room feature mentioned in description
           if current_room_def["description"]&.downcase&.include?(target)
-            return success("You see nothing special about that.")
+            return success(ClassicGame::FunnyResponses.nothing_special)
           end
 
-          failure("You don't see that here.")
+          failure(ClassicGame::FunnyResponses.dont_see_that)
         end
 
         def handle_examine_reveals_exit(item_def, base_description)

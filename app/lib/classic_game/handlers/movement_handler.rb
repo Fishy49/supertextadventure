@@ -5,11 +5,11 @@ module ClassicGame
     class MovementHandler < BaseHandler
       def handle(command)
         direction = command[:target]
-        return failure("Go where?") unless direction
+        return failure(ClassicGame::FunnyResponses.go_where) unless direction
 
         # Get exit from current room
         exit_data = current_room_def.dig("exits", direction.to_s) || current_room_def.dig("exits", direction.to_sym)
-        return failure("You can't go that way.") unless exit_data
+        return failure(ClassicGame::FunnyResponses.cant_go) unless exit_data
 
         # Handle simple string exit vs. complex exit object
         if exit_data.is_a?(String)
@@ -35,7 +35,7 @@ module ClassicGame
           # Check if exit is hidden and not yet revealed
           if hidden && direction && !game.exit_revealed?(player_state["current_room"], direction)
             # Check if it should be auto-revealed by flag
-            return failure("You can't go that way.") unless requires_flag && game.get_flag(requires_flag)
+            return failure(ClassicGame::FunnyResponses.cant_go) unless requires_flag && game.get_flag(requires_flag)
 
             game.reveal_exit(player_state["current_room"], direction)
           end

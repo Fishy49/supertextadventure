@@ -166,7 +166,7 @@ module ClassicGame
         end
 
         def handle_use_item(item_target)
-          return failure("Use what?") unless item_target
+          return failure(ClassicGame::FunnyResponses.use_what) unless item_target
 
           # Find the item in inventory
           item_id, item_def = find_item(item_target)

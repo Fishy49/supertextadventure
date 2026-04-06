@@ -26,7 +26,7 @@ module ClassicGame
           # "talk to X about Y" parses as target="" modifier="X about Y"
           npc_name, topic_name = resolve_talk_target(target, modifier)
 
-          return failure("Talk to whom?") if npc_name.blank?
+          return failure(ClassicGame::FunnyResponses.talk_to_whom) if npc_name.blank?
 
           npc_id, npc_def = find_npc(npc_name)
 
@@ -196,7 +196,7 @@ module ClassicGame
         end
 
         def handle_attack(target)
-          return failure("Attack what?") unless target
+          return failure(ClassicGame::FunnyResponses.attack_what) unless target
 
           # Find creature
           creature_id, creature_def = find_creature(target)

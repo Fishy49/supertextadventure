@@ -61,6 +61,70 @@ module ClassicGame
       "You see nothing special about that. Move along."
     ].freeze
 
+    TAKE_WHAT = [
+      "Take what? Your hands grasp at empty air.",
+      "Take what? Be more specific, adventurer.",
+      "Take what? There's a lot of stuff around. Narrow it down.",
+      "Take what? You mime picking up something invisible.",
+      "Take what? You'll need to say what you want."
+    ].freeze
+
+    DROP_WHAT = [
+      "Drop what? Your hands are already empty on that front.",
+      "Drop what? Specify the item you're tired of carrying.",
+      "Drop what? You need to be more specific.",
+      "Drop what? You pantomime letting go of nothing.",
+      "Drop what? Name the thing you wish to discard."
+    ].freeze
+
+    USE_WHAT = [
+      "Use what? You wiggle your fingers expectantly.",
+      "Use what? Specify the item you'd like to employ.",
+      "Use what? The dungeon awaits further instructions.",
+      "Use what? You need to tell me what to use.",
+      "Use what? Your pockets aren't going to search themselves."
+    ].freeze
+
+    EXAMINE_WHAT = [
+      "Examine what? You squint at nothing in particular.",
+      "Examine what? Your magnifying glass hovers aimlessly.",
+      "Examine what? Be specific about what catches your eye.",
+      "Examine what? You peer around with scholarly intent but no target.",
+      "Examine what? Tell me what deserves your scrutiny."
+    ].freeze
+
+    OPEN_WHAT = [
+      "Open what? You tug at the air expectantly.",
+      "Open what? Specify what you'd like to open.",
+      "Open what? Your hands reach for an imaginary handle.",
+      "Open what? The dungeon has many things — name one.",
+      "Open what? You'll need to be more specific."
+    ].freeze
+
+    CLOSE_WHAT = [
+      "Close what? You push against nothing.",
+      "Close what? Specify what needs shutting.",
+      "Close what? Your arms swing shut on empty air.",
+      "Close what? Name the thing you want closed.",
+      "Close what? The dungeon awaits clarification."
+    ].freeze
+
+    TALK_TO_WHOM = [
+      "Talk to whom? You mumble into the void.",
+      "Talk to whom? Specify who deserves your eloquence.",
+      "Talk to whom? The walls aren't great conversationalists.",
+      "Talk to whom? You clear your throat at nobody.",
+      "Talk to whom? Name your intended audience."
+    ].freeze
+
+    ATTACK_WHAT = [
+      "Attack what? You swing at the air heroically.",
+      "Attack what? Specify your target before you hurt yourself.",
+      "Attack what? Your weapon thirsts for a named foe.",
+      "Attack what? You shadow-box impressively but accomplish nothing.",
+      "Attack what? The dungeon suggests picking a real target."
+    ].freeze
+
     class << self
       def unknown_command(raw)
         format(UNKNOWN_COMMAND.sample, raw)

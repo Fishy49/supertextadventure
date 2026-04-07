@@ -29,11 +29,16 @@ module.exports = {
       keyframes: {
         blink: {
           'to': { opacity: '0.7' },
+        },
+        fadeInNarrative: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         }
       },
       animation: {
         blink: 'blink 1s steps(5, start) infinite',
-        spin: 'spin 3s steps(10, start) infinite'
+        spin: 'spin 3s steps(10, start) infinite',
+        'fade-in-narrative': 'fadeInNarrative 2s ease-in forwards',
       },
       colors: {
         'terminal-green': '#8fe86b',

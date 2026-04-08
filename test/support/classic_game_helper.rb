@@ -140,6 +140,21 @@ module ClassicGameTestHelper
       end
   end
 
+  # ─── Engine helper ─────────────────────────────────────────────────────────
+
+  # Route a command through the full Engine (handles pending rolls, aggro checks, etc.)
+  def execute_engine(game, user, command_text)
+    ClassicGame::Engine.execute(game: game, user: user, command_text: command_text)
+  end
+
+  # Seed the PRNG for deterministic outcomes, then restore the previous seed.
+  def with_deterministic_rand(seed = 42)
+    old_seed = srand(seed)
+    yield
+  ensure
+    srand(old_seed)
+  end
+
   # ─── Builders ──────────────────────────────────────────────────────────────
 
   def build_world(rooms: {}, items: {}, npcs: {}, creatures: {}, starting_room: nil)

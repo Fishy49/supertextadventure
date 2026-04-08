@@ -10,7 +10,7 @@ require "test_helper"
 #   - Troll HP: 1  (dies on any hit; min player damage is 1)
 #   - Dice roll DC: 1  (1d20 minimum is 1, so roll always succeeds)
 #   - srand(42) wraps the test for repeatable rand sequences
-class FullGameSystemTest < ActiveSupport::TestCase
+class FullGameSystemTest < ActiveSupport::TestCase # rubocop:disable Metrics/ClassLength
   include ClassicGameTestHelper
 
   FakeUser = Struct.new(:id)
@@ -53,7 +53,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
       )
     end
 
-    def rooms_data # rubocop:disable Metrics/MethodLength
+    def rooms_data
       {
         "entrance" => {
           "name" => "Entrance Hall",
@@ -70,7 +70,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
         "storeroom" => {
           "name" => "Storeroom",
           "description" => "A dusty storeroom with shelves.",
-          "items" => ["supply_crate", "lockpick"],
+          "items" => %w[supply_crate lockpick],
           "exits" => { "west" => "entrance" }
         },
         "cave" => {
@@ -112,36 +112,36 @@ class FullGameSystemTest < ActiveSupport::TestCase
           "takeable" => true, "description" => "A tarnished old key."
         },
         "gem" => {
-          "name" => "Glowing Gem", "keywords" => ["gem", "glowing"],
+          "name" => "Glowing Gem", "keywords" => %w[gem glowing],
           "takeable" => true, "description" => "It pulsates with inner light."
         },
         "enchanted_blade" => {
-          "name" => "Enchanted Blade", "keywords" => ["blade", "sword", "enchanted"],
+          "name" => "Enchanted Blade", "keywords" => %w[blade sword enchanted],
           "takeable" => true, "weapon_damage" => 3,
           "description" => "A blade humming with magic."
         },
         "scroll" => {
-          "name" => "Ancient Scroll", "keywords" => ["scroll", "ancient"],
+          "name" => "Ancient Scroll", "keywords" => %w[scroll ancient],
           "takeable" => true, "description" => "Yellowed parchment covered in runes.",
           "on_use" => { "type" => "message", "text" => "The scroll speaks of ancient prophecies." }
         },
         "victory_crown" => {
-          "name" => "Victory Crown", "keywords" => ["crown", "victory"],
+          "name" => "Victory Crown", "keywords" => %w[crown victory],
           "takeable" => true, "description" => "The crown of the realm."
         }
       }
     end
 
-    def complex_items # rubocop:disable Metrics/MethodLength
+    def complex_items
       {
         "health_potion" => {
-          "name" => "Health Potion", "keywords" => ["potion", "health"],
+          "name" => "Health Potion", "keywords" => %w[potion health],
           "takeable" => true, "consumable" => true,
           "description" => "A red potion that restores health.",
           "combat_effect" => { "type" => "heal", "amount" => 5 }
         },
         "lockpick" => {
-          "name" => "Lockpick", "keywords" => ["lockpick", "pick"],
+          "name" => "Lockpick", "keywords" => %w[lockpick pick],
           "takeable" => true, "description" => "A slender metal pick.",
           "dice_roll" => {
             "dc" => 1, "dice" => "1d20",
@@ -153,7 +153,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
           }
         },
         "supply_crate" => {
-          "name" => "Supply Crate", "keywords" => ["crate", "supply", "chest"],
+          "name" => "Supply Crate", "keywords" => %w[crate supply chest],
           "is_container" => true, "starts_closed" => true,
           "locked" => true, "unlock_item" => "old_key",
           "contents" => ["health_potion"],
@@ -170,7 +170,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
       { "guide" => guide_data, "wizard" => wizard_data }
     end
 
-    def guide_data # rubocop:disable Metrics/MethodLength
+    def guide_data
       {
         "name" => "Guide", "keywords" => ["guide"],
         "description" => "A helpful traveler who knows the area.",
@@ -179,7 +179,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
           "sets_flag" => "spoke_to_guide",
           "topics" => {
             "directions" => {
-              "keywords" => ["directions", "direction"],
+              "keywords" => %w[directions direction],
               "text" => "Head north for the tower, south for the cave.",
               "leads_to" => ["secret"]
             },
@@ -270,7 +270,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
     end
 
     # Phase 3: take, container locking, open with key, close, drop/take, use absent item
-    def phase_items_containers(game, user) # rubocop:disable Metrics/MethodLength
+    def phase_items_containers(game, user)
       r = ex(game, user, "go east")
       assert_includes r[:response], "Storeroom", "PHASE 3: should move to storeroom"
 
@@ -359,7 +359,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
     end
 
     # Phase 6: enter cave, talk (no aggro), two looks (aggro on 4th action), combat, loot
-    def phase_combat(game, user) # rubocop:disable Metrics/MethodLength
+    def phase_combat(game, user)
       r = ex(game, user, "go south")
       assert_includes r[:response], "Dark Cave", "PHASE 6: should enter the cave"
       assert_not game.player_state(USER_ID).dig("combat", "active"), "no combat yet after entering"

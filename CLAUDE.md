@@ -44,7 +44,9 @@ Add any of these if they help clarify intent:
 
 ## Full-Game System Test
 
-The file `test/lib/classic_game/full_game_system_test.rb` is a comprehensive end-to-end playthrough test that exercises every game mechanic. When adding or modifying classic game features, update this test to cover the new behavior.
+The file `test/lib/classic_game/full_game_system_test.rb` is a comprehensive end-to-end playthrough test that exercises every game mechanic. When adding or modifying classic game features, update this test to cover the new behavior. Run it with:
+
+    bin/rails test test/lib/classic_game/full_game_system_test.rb
 
 ## Preferences
 > **Important:** Every shell command must be a single, simple call — no `$()`,

@@ -140,9 +140,13 @@ module ClassicGameTestHelper
       end
   end
 
+  FakeUser = Struct.new(:id)
+
   # ─── Engine helper ─────────────────────────────────────────────────────────
 
-  # Route a command through the full Engine (handles pending rolls, aggro checks, etc.)
+  # Route a command through the full Engine (handles pending rolls, aggro checks,
+  # restart confirmation, and handler dispatch). Accepts any object that responds
+  # to #id — use FakeUser.new(some_id) as the user argument.
   def execute_engine(game, user, command_text)
     ClassicGame::Engine.execute(game: game, user: user, command_text: command_text)
   end

@@ -45,3 +45,9 @@ Add any of these if they help clarify intent:
 ## Preferences
 > **Important:** Every shell command must be a single, simple call — no `$()`,
 > no `&&` chains. Use separate tool calls and carry values between them.
+
+## Full-Game System Test
+
+Any feature that adds or modifies ClassicGame mechanics **must** update
+`test/lib/classic_game/full_game_system_test.rb` to exercise the new
+behavior. The test serves as a blocking sanity check in CI.

@@ -3,6 +3,17 @@
 # In-memory game double for testing ClassicGame handlers without hitting the database.
 # Implements all game state methods used by BaseHandler and its subclasses.
 module ClassicGameTestHelper
+  FakeUser = Struct.new(:id)
+
+  # Convenience wrapper: run a command through the full Engine stack.
+  def execute_engine_command(game, user_id, command_text)
+    ClassicGame::Engine.execute(
+      game: game,
+      user: FakeUser.new(user_id),
+      command_text: command_text
+    )
+  end
+
   class FakeGame
     attr_accessor :game_state
 

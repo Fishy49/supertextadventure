@@ -438,6 +438,19 @@ System: === Hidden Vault ===
         A secret chamber filled with ancient artifacts...
 ```
 
+## Full-Game System Test
+
+`test/lib/classic_game/full_game_system_test.rb` runs a complete game
+playthrough from start to finish, exercising every mechanic:
+movement, items, containers, dialogue, combat, dice rolls, hidden
+exits, NPC exchange, and aggressive creatures.
+
+**New features must update this test.** If you add a new handler or
+mechanic, add steps to the playthrough and/or add a focused test case.
+The test uses `FakeGame` (in-memory, no database) and stubs all
+randomness for deterministic results. It runs in CI as part of
+`bin/rails test` and failures will block the PR.
+
 ## Testing
 
 Create a classic game and try these commands:

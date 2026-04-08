@@ -6,7 +6,6 @@ class CreatureInteractionTest < ActiveSupport::TestCase
   include ClassicGameTestHelper
 
   USER_ID = 1
-  FakeUser = Struct.new(:id)
 
   # ─── TALK TO CREATURE ─────────────────────────────────────────────────────
 

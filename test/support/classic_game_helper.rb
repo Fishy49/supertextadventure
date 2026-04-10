@@ -140,6 +140,25 @@ module ClassicGameTestHelper
       end
   end
 
+  FakeUser = Struct.new(:id)
+
+  # ─── Engine helper ─────────────────────────────────────────────────────────
+
+  # Route a command through the full Engine (handles pending rolls, aggro checks,
+  # restart confirmation, and handler dispatch). Accepts any object that responds
+  # to #id — use FakeUser.new(some_id) as the user argument.
+  def execute_engine(game, user, command_text)
+    ClassicGame::Engine.execute(game: game, user: user, command_text: command_text)
+  end
+
+  # Seed the PRNG for deterministic outcomes, then restore the previous seed.
+  def with_deterministic_rand(seed = 42)
+    old_seed = srand(seed)
+    yield
+  ensure
+    srand(old_seed)
+  end
+
   # ─── Builders ──────────────────────────────────────────────────────────────
 
   def build_world(rooms: {}, items: {}, npcs: {}, creatures: {}, starting_room: nil)

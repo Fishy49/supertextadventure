@@ -38,6 +38,8 @@ Rails/ThreeStateBooleanColumn:
 
 Metrics/ClassLength:
   Max: 300
+  Exclude:
+    - 'test/**/*'
 
 Metrics/PerceivedComplexity:
   Enabled: false

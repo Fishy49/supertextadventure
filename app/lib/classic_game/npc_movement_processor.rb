@@ -13,15 +13,16 @@ module ClassicGame
         world = game.world_snapshot
         messages = []
 
-        collect_movable_entities(world).each do |entity_id, entity_def, entity_type|
+        collect_movable_entities(world).each do |entity|
+          entity_id, entity_def, _ = entity
           next if entity_id == combat_creature_id
 
           movement = entity_def["movement"]
           entity_messages = case movement["type"]
                             when "patrol"
-                              process_patrol(game, entity_id, entity_def, entity_type, player_room, world)
+                              process_patrol(game, entity, player_room, world)
                             when "triggered"
-                              process_triggered(game, entity_id, entity_def, entity_type, player_room, world)
+                              process_triggered(game, entity, player_room, world)
                             else
                               []
                             end
@@ -46,7 +47,8 @@ module ClassicGame
           entities
         end
 
-        def process_patrol(game, entity_id, entity_def, entity_type, player_room, world)
+        def process_patrol(game, entity, player_room, world)
+          entity_id, entity_def, entity_type = entity
           state = game.npc_movement_state(entity_id)
           state = { "schedule_index" => 0, "turns_in_step" => 0 } if state.empty?
 
@@ -83,7 +85,8 @@ module ClassicGame
           messages
         end
 
-        def process_triggered(game, entity_id, entity_def, entity_type, player_room, world)
+        def process_triggered(game, entity, player_room, world)
+          entity_id, entity_def, entity_type = entity
           movement = entity_def["movement"]
           state = game.npc_movement_state(entity_id)
 
@@ -126,13 +129,8 @@ module ClassicGame
           movement = entity_def["movement"]
           name = entity_def["name"]
 
-          if from_room == player_room
-            messages << (movement["depart_msg"] || "The #{name} leaves.")
-          end
-
-          if to_room == player_room
-            messages << (movement["arrive_msg"] || "The #{name} arrives.")
-          end
+          messages << (movement["depart_msg"] || "The #{name} leaves.") if from_room == player_room
+          messages << (movement["arrive_msg"] || "The #{name} arrives.") if to_room == player_room
 
           messages
         end

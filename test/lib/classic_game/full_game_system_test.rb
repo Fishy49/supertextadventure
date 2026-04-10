@@ -10,7 +10,7 @@ require "test_helper"
 #   - Troll HP: 1  (dies on any hit; min player damage is 1)
 #   - Dice roll DC: 1  (1d20 minimum is 1, so roll always succeeds)
 #   - srand(42) wraps the test for repeatable rand sequences
-class FullGameSystemTest < ActiveSupport::TestCase # rubocop:disable Metrics/ClassLength
+class FullGameSystemTest < ActiveSupport::TestCase
   include ClassicGameTestHelper
 
   FakeUser = Struct.new(:id)

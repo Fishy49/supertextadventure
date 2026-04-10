@@ -14,7 +14,7 @@ module ClassicGame
         messages = []
 
         collect_movable_entities(world).each do |entity|
-          entity_id, entity_def, _ = entity
+          entity_id, entity_def, = entity
           next if entity_id == combat_creature_id
 
           movement = entity_def["movement"]

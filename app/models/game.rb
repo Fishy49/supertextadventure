@@ -187,7 +187,7 @@ class Game < ApplicationRecord
   def players_in_room(room_id)
     states = game_state["player_states"] || {}
     states.select { |_uid, state| state["current_room"] == room_id.to_s }
-          .map { |uid, state| [uid.to_i, state] }
+          .transform_keys(&:to_i)
   end
 
   def all_player_user_ids

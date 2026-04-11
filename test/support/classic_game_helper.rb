@@ -156,7 +156,7 @@ module ClassicGameTestHelper
     def players_in_room(room_id)
       states = @game_state["player_states"] || {}
       states.select { |_uid, state| state["current_room"] == room_id.to_s }
-            .map { |uid, state| [uid.to_i, state] }
+            .transform_keys(&:to_i)
     end
 
     def all_player_user_ids
@@ -276,8 +276,7 @@ module ClassicGameTestHelper
   end
 
   # Shorthand to build a player_state hash for use in build_game.
-  def player_state_in(room_id, inventory: [], health: 10, max_health: 10, combat: nil,
-                      waiting_for_combat_end: false)
+  def player_state_in(room_id, inventory: [], health: 10, max_health: 10, **opts)
     state = {
       "current_room" => room_id.to_s,
       "inventory" => inventory,
@@ -286,8 +285,8 @@ module ClassicGameTestHelper
       "visited_rooms" => [],
       "flags" => {}
     }
-    state["combat"] = combat if combat
-    state["waiting_for_combat_end"] = true if waiting_for_combat_end
+    state["combat"] = opts[:combat] if opts[:combat]
+    state["waiting_for_combat_end"] = true if opts[:waiting_for_combat_end]
     state
   end
 end

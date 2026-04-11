@@ -14,7 +14,9 @@ module ClassicGameTestHelper
         "global_flags" => {},
         "container_states" => {},
         "unlocked_exits" => {},
-        "revealed_exits" => {}
+        "revealed_exits" => {},
+        "turn_count" => 0,
+        "npc_movement" => {}
       }
     end
 
@@ -92,6 +94,23 @@ module ClassicGameTestHelper
       @game_state["container_states"][container_id.to_s]["removed_items"] ||= []
       @game_state["container_states"][container_id.to_s]["removed_items"] << item_id
       @game_state["container_states"][container_id.to_s]["removed_items"].uniq!
+    end
+
+    def turn_count
+      @game_state["turn_count"] || 0
+    end
+
+    def increment_turn_count
+      @game_state["turn_count"] = turn_count + 1
+    end
+
+    def npc_movement_state(entity_id)
+      @game_state.dig("npc_movement", entity_id.to_s) || {}
+    end
+
+    def update_npc_movement_state(entity_id, state)
+      @game_state["npc_movement"] ||= {}
+      @game_state["npc_movement"][entity_id.to_s] = state
     end
 
     def starting_hp

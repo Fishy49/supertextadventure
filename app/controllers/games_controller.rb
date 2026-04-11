@@ -111,6 +111,7 @@ class GamesController < ApplicationController
   end
 
   def destroy
+    game_dom_id = helpers.dom_id(@game)
     @game.destroy
 
     respond_to do |format|
@@ -118,7 +119,10 @@ class GamesController < ApplicationController
       format.json { head :no_content }
       format.turbo_stream do
         load_games
-        render turbo_stream: turbo_stream.update(@turbo_frame_id, partial: "list")
+        render turbo_stream: [
+          turbo_stream.update(@turbo_frame_id, partial: "list"),
+          turbo_stream.remove(game_dom_id)
+        ]
       end
     end
   end

@@ -47,7 +47,7 @@ module TestSupport
           "west" => "market"
         },
         "items" => ["rusty_key"],
-        "npcs" => ["crier"]
+        "npcs" => %w[crier patrol_guard]
       }
     end
 
@@ -212,7 +212,8 @@ module TestSupport
           }
         },
         "innkeeper" => innkeeper_npc,
-        "merchant" => merchant_npc
+        "merchant" => merchant_npc,
+        "patrol_guard" => patrol_guard_npc
       }
     end
 
@@ -275,6 +276,23 @@ module TestSupport
         "dialogue" => {
           "greeting" => "Looking to trade? I'm after a sparkling gem. Bring me one and I'll make it worth your while.",
           "default" => "Looking to trade? I'm after a sparkling gem. Bring me one and I'll make it worth your while."
+        }
+      }
+    end
+
+    def self.patrol_guard_npc
+      {
+        "name" => "Town Guard",
+        "keywords" => %w[guard town guard],
+        "description" => "A guard making rounds through town.",
+        "movement" => {
+          "type" => "patrol",
+          "schedule" => [
+            { "room" => "town_square", "duration" => 3 },
+            { "room" => "tavern", "duration" => 3 }
+          ],
+          "depart_msg" => "The Town Guard heads toward the tavern.",
+          "arrive_msg" => "The Town Guard arrives from the tavern."
         }
       }
     end

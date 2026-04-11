@@ -181,6 +181,28 @@ class Game < ApplicationRecord
     save!
   end
 
+  def turn_count
+    game_state["turn_count"] || 0
+  end
+
+  def increment_turn_count
+    self.game_state ||= {}
+    self.game_state["turn_count"] = turn_count + 1
+    save!
+    game_state["turn_count"]
+  end
+
+  def npc_movement_state(entity_id)
+    game_state.dig("npc_movement", entity_id.to_s) || {}
+  end
+
+  def update_npc_movement_state(entity_id, state)
+    self.game_state ||= {}
+    self.game_state["npc_movement"] ||= {}
+    self.game_state["npc_movement"][entity_id.to_s] = state
+    save!
+  end
+
   private
 
     def initialize_player_state(_user_id)
@@ -238,7 +260,9 @@ class Game < ApplicationRecord
                 "player_states" => {},
                 "room_states" => {},
                 "global_flags" => {},
-                "container_states" => {}
+                "container_states" => {},
+                "turn_count" => 0,
+                "npc_movement" => {}
               })
 
       # Generate starting room description

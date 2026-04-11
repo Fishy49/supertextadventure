@@ -18,6 +18,22 @@ class HostTest < ApplicationSystemTestCase
     assert_text "My New Game"
   end
 
+  test "delete a game via tavern removes the card from the UI" do
+    game = games(:classic_open)
+
+    visit tavern_url
+    assert_text game.name
+
+    accept_confirm do
+      within "##{ActionView::RecordIdentifier.dom_id(game)}" do
+        click_on "Delete"
+      end
+    end
+
+    assert_no_text game.name
+    assert_nil Game.find_by(id: game.id)
+  end
+
   test "start the game via terminal command" do
     visit game_url(id: games(:classic_open).uuid)
     find(".terminal-input").click

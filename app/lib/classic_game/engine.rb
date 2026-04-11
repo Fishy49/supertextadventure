@@ -10,9 +10,10 @@ module ClassicGame
         # Check if a dice roll is pending — route all input to RollHandler
         ps = game.player_state(user.id)
         if ps["pending_roll"]
-          return ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
+          result = ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
             ClassicGame::CommandParser.parse(command_text)
           )
+          return process_npc_movement(game, user, result)
         end
 
         # Parse the command
@@ -28,7 +29,8 @@ module ClassicGame
                  end
 
         # Check for aggressive creatures after the player acts
-        check_aggressive_creatures(game, user, command, result)
+        result = check_aggressive_creatures(game, user, command, result)
+        process_npc_movement(game, user, result)
       rescue StandardError => e
         Rails.logger.error("ClassicGame::Engine error: #{e.message}")
         Rails.logger.error(e.backtrace.join("\n"))
@@ -58,6 +60,15 @@ module ClassicGame
       end
 
       private
+
+        def process_npc_movement(game, user, result)
+          messages = ClassicGame::NpcMovementProcessor.process(game: game, user_id: user.id)
+          return result if messages.empty?
+
+          combined = result[:response]
+          messages.each { |msg| combined += "\n\n#{msg}" }
+          result.merge(response: combined)
+        end
 
         def check_aggressive_creatures(game, user, command, result)
           ps = game.player_state(user.id)
@@ -175,7 +186,9 @@ module ClassicGame
                            "player_states" => {},
                            "room_states" => {},
                            "global_flags" => {},
-                           "container_states" => {}
+                           "container_states" => {},
+                           "turn_count" => 0,
+                           "npc_movement" => {}
                          })
 
             # Generate fresh starting room description

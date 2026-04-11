@@ -154,7 +154,7 @@ class MultiplayerSystemTest < ActiveSupport::TestCase
 
     assert r[:state_changes][:arrival_text], "arrival_text should be present"
     assert_includes r[:state_changes][:arrival_text], "Elara"
-    assert_includes r[:state_changes][:arrival_text], "north"  # from north (opposite of south)
+    assert_includes r[:state_changes][:arrival_text], "north" # from north (opposite of south)
   end
 
   test "movement state_changes include departure text when leaving occupied room" do
@@ -254,7 +254,7 @@ class MultiplayerSystemTest < ActiveSupport::TestCase
     end
 
     # Force flee to succeed by seeding rand to always flee
-    with_deterministic_rand(99) do  # rand(1..100) with seed 99 returns > 50 first? Let's check.
+    with_deterministic_rand(99) do # rand(1..100) with seed 99 returns > 50 first? Let's check.
       # Simulate a successful flee by calling TurnManager directly
       ClassicGame::TurnManager.remove_from_combat(game, PLAYER1_ID)
     end

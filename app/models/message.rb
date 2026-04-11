@@ -9,7 +9,7 @@ class Message < ApplicationRecord
   scope :latest, -> { order(id: :desc) }
   scope :oldest, -> { order(id: :asc) }
   scope :for_game, ->(game) { where(game_id: game.id, is_system_message: false).latest }
-  scope :visible_to_user, ->(user) {
+  scope :visible_to_user, lambda { |user|
     where("visible_to_user_ids IS NULL OR :uid = ANY(visible_to_user_ids)", uid: user.id)
   }
   before_create :parse_dice_rolls

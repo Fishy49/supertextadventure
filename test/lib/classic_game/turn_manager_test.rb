@@ -166,7 +166,7 @@ class TurnManagerTest < ActiveSupport::TestCase
     assert order.is_a?(Array), "combat_turn_order should be an array"
     assert_equal 3, order.length, "should have 2 players + 1 creature"
 
-    ids = order.map { |c| c["id"] }
+    ids = order.pluck("id")
     assert_includes ids, "1"
     assert_includes ids, "2"
     assert_includes ids, "goblin"

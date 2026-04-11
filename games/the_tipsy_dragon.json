@@ -31,7 +31,7 @@
         "south": "village_square"
       },
       "items": ["tavern_menu"],
-      "npcs": ["barkeep"]
+      "npcs": ["barkeep", "wandering_bard"]
     },
 
     "village_square": {
@@ -269,6 +269,38 @@
       "gives_item": "wizard_hat",
       "accept_message": "'A gift? For ME?' Thinksworth examines the sticky mug with delight. 'It's... it's the stickiest mug I've ever seen. This raises so many questions. What MADE it this sticky? Is stickiness an inherent property or an acquired one?' A tear rolls down his massive cheek. 'This is the most thoughtful thing anyone has ever given me. Here, take this hat I found — some wizard lost it ages ago. And please, cross freely!' He tucks the mug into his waistcoat pocket, beaming.",
       "sets_flag": "troll_satisfied"
+    },
+
+    "wandering_bard": {
+      "name": "Bardric the Unasked-For",
+      "description": "A reedy man clutching a lute he is not qualified to hold, let alone play. He strikes a chord so flat it visibly offends a nearby candle.",
+      "keywords": ["bard", "bardric", "musician", "minstrel"],
+      "dialogue": {
+        "default": "'AH! A PATRON!' Bardric strums dramatically. 'Allow me to regale you with THE BALLAD OF THE BOAR EATER — a stirring tale of one hero's magnificent gluttony, based on real events from LAST NIGHT!' You consider asking him to stop. You decide against it. He would only sing louder.",
+        "topics": {
+          "song": {
+            "keywords": ["song", "ballad", "music", "sing", "play"],
+            "text": "'It's thirty-seven verses long. I composed it this morning. I'm still workshopping the part where the hero weeps into a bowl of stew.' He strums mournfully. 'Art takes TIME."
+          },
+          "chicken": {
+            "keywords": ["chicken", "pollo", "tip", "bird"],
+            "text": "'Ah yes — the CHICKEN INCIDENT.' Bardric looks wounded. 'You tried to tip me with a LIVE CHICKEN. I do not accept poultry as payment. It took hours to catch. The chicken, I mean. Though also the tip."
+          },
+          "boar": {
+            "keywords": ["boar", "ballad", "pig", "swine"],
+            "text": "'THE BALLAD OF THE BOAR EATER will be my magnum opus. Verse twelve is just the word BOAR repeated twenty-six times, each with a different emotional inflection. It's very avant-garde."
+          }
+        }
+      },
+      "movement": {
+        "type": "patrol",
+        "schedule": [
+          { "room": "tavern_floor", "duration": 3 },
+          { "room": "village_square", "duration": 3 }
+        ],
+        "depart_msg": "Bardric slings his lute over his shoulder and wanders off, still humming to himself.",
+        "arrive_msg": "Bardric strolls in, already mid-song. Something about a boar, by the sound of it."
+      }
     }
   },
 

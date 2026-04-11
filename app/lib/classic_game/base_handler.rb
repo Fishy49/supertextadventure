@@ -205,7 +205,7 @@ module ClassicGame
       def find_player_in_room(name_or_id)
         return [nil, nil] if name_or_id.blank?
 
-        other_players_in_room.each do |uid, _state|
+        other_players_in_room.each_key do |uid|
           name = game.character_name_for(uid)
           next if name.blank?
 

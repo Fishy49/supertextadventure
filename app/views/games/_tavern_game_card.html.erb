@@ -14,7 +14,7 @@
   badge_label = status.to_s.upcase
 %>
 
-<div class="border-2 border-terminal-green border-dashed p-3 hover:bg-stone-700 transition-colors">
+<div id="<%= dom_id(game) %>" class="border-2 border-terminal-green border-dashed p-3 hover:bg-stone-700 transition-colors">
   <%= link_to card_path, class: "block", data: { "turbo-frame": "_top" } do %>
     <div class="flex items-center justify-between gap-2 flex-wrap">
       <h3 class="font-bold text-lg mb-0"><%= game.name %></h3>

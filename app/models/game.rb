@@ -203,12 +203,72 @@ class Game < ApplicationRecord
     save!
   end
 
+  # Turn management methods
+  def turn_state
+    game_state["turn_state"] || { "turn_order" => [], "current_index" => 0 }
+  end
+
+  def current_turn_user_id
+    ts = turn_state
+    order = ts["turn_order"] || []
+    return nil if order.empty?
+
+    order[ts["current_index"] || 0]
+  end
+
+  def advance_turn
+    self.game_state ||= {}
+    ts = turn_state.dup
+    order = ts["turn_order"] || []
+    return nil if order.empty?
+
+    count = order.length
+    current = ts["current_index"] || 0
+
+    attempts = 0
+    loop do
+      current = (current + 1) % count
+      attempts += 1
+      break if attempts >= count
+
+      uid = order[current]
+      next_ps = game_state.dig("player_states", uid.to_s) || {}
+      break unless next_ps["waiting_for_combat_end"]
+    end
+
+    ts["current_index"] = current
+    self.game_state["turn_state"] = ts
+    save!
+    order[current]
+  end
+
+  def players_in_room(room_id)
+    states = game_state["player_states"] || {}
+    states.select { |_uid, state| state["current_room"] == room_id.to_s }
+          .map { |uid, state| [uid.to_i, state] }
+  end
+
+  def all_player_user_ids
+    (game_state["player_states"] || {}).keys.map(&:to_i)
+  end
+
+  def register_player_turn_order(user_id)
+    self.game_state ||= {}
+    self.game_state["turn_state"] ||= { "turn_order" => [], "current_index" => 0 }
+    order = self.game_state["turn_state"]["turn_order"] ||= []
+    order << user_id.to_i unless order.include?(user_id.to_i)
+  end
+
+  def character_name_for(user_id)
+    game_users.find_by(user_id: user_id)&.character_name
+  end
+
   private
 
-    def initialize_player_state(_user_id)
+    def initialize_player_state(user_id)
       starting_room = world_snapshot.dig("meta", "starting_room") || world_snapshot["rooms"]&.keys&.first
 
-      {
+      state = {
         "current_room" => starting_room,
         "inventory" => [],
         "health" => starting_hp || 10,
@@ -216,6 +276,13 @@ class Game < ApplicationRecord
         "visited_rooms" => [],
         "flags" => {}
       }
+
+      self.game_state ||= {}
+      self.game_state["player_states"] ||= {}
+      self.game_state["player_states"][user_id.to_s] = state
+      register_player_turn_order(user_id)
+      save!
+      state
     end
 
     def initialize_room_state(room_id)
@@ -262,7 +329,8 @@ class Game < ApplicationRecord
                 "global_flags" => {},
                 "container_states" => {},
                 "turn_count" => 0,
-                "npc_movement" => {}
+                "npc_movement" => {},
+                "turn_state" => { "turn_order" => [], "current_index" => 0 }
               })
 
       # Generate starting room description

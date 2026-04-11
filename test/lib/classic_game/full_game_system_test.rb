@@ -15,6 +15,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
 
   FakeUser = Struct.new(:id)
   USER_ID = 42
+  USER2_ID = 99
 
   test "full game playthrough" do
     world = build_full_game_world
@@ -32,6 +33,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
       phase_final_room(game, user)
       phase_npc_movement(game, user)
       phase_verification(game, user)
+      phase_multiplayer(game, user)
     end
   end
 
@@ -475,6 +477,53 @@ class FullGameSystemTest < ActiveSupport::TestCase
       merchant_in_storeroom = game.room_state("storeroom")["npcs"]&.include?("wandering_merchant") || false
       assert merchant_in_entrance || merchant_in_storeroom,
              "PHASE 9: merchant should be in either entrance or storeroom"
+    end
+
+    # Phase 11: multiplayer — introduce a second player and verify turn management
+    # Runs after phase_verification so we know game state is clean.
+    # Player 1 (user_id 42) is currently in the entrance after phase_npc_movement.
+    def phase_multiplayer(game, user)
+      user2 = FakeUser.new(USER2_ID)
+
+      # Seed player 2 into the entrance room via player_state lookup
+      # (triggers initialize_player_state which registers their turn order entry)
+      game.player_state(USER2_ID)
+      game.character_names[USER2_ID] = "Elara"
+
+      # Both players are now in the entrance; user 1 should be first in turn order
+      assert_includes game.turn_state["turn_order"], USER_ID
+      assert_includes game.turn_state["turn_order"], USER2_ID
+
+      # PHASE 11a: user1 (current turn) looks and sees user2
+      r = ex(game, user, "look")
+      assert r[:success], "PHASE 11: player 1 look should succeed on their turn"
+      assert_includes r[:response], "Also here"
+
+      # PHASE 11b: user2 tries to act on user1's turn — must be blocked
+      # (turn advanced to user2 after user1's look above)
+      assert_equal USER2_ID, game.current_turn_user_id, "should be user2's turn now"
+      r2 = ex(game, user2, "look")
+      assert r2[:success], "player 2 should act on their own turn"
+      assert_includes r2[:response], "Entrance Hall"
+      assert_includes r2[:response], "Also here"
+
+      # PHASE 11c: It's user1's turn again; user2 is blocked
+      assert_equal USER_ID, game.current_turn_user_id
+      r_blocked = ex(game, user2, "inventory")
+      assert_not r_blocked[:success], "off-turn player must be blocked"
+      assert_includes r_blocked[:response], "not your turn"
+
+      # PHASE 11d: player-to-player item give (player 1 has victory_crown from phase_final_room)
+      assert_includes game.player_state(USER_ID)["inventory"], "victory_crown",
+                      "player 1 should still have victory crown"
+
+      r_give = ex(game, user, "give crown to Elara")
+      assert r_give[:success], "give crown to Elara should succeed"
+      assert_includes r_give[:response], "Victory Crown"
+      assert_not_includes game.player_state(USER_ID)["inventory"], "victory_crown",
+                          "crown removed from player 1"
+      assert_includes game.player_state(USER2_ID)["inventory"], "victory_crown",
+                      "crown added to player 2"
     end
 
     # Phase 10: final state verification

@@ -13,7 +13,18 @@ module ClassicGame
           result = ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
             ClassicGame::CommandParser.parse(command_text)
           )
-          return process_npc_movement(game, user, result)
+          result = process_npc_movement(game, user, result)
+          advance_turn_if_ready(game, user)
+          return result
+        end
+
+        # Check turn order — block off-turn players
+        unless TurnManager.can_act?(game, user.id)
+          return {
+            success: false,
+            response: TurnManager.waiting_message(game, user.id),
+            state_changes: { turn_blocked: true }
+          }
         end
 
         # Parse the command
@@ -30,7 +41,9 @@ module ClassicGame
 
         # Check for aggressive creatures after the player acts
         result = check_aggressive_creatures(game, user, command, result)
-        process_npc_movement(game, user, result)
+        result = process_npc_movement(game, user, result)
+        advance_turn_if_ready(game, user)
+        result
       rescue StandardError => e
         Rails.logger.error("ClassicGame::Engine error: #{e.message}")
         Rails.logger.error(e.backtrace.join("\n"))
@@ -60,6 +73,15 @@ module ClassicGame
       end
 
       private
+
+        def advance_turn_if_ready(game, user)
+          return if (game.turn_state["turn_order"] || []).length <= 1
+
+          ps = game.player_state(user.id)
+          return if ps["pending_roll"].present?
+
+          TurnManager.advance(game)
+        end
 
         def process_npc_movement(game, user, result)
           messages = ClassicGame::NpcMovementProcessor.process(game: game, user_id: user.id)
@@ -188,7 +210,8 @@ module ClassicGame
                            "global_flags" => {},
                            "container_states" => {},
                            "turn_count" => 0,
-                           "npc_movement" => {}
+                           "npc_movement" => {},
+                           "turn_state" => { "turn_order" => [], "current_index" => 0 }
                          })
 
             # Generate fresh starting room description

@@ -148,6 +148,10 @@ module ClassicGame
           return failure("You don't have that item.") unless item_def
           return failure("You don't have that item.") unless item?(item_id)
 
+          # Player characters take priority over NPCs with the same name
+          player_uid, player_name = find_player_in_room(npc_target)
+          return handle_give_to_player(item_id, item_def, player_uid, player_name) if player_uid
+
           # Find the NPC
           npc_id, npc_def = find_npc(npc_target)
           return failure("You don't see anyone like that here.") unless npc_def
@@ -193,6 +197,24 @@ module ClassicGame
 
           talk_text = creature_def["talk_text"] || "It has no clue what you're saying."
           success(talk_text)
+        end
+
+        def handle_give_to_player(item_id, item_def, receiver_uid, receiver_name)
+          # Remove item from giver's inventory
+          new_giver_state = player_state.dup
+          new_giver_state["inventory"] = (new_giver_state["inventory"] || []) - [item_id]
+          update_player_state(new_giver_state)
+
+          # Add item to receiver's inventory
+          receiver_state = game.player_state(receiver_uid).dup
+          receiver_state["inventory"] ||= []
+          receiver_state["inventory"] << item_id
+          game.update_player_state(receiver_uid, receiver_state)
+
+          success(
+            "You give the #{item_def['name']} to #{receiver_name}.",
+            state_changes: { give_to_player: { receiver_user_id: receiver_uid, item_id: item_id } }
+          )
         end
 
         def handle_attack(target)

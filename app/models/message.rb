@@ -9,12 +9,19 @@ class Message < ApplicationRecord
   scope :latest, -> { order(id: :desc) }
   scope :oldest, -> { order(id: :asc) }
   scope :for_game, ->(game) { where(game_id: game.id, is_system_message: false).latest }
+  scope :visible_to_user, ->(user) {
+    where("visible_to_user_ids IS NULL OR :uid = ANY(visible_to_user_ids)", uid: user.id)
+  }
   before_create :parse_dice_rolls
 
   after_create_commit -> { broadcast_append_to(game, :messages) }, unless: proc { is_system_message? }
   after_update_commit -> { broadcast_replace_to(game, :messages) }, unless: proc { is_system_message? }
   after_create_commit :set_user_active_at, unless: proc { is_system_message? }
   after_create_commit :enqueue_classic_command, if: proc { game.classic? && player_message? }
+
+  def visible_to?(user)
+    visible_to_user_ids.blank? || visible_to_user_ids.include?(user.id)
+  end
 
   def event?
     event_type.present?

@@ -201,6 +201,14 @@ module ClassicGame
             lines << "Present: #{npc_names.join(', ')}"
           end
 
+          # List other player characters in this room
+          others = other_players_in_room
+          if others.any?
+            lines << ""
+            names = others.map { |uid, _state| game.character_name_for(uid) || "Unknown" }
+            lines << "Also here: #{names.join(', ')}"
+          end
+
           # List creatures
           creatures = current_room_state["creatures"] || []
           if creatures.any?

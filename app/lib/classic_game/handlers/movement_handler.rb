@@ -3,6 +3,14 @@
 module ClassicGame
   module Handlers
     class MovementHandler < BaseHandler
+      OPPOSITE_DIRECTIONS = {
+        "north" => "south", "south" => "north",
+        "east" => "west", "west" => "east",
+        "up" => "down", "down" => "up",
+        "northeast" => "southwest", "southwest" => "northeast",
+        "northwest" => "southeast", "southeast" => "northwest"
+      }.freeze
+
       def handle(command)
         direction = command[:target]
         return failure("Go where?") unless direction
@@ -13,7 +21,7 @@ module ClassicGame
 
         # Handle simple string exit vs. complex exit object
         if exit_data.is_a?(String)
-          move_to_room(exit_data)
+          move_to_room(exit_data, direction: direction.to_s)
         elsif exit_data.is_a?(Hash)
           handle_complex_exit(exit_data, direction)
         else
@@ -43,7 +51,7 @@ module ClassicGame
           # Check if exit is permanently unlocked
           if permanently_unlock && direction && game.exit_unlocked?(player_state["current_room"], direction)
             # Already unlocked, can pass through
-            return move_to_room(destination)
+            return move_to_room(destination, direction: direction.to_s)
           end
 
           # Check if exit requires using an item on it (interactive unlocking)
@@ -60,14 +68,18 @@ module ClassicGame
           return failure(locked_msg) if requires && !item?(requires)
 
           # All checks passed, can move
-          move_to_room(destination)
+          move_to_room(destination, direction: direction.to_s)
         end
 
-        def move_to_room(room_id)
+        def move_to_room(room_id, direction: nil)
           new_room_def = world_snapshot.dig("rooms", room_id)
           return failure("Error: Room '#{room_id}' not found.") unless new_room_def
 
+          old_room_id = player_state["current_room"]
           first_visit = !player_state["visited_rooms"]&.include?(room_id)
+
+          # Capture players in the old room before the move (for departure notifications)
+          departing_observers = other_players_in_room
 
           # Update player state
           new_state = player_state.dup
@@ -80,10 +92,41 @@ module ClassicGame
 
           update_player_state(new_state)
 
-          # Generate room description
+          # Capture players already in the new room (excludes moving player)
+          arriving_observers = other_players_in_room
+
+          # Generate room description (lists co-located players)
           description = generate_room_description(room_id, new_room_def, first_visit)
 
-          success(description, state_changes: { moved: true, room: room_id })
+          # Build multiplayer notification texts
+          player_name = game.character_name_for(user_id)
+          state_changes = build_state_changes(room_id, old_room_id, direction, player_name,
+                                              departing_observers, arriving_observers)
+
+          success(description, state_changes: state_changes)
+        end
+
+        def build_state_changes(new_room_id, old_room_id, direction, player_name,
+                                departing_observers, arriving_observers)
+          changes = { moved: true, room: new_room_id }
+          return changes unless player_name
+
+          dir_str = direction.to_s
+          opposite = OPPOSITE_DIRECTIONS[dir_str] || "another direction"
+
+          if departing_observers.any?
+            changes[:departed_room] = old_room_id
+            changes[:departure_text] = "**#{player_name} heads #{dir_str}.**"
+            changes[:departure_audience] = departing_observers.map { |uid, _| uid }
+          end
+
+          if arriving_observers.any?
+            changes[:entered_room] = new_room_id
+            changes[:arrival_text] = "**#{player_name} arrives from the #{opposite}.**"
+            changes[:arrival_audience] = arriving_observers.map { |uid, _| uid }
+          end
+
+          changes
         end
 
         def generate_room_description(room_id, room_def, first_visit)
@@ -120,6 +163,14 @@ module ClassicGame
             lines << ""
             npc_names = npcs.map { |npc_id| world_snapshot.dig("npcs", npc_id, "name") || npc_id }
             lines << "Present: #{npc_names.join(', ')}"
+          end
+
+          # List other player characters in this room
+          others = other_players_in_room
+          if others.any?
+            lines << ""
+            names = others.map { |uid, _state| game.character_name_for(uid) || "Unknown" }
+            lines << "Also here: #{names.join(', ')}"
           end
 
           # List creatures

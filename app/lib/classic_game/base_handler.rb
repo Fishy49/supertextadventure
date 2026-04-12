@@ -189,6 +189,34 @@ module ClassicGame
         current_room_state["creatures"]&.include?(creature_id)
       end
 
+      # Returns [[user_id, player_state], ...] for all players in the given room.
+      # Defaults to the acting player's current room.
+      def players_in_room(room_id = nil)
+        game.players_in_room(room_id || player_state["current_room"])
+      end
+
+      # Like players_in_room but excludes the acting player.
+      def other_players_in_room
+        players_in_room.reject { |uid, _state| uid == user_id.to_i }
+      end
+
+      # Fuzzy-match a name against other players in the current room.
+      # Returns [user_id, character_name] or [nil, nil] if no match.
+      def find_player_in_room(name_or_id)
+        return [nil, nil] if name_or_id.blank?
+
+        other_players_in_room.each_key do |uid|
+          name = game.character_name_for(uid)
+          next if name.blank?
+
+          if name.downcase.include?(name_or_id.downcase) || name_or_id.downcase.include?(name.downcase)
+            return [uid, name]
+          end
+        end
+
+        [nil, nil]
+      end
+
       # Check if player is in active combat
       def in_combat?
         player_state.dig("combat", "active") == true
@@ -196,7 +224,7 @@ module ClassicGame
 
       # Check if in combat with specific creature
       def in_combat_with?(creature_id)
-        in_combat? && player_state.dig("combat", "creature_id") == creature_id
+        in_combat? && game.combat_state && game.combat_state["creature_id"] == creature_id
       end
 
       # Get total weapon damage from inventory

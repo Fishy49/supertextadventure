@@ -37,6 +37,7 @@ en:
   ye_joined: "Ye joined."
   join_failed: "Ye cannot join yon game."
   game_destroyed: "Game was successfully destroyed."
+  game_updated: "Game was successfully updated."
   inventory_item_created: "Inventory item was successfully created."
   inventory_item_updated: "Inventory item was successfully updated."
   inventory_item_destroyed: "Inventory item was successfully destroyed."

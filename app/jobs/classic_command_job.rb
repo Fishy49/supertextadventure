@@ -21,17 +21,82 @@ class ClassicCommandJob
 
       broadcast_dice_roll(game, message, result)
       sync_classic_sidebar(game, user, message.game_user)
+      broadcast_text_form_updates(game)
 
-      # Create response message (will auto-broadcast via callback)
-      Message.create!(
-        game: game,
-        content: result[:response]
-        # NOTE: no game_user_id, so it's a "host" message from the game engine
-      )
+      state_changes = result[:state_changes] || {}
+      if state_changes[:moved]
+        broadcast_movement_messages(game, user, result, state_changes)
+      elsif state_changes[:give_to_player]
+        broadcast_give_messages(game, user, result, state_changes[:give_to_player])
+      elsif result[:response].present?
+        Message.create!(game: game, content: result[:response])
+      end
     end
   end
 
   private
+
+    def broadcast_movement_messages(game, user, result, state_changes)
+      Message.create!(
+        game: game,
+        content: result[:response],
+        visible_to_user_ids: [user.id]
+      )
+
+      if state_changes[:departure_text] && state_changes[:departure_audience]&.any?
+        Message.create!(
+          game: game,
+          content: state_changes[:departure_text],
+          visible_to_user_ids: state_changes[:departure_audience]
+        )
+      end
+
+      return unless state_changes[:arrival_text] && state_changes[:arrival_audience]&.any?
+
+      Message.create!(
+        game: game,
+        content: state_changes[:arrival_text],
+        visible_to_user_ids: state_changes[:arrival_audience]
+      )
+    end
+
+    def broadcast_give_messages(game, user, result, give_data)
+      Message.create!(
+        game: game,
+        content: result[:response],
+        visible_to_user_ids: [user.id]
+      )
+
+      Message.create!(
+        game: game,
+        content: give_data[:receiver_text],
+        visible_to_user_ids: [give_data[:receiver_user_id]]
+      )
+
+      return unless give_data[:bystander_text] && give_data[:bystander_audience]&.any?
+
+      Message.create!(
+        game: game,
+        content: give_data[:bystander_text],
+        visible_to_user_ids: give_data[:bystander_audience]
+      )
+    end
+
+    def broadcast_text_form_updates(game)
+      return unless game.classic?
+
+      user_ids = game.game_users.pluck(:user_id)
+      user_ids << game.created_by unless user_ids.include?(game.created_by)
+      user_ids.uniq.each do |uid|
+        user = User.find(uid)
+        Turbo::StreamsChannel.broadcast_replace_to(
+          game, "turn_for_#{uid}",
+          target: "text_form_content",
+          partial: "games/text_form",
+          locals: { game: game, user: user }
+        )
+      end
+    end
 
     def broadcast_dice_roll(game, message, result)
       return unless result[:dice_roll]

@@ -148,6 +148,10 @@ module ClassicGame
           return failure("You don't have that item.") unless item_def
           return failure("You don't have that item.") unless item?(item_id)
 
+          # Player characters take priority over NPCs with the same name
+          player_uid, player_name = find_player_in_room(npc_target)
+          return handle_give_to_player(item_id, item_def, player_uid, player_name) if player_uid
+
           # Find the NPC
           npc_id, npc_def = find_npc(npc_target)
           return failure("You don't see anyone like that here.") unless npc_def
@@ -195,90 +199,68 @@ module ClassicGame
           success(talk_text)
         end
 
+        def handle_give_to_player(item_id, item_def, receiver_uid, receiver_name)
+          # Remove item from giver's inventory
+          new_giver_state = player_state.dup
+          new_giver_state["inventory"] = (new_giver_state["inventory"] || []) - [item_id]
+          update_player_state(new_giver_state)
+
+          # Add item to receiver's inventory
+          receiver_state = game.player_state(receiver_uid).dup
+          receiver_state["inventory"] ||= []
+          receiver_state["inventory"] << item_id
+          game.update_player_state(receiver_uid, receiver_state)
+
+          giver_name = game.character_name_for(user_id) || "Someone"
+          bystanders = other_players_in_room.keys - [receiver_uid]
+          give_data = {
+            receiver_user_id: receiver_uid,
+            item_id: item_id,
+            receiver_text: "**#{giver_name} gives you the #{item_def['name']}.**"
+          }
+          if bystanders.any?
+            give_data[:bystander_text] = "**#{giver_name} gives the #{item_def['name']} to #{receiver_name}.**"
+            give_data[:bystander_audience] = bystanders
+          end
+          success(
+            "You give the #{item_def['name']} to #{receiver_name}.",
+            state_changes: { give_to_player: give_data }
+          )
+        end
+
         def handle_attack(target)
           return failure("Attack what?") unless target
 
-          # Find creature
           creature_id, creature_def = find_creature(target)
           return failure("You don't see that creature here.") unless creature_def
           return failure("You don't see that creature here.") unless creature_in_room?(creature_id)
           return failure("You're already fighting!") if in_combat?
 
-          # Initialize player health if not set
-          new_player_state = player_state.dup
+          # Ensure each room player has a baseline health before entering combat.
           starting_health = game.starting_hp || 10
-          new_player_state["health"] ||= starting_health
-          new_player_state["max_health"] ||= starting_health
-
-          # Create combat state
-          combat = {
-            "active" => true,
-            "creature_id" => creature_id,
-            "creature_health" => creature_def["health"],
-            "creature_max_health" => creature_def["health"],
-            "round_number" => 1,
-            "defending" => false
-          }
-
-          # Roll initiative
-          player_roll = rand(1..20)
-          creature_roll = rand(1..20)
-          combat["turn_order"] = player_roll >= creature_roll ? "player" : "creature"
-
-          # Build response
-          lines = []
-          lines << "You engage the #{creature_def['name']} in combat!"
-          lines << ""
-
-          if combat["turn_order"] == "player"
-            # Player goes first
-            new_player_state["combat"] = combat
-            update_player_state(new_player_state)
-
-            lines << "You strike first! What do you do?"
-            lines << "Commands: ATTACK, DEFEND, FLEE, USE [item]"
-          else
-            # Creature attacks first
-            creature_attack = creature_def["attack"] || 5
-            randomness = rand(-2..2)
-            player_defense = get_defense_bonus(new_player_state["inventory"] || [])
-
-            total_attack = creature_attack + randomness
-            damage = total_attack - player_defense
-            damage = [damage, 1].max
-
-            # Apply damage
-            new_player_state["health"] -= damage
-            new_player_state["health"] = [new_player_state["health"], 0].max
-
-            # Check if player died on first hit (unlikely but possible)
-            if new_player_state["health"] <= 0
-              update_player_state(new_player_state)
-              lines << "The #{creature_def['name']} strikes first!"
-              lines << "The creature deals #{damage} damage!"
-              lines << ""
-              lines << "=== GAME OVER ==="
-              lines << "You have been defeated by the #{creature_def['name']} before you could react!"
-              lines << ""
-              lines << "Type RESTART to try again."
-
-              new_player_state["pending_restart"] = true
-              update_player_state(new_player_state)
-              return failure(lines.join("\n"))
-            end
-
-            # Save combat state
-            new_player_state["combat"] = combat
-            update_player_state(new_player_state)
-
-            lines << "The #{creature_def['name']} strikes first!"
-            lines << "The creature deals #{damage} damage!"
-            lines << "Your health: #{new_player_state['health']}/#{new_player_state['max_health']}"
-            lines << ""
-            lines << "What do you do? (ATTACK, DEFEND, FLEE, USE [item])"
+          room_id = player_state["current_room"]
+          game.players_in_room(room_id).each_key do |uid|
+            ps = game.player_state(uid).dup
+            ps["health"] ||= starting_health
+            ps["max_health"] ||= starting_health
+            game.update_player_state(uid, ps)
           end
 
-          success(lines.join("\n"))
+          # Initialize shared combat state and combat turn order. The acting
+          # player goes first so their ATTACK command is their opening turn.
+          ClassicGame::TurnManager.enter_combat_mode(
+            game, room_id, creature_id, starting_combatant: user_id.to_i
+          )
+
+          opening = "You engage the #{creature_def['name']} in combat!"
+          attack_result = ClassicGame::Handlers::CombatHandler
+                          .new(game: game, user_id: user_id)
+                          .handle({ verb: :attack, target: nil, modifier: nil, raw: "attack" })
+
+          success(
+            "#{opening}\n\n#{attack_result[:response]}",
+            state_changes: attack_result[:state_changes] || {}
+          )
         end
     end
   end

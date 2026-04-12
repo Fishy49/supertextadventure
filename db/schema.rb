@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_01_234724) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_11_222705) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -68,6 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_234724) do
     t.boolean "is_system_message", default: false
     t.string "sender_name"
     t.datetime "updated_at", null: false
+    t.integer "visible_to_user_ids", array: true
     t.index ["game_id"], name: "index_messages_on_game_id"
     t.index ["game_user_id"], name: "index_messages_on_game_user_id"
   end
@@ -96,6 +97,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_234724) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.jsonb "world_data"
+    t.index ["name"], name: "index_worlds_on_name", unique: true
   end
 
   add_foreign_key "game_users", "games"

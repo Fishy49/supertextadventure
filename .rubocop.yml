@@ -41,6 +41,10 @@ Metrics/ClassLength:
   Exclude:
     - 'test/**/*'
 
+Metrics/ParameterLists:
+  Exclude:
+    - 'test/**/*'
+
 Metrics/PerceivedComplexity:
   Enabled: false
 

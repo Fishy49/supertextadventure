@@ -3,6 +3,22 @@
 module ClassicGame
   module Handlers
     class MovementHandler < BaseHandler
+      OPPOSITE_DIRECTIONS = {
+        "north" => "south", "south" => "north",
+        "east" => "west", "west" => "east",
+        "up" => "down", "down" => "up",
+        "northeast" => "southwest", "southwest" => "northeast",
+        "northwest" => "southeast", "southeast" => "northwest"
+      }.freeze
+
+      ARRIVAL_PREPOSITIONS = {
+        "up" => "from below", "down" => "from above",
+        "north" => "from the south", "south" => "from the north",
+        "east" => "from the west", "west" => "from the east",
+        "northeast" => "from the southwest", "southwest" => "from the northeast",
+        "northwest" => "from the southeast", "southeast" => "from the northwest"
+      }.freeze
+
       def handle(command)
         direction = command[:target]
         return failure("Go where?") unless direction
@@ -13,7 +29,7 @@ module ClassicGame
 
         # Handle simple string exit vs. complex exit object
         if exit_data.is_a?(String)
-          move_to_room(exit_data)
+          move_to_room(exit_data, direction: direction.to_s)
         elsif exit_data.is_a?(Hash)
           handle_complex_exit(exit_data, direction)
         else
@@ -43,7 +59,7 @@ module ClassicGame
           # Check if exit is permanently unlocked
           if permanently_unlock && direction && game.exit_unlocked?(player_state["current_room"], direction)
             # Already unlocked, can pass through
-            return move_to_room(destination)
+            return move_to_room(destination, direction: direction.to_s)
           end
 
           # Check if exit requires using an item on it (interactive unlocking)
@@ -60,14 +76,18 @@ module ClassicGame
           return failure(locked_msg) if requires && !item?(requires)
 
           # All checks passed, can move
-          move_to_room(destination)
+          move_to_room(destination, direction: direction.to_s)
         end
 
-        def move_to_room(room_id)
+        def move_to_room(room_id, direction: nil)
           new_room_def = world_snapshot.dig("rooms", room_id)
           return failure("Error: Room '#{room_id}' not found.") unless new_room_def
 
+          old_room_id = player_state["current_room"]
           first_visit = !player_state["visited_rooms"]&.include?(room_id)
+
+          # Capture players in the old room before the move (for departure notifications)
+          departing_observers = other_players_in_room
 
           # Update player state
           new_state = player_state.dup
@@ -80,10 +100,40 @@ module ClassicGame
 
           update_player_state(new_state)
 
-          # Generate room description
+          # Capture players already in the new room (excludes moving player)
+          arriving_observers = other_players_in_room
+
+          # Generate room description (lists co-located players)
           description = generate_room_description(room_id, new_room_def, first_visit)
 
-          success(description, state_changes: { moved: true, room: room_id })
+          # Build multiplayer notification texts
+          player_name = game.character_name_for(user_id)
+          observers = { departing: departing_observers, arriving: arriving_observers }
+          state_changes = build_state_changes(room_id, old_room_id, direction, player_name, observers)
+
+          success(description, state_changes: state_changes)
+        end
+
+        def build_state_changes(new_room_id, old_room_id, direction, player_name, observers)
+          changes = { moved: true, room: new_room_id }
+          return changes unless player_name
+
+          dir_str = direction.to_s
+          arrival_phrase = ARRIVAL_PREPOSITIONS[dir_str] || "from another direction"
+
+          if observers[:departing].any?
+            changes[:departed_room] = old_room_id
+            changes[:departure_text] = "**#{player_name} heads #{dir_str}.**"
+            changes[:departure_audience] = observers[:departing].map { |uid, _| uid }
+          end
+
+          if observers[:arriving].any?
+            changes[:entered_room] = new_room_id
+            changes[:arrival_text] = "**#{player_name} arrives #{arrival_phrase}.**"
+            changes[:arrival_audience] = observers[:arriving].map { |uid, _| uid }
+          end
+
+          changes
         end
 
         def generate_room_description(room_id, room_def, first_visit)
@@ -122,6 +172,14 @@ module ClassicGame
             lines << "Present: #{npc_names.join(', ')}"
           end
 
+          # List other player characters in this room
+          others = other_players_in_room
+          if others.any?
+            lines << ""
+            names = others.map { |uid, _state| game.character_name_for(uid) || "Unknown" }
+            lines << "Also here: #{names.join(', ')}"
+          end
+
           # List creatures
           creatures = room_state["creatures"] || []
           if creatures.any?
@@ -145,33 +203,30 @@ module ClassicGame
 
           if visible_exits.any?
             lines << ""
-
-            # Check if any exits have descriptive messages to show
-            exit_descriptions = []
-            visible_exits.each do |direction, exit_data|
-              next unless exit_data.is_a?(Hash)
-
-              # Show reveal_msg for revealed hidden exits
-              if exit_data["hidden"] && exit_data["reveal_msg"].present? && game.exit_revealed?(room_id, direction.to_s)
-                exit_descriptions << exit_data["reveal_msg"]
-              end
-
-              # Show unlocked_msg for unlocked exits
-              if exit_data["unlocked_msg"].present? && game.exit_unlocked?(room_id, direction.to_s)
-                exit_descriptions << exit_data["unlocked_msg"]
-              end
-            end
-
-            # Show exit descriptions if any
+            exit_descriptions = collect_exit_descriptions(room_id, visible_exits)
             if exit_descriptions.any?
               exit_descriptions.each { |desc| lines << desc }
               lines << ""
             end
-
             lines << "Exits: #{visible_exits.keys.map { |k| k.to_s.upcase }.join(', ')}"
           end
 
           lines.join("\n")
+        end
+
+        def collect_exit_descriptions(room_id, visible_exits)
+          descriptions = []
+          visible_exits.each do |direction, exit_data|
+            next unless exit_data.is_a?(Hash)
+
+            if exit_data["hidden"] && exit_data["reveal_msg"].present? && game.exit_revealed?(room_id, direction.to_s)
+              descriptions << exit_data["reveal_msg"]
+            end
+            if exit_data["unlocked_msg"].present? && game.exit_unlocked?(room_id, direction.to_s)
+              descriptions << exit_data["unlocked_msg"]
+            end
+          end
+          descriptions
         end
     end
   end

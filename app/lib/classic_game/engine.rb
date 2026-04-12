@@ -13,11 +13,27 @@ module ClassicGame
           result = ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
             ClassicGame::CommandParser.parse(command_text)
           )
-          return process_npc_movement(game, user, result)
+          result = process_npc_movement(game, user, result)
+          advance_turn_if_ready(game, user)
+          return result
+        end
+
+        # Check turn order — block off-turn players
+        unless TurnManager.can_act?(game, user.id)
+          return {
+            success: false,
+            response: TurnManager.waiting_message(game, user.id),
+            state_changes: { turn_blocked: true }
+          }
         end
 
         # Parse the command
         command = CommandParser.parse(command_text)
+
+        if command[:verb] == :wait
+          advance_turn_if_ready(game, user)
+          return { success: true, response: "", state_changes: {} }
+        end
 
         # Route to appropriate handler
         handler = get_handler(command[:verb], game: game, user_id: user.id)
@@ -28,9 +44,22 @@ module ClassicGame
                    unknown_command_response(command)
                  end
 
-        # Check for aggressive creatures after the player acts
+        # If a player's combat action consumed a turn, advance the combat
+        # order past them and run any creature turns that follow.
+        if game.in_combat? && result.dig(:state_changes, :combat_turn_consumed)
+          result = run_combat_turns(game, result, advance_first: true, acting_user_id: user.id)
+        end
+
+        # Aggro may start combat mid-action; run creature turns from the
+        # current slot (combat_current_index is on the aggressor creature).
         result = check_aggressive_creatures(game, user, command, result)
-        process_npc_movement(game, user, result)
+        if game.in_combat? && result.dig(:state_changes, :aggro_started_combat)
+          result = run_combat_turns(game, result, advance_first: false, acting_user_id: user.id)
+        end
+
+        result = process_npc_movement(game, user, result)
+        advance_turn_if_ready(game, user) unless game.in_combat?
+        result
       rescue StandardError => e
         Rails.logger.error("ClassicGame::Engine error: #{e.message}")
         Rails.logger.error(e.backtrace.join("\n"))
@@ -61,6 +90,15 @@ module ClassicGame
 
       private
 
+        def advance_turn_if_ready(game, user)
+          return if (game.turn_state["turn_order"] || []).length <= 1
+
+          ps = game.player_state(user.id)
+          return if ps["pending_roll"].present?
+
+          TurnManager.advance(game)
+        end
+
         def process_npc_movement(game, user, result)
           messages = ClassicGame::NpcMovementProcessor.process(game: game, user_id: user.id)
           return result if messages.empty?
@@ -70,11 +108,36 @@ module ClassicGame
           result.merge(response: combined)
         end
 
-        def check_aggressive_creatures(game, user, command, result)
-          ps = game.player_state(user.id)
-          return result if ps.dig("combat", "active")
+        # Advance combat turns and fire creature actions until the next
+        # combatant is a player (waiting for input) or combat ends.
+        def run_combat_turns(game, result, advance_first:, acting_user_id: nil)
+          return result unless game.in_combat?
 
-          # Increment room action counter
+          output = [result[:response]].compact_blank
+          game.advance_combat_turn if advance_first
+
+          while game.in_combat?
+            current = game.current_combatant
+            break unless current
+            break if current["type"] == "player"
+
+            creature_text = ClassicGame::CreatureTurn.run(
+              game, current["id"], acting_user_id: acting_user_id
+            )
+            output << creature_text if creature_text.present?
+            break unless game.in_combat?
+
+            game.advance_combat_turn
+          end
+
+          result.merge(response: output.join("\n\n"))
+        end
+
+        def check_aggressive_creatures(game, user, command, result)
+          return result if game.in_combat?
+
+          ps = game.player_state(user.id)
+
           ps["room_actions"] ||= {}
           room_id = ps["current_room"]
           ps["room_actions"][room_id] = (ps["room_actions"][room_id] || 0) + 1
@@ -90,16 +153,17 @@ module ClassicGame
             next unless creature_def["hostile"]
             next if should_defer_attack?(creature_def, ps, room_id, command, creature_id)
 
-            # Creature attacks — build attack via InteractHandler
-            attack_command = { verb: :attack, target: creature_id, modifier: nil, raw: "attack #{creature_id}" }
-            handler = ClassicGame::Handlers::InteractHandler.new(game: game, user_id: user.id)
-            attack_result = handler.handle(attack_command)
+            # Start combat with the creature at the current combat slot so
+            # the engine's combat-turn loop fires its first attack.
+            ClassicGame::TurnManager.enter_combat_mode(
+              game, room_id, creature_id, starting_combatant: :creature
+            )
 
-            aggro_text = creature_def["aggro_text"] || "The #{creature_def['name']} attacks you!"
-            combined = "#{result[:response]}\n\n#{aggro_text}\n\n#{attack_result[:response]}"
+            aggro_text = creature_def["aggro_text"] || "The #{creature_def['name']} attacks!"
+            combined = "#{result[:response]}\n\n#{aggro_text}"
             return result.merge(
               response: combined,
-              state_changes: (result[:state_changes] || {}).merge(attack_result[:state_changes] || {})
+              state_changes: (result[:state_changes] || {}).merge(aggro_started_combat: true)
             )
           end
 
@@ -188,7 +252,8 @@ module ClassicGame
                            "global_flags" => {},
                            "container_states" => {},
                            "turn_count" => 0,
-                           "npc_movement" => {}
+                           "npc_movement" => {},
+                           "turn_state" => { "turn_order" => [], "current_index" => 0 }
                          })
 
             # Generate fresh starting room description

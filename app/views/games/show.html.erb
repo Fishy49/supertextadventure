@@ -2,7 +2,9 @@
   <%= render "debug_bar", game: @game %>
 <% end %>
 <%= turbo_stream_from(@game, :messages) %>
+<%= turbo_stream_from(@game, "messages_for_#{current_user.id}") %>
 <%= turbo_stream_from(@game, :state) %>
+<%= turbo_stream_from(@game, "turn_for_#{current_user.id}") %>
 <% if @game.host?(current_user) %>
   <%= turbo_stream_from(@game, :host_players) %>
 <% else %>
@@ -22,7 +24,7 @@
 </div>
 
 <% content_for :text_form do %>
-  <%= render(TerminalInputComponent.new(prompt: "", stimulus_controllers: ["game"], stimulus_values: { "game-id": @game.id, "game-user-id": @game.game_user(current_user)&.id || (@game.host?(current_user) ? :host : nil) })) %>
+  <%= render "text_form", game: @game, user: current_user %>
 <% end %>
 
 <% content_for :sidebar do %>

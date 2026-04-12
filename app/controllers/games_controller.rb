@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 class GamesController < ApplicationController
-  layout "tavern", only: %i[index new create lobby]
+  layout "tavern", only: %i[index new create lobby edit update]
 
   load_resource find_by: :uuid
   authorize_resource
   skip_authorize_resource only: %i[debug_state update_debug_state]
 
   before_action :set_turbo_frame_id
-  before_action :set_game, except: %i[index list new create]
   before_action :load_games, only: %i[index list]
 
   rescue_from CanCan::AccessDenied, with: :handle_access_denied
@@ -65,7 +64,7 @@ class GamesController < ApplicationController
       @game.game_user(current_user).update(active_at: DateTime.now)
     end
 
-    @pagy, @messages = pagy(Message.for_game(@game), items: 10)
+    @pagy, @messages = pagy(Message.for_game(@game).visible_to_user(current_user), items: 10)
   end
 
   def new
@@ -102,7 +101,7 @@ class GamesController < ApplicationController
   def update
     respond_to do |format|
       if @game.update(game_params)
-        format.turbo_stream { render turbo_stream: turbo_stream.update(@turbo_frame_id, template: "games/show") }
+        format.html { redirect_to tavern_path, notice: t(:game_updated) }
       else
         format.html { render :edit, status: :unprocessable_content }
         format.json { render json: @game.errors, status: :unprocessable_content }
@@ -146,10 +145,6 @@ class GamesController < ApplicationController
       @hosted_games = current_user.hosted_games.load_async
       @joined_games = current_user.joined_games.where.not(created_by: current_user.id).load_async
       @joinable_games = Game.joinable_by_user(current_user).where.not(id: @joined_games.ids).load_async
-    end
-
-    def set_game
-      @game = Game.where(id: params[:id]).or(Game.where(uuid: params[:id])).first!
     end
 
     def game_params

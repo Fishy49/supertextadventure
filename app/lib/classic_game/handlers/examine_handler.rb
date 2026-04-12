@@ -59,8 +59,8 @@ module ClassicGame
 
             # Show health if in combat with this creature
             if in_combat_with?(creature_id)
-              combat = player_state["combat"]
-              health_pct = (combat["creature_health"].to_f / combat["creature_max_health"] * 100).round
+              cs = game.combat_state
+              health_pct = (cs["creature_health"].to_f / cs["creature_max_health"] * 100).round
               description += "\n\nThe creature appears to be at #{health_pct}% health."
             end
 
@@ -199,6 +199,14 @@ module ClassicGame
             lines << ""
             npc_names = npcs.map { |npc_id| world_snapshot.dig("npcs", npc_id, "name") || npc_id }
             lines << "Present: #{npc_names.join(', ')}"
+          end
+
+          # List other player characters in this room
+          others = other_players_in_room
+          if others.any?
+            lines << ""
+            names = others.map { |uid, _state| game.character_name_for(uid) || "Unknown" }
+            lines << "Also here: #{names.join(', ')}"
           end
 
           # List creatures

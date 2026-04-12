@@ -4,7 +4,7 @@
 # Implements all game state methods used by BaseHandler and its subclasses.
 module ClassicGameTestHelper
   class FakeGame
-    attr_accessor :game_state
+    attr_accessor :game_state, :character_names
 
     def initialize(world_data:)
       @game_state = {
@@ -16,8 +16,10 @@ module ClassicGameTestHelper
         "unlocked_exits" => {},
         "revealed_exits" => {},
         "turn_count" => 0,
-        "npc_movement" => {}
+        "npc_movement" => {},
+        "turn_state" => { "turn_order" => [], "current_index" => 0 }
       }
+      @character_names = {}
     end
 
     def world_snapshot
@@ -113,6 +115,120 @@ module ClassicGameTestHelper
       @game_state["npc_movement"][entity_id.to_s] = state
     end
 
+    # Combat state methods
+
+    def in_combat?
+      @game_state["combat_state"].present?
+    end
+
+    def combat_state
+      @game_state["combat_state"]
+    end
+
+    def set_combat_state(room_id:, creature_id:, creature_health:)
+      @game_state["combat_state"] = {
+        "room_id" => room_id.to_s,
+        "creature_id" => creature_id.to_s,
+        "creature_health" => creature_health,
+        "creature_max_health" => creature_health
+      }
+    end
+
+    def clear_combat_state
+      @game_state.delete("combat_state")
+    end
+
+    def update_creature_health(new_health)
+      return unless in_combat?
+
+      @game_state["combat_state"] = combat_state.merge("creature_health" => new_health)
+    end
+
+    def current_combatant
+      ts = turn_state
+      order = ts["combat_turn_order"] || []
+      return nil if order.empty?
+
+      order[ts["combat_current_index"] || 0]
+    end
+
+    def current_combat_user_id
+      c = current_combatant
+      return nil unless c && c["type"] == "player"
+
+      c["id"].to_i
+    end
+
+    def advance_combat_turn
+      ts = turn_state.dup
+      order = ts["combat_turn_order"] || []
+      return nil if order.empty?
+
+      current = ts["combat_current_index"] || 0
+      current = (current + 1) % order.length
+      ts["combat_current_index"] = current
+      @game_state["turn_state"] = ts
+      order[current]
+    end
+
+    # Turn management methods
+
+    def turn_state
+      @game_state["turn_state"] || { "turn_order" => [], "current_index" => 0 }
+    end
+
+    def current_turn_user_id
+      ts = turn_state
+      order = ts["turn_order"] || []
+      return nil if order.empty?
+
+      order[ts["current_index"] || 0]
+    end
+
+    def advance_turn
+      ts = turn_state.dup
+      order = ts["turn_order"] || []
+      return nil if order.empty?
+
+      count = order.length
+      current = ts["current_index"] || 0
+
+      attempts = 0
+      loop do
+        current = (current + 1) % count
+        attempts += 1
+        break if attempts >= count
+
+        uid = order[current]
+        next_ps = @game_state.dig("player_states", uid.to_s) || {}
+        break unless next_ps["waiting_for_combat_end"]
+      end
+
+      ts["current_index"] = current
+      @game_state["turn_state"] = ts
+      order[current]
+    end
+
+    def players_in_room(room_id)
+      states = @game_state["player_states"] || {}
+      states.select { |_uid, state| state["current_room"] == room_id.to_s }
+            .transform_keys(&:to_i)
+    end
+
+    def all_player_user_ids
+      (@game_state["player_states"] || {}).keys.map(&:to_i)
+    end
+
+    def register_player_turn_order(user_id)
+      @game_state["turn_state"] ||= { "turn_order" => [], "current_index" => 0 }
+      order = @game_state["turn_state"]["turn_order"] ||= []
+      order << user_id.to_i unless order.include?(user_id.to_i)
+    end
+
+    def character_name_for(user_id)
+      @character_names[user_id.to_i] || "Player #{user_id}"
+    end
+
     def starting_hp
       10
     end
@@ -141,6 +257,7 @@ module ClassicGameTestHelper
           "flags" => {}
         }
         @game_state["player_states"][user_id.to_s] = state
+        register_player_turn_order(user_id)
         state
       end
 
@@ -193,13 +310,29 @@ module ClassicGameTestHelper
   # Returns a FakeGame pre-populated with optional player/room state overrides.
   def build_game(world_data:, player_id: 1, player_state: nil, room_states: {})
     game = FakeGame.new(world_data: world_data)
-    game.game_state["player_states"][player_id.to_s] = player_state if player_state
+    if player_state
+      game.game_state["player_states"][player_id.to_s] = player_state
+      game.register_player_turn_order(player_id)
+    end
     room_states.each { |id, state| game.game_state["room_states"][id.to_s] = state }
     game
   end
 
+  # Returns a FakeGame with multiple players pre-initialized.
+  # players: hash of { user_id => player_state_hash }
+  # character_names: hash of { user_id => "Name" }
+  def build_multiplayer_game(world_data:, players:, character_names: {})
+    game = FakeGame.new(world_data: world_data)
+    game.character_names = character_names.transform_keys(&:to_i)
+    players.each do |user_id, state|
+      game.game_state["player_states"][user_id.to_s] = state
+      game.register_player_turn_order(user_id)
+    end
+    game
+  end
+
   # Shorthand to build a player_state hash for use in build_game.
-  def player_state_in(room_id, inventory: [], health: 10, max_health: 10, combat: nil)
+  def player_state_in(room_id, inventory: [], health: 10, max_health: 10, **opts)
     state = {
       "current_room" => room_id.to_s,
       "inventory" => inventory,
@@ -208,7 +341,8 @@ module ClassicGameTestHelper
       "visited_rooms" => [],
       "flags" => {}
     }
-    state["combat"] = combat if combat
+    state["combat"] = opts[:combat] if opts[:combat]
+    state["waiting_for_combat_end"] = true if opts[:waiting_for_combat_end]
     state
   end
 end

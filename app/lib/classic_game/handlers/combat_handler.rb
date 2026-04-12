@@ -4,7 +4,6 @@ module ClassicGame
   module Handlers
     class CombatHandler < BaseHandler
       def handle(command)
-        # Verify player is actually in combat
         return failure("You're not in combat!") unless in_combat?
 
         case command[:verb]
@@ -17,7 +16,6 @@ module ClassicGame
         when :use
           handle_use_item(command[:target])
         when :inventory, :examine, :look
-          # Allow these commands during combat, delegate to appropriate handlers
           delegate_to_original_handler(command)
         else
           failure("In combat, you can: ATTACK, DEFEND, FLEE, USE [item], or EXAMINE/INVENTORY/LOOK")
@@ -26,210 +24,102 @@ module ClassicGame
 
       private
 
-        def handle_attack_in_combat
-          combat = player_state["combat"]
-          creature_id = combat["creature_id"]
-          creature_def = world_snapshot.dig("creatures", creature_id)
+        def creature_def
+          @creature_def ||= world_snapshot.dig("creatures", game.combat_state["creature_id"])
+        end
 
+        def handle_attack_in_combat
           return failure("The creature has vanished!") unless creature_def
 
-          # Calculate player damage
+          # Clear any defending stance from this player's previous turn
+          reset_defending
+
           player_damage = calculate_player_damage(creature_def)
+          new_health = [(game.combat_state["creature_health"] || 0) - player_damage, 0].max
+          game.update_creature_health(new_health)
 
-          # Apply damage to creature
-          combat["creature_health"] -= player_damage
-          combat["creature_health"] = [combat["creature_health"], 0].max
+          lines = ["You strike the #{creature_def['name']} for #{player_damage} damage!"]
 
-          lines = []
-          lines << "You strike the #{creature_def['name']} for #{player_damage} damage!"
+          return handle_creature_defeat(lines) if new_health <= 0
 
-          # Check if creature is defeated
-          return handle_creature_defeat(creature_id, creature_def) if combat["creature_health"] <= 0
-
-          # Creature counterattacks
-          creature_damage = calculate_creature_damage(creature_def, defending: false)
-
-          # Apply damage to player
-          current_health = player_state["health"] || 10
-          current_health -= creature_damage
-          current_health = [current_health, 0].max
-
-          new_player_state = player_state.dup
-          new_player_state["health"] = current_health
-          new_player_state["combat"] = combat
-          new_player_state["combat"]["defending"] = false
-          new_player_state["combat"]["round_number"] += 1
-          update_player_state(new_player_state)
-
-          lines << ""
-          lines << "The #{creature_def['name']} retaliates for #{creature_damage} damage!"
-          lines << "Your health: #{current_health}/#{player_state['max_health'] || 10}"
-
-          # Check if player died
-          return handle_player_death(creature_def) if current_health <= 0
-
-          lines << ""
-          lines << "What do you do? (ATTACK, DEFEND, FLEE, USE [item])"
-
-          success(lines.join("\n"))
+          lines << "The #{creature_def['name']} has #{new_health} HP remaining."
+          success(lines.join("\n"), state_changes: { combat_turn_consumed: true })
         end
 
         def handle_defend
-          combat = player_state["combat"]
-          creature_id = combat["creature_id"]
-          creature_def = world_snapshot.dig("creatures", creature_id)
-
           return failure("The creature has vanished!") unless creature_def
 
-          # Set defending flag
-          combat["defending"] = true
+          new_ps = player_state.dup
+          new_ps["combat"] = (new_ps["combat"] || {}).merge("defending" => true)
+          update_player_state(new_ps)
 
-          lines = []
-          lines << "You raise your guard!"
-
-          # Creature attacks
-          creature_damage = calculate_creature_damage(creature_def, defending: true)
-
-          # Apply damage to player
-          current_health = player_state["health"] || 10
-          current_health -= creature_damage
-          current_health = [current_health, 0].max
-
-          new_player_state = player_state.dup
-          new_player_state["health"] = current_health
-          new_player_state["combat"] = combat
-          new_player_state["combat"]["defending"] = false # Reset for next turn
-          new_player_state["combat"]["round_number"] += 1
-          update_player_state(new_player_state)
-
-          lines << ""
-          lines << "The #{creature_def['name']} attacks but you block most of the damage!"
-          max_hp = player_state["max_health"] || 10
-          lines << "You take #{creature_damage} damage. Your health: #{current_health}/#{max_hp}"
-
-          # Check if player died
-          return handle_player_death(creature_def) if current_health <= 0
-
-          lines << ""
-          lines << "What do you do? (ATTACK, DEFEND, FLEE, USE [item])"
-
-          success(lines.join("\n"))
+          success("You raise your guard, ready to block the next blow.",
+                  state_changes: { combat_turn_consumed: true })
         end
 
         def handle_flee
-          combat = player_state["combat"]
-          creature_id = combat["creature_id"]
-          creature_def = world_snapshot.dig("creatures", creature_id)
-
           return failure("The creature has vanished!") unless creature_def
 
-          # 50% chance to flee
+          reset_defending
+
           if rand(1..100) > 50
-            # Failed to flee - creature gets free attack
-            creature_damage = calculate_creature_damage(creature_def, defending: false)
-
-            current_health = player_state["health"] || 10
-            current_health -= creature_damage
-            current_health = [current_health, 0].max
-
-            new_player_state = player_state.dup
-            new_player_state["health"] = current_health
-            new_player_state["combat"]["defending"] = false
-            new_player_state["combat"]["round_number"] += 1
-            update_player_state(new_player_state)
-
-            lines = []
-            lines << "You try to flee but the #{creature_def['name']} blocks your escape!"
-            lines << "The creature attacks you for #{creature_damage} damage!"
-            lines << "Your health: #{current_health}/#{player_state['max_health'] || 10}"
-
-            # Check if player died
-            return handle_player_death(creature_def) if current_health <= 0
-
-            lines << ""
-            lines << "What do you do? (ATTACK, DEFEND, FLEE, USE [item])"
-
-            return success(lines.join("\n"))
+            return success("You try to flee but can't break away from the fight!",
+                           state_changes: { combat_turn_consumed: true })
           end
 
-          # Successfully fled
-          new_player_state = player_state.dup
-          new_player_state["combat"] = nil
-          update_player_state(new_player_state)
+          # Successfully fled — leave combat for this player.
+          new_ps = player_state.dup
+          new_ps["combat"] = nil
+          update_player_state(new_ps)
 
-          lines = []
-          lines << "You flee from combat!"
-          flee_msg = creature_def["on_flee_msg"] || "The #{creature_def['name']} watches you retreat."
-          lines << flee_msg
+          ClassicGame::TurnManager.remove_from_combat(game, user_id)
 
-          success(lines.join("\n"))
+          if game.in_combat?
+            # Others are still fighting — this player goes into limbo.
+            limbo_ps = player_state.dup
+            limbo_ps["waiting_for_combat_end"] = true
+            update_player_state(limbo_ps)
+            success("You break away from the fight and take cover, waiting for the battle to end.",
+                    state_changes: { combat_turn_consumed: true })
+          else
+            flee_msg = creature_def["on_flee_msg"] || "The #{creature_def['name']} watches you retreat."
+            success("You flee from combat!\n#{flee_msg}",
+                    state_changes: { combat_ended: true })
+          end
         end
 
         def handle_use_item(item_target)
           return failure("Use what?") unless item_target
 
-          # Find the item in inventory
           item_id, item_def = find_item(item_target)
           return failure("You don't have that item.") unless item_def
           return failure("You don't have that item.") unless item?(item_id)
 
-          # Check if item has combat effect
           combat_effect = item_def["combat_effect"]
           return failure("You can't use that in combat.") unless combat_effect
 
-          combat = player_state["combat"]
-          creature_id = combat["creature_id"]
-          creature_def = world_snapshot.dig("creatures", creature_id)
-
           return failure("The creature has vanished!") unless creature_def
 
-          lines = []
+          reset_defending
 
           case combat_effect["type"]
           when "heal"
             heal_amount = combat_effect["amount"] || 10
             current_health = player_state["health"] || 10
             max_health = player_state["max_health"] || 10
-
             new_health = [current_health + heal_amount, max_health].min
             actual_heal = new_health - current_health
 
-            lines << "You use the #{item_def['name']}!"
-            lines << "You recover #{actual_heal} health!"
+            new_ps = player_state.dup
+            new_ps["health"] = new_health
+            new_ps["inventory"] = (new_ps["inventory"] || []) - [item_id] if item_def.fetch("consumable", true)
+            update_player_state(new_ps)
 
-            # Remove item if consumable
-            new_player_state = player_state.dup
-            new_player_state["health"] = new_health
-
-            if item_def.fetch("consumable", true)
-              new_player_state["inventory"] = (new_player_state["inventory"] || []) - [item_id]
-            end
-
-            # Creature counterattacks
-            creature_damage = calculate_creature_damage(creature_def, defending: false)
-            new_health -= creature_damage
-            new_health = [new_health, 0].max
-            new_player_state["health"] = new_health
-
-            new_player_state["combat"]["defending"] = false
-            new_player_state["combat"]["round_number"] += 1
-            update_player_state(new_player_state)
-
-            lines << ""
-            lines << "The #{creature_def['name']} attacks for #{creature_damage} damage!"
-            lines << "Your health: #{new_health}/#{max_health}"
-
-            # Check if player died
-            return handle_player_death(creature_def) if new_health <= 0
-
-            lines << ""
-            lines << "What do you do? (ATTACK, DEFEND, FLEE, USE [item])"
-
+            success("You use the #{item_def['name']}!\nYou recover #{actual_heal} health.",
+                    state_changes: { combat_turn_consumed: true })
           else
-            return failure("You can't use that in combat.")
+            failure("You can't use that in combat.")
           end
-
-          success(lines.join("\n"))
         end
 
         def calculate_player_damage(creature_def)
@@ -240,65 +130,44 @@ module ClassicGame
 
           total_attack = base_attack + weapon_damage + randomness
           damage = total_attack - creature_defense
-
-          # Minimum 1 damage
           [damage, 1].max
         end
 
-        def calculate_creature_damage(creature_def, defending:)
-          creature_attack = creature_def["attack"] || 5
-          randomness = rand(-2..2)
-          player_defense = get_defense_bonus(player_state["inventory"] || [])
+        def reset_defending
+          return unless player_state.dig("combat", "defending")
 
-          # Add +3 defense bonus if defending
-          player_defense += 3 if defending
-
-          total_attack = creature_attack + randomness
-          damage = total_attack - player_defense
-
-          # Minimum 1 damage
-          [damage, 1].max
+          new_ps = player_state.dup
+          new_ps["combat"] = new_ps["combat"].merge("defending" => false)
+          update_player_state(new_ps)
         end
 
-        def handle_creature_defeat(creature_id, creature_def)
-          lines = []
+        def handle_creature_defeat(opening_lines = [])
+          lines = Array(opening_lines).dup
           defeat_msg = creature_def["on_defeat_msg"] || "The #{creature_def['name']} collapses!"
           lines << defeat_msg
 
-          # Handle loot
           loot = creature_def["loot"] || []
           if loot.any?
-            # Add loot to room
             new_room_state = current_room_state.dup
             new_room_state["items"] ||= []
             new_room_state["items"] += loot
             new_room_state["modified"] = true
             update_room_state(player_state["current_room"], new_room_state)
 
-            loot_names = loot.map do |item_id|
-              world_snapshot.dig("items", item_id, "name") || item_id
-            end
+            loot_names = loot.map { |id| world_snapshot.dig("items", id, "name") || id }
             lines << "The creature drops: #{loot_names.join(', ')}"
           end
 
-          # Remove creature from room
+          room_id = player_state["current_room"]
           new_room_state = current_room_state.dup
-          new_room_state["creatures"] = (new_room_state["creatures"] || []) - [creature_id]
+          new_room_state["creatures"] = (new_room_state["creatures"] || []) - [game.combat_state["creature_id"]]
           new_room_state["modified"] = true
-          update_room_state(player_state["current_room"], new_room_state)
+          update_room_state(room_id, new_room_state)
 
-          # Clear combat state
-          new_player_state = player_state.dup
-          new_player_state["combat"] = nil
-          update_player_state(new_player_state)
-
-          # Set defeat flag if specified
           if creature_def["sets_flag_on_defeat"]
             flag_name = creature_def["sets_flag_on_defeat"]
             game.set_flag(flag_name, true)
 
-            # Auto-reveal any hidden exits now unlocked by this flag
-            room_id = player_state["current_room"]
             room_def = world_snapshot.dig("rooms", room_id)
             (room_def["exits"] || {}).each do |direction, exit_data|
               next unless exit_data.is_a?(Hash) && exit_data["hidden"]
@@ -310,34 +179,8 @@ module ClassicGame
             end
           end
 
-          success(lines.join("\n"))
-        end
-
-        def handle_player_death(creature_def)
-          # Clear combat state
-          new_player_state = player_state.dup
-          new_player_state["combat"] = nil
-          new_player_state["pending_restart"] = true
-          update_player_state(new_player_state)
-
-          lines = []
-          lines << ""
-          lines << "=== GAME OVER ==="
-          lines << "You have been defeated by the #{creature_def['name']}!"
-          lines << ""
-          lines << "Type RESTART to try again."
-
-          failure(lines.join("\n"))
-        end
-
-        def delegate_to_original_handler(command)
-          # For non-combat commands that should work during combat
-          case command[:verb]
-          when :inventory, :examine, :look
-            ClassicGame::Handlers::ExamineHandler.new(game: game, user_id: user_id).handle(command)
-          else
-            failure("You can't do that during combat!")
-          end
+          ClassicGame::TurnManager.exit_combat_mode(game)
+          success(lines.join("\n"), state_changes: { combat_ended: true })
         end
     end
   end

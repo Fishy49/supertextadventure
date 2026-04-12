@@ -21,6 +21,7 @@ class ClassicCommandJob
 
       broadcast_dice_roll(game, message, result)
       sync_classic_sidebar(game, user, message.game_user)
+      broadcast_text_form_updates(game)
 
       # Create response message (will auto-broadcast via callback)
       Message.create!(
@@ -32,6 +33,22 @@ class ClassicCommandJob
   end
 
   private
+
+    def broadcast_text_form_updates(game)
+      return unless game.classic?
+
+      user_ids = game.game_users.pluck(:user_id)
+      user_ids << game.created_by unless user_ids.include?(game.created_by)
+      user_ids.uniq.each do |uid|
+        user = User.find(uid)
+        Turbo::StreamsChannel.broadcast_replace_to(
+          game, "turn_for_#{uid}",
+          target: "text_form_content",
+          partial: "games/text_form",
+          locals: { game: game, user: user }
+        )
+      end
+    end
 
     def broadcast_dice_roll(game, message, result)
       return unless result[:dice_roll]

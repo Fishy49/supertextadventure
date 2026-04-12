@@ -34,6 +34,10 @@ class Game < ApplicationRecord
 
   attr_accessor :skip_game_state_dump
 
+  def to_param
+    uuid
+  end
+
   def game_user(user)
     game_users.find_by(user_id: user.id)
   end

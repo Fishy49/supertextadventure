@@ -18,6 +18,27 @@ class HostTest < ApplicationSystemTestCase
     assert_text "My New Game"
   end
 
+  test "edit a game via tavern preserves unchanged fields" do
+    game = games(:classic_open)
+
+    visit tavern_url
+    within "##{ActionView::RecordIdentifier.dom_id(game)}" do
+      click_on "Edit"
+    end
+
+    assert_selector "h1", text: "Editing game"
+    fill_in "game[name]", with: "Classic Open Renamed"
+    click_on "Update Game"
+
+    assert_text "Classic Open Renamed"
+    assert_no_selector "h1", text: "Editing game"
+
+    game.reload
+    assert_equal "Classic Open Renamed", game.name
+    assert_equal "classic", game.game_type, "editing the name must not reset game_type"
+    assert_equal "open", game.status, "editing the name must not reset status"
+  end
+
   test "delete a game via tavern removes the card from the UI" do
     game = games(:classic_open)
 

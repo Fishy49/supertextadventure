@@ -2,6 +2,7 @@
 
 class Game < ApplicationRecord
   include ContainerState
+  include CombatState
 
   belongs_to :host, class_name: "User",
                     foreign_key: :created_by,

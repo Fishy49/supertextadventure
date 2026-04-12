@@ -59,8 +59,8 @@ module ClassicGame
 
             # Show health if in combat with this creature
             if in_combat_with?(creature_id)
-              combat = player_state["combat"]
-              health_pct = (combat["creature_health"].to_f / combat["creature_max_health"] * 100).round
+              cs = game.combat_state
+              health_pct = (cs["creature_health"].to_f / cs["creature_max_health"] * 100).round
               description += "\n\nThe creature appears to be at #{health_pct}% health."
             end
 

@@ -1,7 +1,11 @@
 <div id="text_form_content">
   <% in_limbo = game.game_state.dig("player_states", user.id.to_s, "waiting_for_combat_end") %>
-  <% order = game.turn_state["turn_order"] || [] %>
-  <% on_turn = !in_limbo && (order.length <= 1 || game.current_turn_user_id == user.id) %>
+  <% if game.in_combat? %>
+    <% on_turn = !in_limbo && game.current_combat_user_id == user.id %>
+  <% else %>
+    <% order = game.turn_state["turn_order"] || [] %>
+    <% on_turn = !in_limbo && (order.length <= 1 || game.current_turn_user_id == user.id) %>
+  <% end %>
 
   <div class="<%= 'hidden' unless on_turn %>">
     <%= render(TerminalInputComponent.new(
@@ -18,6 +22,15 @@
     <div class="italic opacity-70 py-2">
       <% if in_limbo %>
         Waiting for combat to finish...
+      <% elsif game.in_combat? %>
+        <% current = game.current_combatant %>
+        <% if current && current["type"] == "creature" %>
+          <% creature_name = game.world_snapshot.dig("creatures", current["id"], "name") || current["id"] %>
+          The <%= creature_name %> is taking its turn...
+        <% elsif current %>
+          <% name = game.character_name_for(current["id"].to_i) || "another player" %>
+          Waiting for <%= name %>'s combat turn...
+        <% end %>
       <% else %>
         <% current_name = game.character_name_for(game.current_turn_user_id) || "another player" %>
         Waiting for <%= current_name %>...

@@ -224,7 +224,7 @@ module ClassicGame
 
       # Check if in combat with specific creature
       def in_combat_with?(creature_id)
-        in_combat? && player_state.dig("combat", "creature_id") == creature_id
+        in_combat? && game.combat_state && game.combat_state["creature_id"] == creature_id
       end
 
       # Get total weapon damage from inventory

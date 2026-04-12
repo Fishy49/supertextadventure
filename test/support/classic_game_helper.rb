@@ -115,6 +115,62 @@ module ClassicGameTestHelper
       @game_state["npc_movement"][entity_id.to_s] = state
     end
 
+    # Combat state methods
+
+    def in_combat?
+      @game_state["combat_state"].present?
+    end
+
+    def combat_state
+      @game_state["combat_state"]
+    end
+
+    def set_combat_state(room_id:, creature_id:, creature_health:)
+      @game_state["combat_state"] = {
+        "room_id" => room_id.to_s,
+        "creature_id" => creature_id.to_s,
+        "creature_health" => creature_health,
+        "creature_max_health" => creature_health
+      }
+    end
+
+    def clear_combat_state
+      @game_state.delete("combat_state")
+    end
+
+    def update_creature_health(new_health)
+      return unless in_combat?
+
+      @game_state["combat_state"] = combat_state.merge("creature_health" => new_health)
+    end
+
+    def current_combatant
+      ts = turn_state
+      order = ts["combat_turn_order"] || []
+      return nil if order.empty?
+
+      order[ts["combat_current_index"] || 0]
+    end
+
+    def current_combat_user_id
+      c = current_combatant
+      return nil unless c && c["type"] == "player"
+
+      c["id"].to_i
+    end
+
+    def advance_combat_turn
+      ts = turn_state.dup
+      order = ts["combat_turn_order"] || []
+      return nil if order.empty?
+
+      current = ts["combat_current_index"] || 0
+      current = (current + 1) % order.length
+      ts["combat_current_index"] = current
+      @game_state["turn_state"] = ts
+      order[current]
+    end
+
     # Turn management methods
 
     def turn_state

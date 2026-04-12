@@ -32,6 +32,25 @@ class GameTurnUiTest < ActionDispatch::IntegrationTest
     assert_select "#text_form_content > div.hidden #terminalInput"
   end
 
+  test "player in combat limbo sees the waiting-for-combat message" do
+    state = @game.game_state.dup
+    state["player_states"] ||= {}
+    state["player_states"][@owner.id.to_s] = {
+      "current_room" => "town_square",
+      "health" => 10,
+      "max_health" => 10,
+      "inventory" => [],
+      "waiting_for_combat_end" => true
+    }
+    @game.update!(game_state: state)
+
+    log_in_as(@owner)
+    get game_path(@game)
+
+    assert_match(/Waiting for combat to finish/, response.body)
+    assert_select "#text_form_content > div.hidden #terminalInput"
+  end
+
   private
 
     def log_in_as(user)

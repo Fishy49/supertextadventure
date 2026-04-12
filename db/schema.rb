@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_11_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_11_222705) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -97,6 +97,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_11_000001) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.jsonb "world_data"
+    t.index ["name"], name: "index_worlds_on_name", unique: true
   end
 
   add_foreign_key "game_users", "games"

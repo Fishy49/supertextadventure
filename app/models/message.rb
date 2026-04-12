@@ -13,8 +13,9 @@ class Message < ApplicationRecord
     where("visible_to_user_ids IS NULL OR :uid = ANY(visible_to_user_ids)", uid: user.id)
   }
   before_create :parse_dice_rolls
+  before_create :scope_to_room, if: -> { game.classic? && player_message? }
 
-  after_create_commit -> { broadcast_append_to(game, :messages) }, unless: proc { is_system_message? }
+  after_create_commit :broadcast_to_audience, unless: proc { is_system_message? }
   after_update_commit -> { broadcast_replace_to(game, :messages) }, unless: proc { is_system_message? }
   after_create_commit :set_user_active_at, unless: proc { is_system_message? }
   after_create_commit :enqueue_classic_command, if: proc { game.classic? && player_message? }
@@ -42,6 +43,26 @@ class Message < ApplicationRecord
   end
 
   private
+
+    def scope_to_room
+      user = game_user&.user
+      return unless user
+
+      room_id = game.player_state(user.id)&.dig("current_room")
+      return unless room_id
+
+      self.visible_to_user_ids = game.players_in_room(room_id).keys
+    end
+
+    def broadcast_to_audience
+      if visible_to_user_ids.present?
+        visible_to_user_ids.each do |uid|
+          broadcast_append_to(game, "messages_for_#{uid}")
+        end
+      else
+        broadcast_append_to(game, :messages)
+      end
+    end
 
     def parse_dice_rolls
       return unless content&.downcase&.starts_with?("/roll ")

@@ -11,6 +11,14 @@ module ClassicGame
         "northwest" => "southeast", "southeast" => "northwest"
       }.freeze
 
+      ARRIVAL_PREPOSITIONS = {
+        "up" => "from below", "down" => "from above",
+        "north" => "from the south", "south" => "from the north",
+        "east" => "from the west", "west" => "from the east",
+        "northeast" => "from the southwest", "southwest" => "from the northeast",
+        "northwest" => "from the southeast", "southeast" => "from the northwest"
+      }.freeze
+
       def handle(command)
         direction = command[:target]
         return failure("Go where?") unless direction
@@ -111,7 +119,7 @@ module ClassicGame
           return changes unless player_name
 
           dir_str = direction.to_s
-          opposite = OPPOSITE_DIRECTIONS[dir_str] || "another direction"
+          arrival_phrase = ARRIVAL_PREPOSITIONS[dir_str] || "from another direction"
 
           if observers[:departing].any?
             changes[:departed_room] = old_room_id
@@ -121,7 +129,7 @@ module ClassicGame
 
           if observers[:arriving].any?
             changes[:entered_room] = new_room_id
-            changes[:arrival_text] = "**#{player_name} arrives from the #{opposite}.**"
+            changes[:arrival_text] = "**#{player_name} arrives #{arrival_phrase}.**"
             changes[:arrival_audience] = observers[:arriving].map { |uid, _| uid }
           end
 

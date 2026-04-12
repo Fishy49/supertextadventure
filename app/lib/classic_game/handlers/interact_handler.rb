@@ -211,9 +211,20 @@ module ClassicGame
           receiver_state["inventory"] << item_id
           game.update_player_state(receiver_uid, receiver_state)
 
+          giver_name = game.character_name_for(user_id) || "Someone"
+          bystanders = other_players_in_room.keys - [receiver_uid]
+          give_data = {
+            receiver_user_id: receiver_uid,
+            item_id: item_id,
+            receiver_text: "**#{giver_name} gives you the #{item_def['name']}.**"
+          }
+          if bystanders.any?
+            give_data[:bystander_text] = "**#{giver_name} gives the #{item_def['name']} to #{receiver_name}.**"
+            give_data[:bystander_audience] = bystanders
+          end
           success(
             "You give the #{item_def['name']} to #{receiver_name}.",
-            state_changes: { give_to_player: { receiver_user_id: receiver_uid, item_id: item_id } }
+            state_changes: { give_to_player: give_data }
           )
         end
 

@@ -2,6 +2,7 @@
   <%= render "debug_bar", game: @game %>
 <% end %>
 <%= turbo_stream_from(@game, :messages) %>
+<%= turbo_stream_from(@game, "messages_for_#{current_user.id}") %>
 <%= turbo_stream_from(@game, :state) %>
 <%= turbo_stream_from(@game, "turn_for_#{current_user.id}") %>
 <% if @game.host?(current_user) %>

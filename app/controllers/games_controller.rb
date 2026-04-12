@@ -64,7 +64,7 @@ class GamesController < ApplicationController
       @game.game_user(current_user).update(active_at: DateTime.now)
     end
 
-    @pagy, @messages = pagy(Message.for_game(@game), items: 10)
+    @pagy, @messages = pagy(Message.for_game(@game).visible_to_user(current_user), items: 10)
   end
 
   def new

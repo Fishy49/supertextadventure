@@ -30,6 +30,11 @@ module ClassicGame
         # Parse the command
         command = CommandParser.parse(command_text)
 
+        if command[:verb] == :wait
+          advance_turn_if_ready(game, user)
+          return { success: true, response: "", state_changes: {} }
+        end
+
         # Route to appropriate handler
         handler = get_handler(command[:verb], game: game, user_id: user.id)
 

@@ -10,9 +10,11 @@ class MultiplayerSystemTest < ActiveSupport::TestCase
 
   PLAYER1_ID = 1
   PLAYER2_ID = 2
+  PLAYER3_ID = 3
 
   User1 = Struct.new(:id)
   User2 = Struct.new(:id)
+  User3 = Struct.new(:id)
 
   # ─── World fixture ──────────────────────────────────────────────────────────
 
@@ -24,12 +26,17 @@ class MultiplayerSystemTest < ActiveSupport::TestCase
           "name" => "Tavern",
           "description" => "A busy tavern with a roaring fire.",
           "items" => ["sword"],
-          "exits" => { "north" => "library" }
+          "exits" => { "north" => "library", "up" => "balcony" }
         },
         "library" => {
           "name" => "Library",
           "description" => "Shelves of dusty tomes.",
           "exits" => { "south" => "tavern" }
+        },
+        "balcony" => {
+          "name" => "Balcony",
+          "description" => "A rickety wooden balcony.",
+          "exits" => { "down" => "tavern" }
         },
         "cave" => {
           "name" => "Dark Cave",
@@ -68,6 +75,7 @@ class MultiplayerSystemTest < ActiveSupport::TestCase
 
   def user1 = User1.new(PLAYER1_ID)
   def user2 = User2.new(PLAYER2_ID)
+  def user3 = User3.new(PLAYER3_ID)
 
   # Hand-roll a combat state without TurnManager.enter_combat_mode so tests
   # can set deterministic turn order. Marks every combatant as actively
@@ -451,6 +459,150 @@ class MultiplayerSystemTest < ActiveSupport::TestCase
     # Player is now in combat and can act on their turn
     assert_equal PLAYER1_ID, game.current_combat_user_id
   end
+
+  # ─── Wait command ────────────────────────────────────────────────────────────
+
+  test "wait command skips turn with empty response" do
+    game = build_two_player_game
+    assert_equal PLAYER1_ID, game.current_turn_user_id
+
+    r = execute_engine(game, user1, "wait")
+
+    assert r[:success]
+    assert_equal "", r[:response]
+    assert_equal PLAYER2_ID, game.current_turn_user_id
+  end
+
+  test "skip and pass are synonyms for wait" do
+    game = build_two_player_game
+    r = execute_engine(game, user1, "skip")
+    assert r[:success]
+    assert_equal "", r[:response]
+
+    r = execute_engine(game, user2, "pass")
+    assert r[:success]
+    assert_equal "", r[:response]
+  end
+
+  # ─── Arrival grammar ───────────────────────────────────────────────────────
+
+  test "arrival text uses from below for upward movement" do
+    game = build_two_player_game(p1_room: "tavern", p2_room: "balcony")
+
+    # Player 1 moves up to balcony where player 2 is
+    r = execute_engine(game, user1, "go up")
+
+    assert r[:state_changes][:arrival_text]
+    assert_includes r[:state_changes][:arrival_text], "from below"
+    assert_not_includes r[:state_changes][:arrival_text], "from the up"
+  end
+
+  test "arrival text uses from above for downward movement" do
+    game = build_two_player_game(p1_room: "balcony", p2_room: "tavern")
+
+    r = execute_engine(game, user1, "go down")
+
+    assert r[:state_changes][:arrival_text]
+    assert_includes r[:state_changes][:arrival_text], "from above"
+    assert_not_includes r[:state_changes][:arrival_text], "from the down"
+  end
+
+  test "arrival text uses from the direction for cardinal movement" do
+    game = build_two_player_game(p1_room: "tavern", p2_room: "library")
+
+    r = execute_engine(game, user1, "go north")
+
+    assert r[:state_changes][:arrival_text]
+    assert_includes r[:state_changes][:arrival_text], "from the south"
+  end
+
+  # ─── Per-audience movement messages ─────────────────────────────────────────
+
+  test "movement departure audience is scoped to players in old room" do
+    game = build_two_player_game(p1_room: "tavern", p2_room: "tavern")
+
+    r = execute_engine(game, user1, "go north")
+
+    assert_equal [PLAYER2_ID], r[:state_changes][:departure_audience]
+    assert_includes r[:state_changes][:departure_text], "Thorin"
+  end
+
+  test "movement arrival audience is scoped to players in new room" do
+    game = build_two_player_game(p1_room: "library", p2_room: "tavern")
+
+    r = execute_engine(game, user1, "go south")
+
+    assert_equal [PLAYER2_ID], r[:state_changes][:arrival_audience]
+    assert_includes r[:state_changes][:arrival_text], "Thorin"
+  end
+
+  test "movement with no observers has no departure or arrival data" do
+    game = build_two_player_game(p1_room: "tavern", p2_room: "library")
+
+    # Player 1 moves up to empty balcony; player 2 is in library
+    r = execute_engine(game, user1, "go up")
+
+    assert_nil r[:state_changes][:departure_text]
+    assert_nil r[:state_changes][:arrival_text]
+  end
+
+  # ─── Per-audience give messages ─────────────────────────────────────────────
+
+  test "give state_changes include receiver text" do
+    p1_state = player_state_in("tavern", inventory: ["sword"])
+    game = build_multiplayer_game(
+      world_data: multiplayer_world,
+      players: { PLAYER1_ID => p1_state, PLAYER2_ID => player_state_in("tavern") },
+      character_names: { PLAYER1_ID => "Thorin", PLAYER2_ID => "Elara" }
+    )
+
+    r = execute_engine(game, user1, "give sword to Elara")
+
+    give_data = r[:state_changes][:give_to_player]
+    assert give_data, "give_to_player state_changes should be present"
+    assert_equal PLAYER2_ID, give_data[:receiver_user_id]
+    assert_includes give_data[:receiver_text], "Thorin"
+    assert_includes give_data[:receiver_text], "Iron Sword"
+  end
+
+  test "give state_changes include bystander text when third player present" do
+    p1_state = player_state_in("tavern", inventory: ["sword"])
+    game = build_multiplayer_game(
+      world_data: multiplayer_world,
+      players: {
+        PLAYER1_ID => p1_state,
+        PLAYER2_ID => player_state_in("tavern"),
+        PLAYER3_ID => player_state_in("tavern")
+      },
+      character_names: { PLAYER1_ID => "Thorin", PLAYER2_ID => "Elara", PLAYER3_ID => "Gandalf" }
+    )
+
+    r = execute_engine(game, user1, "give sword to Elara")
+
+    give_data = r[:state_changes][:give_to_player]
+    assert give_data[:bystander_text], "bystander_text should be present"
+    assert_includes give_data[:bystander_text], "Thorin"
+    assert_includes give_data[:bystander_text], "Elara"
+    assert_includes give_data[:bystander_text], "Iron Sword"
+    assert_equal [PLAYER3_ID], give_data[:bystander_audience]
+  end
+
+  test "give state_changes have no bystander data when only giver and receiver present" do
+    p1_state = player_state_in("tavern", inventory: ["sword"])
+    game = build_multiplayer_game(
+      world_data: multiplayer_world,
+      players: { PLAYER1_ID => p1_state, PLAYER2_ID => player_state_in("tavern") },
+      character_names: { PLAYER1_ID => "Thorin", PLAYER2_ID => "Elara" }
+    )
+
+    r = execute_engine(game, user1, "give sword to Elara")
+
+    give_data = r[:state_changes][:give_to_player]
+    assert_nil give_data[:bystander_text]
+    assert_nil give_data[:bystander_audience]
+  end
+
+  # ─── Combat multiplayer ──────────────────────────────────────────────────────
 
   test "exit_combat_mode clears waiting_for_combat_end for all players" do
     ps2 = player_state_in("cave", waiting_for_combat_end: true)

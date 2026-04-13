@@ -90,7 +90,7 @@ export default class extends Controller {
       if(inputText === ""){ return false; }
 
       if(/^(INVENTORY|INV|I)$/.test(inputText)) {
-        if(Date.now() - this.lastInventoryAt < 3000) {
+        if(Date.now() - this.lastInventoryAt < 500) {
           this.show_error("Wait before checking inventory again.", true)
           return false;
         }

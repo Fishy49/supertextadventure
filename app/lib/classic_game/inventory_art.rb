@@ -3,7 +3,7 @@
 module ClassicGame
   class InventoryArt
     ART = {
-      "weapon" => <<~'ART'.chomp,
+      "weapon" => <<~ART.chomp,
            |>
           /|
          / |
@@ -11,53 +11,53 @@ module ClassicGame
         |__|
          ||
       ART
-      "potion" => <<~'ART'.chomp,
+      "potion" => <<~ART.chomp,
           ,--.
          ( ~~ )
         |/~~~~\|
         |      |
          '----'
       ART
-      "key" => <<~'ART'.chomp,
-          ___
-         (   )
-          ---
-           |
-          _|_
+      "key" => <<~ART.chomp,
+            ___
+           (   )
+            ---
+             |
+            _|_
       ART
-      "scroll" => <<~'ART'.chomp,
-          .---.
-         (     )
-         |~~~~~|
-         (     )
-          '---'
+      "scroll" => <<~ART.chomp,
+            .---.
+           (     )
+           |~~~~~|
+           (     )
+            '---'
       ART
-      "shield" => <<~'ART'.chomp,
+      "shield" => <<~ART.chomp,
           /--\
          /    \
         | |  | |
          \ -- /
           \--/
       ART
-      "container" => <<~'ART'.chomp,
+      "container" => <<~ART.chomp,
          _____
         |-----|
         |     |
         |_____|
       ART
-      "crown" => <<~'ART'.chomp,
+      "crown" => <<~ART.chomp,
         |\ /\ /|
         | V  V |
         |      |
          \----/
       ART
-      "gem" => <<~'ART'.chomp,
+      "gem" => <<~ART.chomp,
             /\
            /  \
           / <> \
         /________\
       ART
-      "default" => <<~'ART'.chomp,
+      "default" => <<~ART.chomp
           ___
          /   \
         | bag |
@@ -66,7 +66,7 @@ module ClassicGame
       ART
     }.freeze
 
-    def self.for(item_id, item_def)
+    def self.for(_item_id, item_def)
       return item_def["art"] if item_def["art"].present?
 
       # Check keywords against category names

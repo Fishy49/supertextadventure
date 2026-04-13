@@ -57,7 +57,7 @@ class MessageComponent < ViewComponent::Base
 
       art_end = rest.index { |l| l.present? && !l.start_with?("  ") } || rest.length
       art_text = rest[0...art_end].join("\n")
-      detail_text = rest[art_end..].reject(&:blank?).join("\n")
+      detail_text = rest[art_end..].compact_blank.join("\n")
 
       content_tag(:div, class: "inventory-item", data: { action: "click->inventory#toggle" }) do
         content_tag(:div, name_line, class: "font-bold") +

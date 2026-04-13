@@ -3,7 +3,7 @@
 module ClassicGame
   class InventoryArt
     ART = {
-      "weapon" => <<~ART.chomp,
+      "weapon" => <<~'ART'.chomp,
            |>
           /|
          / |
@@ -11,53 +11,53 @@ module ClassicGame
         |__|
          ||
       ART
-      "potion" => <<~ART.chomp,
+      "potion" => <<~'ART'.chomp,
           ,--.
          ( ~~ )
         |/~~~~\|
         |      |
          '----'
       ART
-      "key" => <<~ART.chomp,
+      "key" => <<~'ART'.chomp,
           ___
          (   )
           ---
            |
           _|_
       ART
-      "scroll" => <<~ART.chomp,
+      "scroll" => <<~'ART'.chomp,
           .---.
          (     )
          |~~~~~|
          (     )
           '---'
       ART
-      "shield" => <<~ART.chomp,
+      "shield" => <<~'ART'.chomp,
           /--\
          /    \
         | |  | |
          \ -- /
           \--/
       ART
-      "container" => <<~ART.chomp,
+      "container" => <<~'ART'.chomp,
          _____
         |-----|
         |     |
         |_____|
       ART
-      "crown" => <<~ART.chomp,
+      "crown" => <<~'ART'.chomp,
         |\ /\ /|
         | V  V |
         |      |
          \----/
       ART
-      "gem" => <<~ART.chomp,
+      "gem" => <<~'ART'.chomp,
             /\
            /  \
           / <> \
         /________\
       ART
-      "default" => <<~ART.chomp,
+      "default" => <<~'ART'.chomp,
           ___
          /   \
         | bag |

@@ -15,6 +15,9 @@ module QaWorld
       find(".terminal-input").send_keys("inventory", :return)
       assert_text "=== INVENTORY ==="
       assert_text "Rusty Key"
+
+      # Click the inventory item to expand hidden detail
+      find(".inventory-item", text: "Rusty Key").click
       assert_text "EXAMINE"
     end
 
@@ -26,7 +29,10 @@ module QaWorld
       assert_text "Rusty Key"
 
       find(".terminal-input").send_keys("inventory", :return)
-      # Key art contains "(   )" from the key icon
+      assert_text "=== INVENTORY ==="
+
+      # Click the inventory item to expand and reveal art
+      find(".inventory-item", text: "Rusty Key").click
       assert_text "(   )"
     end
 
@@ -43,6 +49,9 @@ module QaWorld
       find(".terminal-input").send_keys("inventory", :return)
       assert_text "=== INVENTORY ==="
       assert_text "Magic Wand"
+
+      # Click the inventory item to expand and reveal art
+      find(".inventory-item", text: "Magic Wand").click
       assert_text "***"
     end
   end

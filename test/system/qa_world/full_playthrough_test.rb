@@ -79,7 +79,7 @@ module QaWorld
         cmd_and_wait "take key"
 
         cmd "inventory"
-        assert_text "You are carrying"
+        assert_text "=== INVENTORY ==="
       end
 
       # ─── Phase 3: Dialogue ────────────────────────────────────────

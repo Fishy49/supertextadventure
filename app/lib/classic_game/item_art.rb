@@ -3,18 +3,18 @@
 module ClassicGame
   module ItemArt
     ART = {
-      "sword"  => "   /|\n  / |\n /  |\n/___/",
-      "blade"  => "  /\n |/\n  |\\\n  |_",
-      "key"    => " (O)--\n |___]",
+      "sword" => "   /|\n  / |\n /  |\n/___/",
+      "blade" => "  /\n |/\n  |\\\n  |_",
+      "key" => " (O)--\n |___]",
       "potion" => "  _\n(/)\n|~|\n|_|",
       "shield" => "/---\\\n|[*]|\n\\---/",
       "scroll" => " ____\n(    )\n|-..-|",
-      "crown"  => "^v^v^\n|___|",
-      "gem"    => " /\\\n<  >\n \\/",
-      "coin"   => ".---.\n|($)|\n'---'",
+      "crown" => "^v^v^\n|___|",
+      "gem" => " /\\\n<  >\n \\/",
+      "coin" => ".---.\n|($)|\n'---'"
     }.freeze
 
-    GENERIC_ART = ".-----.\n|     |\n'-----'".freeze
+    GENERIC_ART = ".-----.\n|     |\n'-----'"
 
     def self.art_for(item_def)
       return GENERIC_ART unless item_def

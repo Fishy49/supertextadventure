@@ -180,11 +180,11 @@ module ClassicGame
           name = item_def&.dig("name") || item_id
           desc_raw = item_def&.dig("description")
           short_desc = if desc_raw
-            first = desc_raw.split(".").first
-            first ? "#{first}." : desc_raw
-          else
-            "A mysterious item."
-          end
+                         first = desc_raw.split(".").first
+                         first ? "#{first}." : desc_raw
+                       else
+                         "A mysterious item."
+                       end
 
           art = inventory_art_for(item_def)
           art_lines = art.split("\n")
@@ -192,8 +192,8 @@ module ClassicGame
           content_lines = art_lines.map { |l| "  #{l}" } + ["  #{name}", "  #{short_desc}"]
           inner_width = [content_lines.map(&:length).max, 21].max
 
-          border_top = "┌#{"─" * inner_width}┐"
-          border_bot = "└#{"─" * inner_width}┘"
+          border_top = "┌#{'─' * inner_width}┐"
+          border_bot = "└#{'─' * inner_width}┘"
           rows = content_lines.map { |l| "│#{l.ljust(inner_width)}│" }
 
           ([border_top] + rows + [border_bot]).join("\n")

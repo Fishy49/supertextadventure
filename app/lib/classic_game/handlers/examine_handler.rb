@@ -163,13 +163,44 @@ module ClassicGame
 
           return success("You are carrying nothing.") if inventory.empty?
 
-          lines = ["You are carrying:"]
+          lines = ["=== INVENTORY ===", ""]
+
           inventory.each do |item_id|
-            item_name = world_snapshot.dig("items", item_id, "name") || item_id
-            lines << "  - #{item_name}"
+            item_def = world_snapshot.dig("items", item_id)
+            lines << format_inventory_item(item_id, item_def)
+            lines << ""
           end
 
+          lines << "Type EXAMINE <item> to inspect an item more closely."
+
           success(lines.join("\n"))
+        end
+
+        def format_inventory_item(item_id, item_def)
+          name = item_def&.dig("name") || item_id
+          desc_raw = item_def&.dig("description")
+          short_desc = if desc_raw
+            first = desc_raw.split(".").first
+            first ? "#{first}." : desc_raw
+          else
+            "A mysterious item."
+          end
+
+          art = inventory_art_for(item_def)
+          art_lines = art.split("\n")
+
+          content_lines = art_lines.map { |l| "  #{l}" } + ["  #{name}", "  #{short_desc}"]
+          inner_width = [content_lines.map(&:length).max, 21].max
+
+          border_top = "┌#{"─" * inner_width}┐"
+          border_bot = "└#{"─" * inner_width}┘"
+          rows = content_lines.map { |l| "│#{l.ljust(inner_width)}│" }
+
+          ([border_top] + rows + [border_bot]).join("\n")
+        end
+
+        def inventory_art_for(item_def)
+          ClassicGame::ItemArt.art_for(item_def)
         end
 
         def describe_current_room

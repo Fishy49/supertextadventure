@@ -96,4 +96,14 @@
   .input {
     @apply p-[5px] text-lg bg-stone-800 outline-none focus:outline-none focus-visible:outline-none focus:border-terminal-green placeholder:text-terminal-green placeholder:opacity-[0.5] ring-transparent focus:ring-transparent focus-visible:ring-transparent;
   }
+
+  .inventory-item-line {
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+
+  .inventory-item-line:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
 }

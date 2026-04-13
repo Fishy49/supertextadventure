@@ -12,7 +12,7 @@
 <div id="message-content-wrapper" class="invisible">
   <%= render "/messages/pager", game: @game, pagy: @pagy %>
 
-  <div id="game-messages" class="relative">
+  <div id="game-messages" class="relative" data-controller="inventory">
     <%= turbo_frame_tag(:messages) do %>
       <% @messages.reverse.each do |message| %>
         <%= render "/messages/message", message: message %>

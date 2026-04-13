@@ -484,7 +484,9 @@ class FullGameSystemTest < ActiveSupport::TestCase
       assert_includes r[:response], "Enchanted Blade", "enchanted blade should be in inventory"
       assert_includes r[:response], "Old Key",         "old key should still be in inventory"
       assert_not_includes r[:response], "Glowing Gem", "gem was given away"
-      assert_includes r[:response], "=== INVENTORY ===", "inventory should show formatted header"
+      assert_includes r[:response], "INVENTORY", "inventory should show formatted header"
+      assert(r[:response].include?("╔") || r[:response].include?("║"),
+             "inventory should show box drawing characters")
       assert_includes r[:response], "EXAMINE",         "inventory should include examine hint"
 
       r = ex(game, user, "examine enchanted blade")

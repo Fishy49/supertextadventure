@@ -16,6 +16,8 @@ module ClassicGame
         end
       end
 
+      BOX_WIDTH = 25
+
       private
 
         def handle_look(target)
@@ -166,14 +168,38 @@ module ClassicGame
 
           return success("You are carrying nothing.") if inventory.empty?
 
-          lines = ["=== INVENTORY ==="]
+          last_at = player_state["last_inventory_at"].to_f
+          now = Time.now.to_f
+          update_player_state(player_state.merge("last_inventory_at" => now))
+
+          item_count = inventory.size
+          item_word = item_count == 1 ? "item" : "items"
+
+          if last_at > 0 && now - last_at < 2.0
+            return success("You're carrying #{item_count} #{item_word}. EXAMINE <item> for details.")
+          end
+
+          border    = "╔" + ("═" * BOX_WIDTH) + "╗"
+          separator = "╠" + ("═" * BOX_WIDTH) + "╣"
+          bottom    = "╚" + ("═" * BOX_WIDTH) + "╝"
+
+          lines = [
+            border,
+            "║" + " INVENTORY ".center(BOX_WIDTH) + "║",
+            separator
+          ]
+
           inventory.each do |item_id|
             item_def = world_snapshot.dig("items", item_id)
-            item_name = item_def&.dig("name") || item_id
-            art_line = ClassicGame::ItemArt.art_for(item_id, item_def).lines.first.chomp
-            lines << "  #{art_line}  #{item_name}"
+            item_name = (item_def&.dig("name") || item_id)[0, 19]
+            icon = ClassicGame::ItemArt.icon_for(item_id, item_def)
+            lines << "║ #{icon} #{item_name.ljust(19)} ║"
           end
-          lines << "(#{inventory.size} #{inventory.size == 1 ? 'item' : 'items'}) — EXAMINE <item> for details"
+
+          lines << separator
+          lines << "║ #{"#{item_count} #{item_word}".ljust(23)} ║"
+          lines << bottom
+          lines << "EXAMINE <item> for details"
 
           success(lines.join("\n"))
         end
@@ -191,10 +217,55 @@ module ClassicGame
             stats << "Heals #{item_def.dig('combat_effect', 'amount')} HP" if item_def.dig("combat_effect", "type") == "heal"
           end
 
-          lines = [art, "--- #{name} ---", description]
-          lines << stats.join(" | ") if stats.any?
+          border    = "╔" + ("═" * BOX_WIDTH) + "╗"
+          separator = "╠" + ("═" * BOX_WIDTH) + "╣"
+          bottom    = "╚" + ("═" * BOX_WIDTH) + "╝"
+
+          lines = [
+            border,
+            "║" + " #{name} ".center(BOX_WIDTH) + "║",
+            separator
+          ]
+
+          art.each_line do |art_line|
+            lines << "║ #{art_line.chomp[0, 23].ljust(23)} ║"
+          end
+
+          lines << separator
+
+          wrap_text(description, 23).each do |desc_line|
+            lines << "║ #{desc_line.ljust(23)} ║"
+          end
+
+          if stats.any?
+            lines << separator
+            stats.each do |stat|
+              lines << "║ #{stat.ljust(23)} ║"
+            end
+          end
+
+          lines << bottom
 
           success(lines.join("\n"))
+        end
+
+        def wrap_text(text, width)
+          words = text.split(" ")
+          result = []
+          current = ""
+
+          words.each do |word|
+            if current.empty?
+              current = word
+            elsif (current + " " + word).length <= width
+              current += " " + word
+            else
+              result << current
+              current = word
+            end
+          end
+          result << current unless current.empty?
+          result
         end
 
         def describe_current_room

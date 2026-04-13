@@ -47,7 +47,9 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     result = execute("inventory")
 
     assert result[:success]
-    assert_includes result[:response], "=== INVENTORY ==="
+    assert_includes result[:response], "INVENTORY"
+    assert(result[:response].include?("╔") || result[:response].include?("║"),
+           "inventory should show box drawing characters")
     assert_includes result[:response], "Iron Sword"
   end
 
@@ -56,14 +58,14 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     result = execute("inventory")
 
     assert result[:success]
-    assert_includes result[:response], "(2 items)"
+    assert_includes result[:response], "2 items"
   end
 
   test "inventory shows singular item count" do
     @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["sword"])
     result = execute("inventory")
 
-    assert_includes result[:response], "(1 item)"
+    assert_includes result[:response], "1 item"
   end
 
   test "inventory includes examine hint" do
@@ -81,14 +83,54 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     assert_includes result[:response], "You are carrying nothing."
   end
 
+  test "inventory shows weapon icon" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["sword"])
+    result = execute("inventory")
+
+    assert_includes result[:response], "/|\\"
+  end
+
+  test "inventory shows multiple item icons" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: %w[sword health_potion])
+    result = execute("inventory")
+
+    assert_includes result[:response], "/|\\"
+    assert_includes result[:response], "(*)"
+    assert_includes result[:response], "2 items"
+  end
+
+  test "inventory anti-spam returns condensed response on rapid check" do
+    state = player_state_in("room1", inventory: ["sword"]).merge("last_inventory_at" => Time.now.to_f)
+    @game.game_state["player_states"][USER_ID.to_s] = state
+    result = execute("inventory")
+
+    assert result[:success]
+    assert_includes result[:response], "You're carrying 1 item"
+    assert_includes result[:response], "EXAMINE <item> for details"
+    assert_not(result[:response].include?("╔") || result[:response].include?("╚"),
+               "condensed response should not contain box borders")
+  end
+
+  test "inventory returns full box after cooldown" do
+    state = player_state_in("room1", inventory: ["sword"]).merge("last_inventory_at" => Time.now.to_f - 3.0)
+    @game.game_state["player_states"][USER_ID.to_s] = state
+    result = execute("inventory")
+
+    assert result[:success]
+    assert_includes result[:response], "INVENTORY"
+    assert(result[:response].include?("╔") || result[:response].include?("║"),
+           "full response should contain box drawing characters")
+  end
+
   # ─── EXAMINE INVENTORY ITEMS ─────────────────────────────────────────────────
 
-  test "examining inventory item shows ASCII art" do
+  test "examining inventory item shows framed output" do
     @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["sword"])
     result = execute("examine sword")
 
     assert result[:success]
-    assert result[:response].include?("\n"), "response should be multi-line with ASCII art"
+    assert(result[:response].include?("╔") || result[:response].include?("║"),
+           "framed examine should show box drawing characters")
   end
 
   test "examining inventory item shows item name header" do
@@ -130,6 +172,25 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     assert_includes result[:response], "Defense: +2"
   end
 
+  test "examining inventory item shows description in framed output" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["sword"])
+    result = execute("examine sword")
+
+    assert result[:success]
+    assert_includes result[:response], "A sharp iron sword."
+  end
+
+  test "examining inventory potion shows framed consumable info" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["health_potion"])
+    result = execute("examine potion")
+
+    assert result[:success]
+    assert(result[:response].include?("╔") || result[:response].include?("║"),
+           "framed examine should show box drawing characters")
+    assert_includes result[:response], "Health Potion"
+    assert_includes result[:response], "Heals 5 HP"
+  end
+
   # ─── EXAMINE ROOM ITEMS ───────────────────────────────────────────────────────
 
   test "examining room item does not show stats" do
@@ -148,6 +209,15 @@ class ExamineHandlerTest < ActiveSupport::TestCase
 
     assert result[:success]
     assert_includes result[:response], "A sharp iron sword."
+  end
+
+  test "examining room item does not show box borders" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: [])
+    result = execute("examine sword")
+
+    assert result[:success]
+    assert_not(result[:response].include?("╔") || result[:response].include?("╚"),
+               "room item examine should not have box borders")
   end
 
   private

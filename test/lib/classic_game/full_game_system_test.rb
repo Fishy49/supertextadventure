@@ -496,7 +496,8 @@ class FullGameSystemTest < ActiveSupport::TestCase
 
       r = ex(game, user, "examine enchanted blade")
       assert_includes r[:response], "Damage: +3",            "enchanted blade should show weapon stats"
-      assert_includes r[:response], "blade humming with magic", "enchanted blade description should appear"
+      plain_response = r[:response].gsub(/[║╔╗╚╝╠╣═]/, "").gsub(/\n/, " ").gsub(/\s+/, " ")
+      assert_includes plain_response, "blade humming with magic", "enchanted blade description should appear"
 
       assert game.get_flag("spoke_to_guide"),  "spoke_to_guide flag should be set"
       assert game.get_flag("tower_unlocked"),  "tower_unlocked flag should be set"

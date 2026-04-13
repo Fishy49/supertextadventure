@@ -428,7 +428,10 @@ class FullGameSystemTest < ActiveSupport::TestCase
       assert_not_includes game.player_state(USER_ID)["inventory"], "gem"
 
       r = ex(game, user, "inventory")
+      assert_includes r[:response], "=== INVENTORY ==="
       assert_includes r[:response], "Enchanted Blade"
+      # Enchanted blade has weapon_damage so weapon art (contains "|>") should appear
+      assert_includes r[:response], "|>"
     end
 
     # Phase 8: traverse the now-revealed hidden exit and pick up the victory crown
@@ -480,10 +483,12 @@ class FullGameSystemTest < ActiveSupport::TestCase
     # Phase 10: final state verification
     def phase_verification(game, user)
       r = ex(game, user, "inventory")
-      assert_includes r[:response], "Victory Crown",   "PHASE 9: victory crown should be in inventory"
-      assert_includes r[:response], "Enchanted Blade", "enchanted blade should be in inventory"
-      assert_includes r[:response], "Old Key",         "old key should still be in inventory"
-      assert_not_includes r[:response], "Glowing Gem", "gem was given away"
+      assert_includes r[:response], "=== INVENTORY ===", "PHASE 10: inventory should show enhanced header"
+      assert_includes r[:response], "EXAMINE",           "inventory should show EXAMINE footer hint"
+      assert_includes r[:response], "Victory Crown",     "PHASE 9: victory crown should be in inventory"
+      assert_includes r[:response], "Enchanted Blade",   "enchanted blade should be in inventory"
+      assert_includes r[:response], "Old Key",           "old key should still be in inventory"
+      assert_not_includes r[:response], "Glowing Gem",   "gem was given away"
 
       assert game.get_flag("spoke_to_guide"),  "spoke_to_guide flag should be set"
       assert game.get_flag("tower_unlocked"),  "tower_unlocked flag should be set"

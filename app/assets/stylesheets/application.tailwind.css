@@ -92,4 +92,19 @@
   .input {
     @apply p-[5px] text-lg bg-stone-800 outline-none focus:outline-none focus-visible:outline-none focus:border-terminal-green placeholder:text-terminal-green placeholder:opacity-[0.5] ring-transparent focus:ring-transparent focus-visible:ring-transparent;
   }
+
+  .inventory-item {
+    @apply border border-terminal-green px-2 py-1 cursor-pointer my-1;
+    transition: background-color 0.15s ease;
+  }
+
+  @media (hover: hover) {
+    .inventory-item:hover {
+      @apply bg-terminal-green bg-opacity-10;
+    }
+  }
+
+  .inventory-detail {
+    @apply mt-1;
+  }
 }

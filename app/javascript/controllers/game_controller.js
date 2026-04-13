@@ -12,6 +12,7 @@ export default class extends Controller {
   observer = null
   scrollPosition = 'last'
   message_count = 0
+  lastInventoryAt = 0
 
   connect(){
     const targetNode = document.querySelector('.grid-in-message-container');
@@ -87,6 +88,14 @@ export default class extends Controller {
       let inputText = e.target.textContent.trim().toUpperCase()
 
       if(inputText === ""){ return false; }
+
+      if(/^(INVENTORY|INV|I)$/.test(inputText)) {
+        if(Date.now() - this.lastInventoryAt < 3000) {
+          this.show_error("Wait before checking inventory again.", true)
+          return false;
+        }
+        this.lastInventoryAt = Date.now()
+      }
 
       window.stimulus_controller("terminalInput", "terminal").clear_input()
       this.errorTarget.style.display = "none"

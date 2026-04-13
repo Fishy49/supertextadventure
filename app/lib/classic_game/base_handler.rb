@@ -225,6 +225,11 @@ module ClassicGame
         total_defense
       end
 
+      # Return ASCII art for an item, delegating to the InventoryArt registry
+      def item_art(item_id, item_def)
+        ClassicGame::InventoryArt.for(item_id, item_def)
+      end
+
       # Check if a dice roll is pending
       def pending_roll?
         player_state["pending_roll"].present?

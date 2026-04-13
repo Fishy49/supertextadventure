@@ -2,7 +2,13 @@
 	<% if @message.event? %>
 		<%= render(EventMessageComponent.new(@message)) %>
 	<% elsif @message.host_message? %>
-		<%= simple_format(@message.content) %>
+		<% if inventory_message? %>
+			<div data-controller="inventory">
+				<%= format_inventory_html(@message.content) %>
+			</div>
+		<% else %>
+			<%= simple_format(@message.content) %>
+		<% end %>
 	<% elsif @message.player_message? %>
 		<%= @message.display_name %> /&gt; <%= @message.content %>
 	<% end %>

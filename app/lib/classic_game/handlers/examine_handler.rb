@@ -163,13 +163,54 @@ module ClassicGame
 
           return success("You are carrying nothing.") if inventory.empty?
 
-          lines = ["You are carrying:"]
-          inventory.each do |item_id|
-            item_name = world_snapshot.dig("items", item_id, "name") || item_id
-            lines << "  - #{item_name}"
+          # Anti-spam: condensed mode when called twice in the same turn
+          if player_state["last_inventory_at"] == game.turn_count
+            names = inventory.map { |id| world_snapshot.dig("items", id, "name") || id }
+            return success("You are carrying: #{names.join(', ')}")
           end
 
+          lines = ["=== INVENTORY ===", ""]
+
+          inventory.each do |item_id|
+            item_def = world_snapshot.dig("items", item_id)
+            if item_def
+              lines.concat(inventory_item_block(item_id, item_def))
+            else
+              lines << "[#{item_id}]"
+            end
+            lines << ""
+          end
+
+          lines << "--- Type EXAMINE [item] for details ---"
+
+          new_state = player_state.merge("last_inventory_at" => game.turn_count)
+          update_player_state(new_state)
+
           success(lines.join("\n"))
+        end
+
+        def inventory_item_block(item_id, item_def)
+          lines = []
+          lines << "[#{item_def['name']}]"
+
+          # ASCII art indented 2 spaces
+          art = item_art(item_id, item_def)
+          art.each_line { |art_line| lines << "  #{art_line.chomp}" }
+
+          # Brief description (first sentence)
+          if item_def["description"].present?
+            first_sentence = item_def["description"].split(/(?<=[.!?])\s+/).first
+            lines << first_sentence
+          end
+
+          # Stat indicators
+          stats = []
+          stats << "(weapon +#{item_def['weapon_damage']})" if item_def["weapon_damage"].present?
+          stats << "(defense +#{item_def['defense_bonus']})" if item_def["defense_bonus"].present?
+          stats << "(consumable)" if item_def["consumable"]
+          lines << stats.join(" ") if stats.any?
+
+          lines
         end
 
         def describe_current_room

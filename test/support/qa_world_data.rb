@@ -67,7 +67,7 @@ module TestSupport
         "name" => "The Market",
         "description" => "Colorful stalls line the street, filled with exotic wares.",
         "exits" => { "east" => "town_square" },
-        "items" => [],
+        "items" => ["magic_wand"],
         "npcs" => ["merchant"]
       }
     end
@@ -141,7 +141,15 @@ module TestSupport
           "defense_bonus" => 3,
           "description" => "A sturdy iron shield."
         },
-        "lockpick" => lockpick_item
+        "lockpick" => lockpick_item,
+        "magic_wand" => {
+          "name" => "Magic Wand",
+          "keywords" => %w[wand magic],
+          "takeable" => true,
+          "weapon_damage" => 2,
+          "art" => "  *  \n *** \n  *  ",
+          "description" => "A slender wand crackling with arcane energy."
+        }
       }
     end
 

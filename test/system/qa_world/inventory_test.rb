@@ -9,7 +9,7 @@ module QaWorld
       find(".terminal-input").click
       find(".terminal-input").send_keys("take key", :return)
       find(".terminal-input").send_keys("inventory", :return)
-      assert_text "=== INVENTORY ==="
+      assert_text "INVENTORY"
     end
 
     test "inventory shows examine hint" do

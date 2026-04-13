@@ -479,6 +479,11 @@ class FullGameSystemTest < ActiveSupport::TestCase
 
     # Phase 10: final state verification
     def phase_verification(game, user)
+      # Clear the inventory throttle timestamp so we get the full visual inventory
+      ps = game.player_state(USER_ID)
+      ps.delete("last_inventory_at")
+      game.update_player_state(USER_ID, ps)
+
       r = ex(game, user, "inventory")
       assert_includes r[:response], "Victory Crown",   "PHASE 10: victory crown should be in inventory"
       assert_includes r[:response], "Enchanted Blade", "enchanted blade should be in inventory"

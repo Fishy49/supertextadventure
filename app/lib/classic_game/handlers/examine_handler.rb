@@ -43,6 +43,9 @@ module ClassicGame
             # Check if it's a container
             return handle_examine_container(item_id, item_def) if item_def["is_container"]
 
+            # Enriched view for inventory items
+            return enriched_item_description(item_id, item_def) if item?(item_id)
+
             # Regular item examination
             description = item_def["description"] || "You see nothing special about the #{item_def['name']}."
             return success(description)
@@ -163,11 +166,33 @@ module ClassicGame
 
           return success("You are carrying nothing.") if inventory.empty?
 
-          lines = ["You are carrying:"]
+          lines = ["=== INVENTORY ==="]
           inventory.each do |item_id|
-            item_name = world_snapshot.dig("items", item_id, "name") || item_id
-            lines << "  - #{item_name}"
+            item_def = world_snapshot.dig("items", item_id)
+            item_name = item_def&.dig("name") || item_id
+            art_line = ClassicGame::ItemArt.art_for(item_id, item_def).lines.first.chomp
+            lines << "  #{art_line}  #{item_name}"
           end
+          lines << "(#{inventory.size} #{inventory.size == 1 ? 'item' : 'items'}) — EXAMINE <item> for details"
+
+          success(lines.join("\n"))
+        end
+
+        def enriched_item_description(item_id, item_def)
+          art = ClassicGame::ItemArt.art_for(item_id, item_def)
+          name = item_def["name"] || item_id
+          description = item_def["description"] || "You see nothing special about the #{name}."
+
+          stats = []
+          stats << "Damage: +#{item_def['weapon_damage']}" if item_def["weapon_damage"]
+          stats << "Defense: +#{item_def['defense_bonus']}" if item_def["defense_bonus"]
+          if item_def["consumable"]
+            stats << "Consumable"
+            stats << "Heals #{item_def.dig('combat_effect', 'amount')} HP" if item_def.dig("combat_effect", "type") == "heal"
+          end
+
+          lines = [art, "--- #{name} ---", description]
+          lines << stats.join(" | ") if stats.any?
 
           success(lines.join("\n"))
         end

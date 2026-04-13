@@ -480,10 +480,16 @@ class FullGameSystemTest < ActiveSupport::TestCase
     # Phase 10: final state verification
     def phase_verification(game, user)
       r = ex(game, user, "inventory")
-      assert_includes r[:response], "Victory Crown",   "PHASE 9: victory crown should be in inventory"
+      assert_includes r[:response], "Victory Crown",   "PHASE 10: victory crown should be in inventory"
       assert_includes r[:response], "Enchanted Blade", "enchanted blade should be in inventory"
       assert_includes r[:response], "Old Key",         "old key should still be in inventory"
       assert_not_includes r[:response], "Glowing Gem", "gem was given away"
+      assert_includes r[:response], "=== INVENTORY ===", "inventory should show formatted header"
+      assert_includes r[:response], "EXAMINE",         "inventory should include examine hint"
+
+      r = ex(game, user, "examine enchanted blade")
+      assert_includes r[:response], "Damage: +3",            "enchanted blade should show weapon stats"
+      assert_includes r[:response], "blade humming with magic", "enchanted blade description should appear"
 
       assert game.get_flag("spoke_to_guide"),  "spoke_to_guide flag should be set"
       assert game.get_flag("tower_unlocked"),  "tower_unlocked flag should be set"

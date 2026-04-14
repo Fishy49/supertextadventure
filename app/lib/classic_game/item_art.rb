@@ -30,17 +30,17 @@ module ClassicGame
     end
 
     def self.category_for(item_def)
-      item_def = item_def || {}
+      item_def ||= {}
       return "weapon" if item_def["weapon_damage"]
       return "armor" if item_def["defense_bonus"]
       return "potion" if item_def["consumable"] && item_def.dig("combat_effect", "type") == "heal"
 
       keywords = item_def["keywords"] || []
-      return "tool" if (keywords & %w[pick lockpick tool]).any?
+      return "tool" if keywords.intersect?(%w[pick lockpick tool])
       return "key" if keywords.include?("key")
       return "scroll" if keywords.include?("scroll")
       return "container" if item_def["is_container"]
-      return "treasure" if (keywords & %w[crown gem]).any?
+      return "treasure" if keywords.intersect?(%w[crown gem])
 
       "default"
     end

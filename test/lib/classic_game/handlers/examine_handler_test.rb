@@ -208,12 +208,12 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     @game.game_state["player_states"][user2_id.to_s] = player_state_in("room1", inventory: ["shield"])
 
     result1 = ClassicGame::Handlers::ExamineHandler.new(game: @game, user_id: USER_ID)
-                .handle(ClassicGame::CommandParser.parse("inventory"))
+      .handle(ClassicGame::CommandParser.parse("inventory"))
     result2 = ClassicGame::Handlers::ExamineHandler.new(game: @game, user_id: user2_id)
-                .handle(ClassicGame::CommandParser.parse("inventory"))
+      .handle(ClassicGame::CommandParser.parse("inventory"))
 
-    items1 = result1[:state_changes][:inventory_data].map { |i| i["name"] }
-    items2 = result2[:state_changes][:inventory_data].map { |i| i["name"] }
+    items1 = result1[:state_changes][:inventory_data].pluck("name")
+    items2 = result2[:state_changes][:inventory_data].pluck("name")
 
     assert_includes items1, "Iron Sword"
     assert_not_includes items1, "Wooden Shield"

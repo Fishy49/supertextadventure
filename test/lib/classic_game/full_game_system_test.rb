@@ -485,16 +485,16 @@ class FullGameSystemTest < ActiveSupport::TestCase
       assert_includes r[:response], "Old Key",         "old key should still be in inventory"
       assert_not_includes r[:response], "Glowing Gem", "gem was given away"
       assert_includes r[:response], "=== INVENTORY ===", "inventory should show formatted header"
-      assert_includes r[:response], "EXAMINE",         "inventory should include examine hint"
+      assert_includes r[:response], "EXAMINE", "inventory should include examine hint"
 
       # Verify inventory_data is present and contains expected items
       assert r[:state_changes][:inventory_data].is_a?(Array), "inventory_data should be an Array"
-      inv_names = r[:state_changes][:inventory_data].map { |i| i["name"] }
+      inv_names = r[:state_changes][:inventory_data].pluck("name")
       assert_includes inv_names, "Victory Crown",   "inventory_data should include Victory Crown"
       assert_includes inv_names, "Enchanted Blade", "inventory_data should include Enchanted Blade"
 
       r = ex(game, user, "examine enchanted blade")
-      assert_includes r[:response], "Damage: +3",            "enchanted blade should show weapon stats"
+      assert_includes r[:response], "Damage: +3", "enchanted blade should show weapon stats"
       assert_includes r[:response], "blade humming with magic", "enchanted blade description should appear"
 
       assert game.get_flag("spoke_to_guide"),  "spoke_to_guide flag should be set"

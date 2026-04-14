@@ -203,7 +203,9 @@ module ClassicGame
           stats << "Defense: +#{item_def['defense_bonus']}" if item_def["defense_bonus"]
           if item_def["consumable"]
             stats << "Consumable"
-            stats << "Heals #{item_def.dig('combat_effect', 'amount')} HP" if item_def.dig("combat_effect", "type") == "heal"
+            if item_def.dig("combat_effect", "type") == "heal"
+              stats << "Heals #{item_def.dig('combat_effect', 'amount')} HP"
+            end
           end
           stats
         end

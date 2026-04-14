@@ -17,7 +17,7 @@ module QaWorld
       find(".terminal-input").click
       find(".terminal-input").send_keys("take key", :return)
       find(".terminal-input").send_keys("inventory", :return)
-      assert_text "EXAMINE"
+      assert_text "Click an item for details"
     end
 
     test "examine inventory key shows description" do

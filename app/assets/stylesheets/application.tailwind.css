@@ -96,4 +96,18 @@
   .input {
     @apply p-[5px] text-lg bg-stone-800 outline-none focus:outline-none focus-visible:outline-none focus:border-terminal-green placeholder:text-terminal-green placeholder:opacity-[0.5] ring-transparent focus:ring-transparent focus-visible:ring-transparent;
   }
+
+  .inventory-item {
+    @apply cursor-pointer px-2 py-1 transition-colors duration-100;
+  }
+
+  @media (hover: hover) {
+    .inventory-item {
+      @apply hover:bg-terminal-green/20;
+    }
+  }
+
+  .inventory-item:active {
+    @apply bg-terminal-green/40;
+  }
 }

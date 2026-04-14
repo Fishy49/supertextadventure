@@ -1,0 +1,17 @@
+<div class="w-fit border-2 border-white/75 my-5 px-4 pb-4 border-solid mx-auto">
+	<div class="w-fit text-center px-4 mx-auto mt-[-18px] bg-stone-800">
+		=== INVENTORY ===
+	</div>
+	<% items.each do |item| %>
+		<div class="inventory-item"
+		     data-controller="inventory-item"
+		     data-inventory-item-command-value="EXAMINE <%= item['name'] %>"
+		     data-action="click->inventory-item#send">
+			<pre class="text-xs inline-block align-middle"><%= item['art_line'] %></pre>
+			<span class="ml-2"><%= item['name'] %></span>
+		</div>
+	<% end %>
+	<div class="text-center mt-2 opacity-60 text-sm">
+		(<%= item_count %> <%= item_count == 1 ? 'item' : 'items' %>) — Click an item for details
+	</div>
+</div>

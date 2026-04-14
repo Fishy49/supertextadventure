@@ -167,15 +167,23 @@ module ClassicGame
           return success("You are carrying nothing.") if inventory.empty?
 
           lines = ["=== INVENTORY ==="]
+          inventory_data = []
+
           inventory.each do |item_id|
             item_def = world_snapshot.dig("items", item_id)
             item_name = item_def&.dig("name") || item_id
             art_line = ClassicGame::ItemArt.art_for(item_id, item_def).lines.first.chomp
             lines << "  #{art_line}  #{item_name}"
+            inventory_data << {
+              "item_id" => item_id,
+              "name" => item_name,
+              "art_line" => art_line,
+              "category" => ClassicGame::ItemArt.category_for(item_def)
+            }
           end
           lines << "(#{inventory.size} #{inventory.size == 1 ? 'item' : 'items'}) — EXAMINE <item> for details"
 
-          success(lines.join("\n"))
+          success(lines.join("\n"), state_changes: { inventory_data: inventory_data })
         end
 
         def enriched_item_description(item_id, item_def)
@@ -183,6 +191,13 @@ module ClassicGame
           name = item_def["name"] || item_id
           description = item_def["description"] || "You see nothing special about the #{name}."
 
+          stats = build_item_stats(item_def)
+          box_content = build_item_box(art, name, description, stats)
+
+          success(box_content)
+        end
+
+        def build_item_stats(item_def)
           stats = []
           stats << "Damage: +#{item_def['weapon_damage']}" if item_def["weapon_damage"]
           stats << "Defense: +#{item_def['defense_bonus']}" if item_def["defense_bonus"]
@@ -190,11 +205,16 @@ module ClassicGame
             stats << "Consumable"
             stats << "Heals #{item_def.dig('combat_effect', 'amount')} HP" if item_def.dig("combat_effect", "type") == "heal"
           end
+          stats
+        end
 
-          lines = [art, "--- #{name} ---", description]
+        def build_item_box(art, name, description, stats)
+          lines = []
+          lines << art
+          lines << "--- #{name} ---"
+          lines << description
           lines << stats.join(" | ") if stats.any?
-
-          success(lines.join("\n"))
+          lines.join("\n")
         end
 
         def describe_current_room

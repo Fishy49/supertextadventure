@@ -150,6 +150,78 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     assert_includes result[:response], "A sharp iron sword."
   end
 
+  # ─── INVENTORY DATA IN STATE_CHANGES ─────────────────────────────────────────
+
+  test "inventory result includes inventory_data in state_changes" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["sword"])
+    result = execute("inventory")
+
+    assert result[:success]
+    assert result[:state_changes].key?(:inventory_data), "inventory_data should be present in state_changes"
+    assert_equal 1, result[:state_changes][:inventory_data].length
+    assert_equal "Iron Sword", result[:state_changes][:inventory_data][0]["name"]
+  end
+
+  test "inventory_data includes item category" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["sword"])
+    result = execute("inventory")
+
+    assert_equal "weapon", result[:state_changes][:inventory_data][0]["category"]
+  end
+
+  test "inventory_data includes art_line" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["sword"])
+    result = execute("inventory")
+
+    assert result[:state_changes][:inventory_data][0]["art_line"].present?,
+           "art_line should be a non-empty string"
+  end
+
+  test "inventory_data includes item_id" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["sword"])
+    result = execute("inventory")
+
+    assert_equal "sword", result[:state_changes][:inventory_data][0]["item_id"]
+  end
+
+  test "empty inventory has no inventory_data" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: [])
+    result = execute("inventory")
+
+    assert result[:success]
+    assert_empty result[:state_changes], "state_changes should be empty for empty inventory"
+    assert_not result[:state_changes].key?(:inventory_data)
+  end
+
+  test "examining inventory item shows bordered output" do
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["sword"])
+    result = execute("examine sword")
+
+    assert result[:success]
+    assert_includes result[:response], "---", "response should include border characters"
+    assert result[:response].include?("\n"), "response should be multi-line"
+  end
+
+  test "inventory works for different user_ids (multiplayer isolation)" do
+    user2_id = 2
+    @game.game_state["player_states"][USER_ID.to_s] = player_state_in("room1", inventory: ["sword"])
+    @game.game_state["player_states"][user2_id.to_s] = player_state_in("room1", inventory: ["shield"])
+
+    result1 = ClassicGame::Handlers::ExamineHandler.new(game: @game, user_id: USER_ID)
+                .handle(ClassicGame::CommandParser.parse("inventory"))
+    result2 = ClassicGame::Handlers::ExamineHandler.new(game: @game, user_id: user2_id)
+                .handle(ClassicGame::CommandParser.parse("inventory"))
+
+    items1 = result1[:state_changes][:inventory_data].map { |i| i["name"] }
+    items2 = result2[:state_changes][:inventory_data].map { |i| i["name"] }
+
+    assert_includes items1, "Iron Sword"
+    assert_not_includes items1, "Wooden Shield"
+
+    assert_includes items2, "Wooden Shield"
+    assert_not_includes items2, "Iron Sword"
+  end
+
   private
 
     def execute(input)

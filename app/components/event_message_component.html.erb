@@ -1,3 +1,6 @@
+<% if @message.event_type == "inventory" %>
+	<%= render(InventoryMessageComponent.new(@message)) %>
+<% else %>
 <div class="w-fit border-2 border-white/75 my-5 px-4 pb-4 border-solid mx-auto">
 	<% if @message.event_type == "roll" %>
 		<div class="w-fit text-center px-4 mx-auto mt-[-18px] bg-stone-800">
@@ -27,3 +30,4 @@
 		</div>
 	<% end %>
 </div>
+<% end %>

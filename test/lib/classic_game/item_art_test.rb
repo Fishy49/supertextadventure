@@ -67,4 +67,48 @@ class ItemArtTest < ActiveSupport::TestCase
     result = ClassicGame::ItemArt.art_for("unknown", nil)
     assert_equal ClassicGame::ItemArt::CATEGORY_ART["default"], result
   end
+
+  # ─── ITEM_ART per-item entries ────────────────────────────────────────────────
+
+  test "ITEM_ART has entry for old_key" do
+    result = ClassicGame::ItemArt::ITEM_ART["old_key"]
+    assert_not_nil result, "ITEM_ART should have an entry for old_key"
+    assert result.include?("\n"), "old_key art should be multi-line"
+  end
+
+  test "ITEM_ART has entry for health_potion" do
+    assert_not_nil ClassicGame::ItemArt::ITEM_ART["health_potion"]
+  end
+
+  test "ITEM_ART has entry for enchanted_blade" do
+    assert_not_nil ClassicGame::ItemArt::ITEM_ART["enchanted_blade"]
+  end
+
+  test "ITEM_ART has entry for victory_crown" do
+    assert_not_nil ClassicGame::ItemArt::ITEM_ART["victory_crown"]
+  end
+
+  test "art_for prefers ITEM_ART over CATEGORY_ART for old_key" do
+    item_def = { "keywords" => ["key"] }
+    result = ClassicGame::ItemArt.art_for("old_key", item_def)
+    assert_equal ClassicGame::ItemArt::ITEM_ART["old_key"], result,
+                 "art_for should return ITEM_ART entry, not CATEGORY_ART key art"
+  end
+
+  # ─── category_for tool category ───────────────────────────────────────────────
+
+  test "category_for returns tool for lockpick keywords" do
+    item_def = { "keywords" => %w[lockpick pick] }
+    assert_equal "tool", ClassicGame::ItemArt.category_for(item_def)
+  end
+
+  test "category_for returns tool for pick keyword" do
+    item_def = { "keywords" => %w[pick metal] }
+    assert_equal "tool", ClassicGame::ItemArt.category_for(item_def)
+  end
+
+  test "CATEGORY_ART has entry for tool" do
+    assert_not_nil ClassicGame::ItemArt::CATEGORY_ART["tool"],
+                   "CATEGORY_ART should have a tool entry"
+  end
 end

@@ -22,12 +22,23 @@ class ClassicCommandJob
       broadcast_dice_roll(game, message, result)
       sync_classic_sidebar(game, user, message.game_user)
 
-      # Create response message (will auto-broadcast via callback)
-      Message.create!(
-        game: game,
-        content: result[:response]
-        # NOTE: no game_user_id, so it's a "host" message from the game engine
-      )
+      # Create inventory event message if inventory_data is present
+      if result.dig(:state_changes, :inventory_data).present?
+        Message.create!(
+          game: game,
+          game_user: message.game_user,
+          event_type: "inventory",
+          event_data: result[:state_changes][:inventory_data],
+          content: result[:response]
+        )
+      else
+        # Create normal host response message (will auto-broadcast via callback)
+        Message.create!(
+          game: game,
+          content: result[:response]
+          # NOTE: no game_user_id, so it's a "host" message from the game engine
+        )
+      end
     end
   end
 

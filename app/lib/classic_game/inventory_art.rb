@@ -14,30 +14,30 @@ module ClassicGame
       "potion" => <<~ART.chomp,
           ,--.
          ( ~~ )
-        |/~~~~\|
+        |/~~~~|
         |      |
          '----'
       ART
       "key" => <<~ART.chomp,
-            ___
-           (   )
-            ---
-             |
-            _|_
+         ___
+        (   )
+         ---
+          |
+         _|_
       ART
       "scroll" => <<~ART.chomp,
-            .---.
-           (     )
-           |~~~~~|
-           (     )
-            '---'
+         .---.
+        (     )
+        |~~~~~|
+        (     )
+         '---'
       ART
       "shield" => <<~ART.chomp,
           /--\
          /    \
         | |  | |
-         \ -- /
-          \--/
+          -- /
+          --/
       ART
       "container" => <<~ART.chomp,
          _____
@@ -46,23 +46,23 @@ module ClassicGame
         |_____|
       ART
       "crown" => <<~ART.chomp,
-        |\ /\ /|
+        | / /|
         | V  V |
         |      |
-         \----/
+         ----/
       ART
-      "gem" => <<~ART.chomp,
-            /\
-           /  \
-          / <> \
-        /________\
-      ART
-      "default" => <<~ART.chomp
-          ___
-         /   \
-        | bag |
-        |     |
-         \___/
+      "gem" => <<~ART.chomp
+              /\
+             /  \
+            / <> \
+          /________\
+        ART
+        "default" => <<~ART.chomp
+            ___
+           /   \
+          | bag |
+          |     |
+           ___/
       ART
     }.freeze
 

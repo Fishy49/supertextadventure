@@ -94,17 +94,22 @@ class ClassicGameTest < ApplicationSystemTestCase
     visit dev_game_path
     find(".terminal-input").click
 
-    find(".terminal-input").send_keys("take key", :return)
+    # Each command waits for its specific response text before the next one is
+    # sent — commands are processed async and sending without a wait races the
+    # job queue against the broadcast that updates the sidebar.
     assert_selector "[id^='player_inventory_']", visible: :visible
+
+    find(".terminal-input").send_keys("take key", :return)
+    assert_text "Rusty Key"
 
     find(".terminal-input").send_keys("go east", :return)
-    assert_selector "[id^='player_inventory_']", visible: :visible
+    assert_text "The Tavern"
 
     find(".terminal-input").send_keys("open chest", :return)
-    assert_selector "[id^='player_inventory_']", visible: :visible
+    assert_text "unlock the chest"
 
     find(".terminal-input").send_keys("take potion", :return)
-    assert_selector "[id^='player_inventory_']", visible: :visible
+    assert_text "Health Potion"
 
     within("[id^='player_inventory_']") do
       assert_text "Rusty Key"

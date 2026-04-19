@@ -22,7 +22,7 @@
 </div>
 
 <% content_for :text_form do %>
-  <%= render(TerminalInputComponent.new(prompt: "", stimulus_controllers: ["game"], stimulus_values: { "game-id": @game.id, "game-user-id": @game.game_user(current_user)&.id || (@game.host?(current_user) ? :host : nil), "game-type": @game.game_type })) %>
+  <%= render(TerminalInputComponent.new(prompt: "", stimulus_controllers: ["game"], stimulus_values: { "game-id": @game.id, "game-user-id": @game.game_user(current_user)&.id || (@game.host?(current_user) ? :host : nil), "game-game-type": @game.game_type })) %>
 <% end %>
 
 <% content_for :sidebar do %>

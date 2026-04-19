@@ -159,7 +159,7 @@ module ClassicGame
         end
 
         def handle_inventory
-          success("Your inventory is shown in the sidebar.")
+          success("Thine inventory is innith thine sidebar!")
         end
 
         def describe_current_room

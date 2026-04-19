@@ -33,7 +33,7 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     result = ClassicGame::Handlers::ExamineHandler.new(game: @game, user_id: USER_ID).handle(command)
 
     assert result[:success]
-    assert_equal "Your inventory is shown in the sidebar.", result[:response]
+    assert_equal "Thine inventory is innith thine sidebar!", result[:response]
     assert_not_includes result[:response], "Iron Sword"
     assert_not_includes result[:response], "sword"
   end
@@ -43,7 +43,7 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     result = ClassicGame::Handlers::ExamineHandler.new(game: @game, user_id: USER_ID).handle(command)
 
     assert result[:success]
-    assert_equal "Your inventory is shown in the sidebar.", result[:response]
+    assert_equal "Thine inventory is innith thine sidebar!", result[:response]
   end
 
   test "i alias returns sidebar redirect message" do
@@ -51,7 +51,7 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     result = ClassicGame::Handlers::ExamineHandler.new(game: @game, user_id: USER_ID).handle(command)
 
     assert result[:success]
-    assert_equal "Your inventory is shown in the sidebar.", result[:response]
+    assert_equal "Thine inventory is innith thine sidebar!", result[:response]
   end
 
   test "inventory command with empty inventory returns sidebar redirect message" do
@@ -60,6 +60,6 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     result = ClassicGame::Handlers::ExamineHandler.new(game: game, user_id: USER_ID).handle(command)
 
     assert result[:success]
-    assert_equal "Your inventory is shown in the sidebar.", result[:response]
+    assert_equal "Thine inventory is innith thine sidebar!", result[:response]
   end
 end

@@ -476,7 +476,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
     end
 
     # Phase 10: final state verification
-    def phase_verification(game, user)
+    def phase_verification(game, _user)
       inv = game.player_state(USER_ID)["inventory"]
       assert_includes inv, "victory_crown",   "PHASE 9: victory crown should be in inventory"
       assert_includes inv, "enchanted_blade", "enchanted blade should be in inventory"

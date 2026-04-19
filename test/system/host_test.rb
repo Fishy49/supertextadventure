@@ -43,6 +43,7 @@ class HostTest < ApplicationSystemTestCase
 
   test "mute all players" do
     visit game_url(id: games(:classic_open).uuid)
+    click_on "Players"
     click_on "Mute All"
     assert_selector "input[value='Mute All']"
   end

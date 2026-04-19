@@ -22,7 +22,7 @@
 </div>
 
 <% content_for :text_form do %>
-  <%= render(TerminalInputComponent.new(prompt: "", stimulus_controllers: ["game"], stimulus_values: { "game-id": @game.id, "game-user-id": @game.game_user(current_user)&.id || (@game.host?(current_user) ? :host : nil) })) %>
+  <%= render(TerminalInputComponent.new(prompt: "", stimulus_controllers: ["game"], stimulus_values: { "game-id": @game.id, "game-user-id": @game.game_user(current_user)&.id || (@game.host?(current_user) ? :host : nil), "game-game-type": @game.game_type })) %>
 <% end %>
 
 <% content_for :sidebar do %>
@@ -32,20 +32,60 @@
     <%= render "current_context", game: @game %>
   </div>
 
-  <h4 class="text-center mb-0 mt-3">PLAYERS</h4>
-  <% if @game.host?(current_user) %>
-    <div class="grid grid-cols-2 mb-3">
-      <%= form_with(scope: :game_user, url: game_users_mute_or_unmute_path(game_id: @game.id), method: :patch) do |form| %>
-        <%= form.hidden_field :can_message, value: false %>
-        <%= form.submit class: "button w-full text-sm", value: "Mute All" %>
-      <% end %>
-      <%= form_with(scope: :game_user, url: game_users_mute_or_unmute_path(game_id: @game.id), method: :patch) do |form| %>
-        <%= form.hidden_field :can_message, value: true %>
-        <%= form.submit class: "button w-full text-sm", value: "Unmute All" %>
-      <% end %>
+  <% show_inventory_tab = @game.classic? && @game.game_user(current_user).present? %>
+  <% if show_inventory_tab %>
+    <div data-controller="sidebar-tabs" data-sidebar-tabs-active-value="inventory">
+      <div class="grid grid-cols-2 mb-3 border-b border-dashed border-terminal-green" role="tablist">
+        <button type="button"
+                class="py-2 font-bold uppercase text-terminal-green border-b-2 -mb-px bg-transparent cursor-pointer"
+                role="tab"
+                data-sidebar-tabs-target="tab"
+                data-sidebar-tabs-name-param="inventory"
+                data-action="click->sidebar-tabs#switch">Inventory</button>
+        <button type="button"
+                class="py-2 font-bold uppercase text-terminal-green border-b-2 -mb-px bg-transparent cursor-pointer"
+                role="tab"
+                data-sidebar-tabs-target="tab"
+                data-sidebar-tabs-name-param="players"
+                data-action="click->sidebar-tabs#switch">Players</button>
+      </div>
+
+      <div data-sidebar-tabs-target="panel" data-sidebar-tabs-name="inventory" role="tabpanel">
+        <%= render "/games/inventory", game: @game, user: current_user %>
+      </div>
+
+      <div data-sidebar-tabs-target="panel" data-sidebar-tabs-name="players" role="tabpanel" class="hidden">
+        <% if @game.host?(current_user) %>
+          <div class="grid grid-cols-2 mb-3">
+            <%= form_with(scope: :game_user, url: game_users_mute_or_unmute_path(game_id: @game.id), method: :patch) do |form| %>
+              <%= form.hidden_field :can_message, value: false %>
+              <%= form.submit class: "button w-full text-sm", value: "Mute All" %>
+            <% end %>
+            <%= form_with(scope: :game_user, url: game_users_mute_or_unmute_path(game_id: @game.id), method: :patch) do |form| %>
+              <%= form.hidden_field :can_message, value: true %>
+              <%= form.submit class: "button w-full text-sm", value: "Unmute All" %>
+            <% end %>
+          </div>
+        <% end %>
+        <%= render "players", game_users: @game.game_users.order(:id), for_host: @game.host?(current_user) %>
+      </div>
     </div>
+  <% else %>
+    <h4 class="text-center mb-0 mt-3">PLAYERS</h4>
+    <% if @game.host?(current_user) %>
+      <div class="grid grid-cols-2 mb-3">
+        <%= form_with(scope: :game_user, url: game_users_mute_or_unmute_path(game_id: @game.id), method: :patch) do |form| %>
+          <%= form.hidden_field :can_message, value: false %>
+          <%= form.submit class: "button w-full text-sm", value: "Mute All" %>
+        <% end %>
+        <%= form_with(scope: :game_user, url: game_users_mute_or_unmute_path(game_id: @game.id), method: :patch) do |form| %>
+          <%= form.hidden_field :can_message, value: true %>
+          <%= form.submit class: "button w-full text-sm", value: "Unmute All" %>
+        <% end %>
+      </div>
+    <% end %>
+    <%= render "players", game_users: @game.game_users.order(:id), for_host: @game.host?(current_user) %>
   <% end %>
-  <%= render "players", game_users: @game.game_users.order(:id), for_host: @game.host?(current_user) %>
 <% end %>
 
 <% content_for :loading_modal do %>

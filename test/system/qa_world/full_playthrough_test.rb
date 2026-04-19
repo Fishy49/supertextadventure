@@ -57,11 +57,18 @@ module QaWorld
         cmd "help"
         assert_text "Available commands"
 
-        cmd "inventory"
-        assert_text "carrying nothing"
+        # Sidebar defaults to the Inventory tab and the empty inventory is visible.
+        assert_button "Inventory"
+        assert_button "Players"
+        within("[id^='player_inventory_']") { assert_text "(empty)" }
+
+        # Inventory shortcut shows the client-only hint and clears on next command.
+        cmd "i"
+        assert_text "Thine inventory is innith thine sidebar!"
 
         cmd "examine crier"
         assert_text "loud man"
+        assert_no_text "Thine inventory is innith thine sidebar!"
       end
 
       # ─── Phase 2: Item Basics ─────────────────────────────────────
@@ -78,8 +85,16 @@ module QaWorld
 
         cmd_and_wait "take key"
 
-        cmd "inventory"
-        assert_text "You are carrying"
+        within("[id^='player_inventory_']") do
+          assert_text "Rusty Key"
+          # Clicking the item in the sidebar expands its description inline.
+          click_on "Rusty Key"
+          assert_text "An old rusty iron key"
+        end
+
+        # Clicking the sidebar button moves focus; refocus the terminal so the
+        # next cmd's keystrokes land on the contenteditable input.
+        find(".terminal-input").click
       end
 
       # ─── Phase 3: Dialogue ────────────────────────────────────────
@@ -238,9 +253,18 @@ module QaWorld
       def phase_final_verification
         cmd_and_wait "go north" # return to Town Square
 
-        cmd "inventory"
-        assert_text "Enchanted Sword"
-        assert_text "Iron Shield"
+        within("[id^='player_inventory_']") do
+          assert_text "Enchanted Sword"
+          assert_text "Iron Shield"
+        end
+
+        # Tabs toggle the Players panel into view and swap back to Inventory.
+        click_on "Players"
+        assert_selector "turbo-frame#players", visible: :visible
+        assert_selector "[id^='player_inventory_']", visible: :hidden
+
+        click_on "Inventory"
+        assert_selector "[id^='player_inventory_']", visible: :visible
       end
   end
 end

@@ -6,7 +6,8 @@ export default class extends Controller {
   static outlets = [ "game-user" ]
   static values = {
     id: Number,
-    userId: String
+    userId: String,
+    gameType: String
   }
 
   observer = null
@@ -27,7 +28,7 @@ export default class extends Controller {
       document.getElementById('message-content-wrapper').classList.remove('invisible');
     }, 500)
 
-    // If messages are being loaded from scrolling "up", we want the 
+    // If messages are being loaded from scrolling "up", we want the
     // mutation observer to scroll the view to 0, otherwise all the way down
     document.addEventListener('turbo:before-stream-render', (event) => {
       if(event.detail.newStream.target == 'messages' || event.detail.newStream.target.indexOf("message_") === 0) {
@@ -35,6 +36,7 @@ export default class extends Controller {
           this.scrollPosition = document.getElementById('game-messages').getBoundingClientRect().height
         } else {
           this.scrollPosition = 'last'
+          this.clear_client_messages()
         }
       }
     });
@@ -88,6 +90,13 @@ export default class extends Controller {
 
       if(inputText === ""){ return false; }
 
+      if(this.gameTypeValue === "classic" && ["I", "INV", "INVENTORY"].includes(inputText)){
+        window.stimulus_controller("terminalInput", "terminal").clear_input()
+        this.show_client_message("Thine inventory is innith thine sidebar!")
+        return false
+      }
+
+      this.clear_client_messages()
       window.stimulus_controller("terminalInput", "terminal").clear_input()
       this.errorTarget.style.display = "none"
 
@@ -104,5 +113,31 @@ export default class extends Controller {
 
   show_error(text, fade){
     window.stimulus_controller("terminalInput", "terminal").show_error(text, fade)
+  }
+
+  show_client_message(text){
+    const messages = document.getElementById("game-messages")
+    if(!messages){ return }
+
+    this.clear_client_messages()
+
+    const div = document.createElement("div")
+    div.className = "game-message host-message client-message text-white opacity-70 italic py-2 pl-5 transition-opacity duration-500"
+    div.dataset.clientMessage = "true"
+    div.textContent = text
+    messages.appendChild(div)
+
+    const container = document.querySelector(".grid-in-message-container")
+    if(container){ container.scrollTo(0, container.scrollHeight) }
+
+    setTimeout(() => {
+      if(!div.isConnected){ return }
+      div.classList.add("opacity-0")
+      setTimeout(() => div.remove(), 500)
+    }, 4000)
+  }
+
+  clear_client_messages(){
+    document.querySelectorAll("[data-client-message='true']").forEach((el) => el.remove())
   }
 }

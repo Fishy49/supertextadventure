@@ -10,8 +10,7 @@ module QaWorld
       find(".terminal-input").send_keys("take key", :return)
       assert_text "Rusty Key"
 
-      find(".terminal-input").send_keys("inventory", :return)
-      assert_text "Rusty Key"
+      within("[id^='player_inventory_']") { assert_text "Rusty Key" }
     end
 
     test "drop item shows it in room" do

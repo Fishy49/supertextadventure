@@ -62,9 +62,13 @@ class ClassicCommandJob
                                                      partial: "/games/player",
                                                      locals: { game_user: game_user, for_host: false })
 
-      # Broadcast updated inventory partial
+      # Broadcast updated inventory partial on both player and host streams — when a
+      # host is also a player (dev mode), they only subscribe to :host_players.
       game_user.broadcast_replace_to(game, :players, target: "player_inventory_#{user.id}",
                                                      partial: "/games/inventory",
                                                      locals: { game: game, user: user })
+      game_user.broadcast_replace_to(game, :host_players, target: "player_inventory_#{user.id}",
+                                                          partial: "/games/inventory",
+                                                          locals: { game: game, user: user })
     end
 end

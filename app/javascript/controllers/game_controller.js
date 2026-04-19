@@ -6,7 +6,8 @@ export default class extends Controller {
   static outlets = [ "game-user" ]
   static values = {
     id: Number,
-    userId: String
+    userId: String,
+    gameType: String
   }
 
   observer = null
@@ -88,7 +89,7 @@ export default class extends Controller {
 
       if(inputText === ""){ return false; }
 
-      if(["I", "INV", "INVENTORY"].includes(inputText)){
+      if(this.gameTypeValue === "classic" && ["I", "INV", "INVENTORY"].includes(inputText)){
         window.stimulus_controller("terminalInput", "terminal").clear_input()
         this.show_client_message("Your inventory is shown in the sidebar.")
         return false

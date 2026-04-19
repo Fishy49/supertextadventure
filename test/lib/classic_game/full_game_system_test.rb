@@ -258,8 +258,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
       r = ex(game, user, "help")
       assert_includes r[:response], "Available commands"
 
-      r = ex(game, user, "inventory")
-      assert_includes r[:response], "carrying nothing"
+      assert_empty game.player_state(USER_ID)["inventory"]
 
       r = ex(game, user, "examine guide")
       assert_includes r[:response], "helpful traveler"
@@ -427,8 +426,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
       assert_includes game.player_state(USER_ID)["inventory"], "enchanted_blade"
       assert_not_includes game.player_state(USER_ID)["inventory"], "gem"
 
-      r = ex(game, user, "inventory")
-      assert_includes r[:response], "Enchanted Blade"
+      assert_includes game.player_state(USER_ID)["inventory"], "enchanted_blade"
     end
 
     # Phase 8: traverse the now-revealed hidden exit and pick up the victory crown
@@ -479,11 +477,11 @@ class FullGameSystemTest < ActiveSupport::TestCase
 
     # Phase 10: final state verification
     def phase_verification(game, user)
-      r = ex(game, user, "inventory")
-      assert_includes r[:response], "Victory Crown",   "PHASE 9: victory crown should be in inventory"
-      assert_includes r[:response], "Enchanted Blade", "enchanted blade should be in inventory"
-      assert_includes r[:response], "Old Key",         "old key should still be in inventory"
-      assert_not_includes r[:response], "Glowing Gem", "gem was given away"
+      inv = game.player_state(USER_ID)["inventory"]
+      assert_includes inv, "victory_crown",   "PHASE 9: victory crown should be in inventory"
+      assert_includes inv, "enchanted_blade", "enchanted blade should be in inventory"
+      assert_includes inv, "old_key",         "old key should still be in inventory"
+      assert_not_includes inv, "gem",         "gem was given away"
 
       assert game.get_flag("spoke_to_guide"),  "spoke_to_guide flag should be set"
       assert game.get_flag("tower_unlocked"),  "tower_unlocked flag should be set"

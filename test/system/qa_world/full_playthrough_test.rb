@@ -57,8 +57,7 @@ module QaWorld
         cmd "help"
         assert_text "Available commands"
 
-        cmd "inventory"
-        assert_text "carrying nothing"
+        within("[id^='player_inventory_']") { assert_text "(empty)" }
 
         cmd "examine crier"
         assert_text "loud man"
@@ -78,8 +77,7 @@ module QaWorld
 
         cmd_and_wait "take key"
 
-        cmd "inventory"
-        assert_text "You are carrying"
+        within("[id^='player_inventory_']") { assert_text "Rusty Key" }
       end
 
       # ─── Phase 3: Dialogue ────────────────────────────────────────
@@ -238,9 +236,10 @@ module QaWorld
       def phase_final_verification
         cmd_and_wait "go north" # return to Town Square
 
-        cmd "inventory"
-        assert_text "Enchanted Sword"
-        assert_text "Iron Shield"
+        within("[id^='player_inventory_']") do
+          assert_text "Enchanted Sword"
+          assert_text "Iron Shield"
+        end
       end
   end
 end

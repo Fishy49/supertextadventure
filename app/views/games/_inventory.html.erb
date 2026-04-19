@@ -1,0 +1,14 @@
+<div id="player_inventory_<%= user.id %>" class="mb-5">
+  <h4 class="text-center mb-0 mt-3">INVENTORY</h4>
+  <% inventory = game.player_state(user.id)["inventory"] || [] %>
+  <% if inventory.empty? %>
+    <p class="text-center opacity-60 italic">(empty)</p>
+  <% else %>
+    <ul class="list-none p-0 m-0">
+      <% inventory.each do |item_id| %>
+        <% item_name = game.world_snapshot.dig("items", item_id, "name") || item_id %>
+        <li class="text-center"><%= item_name %></li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

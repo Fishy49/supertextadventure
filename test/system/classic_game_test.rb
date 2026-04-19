@@ -43,4 +43,72 @@ class ClassicGameTest < ApplicationSystemTestCase
     assert_current_path(%r{/games/})
     assert_text "Town Square"
   end
+
+  # AC1 — Inventory section appears in sidebar on load
+  test "sidebar shows inventory section for classic game" do
+    visit dev_game_path
+    assert_selector "[id^='player_inventory_']"
+    within("[id^='player_inventory_']") do
+      assert_text "INVENTORY"
+      assert_text "(empty)"
+    end
+  end
+
+  # AC2 — Sidebar inventory updates in real-time as items are added/removed
+  test "sidebar inventory updates when player takes and drops items" do
+    visit dev_game_path
+    find(".terminal-input").click
+
+    find(".terminal-input").send_keys("take key", :return)
+    within("[id^='player_inventory_']") do
+      assert_text "Rusty Key"
+    end
+
+    find(".terminal-input").send_keys("drop key", :return)
+    within("[id^='player_inventory_']") do
+      assert_text "(empty)"
+      assert_no_text "Rusty Key"
+    end
+  end
+
+  # AC3 — Inventory shortcuts show client-only hint and do not create game messages
+  test "inventory shortcuts show client-only hint and do not create game messages" do
+    visit dev_game_path
+    find(".terminal-input").click
+    initial_count = Message.count
+
+    find(".terminal-input").send_keys("i", :return)
+    assert_text "Your inventory is shown in the sidebar."
+
+    find(".terminal-input").send_keys("inv", :return)
+    assert_text "Your inventory is shown in the sidebar."
+
+    find(".terminal-input").send_keys("inventory", :return)
+    assert_text "Your inventory is shown in the sidebar."
+
+    assert_equal initial_count, Message.count
+  end
+
+  # AC4 — Sidebar inventory is visible across commands and room changes
+  test "sidebar inventory is visible across commands and room changes" do
+    visit dev_game_path
+    find(".terminal-input").click
+
+    find(".terminal-input").send_keys("take key", :return)
+    assert_selector "[id^='player_inventory_']", visible: :visible
+
+    find(".terminal-input").send_keys("go east", :return)
+    assert_selector "[id^='player_inventory_']", visible: :visible
+
+    find(".terminal-input").send_keys("open chest", :return)
+    assert_selector "[id^='player_inventory_']", visible: :visible
+
+    find(".terminal-input").send_keys("take potion", :return)
+    assert_selector "[id^='player_inventory_']", visible: :visible
+
+    within("[id^='player_inventory_']") do
+      assert_text "Rusty Key"
+      assert_text "Health Potion"
+    end
+  end
 end

@@ -88,6 +88,12 @@ export default class extends Controller {
 
       if(inputText === ""){ return false; }
 
+      if(["I", "INV", "INVENTORY"].includes(inputText)){
+        window.stimulus_controller("terminalInput", "terminal").clear_input()
+        this.show_client_message("Your inventory is shown in the sidebar.")
+        return false
+      }
+
       window.stimulus_controller("terminalInput", "terminal").clear_input()
       this.errorTarget.style.display = "none"
 
@@ -104,5 +110,18 @@ export default class extends Controller {
 
   show_error(text, fade){
     window.stimulus_controller("terminalInput", "terminal").show_error(text, fade)
+  }
+
+  show_client_message(text){
+    const messages = document.getElementById("game-messages")
+    if(!messages){ return }
+
+    const div = document.createElement("div")
+    div.className = "game-message host-message text-white opacity-70 italic py-2 pl-5"
+    div.textContent = text
+    messages.appendChild(div)
+
+    const container = document.querySelector(".grid-in-message-container")
+    if(container){ container.scrollTo(0, container.scrollHeight) }
   }
 }

@@ -159,17 +159,7 @@ module ClassicGame
         end
 
         def handle_inventory
-          inventory = player_state["inventory"] || []
-
-          return success("You are carrying nothing.") if inventory.empty?
-
-          lines = ["You are carrying:"]
-          inventory.each do |item_id|
-            item_name = world_snapshot.dig("items", item_id, "name") || item_id
-            lines << "  - #{item_name}"
-          end
-
-          success(lines.join("\n"))
+          success("Your inventory is shown in the sidebar.")
         end
 
         def describe_current_room

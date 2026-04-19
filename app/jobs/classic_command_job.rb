@@ -61,5 +61,10 @@ class ClassicCommandJob
       game_user.broadcast_replace_to(game, :players, target: "game_user_#{game_user.id}",
                                                      partial: "/games/player",
                                                      locals: { game_user: game_user, for_host: false })
+
+      # Broadcast updated inventory partial
+      game_user.broadcast_replace_to(game, :players, target: "player_inventory_#{user.id}",
+                                                     partial: "/games/inventory",
+                                                     locals: { game: game, user: user })
     end
 end

@@ -2,75 +2,75 @@
 
 module ClassicGame
   module InventoryArt
-    DEFAULT_ART = <<~ART.freeze
+    DEFAULT_ART = <<~ART
       +--------+
       |  ITEM  |
       +--------+
     ART
 
     CATALOG = {
-      "sword" => <<~ART.freeze,
-           /|
-          / |
-         /  |
-        /===|
-       /    |
-      |_____|
+      "sword" => <<~ART,
+             /|
+            / |
+           /  |
+          /===|
+         /    |
+        |_____|
       ART
-      "key" => <<~ART.freeze,
-         ___
-        /   \
-        \___/
-          |---+
-          |---+
+      "key" => <<~ART,
+           ___
+          /   \
+          ___/
+            |---+
+            |---+
       ART
-      "rusty_key" => <<~ART.freeze,
-         ~~~
-        /~~~\
-        \~~~/
-          |---+
-          |---+
+      "rusty_key" => <<~ART,
+           ~~~
+          /~~~\
+          ~~~/
+            |---+
+            |---+
       ART
-      "potion" => <<~ART.freeze,
+      "potion" => <<~ART,
           .---.
          /     \
         |  o o  |
         |   ~   |
-         \     /
+              /
           `---'
       ART
-      "health_potion" => <<~ART.freeze,
+      "health_potion" => <<~ART,
           .---.
          /  +  \
         |  + +  |
         |   +   |
-         \     /
+              /
           `---'
       ART
-      "scroll" => <<~ART.freeze,
+      "scroll" => <<~ART,
         .======.
         | .... |
         | .... |
         | .... |
         `======'
       ART
-      "chest" => <<~ART.freeze,
+      "chest" => <<~ART,
         .--------.
         |========|
         |  [__]  |
         `--------'
       ART
-      "gold_coin" => <<~ART.freeze
+      "gold_coin" => <<~ART
           .---.
          /  $  \
         |  $ $  |
-         \  $  /
+           $  /
           `---'
       ART
     }.freeze
 
     def self.for(item_id, item_def = nil)
-      item_def = item_def || {}
+      item_def ||= {}
       return item_def["ascii_art"] if item_def["ascii_art"].present?
 
       id_str = item_id.to_s

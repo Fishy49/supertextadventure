@@ -62,4 +62,13 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     assert result[:success]
     assert_equal "Thine inventory is innith thine sidebar!", result[:response]
   end
+
+  test "examine handler inventory response never includes ascii art" do
+    command = ClassicGame::CommandParser.parse("inventory")
+    result = ClassicGame::Handlers::ExamineHandler.new(game: @game, user_id: USER_ID).handle(command)
+
+    assert_not_includes result[:response], "|"
+    first_art_line = ClassicGame::InventoryArt::CATALOG["sword"].lines.first.strip
+    assert_not_includes result[:response], first_art_line
+  end
 end

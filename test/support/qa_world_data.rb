@@ -117,7 +117,9 @@ module TestSupport
           "name" => "Rusty Key",
           "keywords" => %w[key rusty],
           "takeable" => true,
-          "description" => "An old rusty iron key."
+          "description" => "An old rusty iron key.",
+          "detailed_description" => "An ancient rusty iron key, pitted with corrosion and worn smooth at the bow. The teeth still look sharp enough to turn a lock.",
+          "ascii_art" => " .-.\n|~~~|\n'~~'--->"
         },
         "chest" => chest_item,
         "health_potion" => health_potion_item,
@@ -132,7 +134,8 @@ module TestSupport
           "keywords" => %w[sword enchanted],
           "takeable" => true,
           "weapon_damage" => 8,
-          "description" => "A sword that hums with magical energy."
+          "description" => "A sword that hums with magical energy.",
+          "detailed_description" => "A gleaming sword etched with arcane runes. It hums with magical energy and feels warm to the touch. Weapon damage: 8."
         },
         "shield" => {
           "name" => "Iron Shield",
@@ -192,6 +195,7 @@ module TestSupport
         "takeable" => true,
         "consumable" => true,
         "description" => "A bubbling red potion.",
+        "detailed_description" => "A small vial filled with a bubbling crimson liquid. Drinking it restores 5 HP. Handle with care.",
         "on_use" => { "type" => "heal", "amount" => 5, "text" => "You drink the health potion and feel revitalized!" },
         "combat_effect" => { "type" => "heal", "amount" => 5 }
       }

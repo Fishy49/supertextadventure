@@ -89,7 +89,7 @@ module QaWorld
           assert_text "Rusty Key"
           # Clicking the item in the sidebar expands its description inline.
           click_on "Rusty Key"
-          assert_text "An old rusty iron key"
+          assert_text "An ancient rusty iron key"
         end
 
         # Clicking the sidebar button moves focus; refocus the terminal so the

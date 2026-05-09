@@ -86,7 +86,7 @@ gem "sucker_punch", "~> 3.0"
 
 gem "tailwindcss-rails", "~> 2.0"
 
-gem "view_component", "~> 3.21"
+gem "view_component", "~> 4.9"
 
 gem "pagy", "~> 5.10"
 

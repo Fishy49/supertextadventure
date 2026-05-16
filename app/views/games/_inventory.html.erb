@@ -14,7 +14,7 @@
         <% items = game.world_snapshot["items"] || {} %>
         <% inventory.each do |item_id| %>
           <% item_def = items[item_id] || {} %>
-          <%= render "inventory_item", item_id: item_id, item_def: item_def %>
+          <%= render "games/inventory_item", item_id: item_id, item_def: item_def %>
         <% end %>
       </ul>
     <% end %>

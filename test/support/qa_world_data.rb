@@ -2,6 +2,83 @@
 
 module TestSupport
   module QaWorldData # rubocop:disable Metrics/ModuleLength
+    RUSTY_KEY_ART = <<~ART.freeze
+      ╔═══╗
+      ║ ◉ ╠══╗
+      ╚═══╝  ║
+         ▓▓▓▓╝
+    ART
+
+    GEM_ART = <<~ART.freeze
+      ╔══╦══╗
+      ║◆◆║◆◆║
+      ╠══╬══╣
+      ║◊◊║◊◊║
+      ╚══╩══╝
+    ART
+
+    SWORD_ART = <<~ART.freeze
+          ╔╗
+          ║║
+          ║║
+        ╔═╬╬═╗
+        ╚═╬╬═╝
+          ║║
+          ╚╝
+    ART
+
+    SHIELD_ART = <<~ART.freeze
+      ██████████
+      █▓▓▓▓▓▓▓█
+      █▓▒▒▒▒▓█
+      █▓▒░░▒▓█
+      ██████████
+       ████████
+        ██████
+         ████
+          ██
+    ART
+
+    POTION_ART = <<~ART.freeze
+           _____
+          /° ° °\
+         | °   ° |
+         | ° ° ° |
+          \_____/
+            | |
+           =====
+    ART
+
+    LOCKPICK_ART = <<~ART.freeze
+      ⌐──────────┐
+                  │
+      ⌐──────────┘
+    ART
+
+    def self.rusty_key_lore
+      "A tarnished rusty iron key, worn smooth by many hands — what lock does it open?"
+    end
+
+    def self.gem_lore
+      "A faceted jewel that catches even the faintest light, cold and brilliant to the touch."
+    end
+
+    def self.sword_lore
+      "An enchanted blade humming with arcane energy, its edge never dulling."
+    end
+
+    def self.shield_lore
+      "A sturdy shield bearing the crest of a forgotten order, still solid as the day it was forged."
+    end
+
+    def self.potion_lore
+      "A stoppered vial of crimson liquid that seems to pulse with warmth."
+    end
+
+    def self.lockpick_lore
+      "A slender steel pick, its tip bent just so — in the right hands, no lock is a match for it."
+    end
+
     def self.data
       @data ||= {
         "meta" => meta,
@@ -117,7 +194,9 @@ module TestSupport
           "name" => "Rusty Key",
           "keywords" => %w[key rusty],
           "takeable" => true,
-          "description" => "An old rusty iron key."
+          "description" => "An old rusty iron key.",
+          "ascii_art" => RUSTY_KEY_ART,
+          "detailed_description" => rusty_key_lore
         },
         "chest" => chest_item,
         "health_potion" => health_potion_item,
@@ -125,21 +204,27 @@ module TestSupport
           "name" => "Sparkling Gem",
           "keywords" => %w[gem sparkling],
           "takeable" => true,
-          "description" => "A brilliant gemstone that glows faintly."
+          "description" => "A brilliant gemstone that glows faintly.",
+          "ascii_art" => GEM_ART,
+          "detailed_description" => gem_lore
         },
         "enchanted_sword" => {
           "name" => "Enchanted Sword",
           "keywords" => %w[sword enchanted],
           "takeable" => true,
           "weapon_damage" => 8,
-          "description" => "A sword that hums with magical energy."
+          "description" => "A sword that hums with magical energy.",
+          "ascii_art" => SWORD_ART,
+          "detailed_description" => sword_lore
         },
         "shield" => {
           "name" => "Iron Shield",
           "keywords" => %w[shield iron],
           "takeable" => true,
           "defense_bonus" => 3,
-          "description" => "A sturdy iron shield."
+          "description" => "A sturdy iron shield.",
+          "ascii_art" => SHIELD_ART,
+          "detailed_description" => shield_lore
         },
         "lockpick" => lockpick_item
       }
@@ -151,6 +236,8 @@ module TestSupport
         "keywords" => %w[lockpick pick],
         "takeable" => true,
         "description" => "A thin metal pick for opening locks.",
+        "ascii_art" => LOCKPICK_ART,
+        "detailed_description" => lockpick_lore,
         "dice_roll" => {
           "dc" => 12,
           "stat" => "dexterity",
@@ -192,6 +279,8 @@ module TestSupport
         "takeable" => true,
         "consumable" => true,
         "description" => "A bubbling red potion.",
+        "ascii_art" => POTION_ART,
+        "detailed_description" => potion_lore,
         "on_use" => { "type" => "heal", "amount" => 5, "text" => "You drink the health potion and feel revitalized!" },
         "combat_effect" => { "type" => "heal", "amount" => 5 }
       }

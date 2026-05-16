@@ -60,7 +60,7 @@ module QaWorld
         # Sidebar defaults to the Inventory tab and the empty inventory is visible.
         assert_button "Inventory"
         assert_button "Players"
-        within("[id^='player_inventory_']") { assert_text "(empty)" }
+        within("[id^='player_inventory_']") { assert_text "thine sack lieth empty" }
 
         # Inventory shortcut shows the client-only hint and clears on next command.
         cmd "i"
@@ -89,7 +89,7 @@ module QaWorld
           assert_text "Rusty Key"
           # Clicking the item in the sidebar expands its description inline.
           click_on "Rusty Key"
-          assert_text "An old rusty iron key"
+          assert_text "rusty iron key"
         end
 
         # Clicking the sidebar button moves focus; refocus the terminal so the

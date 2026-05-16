@@ -50,7 +50,7 @@ class ClassicGameTest < ApplicationSystemTestCase
     assert_selector "[id^='player_inventory_']"
     assert_button "Inventory"
     within("[id^='player_inventory_']") do
-      assert_text "(empty)"
+      assert_text "thine sack lieth empty"
     end
   end
 
@@ -66,7 +66,7 @@ class ClassicGameTest < ApplicationSystemTestCase
 
     find(".terminal-input").send_keys("drop key", :return)
     within("[id^='player_inventory_']") do
-      assert_text "(empty)"
+      assert_text "thine sack lieth empty"
       assert_no_text "Rusty Key"
     end
   end
@@ -145,13 +145,16 @@ class ClassicGameTest < ApplicationSystemTestCase
     within("[id^='player_inventory_']") do
       # Description is hidden until the item is clicked.
       assert_no_text "rusty iron key"
+      assert_no_text "▓"
 
       click_on "Rusty Key"
       assert_text "rusty iron key"
+      assert_text "▓"
 
       # Clicking again collapses the description.
       click_on "Rusty Key"
       assert_no_text "rusty iron key"
+      assert_no_text "▓"
     end
   end
 

@@ -1,28 +1,22 @@
 <div id="player_inventory_<%= user.id %>" class="mb-5">
-  <% inventory = game.player_state(user.id)["inventory"] || [] %>
-  <% if inventory.empty? %>
-    <p class="text-center opacity-60 italic">(empty)</p>
-  <% else %>
-    <ul class="list-none p-0 m-0" data-controller="inventory">
-      <% inventory.each do |item_id| %>
-        <% item_def = game.world_snapshot.dig("items", item_id) || {} %>
-        <% item_name = item_def["name"] || item_id %>
-        <% item_description = item_def["description"] %>
-        <li class="mb-1">
-          <button type="button"
-                  class="w-full text-center py-1 px-2 cursor-pointer bg-transparent border border-transparent hover:border-terminal-green hover:border-dashed text-terminal-green"
-                  aria-expanded="false"
-                  data-inventory-target="toggle"
-                  data-action="click->inventory#toggle">
-            <%= item_name %>
-          </button>
-          <% if item_description.present? %>
-            <p class="hidden text-sm opacity-80 italic px-2 pt-1 pb-2" data-inventory-target="description">
-              <%= item_description %>
-            </p>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  <% end %>
+  <div class="border-double border-2 border-terminal-green/40 px-2 py-3 bg-stone-900/40">
+    <p class="text-xs uppercase opacity-70 mb-2 text-center tracking-widest">— Inventory —</p>
+    <% inventory = game.player_state(user.id)["inventory"] || [] %>
+    <% if inventory.empty? %>
+      <pre class="text-[0.55rem] md:text-xs leading-tight text-terminal-green text-center opacity-70">  _____
+ /     \
+|       |
+|  ___  |
+ \_____/</pre>
+      <p class="text-center opacity-60 italic">(thine sack lieth empty)</p>
+    <% else %>
+      <ul data-controller="inventory">
+        <% items = game.world_snapshot["items"] || {} %>
+        <% inventory.each do |item_id| %>
+          <% item_def = items[item_id] || {} %>
+          <%= render "inventory_item", item_id: item_id, item_def: item_def %>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
 </div>

@@ -1,0 +1,23 @@
+<%
+  item_name = item_def["name"] || item_id
+  ascii_art = item_def["ascii_art"]
+  body = item_def["detailed_description"].presence || item_def["description"].presence || "Naught to tell about this."
+%>
+<li class="mb-2 group">
+  <button
+    class="w-full text-left text-terminal-green hover:border-dashed hover:border hover:border-terminal-green px-2 py-1 flex justify-between items-center"
+    data-inventory-target="toggle"
+    data-action="click->inventory#toggle"
+    aria-expanded="false"
+  >
+    <span><%= item_name %></span>
+    <span class="opacity-60 transition-transform inline-block" data-inventory-target="caret">▶</span>
+  </button>
+  <div class="hidden mt-1 border border-dashed border-terminal-green/60 bg-stone-950/60 px-2 py-3" data-inventory-target="detail">
+    <% if ascii_art %>
+      <pre class="text-[0.55rem] md:text-xs leading-tight text-terminal-green text-center overflow-x-auto whitespace-pre"><%= ascii_art %></pre>
+      <hr class="border-terminal-green/30 my-2">
+    <% end %>
+    <p class="text-sm italic opacity-80 px-1"><%= body %></p>
+  </div>
+</li>

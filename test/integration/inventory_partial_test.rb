@@ -30,7 +30,7 @@ class InventoryPartialTest < ActionView::TestCase
     )
     user = FakeUser.new(1)
 
-    render template: "games/inventory", locals: { game: game, user: user }
+    render partial: "games/inventory", locals: { game: game, user: user }
 
     assert_includes rendered, "███"
     assert_select "li", 2
@@ -49,7 +49,7 @@ class InventoryPartialTest < ActionView::TestCase
     game = build_game(world_data: world, player_id: 1)
     user = FakeUser.new(1)
 
-    render template: "games/inventory", locals: { game: game, user: user }
+    render partial: "games/inventory", locals: { game: game, user: user }
 
     assert_includes rendered, "thine sack lieth empty"
     assert_match(/<pre[^>]*>/, rendered)

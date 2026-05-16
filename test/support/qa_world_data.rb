@@ -2,14 +2,14 @@
 
 module TestSupport
   module QaWorldData # rubocop:disable Metrics/ModuleLength
-    RUSTY_KEY_ART = <<~ART.freeze
+    RUSTY_KEY_ART = <<~ART
       ╔═══╗
       ║ ◉ ╠══╗
       ╚═══╝  ║
          ▓▓▓▓╝
     ART
 
-    GEM_ART = <<~ART.freeze
+    GEM_ART = <<~ART
       ╔══╦══╗
       ║◆◆║◆◆║
       ╠══╬══╣
@@ -17,17 +17,17 @@ module TestSupport
       ╚══╩══╝
     ART
 
-    SWORD_ART = <<~ART.freeze
-          ╔╗
-          ║║
-          ║║
-        ╔═╬╬═╗
-        ╚═╬╬═╝
-          ║║
-          ╚╝
+    SWORD_ART = <<~ART
+        ╔╗
+        ║║
+        ║║
+      ╔═╬╬═╗
+      ╚═╬╬═╝
+        ║║
+        ╚╝
     ART
 
-    SHIELD_ART = <<~ART.freeze
+    SHIELD_ART = <<~ART
       ██████████
       █▓▓▓▓▓▓▓█
       █▓▒▒▒▒▓█
@@ -39,17 +39,17 @@ module TestSupport
           ██
     ART
 
-    POTION_ART = <<~ART.freeze
-           _____
-          /° ° °\
-         | °   ° |
-         | ° ° ° |
-          \_____/
-            | |
-           =====
+    POTION_ART = <<~ART
+        _____
+       /° ° °\
+      | °   ° |
+      | ° ° ° |
+       _____/
+         | |
+        =====
     ART
 
-    LOCKPICK_ART = <<~ART.freeze
+    LOCKPICK_ART = <<~ART
       ⌐──────────┐
                   │
       ⌐──────────┘

@@ -134,6 +134,21 @@ class ClassicGameTest < ApplicationSystemTestCase
     assert_selector "turbo-frame#players", visible: :hidden
   end
 
+  # AC4 — Inventory item shows ASCII art card and reveals description on click
+  test "inventory item shows ASCII art card and reveals description on click" do
+    visit dev_game_path
+    find(".terminal-input").click
+
+    find(".terminal-input").send_keys("take key", :return)
+    within("[id^='player_inventory_']") { assert_text "Rusty Key" }
+
+    within("[id^='player_inventory_']") do
+      assert_selector "pre"
+      click_on "Rusty Key"
+      assert_text "rusty iron key"
+    end
+  end
+
   # AC6 — Clicking an inventory item expands/collapses its description
   test "clicking inventory item toggles its description" do
     visit dev_game_path

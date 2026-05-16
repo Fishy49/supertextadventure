@@ -125,7 +125,8 @@ module TestSupport
           "name" => "Sparkling Gem",
           "keywords" => %w[gem sparkling],
           "takeable" => true,
-          "description" => "A brilliant gemstone that glows faintly."
+          "description" => "A brilliant gemstone that glows faintly.",
+          "ascii_art" => "  * *\n *   *\n  * *\n   *"
         },
         "enchanted_sword" => {
           "name" => "Enchanted Sword",

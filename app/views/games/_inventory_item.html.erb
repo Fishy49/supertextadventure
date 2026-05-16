@@ -1,0 +1,20 @@
+<% item_name = item_def["name"].presence || item_id %>
+<% item_description = item_def["description"] %>
+<li class="mb-3 border border-dashed border-terminal-green/40 rounded-sm overflow-hidden">
+  <% if ascii_art.present? %>
+    <pre class="m-0 px-2 py-1 text-[10px] leading-tight text-terminal-green text-center whitespace-pre font-mono select-none"><%= ascii_art %></pre>
+  <% end %>
+  <button type="button"
+          aria-expanded="false"
+          data-inventory-target="toggle"
+          data-action="click->inventory#toggle"
+          class="w-full py-1 px-2 bg-transparent border-0 border-t border-dashed border-terminal-green/30 text-terminal-green font-bold uppercase tracking-wide cursor-pointer hover:bg-terminal-green hover:text-stone-900 transition-colors">
+    <%= item_name %>
+  </button>
+  <% if item_description.present? %>
+    <div class="hidden px-3 py-2 text-sm opacity-90 italic border-t border-dashed border-terminal-green/30"
+         data-inventory-target="description">
+      <p class="m-0"><%= item_description %></p>
+    </div>
+  <% end %>
+</li>

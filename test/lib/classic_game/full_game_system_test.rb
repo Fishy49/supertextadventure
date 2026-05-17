@@ -114,12 +114,16 @@ class FullGameSystemTest < ActiveSupport::TestCase
         },
         "gem" => {
           "name" => "Glowing Gem", "keywords" => %w[gem glowing],
-          "takeable" => true, "description" => "It pulsates with inner light."
+          "takeable" => true, "description" => "It pulsates with inner light.",
+          "category" => "gem",
+          "ascii_art" => "  *\n * * *\n  *  "
         },
         "enchanted_blade" => {
           "name" => "Enchanted Blade", "keywords" => %w[blade sword enchanted],
           "takeable" => true, "weapon_damage" => 3,
-          "description" => "A blade humming with magic."
+          "description" => "A blade humming with magic.",
+          "category" => "weapon",
+          "ascii_art" => " /\\\n/  \\\n\\  /\n \\/"
         },
         "scroll" => {
           "name" => "Ancient Scroll", "keywords" => %w[scroll ancient],
@@ -128,7 +132,8 @@ class FullGameSystemTest < ActiveSupport::TestCase
         },
         "victory_crown" => {
           "name" => "Victory Crown", "keywords" => %w[crown victory],
-          "takeable" => true, "description" => "The crown of the realm."
+          "takeable" => true, "description" => "The crown of the realm.",
+          "category" => "crown"
         }
       }
     end

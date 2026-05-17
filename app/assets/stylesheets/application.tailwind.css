@@ -93,3 +93,32 @@
     @apply p-[5px] text-lg bg-stone-800 outline-none focus:outline-none focus-visible:outline-none focus:border-terminal-green placeholder:text-terminal-green placeholder:opacity-[0.5] ring-transparent focus:ring-transparent focus-visible:ring-transparent;
   }
 }
+
+.inventory-ascii {
+  font-family: monospace;
+  font-size: 0.55rem;
+  white-space: pre;
+  overflow-x: auto;
+  border: 1px dashed #22c55e;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 0.25rem;
+  text-shadow: 0 0 4px #22c55e;
+  color: #86efac;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .inventory-ascii {
+    font-size: 0.75rem;
+  }
+}
+
+.inventory-item-button[aria-expanded="true"] {
+  border: 1px dashed #22c55e;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.inventory-item-detail {
+  transition: all 200ms ease-out;
+  overflow: hidden;
+}

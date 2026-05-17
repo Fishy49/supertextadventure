@@ -3,6 +3,8 @@
 module ClassicGame
   module Handlers
     class ExamineHandler < BaseHandler
+      SIDEBAR_REDIRECT_MSG = "Thine inventory is innith thine sidebar!"
+
       def handle(command)
         case command[:verb]
         when :look
@@ -159,7 +161,7 @@ module ClassicGame
         end
 
         def handle_inventory
-          success("Thine inventory is innith thine sidebar!")
+          success(SIDEBAR_REDIRECT_MSG)
         end
 
         def describe_current_room

@@ -1,0 +1,18 @@
+<li data-item-category="<%= inventory_category_for(item_def) %>">
+  <button class="inventory-item-button"
+          type="button"
+          aria-expanded="false"
+          aria-controls="item-detail-<%= index %>"
+          data-inventory-target="toggle"
+          data-action="click->inventory#toggle">
+    <%= item_def["name"] || item_id %>
+  </button>
+  <div id="item-detail-<%= index %>"
+       class="inventory-item-detail hidden"
+       data-inventory-target="detail">
+    <pre class="inventory-ascii"><%= inventory_ascii_for(item_def) %></pre>
+    <% if item_def["description"].present? %>
+      <p data-inventory-target="description"><%= item_def["description"] %></p>
+    <% end %>
+  </div>
+</li>

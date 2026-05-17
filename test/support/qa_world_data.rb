@@ -117,7 +117,8 @@ module TestSupport
           "name" => "Rusty Key",
           "keywords" => %w[key rusty],
           "takeable" => true,
-          "description" => "An old rusty iron key."
+          "description" => "An old rusty iron key.",
+          "category" => "key"
         },
         "chest" => chest_item,
         "health_potion" => health_potion_item,
@@ -125,21 +126,25 @@ module TestSupport
           "name" => "Sparkling Gem",
           "keywords" => %w[gem sparkling],
           "takeable" => true,
-          "description" => "A brilliant gemstone that glows faintly."
+          "description" => "A brilliant gemstone that glows faintly.",
+          "category" => "gem",
+          "ascii_art" => "  *.*\n *.*.* \n*.*.*.*\n *.*.* \n  *.*"
         },
         "enchanted_sword" => {
           "name" => "Enchanted Sword",
           "keywords" => %w[sword enchanted],
           "takeable" => true,
           "weapon_damage" => 8,
-          "description" => "A sword that hums with magical energy."
+          "description" => "A sword that hums with magical energy.",
+          "category" => "weapon"
         },
         "shield" => {
           "name" => "Iron Shield",
           "keywords" => %w[shield iron],
           "takeable" => true,
           "defense_bonus" => 3,
-          "description" => "A sturdy iron shield."
+          "description" => "A sturdy iron shield.",
+          "category" => "shield"
         },
         "lockpick" => lockpick_item
       }

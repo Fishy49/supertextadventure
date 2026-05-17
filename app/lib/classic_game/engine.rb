@@ -38,12 +38,18 @@ module ClassicGame
       end
 
       VALID_CONSUME_ON = %w[failure success any].freeze
+      VALID_ITEM_CATEGORIES = %w[weapon shield armor key potion scroll gem crown book ring food container torch generic].freeze
 
       def validate_world_data(world_data)
         errors = []
         items = world_data["items"] || {}
         items.each do |item_id, item_def|
-          next unless item_def.is_a?(Hash) && item_def["dice_roll"]
+          next unless item_def.is_a?(Hash)
+
+          validate_item_ascii(item_id, item_def, errors)
+          validate_item_category(item_id, item_def, errors)
+
+          next unless item_def["dice_roll"]
 
           roll = item_def["dice_roll"]
           unless roll["on_success"].is_a?(Hash) && roll["on_failure"].is_a?(Hash)
@@ -60,6 +66,22 @@ module ClassicGame
       end
 
       private
+
+        def validate_item_ascii(item_id, item_def, errors)
+          return unless item_def.key?("ascii_art")
+          return if item_def["ascii_art"].is_a?(String)
+
+          errors << "Item '#{item_id}' has ascii_art that is not a String."
+        end
+
+        def validate_item_category(item_id, item_def, errors)
+          return unless item_def.key?("category")
+          return if VALID_ITEM_CATEGORIES.include?(item_def["category"])
+
+          error_text = "Item '#{item_id}' has invalid category '#{item_def['category']}'"
+          error_text += " (must be: #{VALID_ITEM_CATEGORIES.join(', ')})."
+          errors << error_text
+        end
 
         def process_npc_movement(game, user, result)
           messages = ClassicGame::NpcMovementProcessor.process(game: game, user_id: user.id)

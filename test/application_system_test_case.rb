@@ -15,4 +15,14 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   Capybara.default_max_wait_time = 10
 
   include SystemTestHelper
+
+  # The Capybara/Cuprite driver is shared across the test process. Mobile system
+  # tests call page.driver.resize(375, 667), and Capybara only resets sessions
+  # between tests — not the browser window size. When a mobile test runs before
+  # an ApplicationSystemTestCase test (random seed order), the desktop test
+  # inherits the 375x667 viewport and the sidebar (hidden md:block) stays
+  # hidden. Force the desktop viewport back at the start of every test.
+  setup do
+    page.driver.resize(1400, 1400)
+  end
 end

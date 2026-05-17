@@ -23,11 +23,7 @@ module InventoryAsciiHelper
     category = inventory_category_for(item_def)
     partial_name = category_to_partial(category)
 
-    begin
-      render("ascii/items/#{partial_name}")
-    rescue ActionView::MissingTemplate
-      render("ascii/items/generic")
-    end
+    safe_render_ascii(partial_name) || safe_render_ascii("generic") || ""
   end
 
   private
@@ -37,5 +33,15 @@ module InventoryAsciiHelper
       when "weapon" then "sword"
       else category
       end
+    end
+
+    # Render an ASCII partial, swallowing any errors so a malformed or missing
+    # template never aborts the surrounding inventory partial render — that
+    # render is invoked from `broadcast_replace_to`, where a raise causes the
+    # broadcast to be dropped silently and the sidebar stays out of sync.
+    def safe_render_ascii(partial_name)
+      render("ascii/items/#{partial_name}")
+    rescue StandardError
+      nil
     end
 end

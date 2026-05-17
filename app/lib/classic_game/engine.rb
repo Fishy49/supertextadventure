@@ -39,6 +39,7 @@ module ClassicGame
 
       VALID_CONSUME_ON = %w[failure success any].freeze
 
+      # Items may include an optional `ascii_art_partial` string (UI hint for InventoryArtHelper).
       def validate_world_data(world_data)
         errors = []
         items = world_data["items"] || {}

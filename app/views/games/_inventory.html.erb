@@ -4,7 +4,7 @@
     <p class="text-center opacity-60 italic">(empty)</p>
   <% else %>
     <ul class="list-none p-0 m-0" data-controller="inventory">
-      <% inventory.each do |item_id| %>
+      <% inventory.each_with_index do |item_id, idx| %>
         <% item_def = game.world_snapshot.dig("items", item_id) || {} %>
         <% item_name = item_def["name"] || item_id %>
         <% item_description = item_def["description"] %>
@@ -12,15 +12,21 @@
           <button type="button"
                   class="w-full text-center py-1 px-2 cursor-pointer bg-transparent border border-transparent hover:border-terminal-green hover:border-dashed text-terminal-green"
                   aria-expanded="false"
+                  aria-controls="inventory_details_<%= user.id %>_<%= idx %>"
                   data-inventory-target="toggle"
                   data-action="click->inventory#toggle">
             <%= item_name %>
           </button>
-          <% if item_description.present? %>
-            <p class="hidden text-sm opacity-80 italic px-2 pt-1 pb-2" data-inventory-target="description">
-              <%= item_description %>
-            </p>
-          <% end %>
+          <div id="inventory_details_<%= user.id %>_<%= idx %>"
+               hidden
+               data-inventory-target="details">
+            <%= inventory_art(item_id, item_def) %>
+            <% if item_description.present? %>
+              <p class="text-sm opacity-80 italic px-2 pt-1 pb-2">
+                <%= item_description %>
+              </p>
+            <% end %>
+          </div>
         </li>
       <% end %>
     </ul>

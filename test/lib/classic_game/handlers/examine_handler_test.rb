@@ -62,4 +62,13 @@ class ExamineHandlerTest < ActiveSupport::TestCase
     assert result[:success]
     assert_equal "Thine inventory is innith thine sidebar!", result[:response]
   end
+
+  test "inventory response does not contain ASCII-art-style line sequences" do
+    command = ClassicGame::CommandParser.parse("inventory")
+    result = ClassicGame::Handlers::ExamineHandler.new(game: @game, user_id: USER_ID).handle(command)
+
+    assert result[:success]
+    assert_equal "Thine inventory is innith thine sidebar!", result[:response]
+    assert_no_match(/[\\\/\|_]{3,}/, result[:response])
+  end
 end

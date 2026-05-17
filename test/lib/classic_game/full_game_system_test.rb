@@ -32,6 +32,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
       phase_final_room(game, user)
       phase_npc_movement(game, user)
       phase_verification(game, user)
+      phase_inventory_view(game, user)
     end
   end
 
@@ -489,5 +490,27 @@ class FullGameSystemTest < ActiveSupport::TestCase
 
       assert_not_includes game.room_state("cave")["creatures"] || [], "troll"
       assert game.exit_revealed?("cave", "west"), "west exit from cave should be permanently revealed"
+    end
+
+    # Phase 11: render the inventory partial and assert ASCII glyphs, item names, hidden panels
+    def phase_inventory_view(game, user)
+      html = ApplicationController.renderer.render(
+        partial: "games/inventory",
+        locals: { game: game, user: user }
+      )
+
+      # Inventory contains victory_crown, enchanted_blade, old_key (among others)
+      assert_includes html, "Victory Crown",   "PHASE 11: victory crown should appear in inventory partial"
+      assert_includes html, "Enchanted Blade", "enchanted blade should appear in inventory partial"
+      assert_includes html, "Old Key",         "old key should appear in inventory partial"
+
+      # ASCII art pre wrapper should be present
+      assert_includes html, "<pre", "inventory partial should contain ASCII art pre element"
+
+      # Details panels should be hidden by default (accordion starts closed)
+      assert_match(/hidden/, html, "details panels should be hidden by default")
+
+      # Buttons should have aria-expanded false
+      assert_includes html, "aria-expanded=\"false\"", "toggle buttons should start unexpanded"
     end
 end

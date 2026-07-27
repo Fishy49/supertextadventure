@@ -2,7 +2,7 @@
 
 class EventMessageComponent < ViewComponent::Base
   def initialize(message)
-    super
+    super()
 
     @message = message
   end

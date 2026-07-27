@@ -2,7 +2,7 @@
 
 class TerminalInputComponent < ViewComponent::Base
   def initialize(prompt:, stimulus_controllers: [], stimulus_values: {})
-    super
+    super()
 
     @terminal_prompt = prompt
     @stimulus_controllers = stimulus_controllers

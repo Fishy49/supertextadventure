@@ -2,7 +2,7 @@
 
 class NoticeComponent < ViewComponent::Base
   def initialize(message: nil, level: :info)
-    super
+    super()
 
     @message = message
     @level = level

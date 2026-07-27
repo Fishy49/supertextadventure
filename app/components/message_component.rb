@@ -2,6 +2,7 @@
 
 class MessageComponent < ViewComponent::Base
   include Classes::Helpers
+  include ActionView::RecordIdentifier
 
   def initialize(message:, current_user:)
     super()

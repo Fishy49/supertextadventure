@@ -15,7 +15,7 @@ gem "sprockets-rails"
 gem "pg", "~> 1.1"
 
 # Use the Puma web server [https://github.com/puma/puma]
-gem "puma", "~> 6.4"
+gem "puma", "~> 7.2"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
@@ -86,7 +86,7 @@ gem "sucker_punch", "~> 3.0"
 
 gem "tailwindcss-rails", "~> 2.0"
 
-gem "view_component", "~> 3.21"
+gem "view_component", "~> 4.9"
 
 gem "pagy", "~> 5.10"
 

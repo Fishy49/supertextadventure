@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MessageComponent < ViewComponent::Base
+  include Classes::Helpers
+
   def initialize(message:, current_user:)
     super()
 

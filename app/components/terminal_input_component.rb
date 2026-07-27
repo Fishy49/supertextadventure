@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class TerminalInputComponent < ViewComponent::Base
+  include Classes::Helpers
+
   def initialize(prompt:, stimulus_controllers: [], stimulus_values: {})
     super()
 

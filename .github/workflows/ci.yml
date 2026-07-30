@@ -8,6 +8,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     services:
       postgres:
@@ -44,6 +45,8 @@ jobs:
 
       - name: Set up Chrome
         uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
 
       - name: Run system tests
         run: bin/rails test:system

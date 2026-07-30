@@ -43,14 +43,11 @@ jobs:
       - name: Run tests
         run: bin/rails test
 
-      # Chrome >= 151 breaks ferrum 0.17.2 CDP node resolution (every system
-      # test errors with Ferrum::NodeNotFoundError). Pin to the last known-good
-      # major until a ferrum release supports newer Chrome.
       - name: Set up Chrome
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
         with:
-          chrome-version: "150"
+          chrome-version: stable
 
       - name: Run system tests
         run: bin/rails test:system

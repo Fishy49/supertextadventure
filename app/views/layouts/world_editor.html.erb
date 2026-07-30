@@ -12,7 +12,9 @@
 
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-    <script data-site="NTUSEIK" src="https://analytics.richardcagle.dev/script.js" defer></script>
+    <% if Rails.env.production? %>
+      <script data-site="NTUSEIK" src="https://analytics.richardcagle.dev/script.js" defer></script>
+    <% end %>
   </head>
 
   <body class="text-base bg-stone-800 text-terminal-green h-full overflow-hidden">

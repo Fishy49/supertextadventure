@@ -1,11 +1,14 @@
+# Solid Cable stores broadcasts in the primary Postgres database (no separate
+# cable database, no Redis). Subscribers poll for new messages.
 development:
-  adapter: redis
-  url: redis://localhost:6379/1
+  adapter: solid_cable
+  polling_interval: 0.1.seconds
+  message_retention: 1.day
 
 test:
   adapter: async
 
 production:
-  adapter: redis
-  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
-  channel_prefix: supertextadventure_production
+  adapter: solid_cable
+  polling_interval: 0.1.seconds
+  message_retention: 1.day

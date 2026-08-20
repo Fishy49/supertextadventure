@@ -1,0 +1,7 @@
+# Recurring jobs for Solid Queue. None configured yet.
+# See https://github.com/rails/solid_queue#recurring-tasks
+#
+# production:
+#   periodic_cleanup:
+#     class: CleanupJob
+#     schedule: every day at 9am

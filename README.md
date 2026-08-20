@@ -17,7 +17,7 @@ Additionally, this app supports a chat-like interface with a few handy tools (Di
 
 - Ruby (version managed via `mise` — see `mise.toml`)
 - Bundler
-- SQLite3
+- PostgreSQL
 
 ### Setup
 

@@ -28,6 +28,10 @@ module ClassicGame
           @creature_def ||= world_snapshot.dig("creatures", game.combat_state["creature_id"])
         end
 
+        def actor_name
+          @actor_name ||= game.character_name_for(user_id) || "Another player"
+        end
+
         def handle_attack_in_combat
           return failure("The creature has vanished!") unless creature_def
 
@@ -39,11 +43,15 @@ module ClassicGame
           game.update_creature_health(new_health)
 
           lines = ["You strike the #{creature_def['name']} for #{player_damage} damage!"]
+          spectator_lines = ["#{actor_name} strikes the #{creature_def['name']} for #{player_damage} damage!"]
 
-          return handle_creature_defeat(lines) if new_health <= 0
+          return handle_creature_defeat(lines, spectator_lines) if new_health <= 0
 
-          lines << "The #{creature_def['name']} has #{new_health} HP remaining."
-          success(lines.join("\n"), state_changes: { combat_turn_consumed: true })
+          remaining = "The #{creature_def['name']} has #{new_health} HP remaining."
+          lines << remaining
+          spectator_lines << remaining
+          success(lines.join("\n"),
+                  state_changes: { combat_turn_consumed: true, spectator_text: spectator_lines.join("\n") })
         end
 
         def handle_defend
@@ -54,7 +62,8 @@ module ClassicGame
           update_player_state(new_ps)
 
           success("You raise your guard, ready to block the next blow.",
-                  state_changes: { combat_turn_consumed: true })
+                  state_changes: { combat_turn_consumed: true,
+                                   spectator_text: "#{actor_name} raises their guard." })
         end
 
         def handle_flee
@@ -64,10 +73,11 @@ module ClassicGame
 
           if rand(1..100) > 50
             return success("You try to flee but can't break away from the fight!",
-                           state_changes: { combat_turn_consumed: true })
+                           state_changes: { combat_turn_consumed: true,
+                                            spectator_text: "#{actor_name} tries to flee but can't break away!" })
           end
 
-          # Successfully fled — leave combat for this player.
+          # Successfully fled - leave combat for this player.
           new_ps = player_state.dup
           new_ps["combat"] = nil
           update_player_state(new_ps)
@@ -75,16 +85,20 @@ module ClassicGame
           ClassicGame::TurnManager.remove_from_combat(game, user_id)
 
           if game.in_combat?
-            # Others are still fighting — this player goes into limbo.
+            # Others are still fighting - this player goes into limbo. Their
+            # removal already put the next combatant in the current slot, so
+            # the engine must not advance the combat order again.
             limbo_ps = player_state.dup
             limbo_ps["waiting_for_combat_end"] = true
             update_player_state(limbo_ps)
             success("You break away from the fight and take cover, waiting for the battle to end.",
-                    state_changes: { combat_turn_consumed: true })
+                    state_changes: { combat_turn_consumed: true, combat_self_removed: true,
+                                     spectator_text: "#{actor_name} breaks away from the fight and takes cover." })
           else
             flee_msg = creature_def["on_flee_msg"] || "The #{creature_def['name']} watches you retreat."
             success("You flee from combat!\n#{flee_msg}",
-                    state_changes: { combat_ended: true })
+                    state_changes: { combat_ended: true,
+                                     spectator_text: "#{actor_name} flees from combat!" })
           end
         end
 
@@ -116,7 +130,8 @@ module ClassicGame
             update_player_state(new_ps)
 
             success("You use the #{item_def['name']}!\nYou recover #{actual_heal} health.",
-                    state_changes: { combat_turn_consumed: true })
+                    state_changes: { combat_turn_consumed: true,
+                                     spectator_text: "#{actor_name} uses the #{item_def['name']}." })
           else
             failure("You can't use that in combat.")
           end
@@ -141,10 +156,12 @@ module ClassicGame
           update_player_state(new_ps)
         end
 
-        def handle_creature_defeat(opening_lines = [])
+        def handle_creature_defeat(opening_lines = [], spectator_opening = [])
           lines = Array(opening_lines).dup
+          spectator_lines = Array(spectator_opening).dup
           defeat_msg = creature_def["on_defeat_msg"] || "The #{creature_def['name']} collapses!"
           lines << defeat_msg
+          spectator_lines << defeat_msg
 
           loot = creature_def["loot"] || []
           if loot.any?
@@ -155,7 +172,9 @@ module ClassicGame
             update_room_state(player_state["current_room"], new_room_state)
 
             loot_names = loot.map { |id| world_snapshot.dig("items", id, "name") || id }
-            lines << "The creature drops: #{loot_names.join(', ')}"
+            loot_line = "The creature drops: #{loot_names.join(', ')}"
+            lines << loot_line
+            spectator_lines << loot_line
           end
 
           room_id = player_state["current_room"]
@@ -175,12 +194,15 @@ module ClassicGame
               next unless exit_data["requires_flag"] == flag_name
 
               game.reveal_exit(room_id, direction.to_s)
-              lines << "" << (exit_data["reveal_msg"] || "A new passage has been revealed to the #{direction}.")
+              reveal_line = exit_data["reveal_msg"] || "A new passage has been revealed to the #{direction}."
+              lines << "" << reveal_line
+              spectator_lines << "" << reveal_line
             end
           end
 
           ClassicGame::TurnManager.exit_combat_mode(game)
-          success(lines.join("\n"), state_changes: { combat_ended: true })
+          success(lines.join("\n"),
+                  state_changes: { combat_ended: true, spectator_text: spectator_lines.join("\n") })
         end
     end
   end

@@ -83,9 +83,13 @@ module ClassicGame
                    end
 
           # If a player's combat action consumed a turn, advance the combat
-          # order past them and run any creature turns that follow.
+          # order past them and run any creature turns that follow. When the
+          # action removed the actor from the order (a successful flee), the
+          # next combatant already occupies the current slot - advancing again
+          # would skip their turn.
           if game.in_combat? && result.dig(:state_changes, :combat_turn_consumed)
-            result = run_combat_turns(game, result, advance_first: true, acting_user_id: user.id)
+            advance_first = !result.dig(:state_changes, :combat_self_removed)
+            result = run_combat_turns(game, result, advance_first: advance_first, acting_user_id: user.id)
           end
 
           # Aggro may start combat mid-action; run creature turns from the
@@ -95,12 +99,15 @@ module ClassicGame
             result = run_combat_turns(game, result, advance_first: false, acting_user_id: user.id)
           end
 
+          result = attach_spectator_response(game, user, result)
           result = process_npc_movement(game, user, result)
           advance_turn_if_ready(game, user) unless game.in_combat?
           result
         end
 
         def advance_turn_if_ready(game, user)
+          # The normal turn cursor stays frozen during combat.
+          return if game.in_combat?
           return if (game.turn_state["turn_order"] || []).length <= 1
 
           ps = game.player_state(user.id)
@@ -119,11 +126,14 @@ module ClassicGame
         end
 
         # Advance combat turns and fire creature actions until the next
-        # combatant is a player (waiting for input) or combat ends.
+        # combatant is a player (waiting for input) or combat ends. Creature
+        # turns produce two narrations: one for the acting player (second
+        # person when they're the target) and one for spectators (names only).
         def run_combat_turns(game, result, advance_first:, acting_user_id: nil)
           return result unless game.in_combat?
 
           output = [result[:response]].compact_blank
+          spectator_output = [result.dig(:state_changes, :spectator_text)].compact_blank
           game.advance_combat_turn if advance_first
 
           while game.in_combat?
@@ -131,16 +141,37 @@ module ClassicGame
             break unless current
             break if current["type"] == "player"
 
-            creature_text = ClassicGame::CreatureTurn.run(
+            turn_texts = ClassicGame::CreatureTurn.run(
               game, current["id"], acting_user_id: acting_user_id
             )
-            output << creature_text if creature_text.present?
+            output << turn_texts[:actor] if turn_texts[:actor].present?
+            spectator_output << turn_texts[:spectator] if turn_texts[:spectator].present?
             break unless game.in_combat?
 
             game.advance_combat_turn
           end
 
-          result.merge(response: output.join("\n\n"))
+          state_changes = (result[:state_changes] || {}).merge(spectator_text: spectator_output.join("\n\n"))
+          result.merge(response: output.join("\n\n"), state_changes: state_changes)
+        end
+
+        # Turn a handler/creature-turn :spectator_text into a scoped spectator
+        # message for the job layer: other players in the actor's room get the
+        # names-only narration while the actor keeps the personalized response.
+        def attach_spectator_response(game, user, result)
+          state_changes = result[:state_changes] || {}
+          spectator_text = state_changes[:spectator_text]
+          return result if spectator_text.blank?
+
+          room_id = game.player_state(user.id)["current_room"]
+          audience = game.players_in_room(room_id).keys - [user.id.to_i]
+
+          # The audience may be empty here - the job layer still adds the host
+          # (GM) so a spectating host sees the names-only narration.
+          new_changes = state_changes.except(:spectator_text)
+          new_changes[:spectator_response] = spectator_text
+          new_changes[:spectator_audience] = audience
+          result.merge(state_changes: new_changes)
         end
 
         def check_aggressive_creatures(game, user, command, result)
@@ -171,9 +202,13 @@ module ClassicGame
 
             aggro_text = creature_def["aggro_text"] || "The #{creature_def['name']} attacks!"
             combined = "#{result[:response]}\n\n#{aggro_text}"
+            actor_name = game.character_name_for(user.id) || "Another player"
+            spectator_text = "The #{creature_def['name']} attacks #{actor_name}!"
             return result.merge(
               response: combined,
-              state_changes: (result[:state_changes] || {}).merge(aggro_started_combat: true)
+              state_changes: (result[:state_changes] || {}).merge(
+                aggro_started_combat: true, spectator_text: spectator_text
+              )
             )
           end
 

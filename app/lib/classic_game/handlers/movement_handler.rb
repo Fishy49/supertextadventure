@@ -121,11 +121,11 @@ module ClassicGame
           dir_str = direction.to_s
           arrival_phrase = ARRIVAL_PREPOSITIONS[dir_str] || "from another direction"
 
-          if observers[:departing].any?
-            changes[:departed_room] = old_room_id
-            changes[:departure_text] = "**#{player_name} heads #{dir_str}.**"
-            changes[:departure_audience] = observers[:departing].map { |uid, _| uid }
-          end
+          # Always set the departure text - the audience may be empty, but the
+          # job layer adds the host (GM) so a spectating host sees movement.
+          changes[:departed_room] = old_room_id
+          changes[:departure_text] = "**#{player_name} heads #{dir_str}.**"
+          changes[:departure_audience] = observers[:departing].map { |uid, _| uid }
 
           if observers[:arriving].any?
             changes[:entered_room] = new_room_id

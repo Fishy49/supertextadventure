@@ -3,19 +3,20 @@
 module ClassicGame
   # A creature's combat turn. Picks a live in-combat player, deals damage
   # (respecting defender bonus), handles target death, and ends combat if
-  # no valid targets remain. Returns a multi-line text response for the
-  # engine to append to the acting player's output.
+  # no valid targets remain. Returns two narrations for the engine:
+  #   :actor     - second person when the acting player is the target
+  #   :spectator - character names only, safe to show other players
   class CreatureTurn
     class << self
       def run(game, creature_id, acting_user_id: nil)
         creature_def = game.world_snapshot.dig("creatures", creature_id) || {}
         combat = game.combat_state
-        return "" unless combat
+        return empty_turn unless combat
 
         targets = live_targets(game, combat["room_id"])
         if targets.empty?
           ClassicGame::TurnManager.exit_combat_mode(game)
-          return ""
+          return empty_turn
         end
 
         target_uid, target_ps = targets.to_a.sample
@@ -24,14 +25,17 @@ module ClassicGame
 
       private
 
+        def empty_turn
+          { actor: "", spectator: "" }
+        end
+
         def live_targets(game, room_id)
           game.players_in_room(room_id).select { |_, ps| ps.dig("combat", "active") }
         end
 
         def apply_attack(game, creature_def, target_uid, target_ps, acting_user_id)
           viewer_is_target = acting_user_id && target_uid.to_i == acting_user_id.to_i
-          target_name = viewer_is_target ? "you" : (game.character_name_for(target_uid) || "Player #{target_uid}")
-          possessive = viewer_is_target ? "your" : "#{target_name}'s"
+          target_name = game.character_name_for(target_uid) || "Player #{target_uid}"
 
           defending = target_ps.dig("combat", "defending") ? true : false
           damage = calculate_damage(creature_def, target_ps, defending: defending, world: game.world_snapshot)
@@ -40,24 +44,48 @@ module ClassicGame
           new_health = [(target_ps["health"] || 10) - damage, 0].max
           persist_hit(game, target_uid, target_ps, new_health)
 
-          lines = []
-          lines << strike_line(creature_def, target_name, damage, defending, viewer_is_target)
-          lines << "#{possessive.capitalize} health: #{new_health}/#{max_health}"
+          hit = { damage: damage, defending: defending, new_health: new_health, max_health: max_health }
+          actor_lines = narration_lines(
+            creature_def, viewer_is_target ? "you" : target_name, hit, second_person: viewer_is_target
+          )
+          spectator_lines = narration_lines(creature_def, target_name, hit, second_person: false)
+
           if new_health <= 0
-            lines << ""
-            lines << "#{viewer_is_target ? 'You have' : "#{target_name} has"} been defeated!"
+            actor_lines << "" << restart_hint if viewer_is_target && solo_game?(game)
             handle_death(game, target_uid, target_ps)
           end
-          lines.join("\n")
+
+          { actor: actor_lines.join("\n"), spectator: spectator_lines.join("\n") }
         end
 
-        def strike_line(creature_def, target_name, damage, defending, viewer_is_target)
+        # hit: { damage:, defending:, new_health:, max_health: }
+        def narration_lines(creature_def, target_name, hit, second_person:)
+          possessive = second_person ? "Your" : "#{target_name}'s"
+          lines = []
+          lines << strike_line(creature_def, target_name, hit[:damage], hit[:defending], second_person)
+          lines << "#{possessive} health: #{hit[:new_health]}/#{hit[:max_health]}"
+          if hit[:new_health] <= 0
+            lines << ""
+            lines << "#{second_person ? 'You have' : "#{target_name} has"} been defeated!"
+          end
+          lines
+        end
+
+        def strike_line(creature_def, target_name, damage, defending, second_person)
           if defending
-            blocker = viewer_is_target ? "you block" : "they block"
+            blocker = second_person ? "you block" : "they block"
             "The #{creature_def['name']} strikes at #{target_name}, but #{blocker} most of the blow!"
           else
             "The #{creature_def['name']} attacks #{target_name} for #{damage} damage!"
           end
+        end
+
+        def restart_hint
+          "Type RESTART to try again."
+        end
+
+        def solo_game?(game)
+          game.all_player_user_ids.length <= 1
         end
 
         def persist_hit(game, target_uid, target_ps, new_health)

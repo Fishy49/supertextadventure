@@ -51,7 +51,10 @@ class Message < ApplicationRecord
       room_id = game.player_state(user.id)&.dig("current_room")
       return unless room_id
 
-      self.visible_to_user_ids = game.players_in_room(room_id).keys
+      # The host (GM) always sees player commands, wherever they were typed.
+      ids = game.players_in_room(room_id).keys
+      ids << game.created_by if game.created_by
+      self.visible_to_user_ids = ids.uniq
     end
 
     def broadcast_to_audience

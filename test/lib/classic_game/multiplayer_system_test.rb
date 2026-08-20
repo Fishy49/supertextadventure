@@ -536,13 +536,16 @@ class MultiplayerSystemTest < ActiveSupport::TestCase
     assert_includes r[:state_changes][:arrival_text], "Thorin"
   end
 
-  test "movement with no observers has no departure or arrival data" do
+  test "movement with no observers has empty departure audience and no arrival data" do
     game = build_two_player_game(p1_room: "tavern", p2_room: "library")
 
-    # Player 1 moves up to empty balcony; player 2 is in library
+    # Player 1 moves up to empty balcony; player 2 is in library.
+    # departure_text is always present (the job layer delivers it to the host),
+    # but the player audience is empty; arrival data is only set for observers.
     r = execute_engine(game, user1, "go up")
 
-    assert_nil r[:state_changes][:departure_text]
+    assert_includes r[:state_changes][:departure_text], "Thorin"
+    assert_empty r[:state_changes][:departure_audience]
     assert_nil r[:state_changes][:arrival_text]
   end
 
@@ -587,7 +590,7 @@ class MultiplayerSystemTest < ActiveSupport::TestCase
     assert_equal [PLAYER3_ID], give_data[:bystander_audience]
   end
 
-  test "give state_changes have no bystander data when only giver and receiver present" do
+  test "give state_changes have empty bystander audience when only giver and receiver present" do
     p1_state = player_state_in("tavern", inventory: ["sword"])
     game = build_multiplayer_game(
       world_data: multiplayer_world,
@@ -597,9 +600,11 @@ class MultiplayerSystemTest < ActiveSupport::TestCase
 
     r = execute_engine(game, user1, "give sword to Elara")
 
+    # bystander_text is always present (the job layer delivers it to the host),
+    # but no other players are around to receive it.
     give_data = r[:state_changes][:give_to_player]
-    assert_nil give_data[:bystander_text]
-    assert_nil give_data[:bystander_audience]
+    assert_includes give_data[:bystander_text], "Iron Sword"
+    assert_empty give_data[:bystander_audience]
   end
 
   # ─── Combat multiplayer ──────────────────────────────────────────────────────
@@ -623,5 +628,52 @@ class MultiplayerSystemTest < ActiveSupport::TestCase
 
     assert_not game.player_state(PLAYER2_ID)["waiting_for_combat_end"],
                "waiting_for_combat_end cleared after combat ends"
+  end
+
+  test "successful flee does not skip the next combatant's turn" do
+    game = build_two_player_game(p1_room: "cave", p2_room: "cave")
+    setup_shared_combat(game, creature_id: "troll", creature_health: 50, combatants: [PLAYER1_ID, PLAYER2_ID])
+
+    # Order: [P1, P2, troll], index 0 (P1). Seed 7 makes the flee roll succeed.
+    r = with_deterministic_rand(7) { execute_engine(game, user1, "flee") }
+
+    assert_includes r[:response], "break away"
+    assert game.in_combat?
+    # P2 slid into the vacated slot and must be the next to act - the troll
+    # must not sneak in a turn because of a double advance.
+    assert_equal PLAYER2_ID, game.current_combat_user_id
+    assert_equal 10, game.player_state(PLAYER2_ID)["health"],
+                 "the creature must not act before the next player's turn"
+  end
+
+  test "resolving a pending roll during combat leaves the normal turn cursor frozen" do
+    game = build_two_player_game(p1_room: "cave", p2_room: "cave")
+    setup_shared_combat(game, creature_id: "troll", creature_health: 50, combatants: [PLAYER1_ID, PLAYER2_ID])
+
+    ps = game.player_state(PLAYER1_ID).dup
+    ps["pending_roll"] = {
+      "dc" => 1, "dice" => "1d20",
+      "on_success" => { "message" => "Success." },
+      "on_failure" => { "message" => "Failure." }
+    }
+    game.update_player_state(PLAYER1_ID, ps)
+
+    index_before = game.turn_state["current_index"]
+    execute_engine(game, user1, "roll")
+
+    assert_equal index_before, game.turn_state["current_index"],
+                 "normal turn cursor must not advance during combat"
+  end
+
+  test "combat actions attach a names-only spectator narration for other players in the room" do
+    game = build_two_player_game(p1_room: "cave", p2_room: "cave")
+    setup_shared_combat(game, creature_id: "troll", creature_health: 50, combatants: [PLAYER1_ID, PLAYER2_ID])
+
+    r = with_deterministic_rand(42) { execute_engine(game, user1, "attack") }
+
+    assert_includes r[:response], "You strike the Troll"
+    assert_includes r[:state_changes][:spectator_response], "Thorin strikes the Troll"
+    assert_equal [PLAYER2_ID], r[:state_changes][:spectator_audience]
+    assert_not_includes r[:state_changes][:spectator_response].downcase, "you strike"
   end
 end

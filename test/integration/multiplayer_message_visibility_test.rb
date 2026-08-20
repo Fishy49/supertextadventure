@@ -120,6 +120,80 @@ class MultiplayerMessageVisibilityTest < ActionDispatch::IntegrationTest
     assert_select ".game-message", text: /look around/, count: 0
   end
 
+  # ─── Turn-blocked feedback ──────────────────────────────────────────────────
+
+  test "not-your-turn feedback is visible only to the blocked player" do
+    # It's the owner's turn; player1 tries to act and gets blocked.
+    result = ClassicGame::Engine.execute(game: @game, user: @player1, command_text: "look")
+    assert result[:state_changes][:turn_blocked]
+    dispatch_messages(result, @player1)
+
+    log_in_as(@player1)
+    get game_path(@game)
+    assert_select ".game-message", text: /not your turn/
+
+    log_in_as(@player2)
+    get game_path(@game)
+    assert_select ".game-message", text: /not your turn/, count: 0
+  end
+
+  # ─── Combat spectator narration ─────────────────────────────────────────────
+
+  test "combat narration is second person for the actor and names-only for room-mates" do
+    move_player(@owner, "cave")
+    move_player(@player1, "cave")
+
+    result = ClassicGame::Engine.execute(game: @game, user: @owner, command_text: "attack spider")
+    dispatch_messages(result, @owner)
+
+    log_in_as(@owner)
+    get game_path(@game)
+    assert_select ".game-message", text: /You engage the/
+    assert_select ".game-message", text: /Dev Player engages the/, count: 0
+
+    log_in_as(@player1)
+    get game_path(@game)
+    assert_select ".game-message", text: /Dev Player engages the/
+    assert_select ".game-message", text: /You engage the/, count: 0
+  end
+
+  # ─── Host (GM) visibility ───────────────────────────────────────────────────
+
+  test "host sees departure text even when no other player observes it" do
+    # player1 is alone in the tavern and moves; nobody else is there to watch,
+    # but the host (owner) still sees the movement as GM.
+    move_player(@player1, "tavern")
+    move_player(@player2, "cave")
+    make_it_the_turn_of(@player1)
+
+    result = ClassicGame::Engine.execute(game: @game, user: @player1, command_text: "go west")
+    dispatch_messages(result, @player1)
+
+    log_in_as(@owner)
+    get game_path(@game)
+    assert_select ".game-message", text: /Elara heads west/
+
+    log_in_as(@player2)
+    get game_path(@game)
+    assert_select ".game-message", text: /Elara heads west/, count: 0
+  end
+
+  test "host sees player commands typed in other rooms" do
+    move_player(@player2, "cave")
+
+    gu = @game.game_users.find_by(user_id: @player2.id)
+    Message.create!(game: @game, game_user: gu, content: "sneak around")
+
+    # The owner's character is in town_square, but as host they still see it.
+    log_in_as(@owner)
+    get game_path(@game)
+    assert_select ".game-message", text: /sneak around/
+
+    log_in_as(@player1)
+    get game_path(@game)
+    assert_select ".game-message", text: /sneak around/, count: 0
+  end
+
   # ─── Wait command ───────────────────────────────────────────────────────────
 
   test "wait command produces no visible response message" do
@@ -153,37 +227,31 @@ class MultiplayerMessageVisibilityTest < ActionDispatch::IntegrationTest
       @game.update!(game_state: state)
     end
 
+    def make_it_the_turn_of(user)
+      state = @game.game_state.dup
+      index = state["turn_state"]["turn_order"].index(user.id)
+      state["turn_state"]["current_index"] = index
+      @game.update!(game_state: state)
+    end
+
     def give_player_item(user, item_id)
       state = @game.game_state.dup
       state["player_states"][user.id.to_s]["inventory"] << item_id
       @game.update!(game_state: state)
     end
 
-    def create_movement_messages(result)
-      sc = result[:state_changes] || {}
-      return unless sc[:moved]
-
-      Message.create!(game: @game, content: result[:response], visible_to_user_ids: [@owner.id])
-
-      if sc[:departure_text] && sc[:departure_audience]&.any?
-        Message.create!(game: @game, content: sc[:departure_text], visible_to_user_ids: sc[:departure_audience])
-      end
-
-      return unless sc[:arrival_text] && sc[:arrival_audience]&.any?
-
-      Message.create!(game: @game, content: sc[:arrival_text], visible_to_user_ids: sc[:arrival_audience])
+    # Route results through the job's real dispatch so these tests cover the
+    # production message-creation code instead of a copy of it.
+    def dispatch_messages(result, acting_user)
+      ClassicCommandJob.new.dispatch_result_messages(@game, acting_user, result)
     end
 
-    def create_give_messages(result)
-      give_data = result.dig(:state_changes, :give_to_player)
-      return unless give_data
+    def create_movement_messages(result, acting_user: @owner)
+      dispatch_messages(result, acting_user)
+    end
 
-      Message.create!(game: @game, content: result[:response], visible_to_user_ids: [@owner.id])
-      Message.create!(game: @game, content: give_data[:receiver_text], visible_to_user_ids: [give_data[:receiver_user_id]])
-
-      return unless give_data[:bystander_text] && give_data[:bystander_audience]&.any?
-
-      Message.create!(game: @game, content: give_data[:bystander_text], visible_to_user_ids: give_data[:bystander_audience])
+    def create_give_messages(result, acting_user: @owner)
+      dispatch_messages(result, acting_user)
     end
 
     def log_in_as(user)

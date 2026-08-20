@@ -213,15 +213,15 @@ module ClassicGame
 
           giver_name = game.character_name_for(user_id) || "Someone"
           bystanders = other_players_in_room.keys - [receiver_uid]
+          # bystander_text is always set - the audience may be empty, but the
+          # job layer adds the host (GM) so a spectating host sees the trade.
           give_data = {
             receiver_user_id: receiver_uid,
             item_id: item_id,
-            receiver_text: "**#{giver_name} gives you the #{item_def['name']}.**"
+            receiver_text: "**#{giver_name} gives you the #{item_def['name']}.**",
+            bystander_text: "**#{giver_name} gives the #{item_def['name']} to #{receiver_name}.**",
+            bystander_audience: bystanders
           }
-          if bystanders.any?
-            give_data[:bystander_text] = "**#{giver_name} gives the #{item_def['name']} to #{receiver_name}.**"
-            give_data[:bystander_audience] = bystanders
-          end
           success(
             "You give the #{item_def['name']} to #{receiver_name}.",
             state_changes: { give_to_player: give_data }
@@ -257,9 +257,15 @@ module ClassicGame
                           .new(game: game, user_id: user_id)
                           .handle({ verb: :attack, target: nil, modifier: nil, raw: "attack" })
 
+          actor_name = game.character_name_for(user_id) || "Another player"
+          spectator_opening = "#{actor_name} engages the #{creature_def['name']} in combat!"
+          state_changes = (attack_result[:state_changes] || {}).dup
+          state_changes[:spectator_text] =
+            [spectator_opening, state_changes[:spectator_text]].compact_blank.join("\n\n")
+
           success(
             "#{opening}\n\n#{attack_result[:response]}",
-            state_changes: attack_result[:state_changes] || {}
+            state_changes: state_changes
           )
         end
     end

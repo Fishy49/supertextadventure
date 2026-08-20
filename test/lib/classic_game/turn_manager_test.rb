@@ -216,4 +216,136 @@ class TurnManagerTest < ActiveSupport::TestCase
     state2 = game.player_state(2)
     assert_not state2["waiting_for_combat_end"], "waiting_for_combat_end should be cleared for player 2"
   end
+
+  # ─── Host controls: bench / unbench ─────────────────────────────────────────
+
+  def three_player_game
+    build_multiplayer_game(
+      world_data: simple_world,
+      players: {
+        1 => player_state_in("tavern"),
+        2 => player_state_in("tavern"),
+        3 => player_state_in("tavern")
+      },
+      character_names: { 1 => "Thorin", 2 => "Elara", 3 => "Gandalf" }
+    )
+  end
+
+  test "benched player cannot act while others rotate" do
+    game = three_player_game
+    game.remove_from_turn_order(2)
+
+    assert_not ClassicGame::TurnManager.can_act?(game, 2)
+    assert_includes ClassicGame::TurnManager.waiting_message(game, 2), "out of the turn rotation"
+    assert ClassicGame::TurnManager.can_act?(game, 1), "current player still acts"
+  end
+
+  test "benching down to one player keeps that player acting but not the benched" do
+    game = three_player_game
+    game.remove_from_turn_order(2)
+    game.remove_from_turn_order(3)
+
+    assert_equal [1], game.turn_state["turn_order"]
+    assert ClassicGame::TurnManager.can_act?(game, 1), "last active player plays solo-style"
+    assert_not ClassicGame::TurnManager.can_act?(game, 2), "benched player must stay blocked"
+    assert_not ClassicGame::TurnManager.can_act?(game, 3)
+  end
+
+  test "unbenching restores a player to the rotation" do
+    game = three_player_game
+    game.remove_from_turn_order(2)
+    game.add_to_turn_order(2)
+
+    assert_includes game.turn_state["turn_order"], 2
+    assert_equal [], game.benched_user_ids
+  end
+
+  test "removing the current player hands the turn to the next in order" do
+    game = three_player_game
+    assert_equal 1, game.current_turn_user_id
+
+    game.remove_from_turn_order(1)
+
+    assert_equal [2, 3], game.turn_state["turn_order"]
+    assert_equal 2, game.current_turn_user_id
+  end
+
+  test "removing an earlier player keeps the cursor on the current player" do
+    game = three_player_game
+    game.advance_turn # now player 2's turn
+
+    game.remove_from_turn_order(1)
+
+    assert_equal 2, game.current_turn_user_id
+  end
+
+  # ─── Host controls: reorder ─────────────────────────────────────────────────
+
+  test "reorder_turns keeps the cursor on the current player" do
+    game = three_player_game
+    assert_equal 1, game.current_turn_user_id
+
+    game.reorder_turns([3, 1, 2])
+
+    assert_equal [3, 1, 2], game.turn_state["turn_order"]
+    assert_equal 1, game.current_turn_user_id, "cursor follows the current player to their new slot"
+  end
+
+  # ─── Host controls: skip ────────────────────────────────────────────────────
+
+  test "host_skip advances the normal rotation and reports the skipped player" do
+    game = three_player_game
+
+    outcome = ClassicGame::TurnManager.host_skip(game)
+
+    assert_equal 1, outcome[:skipped_user_id]
+    assert_empty outcome[:creature_texts]
+    assert_equal 2, game.current_turn_user_id
+  end
+
+  test "host_skip during combat runs creature turns until a player is up" do
+    game = build_multiplayer_game(
+      world_data: simple_world,
+      players: { 1 => player_state_in("cave"), 2 => player_state_in("cave") },
+      character_names: { 1 => "Thorin", 2 => "Elara" }
+    )
+    game.set_combat_state(room_id: "cave", creature_id: "goblin", creature_health: 50)
+    [1, 2].each do |uid|
+      ps = game.player_state(uid).dup
+      ps["combat"] = { "active" => true, "defending" => false }
+      game.update_player_state(uid, ps)
+    end
+    game.game_state["turn_state"] = game.turn_state.merge(
+      "combat_turn_order" => [
+        { "id" => "1", "type" => "player", "initiative" => 20 },
+        { "id" => "goblin", "type" => "creature", "initiative" => 10 },
+        { "id" => "2", "type" => "player", "initiative" => 5 }
+      ],
+      "combat_current_index" => 0
+    )
+
+    outcome = with_deterministic_rand(42) { ClassicGame::TurnManager.host_skip(game) }
+
+    assert_equal 1, outcome[:skipped_user_id]
+    assert outcome[:creature_texts].any?, "the goblin's turn fires after the skip"
+    assert_equal 2, game.current_combat_user_id, "cursor lands on the next player"
+  end
+
+  test "remove_player_from_rotation during combat pulls the player from both orders" do
+    game = build_multiplayer_game(
+      world_data: simple_world,
+      players: { 1 => player_state_in("cave"), 2 => player_state_in("cave") },
+      character_names: { 1 => "Thorin", 2 => "Elara" }
+    )
+    with_deterministic_rand(42) do
+      ClassicGame::TurnManager.enter_combat_mode(game, "cave", "goblin")
+    end
+
+    ClassicGame::TurnManager.remove_player_from_rotation(game, 2)
+
+    combat_ids = (game.turn_state["combat_turn_order"] || []).select { |c| c["type"] == "player" }.pluck("id")
+    assert_not_includes combat_ids, "2"
+    assert_not_includes game.turn_state["turn_order"], 2
+    assert_nil game.player_state(2)["combat"]
+  end
 end

@@ -3,6 +3,7 @@
 class Game < ApplicationRecord
   include ContainerState
   include CombatState
+  include TurnRotation
 
   belongs_to :host, class_name: "User",
                     foreign_key: :created_by,
@@ -150,45 +151,6 @@ class Game < ApplicationRecord
     save!
   end
 
-  # Turn management methods
-  def turn_state
-    game_state["turn_state"] || { "turn_order" => [], "current_index" => 0 }
-  end
-
-  def current_turn_user_id
-    ts = turn_state
-    order = ts["turn_order"] || []
-    return nil if order.empty?
-
-    order[ts["current_index"] || 0]
-  end
-
-  def advance_turn
-    self.game_state ||= {}
-    ts = turn_state.dup
-    order = ts["turn_order"] || []
-    return nil if order.empty?
-
-    count = order.length
-    current = ts["current_index"] || 0
-
-    attempts = 0
-    loop do
-      current = (current + 1) % count
-      attempts += 1
-      break if attempts >= count
-
-      uid = order[current]
-      next_ps = game_state.dig("player_states", uid.to_s) || {}
-      break unless next_ps["waiting_for_combat_end"]
-    end
-
-    ts["current_index"] = current
-    game_state["turn_state"] = ts
-    save!
-    order[current]
-  end
-
   def players_in_room(room_id)
     states = game_state["player_states"] || {}
     states.select { |_uid, state| state["current_room"] == room_id.to_s }
@@ -199,15 +161,36 @@ class Game < ApplicationRecord
     (game_state["player_states"] || {}).keys.map(&:to_i)
   end
 
-  def register_player_turn_order(user_id)
-    self.game_state ||= {}
-    game_state["turn_state"] ||= { "turn_order" => [], "current_index" => 0 }
-    order = game_state["turn_state"]["turn_order"] ||= []
-    order << user_id.to_i unless order.include?(user_id.to_i)
-  end
-
   def character_name_for(user_id)
     game_users.find_by(user_id: user_id)&.character_name
+  end
+
+  # Re-render every participant's terminal input (it follows the turn around
+  # the table) and the host's turn panel.
+  def broadcast_text_forms
+    return unless classic?
+
+    user_ids = game_users.pluck(:user_id)
+    user_ids << created_by unless user_ids.include?(created_by)
+    user_ids.uniq.each do |uid|
+      participant = User.find(uid)
+      Turbo::StreamsChannel.broadcast_replace_to(
+        self, "turn_for_#{uid}",
+        target: "text_form_content",
+        partial: "games/text_form",
+        locals: { game: self, user: participant }
+      )
+    end
+    broadcast_turn_panel
+  end
+
+  def broadcast_turn_panel
+    Turbo::StreamsChannel.broadcast_replace_to(
+      self, "turn_for_#{created_by}",
+      target: "host_turn_panel",
+      partial: "games/turn_panel",
+      locals: { game: self }
+    )
   end
 
   private

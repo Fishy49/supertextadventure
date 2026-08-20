@@ -34,6 +34,10 @@
     <%= render "current_context", game: @game %>
   </div>
 
+  <% if @game.classic? && @game.host?(current_user) %>
+    <%= render "turn_panel", game: @game %>
+  <% end %>
+
   <% show_inventory_tab = @game.classic? && @game.game_user(current_user).present? %>
   <% if show_inventory_tab %>
     <div data-controller="sidebar-tabs" data-sidebar-tabs-active-value="inventory">

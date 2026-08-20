@@ -230,6 +230,47 @@ module ClassicGameTestHelper
       order << user_id.to_i unless order.include?(user_id.to_i)
     end
 
+    def benched_user_ids
+      all_player_user_ids - (turn_state["turn_order"] || [])
+    end
+
+    def reorder_turns(user_ids)
+      ts = turn_state.dup
+      current_uid = current_turn_user_id
+      ts["turn_order"] = user_ids.map(&:to_i)
+      ts["current_index"] = ts["turn_order"].index(current_uid) || 0
+      @game_state["turn_state"] = ts
+    end
+
+    def remove_from_turn_order(user_id)
+      ts = turn_state.dup
+      order = (ts["turn_order"] || []).dup
+      idx = order.index(user_id.to_i)
+      return unless idx
+
+      current = ts["current_index"] || 0
+      order.delete_at(idx)
+      if order.empty?
+        current = 0
+      else
+        current -= 1 if idx < current
+        current %= order.length
+      end
+      ts["turn_order"] = order
+      ts["current_index"] = current
+      @game_state["turn_state"] = ts
+    end
+
+    def add_to_turn_order(user_id)
+      ts = turn_state.dup
+      order = (ts["turn_order"] || []).dup
+      return if order.include?(user_id.to_i)
+
+      order << user_id.to_i
+      ts["turn_order"] = order
+      @game_state["turn_state"] = ts
+    end
+
     def character_name_for(user_id)
       @character_names[user_id.to_i] || "Player #{user_id}"
     end

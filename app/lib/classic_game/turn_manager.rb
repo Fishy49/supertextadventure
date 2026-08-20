@@ -16,6 +16,12 @@ module ClassicGame
         return game.current_combat_user_id == user_id.to_i if game.in_combat?
 
         order = game.turn_state["turn_order"] || []
+        return true if order.empty?
+
+        # Benched players (registered but pulled from the rotation by the
+        # host) may not act, even if only one active player remains.
+        return false unless order.include?(user_id.to_i)
+
         return true if order.length <= 1
 
         # Player with a pending roll may always act to resolve it
@@ -112,10 +118,45 @@ module ClassicGame
         exit_combat_mode(game) unless any_players
       end
 
+      # Host override: skip the current turn. During combat this advances the
+      # combat order and runs any creature turns until a player is up again;
+      # otherwise it advances the normal rotation. Returns a hash with the
+      # skipped player's user id (nil if none) and any creature narration.
+      def host_skip(game)
+        if game.in_combat?
+          skipped = game.current_combat_user_id
+          { skipped_user_id: skipped, creature_texts: run_creature_turns_after_skip(game) }
+        else
+          skipped = game.current_turn_user_id
+          advance(game)
+          { skipped_user_id: skipped, creature_texts: [] }
+        end
+      end
+
+      # Pull a player out of the combat order (if fighting) and the normal
+      # rotation. Used by the host bench control and by player departure.
+      def remove_player_from_rotation(game, user_id)
+        if game.in_combat? && game.player_state(user_id).dig("combat", "active")
+          new_ps = game.player_state(user_id).dup
+          new_ps["combat"] = nil
+          new_ps.delete("waiting_for_combat_end")
+          game.update_player_state(user_id, new_ps)
+          remove_from_combat(game, user_id)
+        end
+        game.remove_from_turn_order(user_id)
+      end
+
       # Returns a context-sensitive "not your turn" message.
       def waiting_message(game, user_id)
         ps = game.player_state(user_id)
         return "Waiting for combat to finish..." if ps["waiting_for_combat_end"]
+
+        unless game.in_combat?
+          order = game.turn_state["turn_order"] || []
+          if order.any? && order.exclude?(user_id.to_i)
+            return "You're out of the turn rotation. The host can add you back in."
+          end
+        end
 
         if game.in_combat?
           combatant = game.current_combatant
@@ -136,6 +177,28 @@ module ClassicGame
       end
 
       private
+
+        # After a host skip in combat: advance past the skipped combatant and
+        # run creature turns until a player slot comes up or combat ends.
+        # Returns names-only narration lines (no acting player to personalize).
+        def run_creature_turns_after_skip(game)
+          texts = []
+          game.advance_combat_turn
+
+          while game.in_combat?
+            current = game.current_combatant
+            break unless current
+            break if current["type"] == "player"
+
+            turn = ClassicGame::CreatureTurn.run(game, current["id"])
+            texts << turn[:spectator] if turn[:spectator].present?
+            break unless game.in_combat?
+
+            game.advance_combat_turn
+          end
+
+          texts
+        end
 
         def resolve_starting_index(combatants, starting_combatant)
           case starting_combatant

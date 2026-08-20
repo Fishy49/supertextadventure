@@ -29,6 +29,11 @@ Rails.application.routes.draw do
     patch "host/typing", to: "games/host#typing"
     patch "host/stop-typing", to: "games/host#stop_typing"
 
+    patch "turn-order", to: "games/turn_orders#update", as: :turn_order
+    post "turn-order/skip", to: "games/turn_orders#skip", as: :skip_turn
+    post "turn-order/bench/:user_id", to: "games/turn_orders#bench", as: :bench_player
+    post "turn-order/unbench/:user_id", to: "games/turn_orders#unbench", as: :unbench_player
+
     member do
       get "debug_state"
       patch "debug_state", action: :update_debug_state

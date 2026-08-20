@@ -68,6 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_000002) do
     t.boolean "is_system_message", default: false
     t.string "sender_name"
     t.datetime "updated_at", null: false
+    t.integer "visible_to_user_ids", array: true
     t.index ["game_id"], name: "index_messages_on_game_id"
     t.index ["game_user_id"], name: "index_messages_on_game_user_id"
   end
@@ -227,6 +228,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_000002) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.jsonb "world_data"
+    t.index ["name"], name: "index_worlds_on_name", unique: true
   end
 
   add_foreign_key "game_users", "games"

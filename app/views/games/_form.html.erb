@@ -29,7 +29,7 @@
 
     <div class="form-group">
       <%= form.label :game_type, style: "display: block" %>
-      <%= form.select :game_type, options_for_select(game_type_options, "freeform"), {}, {
+      <%= form.select :game_type, options_for_select(game_type_options, game.game_type), {}, {
         data: {
           game_form_target: "gameType",
           action: "change->game-form#toggleWorldSelector"
@@ -44,7 +44,7 @@
 
     <div class="form-group">
       <%= form.label :status, style: "display: block" %>
-      <%= form.select :status, options_for_select(game_status_options, "closed") %>
+      <%= form.select :status, options_for_select(game_status_options, game.status) %>
     </div>
 
   <div class="form-group" style="display: none;">

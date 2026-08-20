@@ -1,0 +1,87 @@
+<div id="host_turn_panel" class="mb-5">
+  <h4 class="text-center mb-2">TURN ORDER</h4>
+
+  <% if game.in_combat? %>
+    <% order = game.turn_state["combat_turn_order"] || [] %>
+    <% current_index = game.turn_state["combat_current_index"] || 0 %>
+    <div class="text-xs opacity-70 mb-2 text-center">Combat: order set by initiative</div>
+    <div class="border border-dashed border-terminal-green p-2 mb-2">
+      <% order.each_with_index do |combatant, i| %>
+        <% current = (i == current_index) %>
+        <div class="flex items-center justify-between gap-2 py-1 <%= 'font-bold' if current %>">
+          <span class="truncate">
+            <%= current ? "&#9654;".html_safe : "&nbsp;&nbsp;".html_safe %>
+            <% if combatant["type"] == "creature" %>
+              <%= game.world_snapshot.dig("creatures", combatant["id"], "name") || combatant["id"] %>
+            <% else %>
+              <%= game.character_name_for(combatant["id"].to_i) || "Player #{combatant['id']}" %>
+            <% end %>
+          </span>
+          <span class="flex gap-1 shrink-0">
+            <% if current %>
+              <%= button_to "Skip", game_skip_turn_path(game_id: game.uuid),
+                            method: :post, class: "button text-xs px-2 py-1 m-0" %>
+            <% end %>
+            <% if combatant["type"] == "player" %>
+              <%= button_to "Bench", game_bench_player_path(game_id: game.uuid, user_id: combatant["id"]),
+                            method: :post, class: "button text-xs px-2 py-1 m-0" %>
+            <% end %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <% order = game.turn_state["turn_order"] || [] %>
+    <% current_index = game.turn_state["current_index"] || 0 %>
+    <div class="border border-dashed border-terminal-green p-2 mb-2">
+      <% if order.empty? %>
+        <div class="text-xs opacity-70 text-center py-1">No players in rotation yet.</div>
+      <% end %>
+      <% order.each_with_index do |uid, i| %>
+        <% current = (i == current_index) %>
+        <div class="flex items-center justify-between gap-2 py-1 <%= 'font-bold' if current %>">
+          <span class="truncate">
+            <%= current ? "&#9654;".html_safe : "&nbsp;&nbsp;".html_safe %>
+            <%= game.character_name_for(uid) || "Player #{uid}" %>
+          </span>
+          <span class="flex gap-1 shrink-0">
+            <% if i.positive? %>
+              <% up_order = order.dup.tap { |o| o[i - 1], o[i] = o[i], o[i - 1] } %>
+              <%= button_to "↑", game_turn_order_path(game_id: game.uuid),
+                            method: :patch, params: { user_ids: up_order },
+                            class: "button text-xs px-2 py-1 m-0" %>
+            <% end %>
+            <% if i < order.length - 1 %>
+              <% down_order = order.dup.tap { |o| o[i], o[i + 1] = o[i + 1], o[i] } %>
+              <%= button_to "↓", game_turn_order_path(game_id: game.uuid),
+                            method: :patch, params: { user_ids: down_order },
+                            class: "button text-xs px-2 py-1 m-0" %>
+            <% end %>
+            <% if current && order.length > 1 %>
+              <%= button_to "Skip", game_skip_turn_path(game_id: game.uuid),
+                            method: :post, class: "button text-xs px-2 py-1 m-0" %>
+            <% end %>
+            <% if order.length > 1 %>
+              <%= button_to "Bench", game_bench_player_path(game_id: game.uuid, user_id: uid),
+                            method: :post, class: "button text-xs px-2 py-1 m-0" %>
+            <% end %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% benched = game.game_users.joined.select { |gu| game.benched_user_ids.include?(gu.user_id) } %>
+  <% if benched.any? %>
+    <div class="text-xs opacity-70 mb-1">BENCHED</div>
+    <div class="border border-dashed border-terminal-green p-2 opacity-80">
+      <% benched.each do |gu| %>
+        <div class="flex items-center justify-between gap-2 py-1">
+          <span class="truncate"><%= gu.character_name %></span>
+          <%= button_to "Add", game_unbench_player_path(game_id: game.uuid, user_id: gu.user_id),
+                        method: :post, class: "button text-xs px-2 py-1 m-0 shrink-0" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

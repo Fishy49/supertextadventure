@@ -7,7 +7,7 @@ one:
   world_data:
 
 two:
-  name: MyString
+  name: MyOtherString
   description: MyText
   world_data:
 

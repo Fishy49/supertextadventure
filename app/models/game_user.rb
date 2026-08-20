@@ -13,12 +13,23 @@ class GameUser < ApplicationRecord
 
   after_create_commit :broadcast_new_player
 
+  # A departing player must not wedge the rotation: pull them out of the
+  # turn order (and combat, if fighting) so the cursor never lands on them.
+  after_destroy :remove_from_turn_rotation, if: -> { game.classic? }
+
   after_update_commit :create_health_change_event_message, if: :saved_change_to_current_health?
   after_update_commit :broadcast_updated_player_health, if: :saved_change_to_current_health?
   after_update_commit :broadcast_updated_player_mute, if: :saved_change_to_can_message?
   after_update_commit :broadcast_updated_player_active, if: :saved_change_to_active_at?
 
   private
+
+    def remove_from_turn_rotation
+      game.with_lock do
+        ClassicGame::TurnManager.remove_player_from_rotation(game, user_id)
+      end
+      game.broadcast_text_forms
+    end
 
     def check_game_users_count
       return unless game.max_players?

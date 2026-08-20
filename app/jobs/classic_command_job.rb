@@ -20,16 +20,110 @@ class ClassicCommandJob < ApplicationJob
 
     broadcast_dice_roll(game, message, result)
     sync_classic_sidebar(game, user, message.game_user)
+    game.broadcast_text_forms
 
-    # Create response message (will auto-broadcast via callback)
-    Message.create!(
-      game: game,
-      content: result[:response]
-      # NOTE: no game_user_id, so it's a "host" message from the game engine
-    )
+    dispatch_result_messages(game, user, result)
+  end
+
+  # Route an engine result to the right audience-scoped messages. Public so
+  # integration tests exercise the real dispatch rather than a copy of it.
+  def dispatch_result_messages(game, user, result)
+    state_changes = result[:state_changes] || {}
+    if state_changes[:moved]
+      broadcast_movement_messages(game, user, result, state_changes)
+    elsif state_changes[:give_to_player]
+      broadcast_give_messages(game, user, result, state_changes[:give_to_player])
+    elsif state_changes[:spectator_response].present?
+      broadcast_combat_messages(game, user, result, state_changes)
+    elsif state_changes[:turn_blocked]
+      # Off-turn feedback is for the blocked player alone.
+      if result[:response].present?
+        Message.create!(game: game, content: result[:response],
+                        visible_to_user_ids: [user.id])
+      end
+    elsif result[:response].present?
+      Message.create!(game: game, content: result[:response])
+    end
   end
 
   private
+
+    # The host is the GM: they get every scoped narration meant for observers,
+    # unless they're the acting player themselves.
+    def audience_with_host(game, user_ids, actor_id)
+      ids = Array(user_ids).map(&:to_i)
+      host_id = game.created_by
+      ids << host_id if host_id && host_id != actor_id.to_i
+      ids.uniq
+    end
+
+    def broadcast_movement_messages(game, user, result, state_changes)
+      Message.create!(
+        game: game,
+        content: result[:response],
+        visible_to_user_ids: [user.id]
+      )
+
+      if state_changes[:departure_text]
+        audience = audience_with_host(game, state_changes[:departure_audience] || [], user.id)
+        if audience.any?
+          Message.create!(
+            game: game,
+            content: state_changes[:departure_text],
+            visible_to_user_ids: audience
+          )
+        end
+      end
+
+      return unless state_changes[:arrival_text] && state_changes[:arrival_audience]&.any?
+
+      Message.create!(
+        game: game,
+        content: state_changes[:arrival_text],
+        visible_to_user_ids: state_changes[:arrival_audience]
+      )
+    end
+
+    def broadcast_give_messages(game, user, result, give_data)
+      Message.create!(
+        game: game,
+        content: result[:response],
+        visible_to_user_ids: [user.id]
+      )
+
+      Message.create!(
+        game: game,
+        content: give_data[:receiver_text],
+        visible_to_user_ids: [give_data[:receiver_user_id]]
+      )
+
+      return unless give_data[:bystander_text]
+
+      audience = audience_with_host(game, give_data[:bystander_audience] || [], user.id)
+      return if audience.empty?
+
+      Message.create!(
+        game: game,
+        content: give_data[:bystander_text],
+        visible_to_user_ids: audience
+      )
+    end
+
+    def broadcast_combat_messages(game, user, result, state_changes)
+      if result[:response].present?
+        Message.create!(game: game, content: result[:response],
+                        visible_to_user_ids: [user.id])
+      end
+
+      audience = audience_with_host(game, state_changes[:spectator_audience] || [], user.id)
+      return if audience.empty?
+
+      Message.create!(
+        game: game,
+        content: state_changes[:spectator_response],
+        visible_to_user_ids: audience
+      )
+    end
 
     def broadcast_dice_roll(game, message, result)
       return unless result[:dice_roll]

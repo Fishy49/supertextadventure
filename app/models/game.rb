@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Game < ApplicationRecord
+  include ContainerState
+  include CombatState
+  include TurnRotation
+
   belongs_to :host, class_name: "User",
                     foreign_key: :created_by,
                     primary_key: :id,
@@ -31,6 +35,10 @@ class Game < ApplicationRecord
   validates :created_by, presence: true
 
   attr_accessor :skip_game_state_dump
+
+  def to_param
+    uuid
+  end
 
   def game_user(user)
     game_users.find_by(user_id: user.id)
@@ -121,66 +129,6 @@ class Game < ApplicationRecord
     game_state.dig("revealed_exits", exit_key) || false
   end
 
-  # Container state methods
-  def container_state(container_id)
-    game_state.dig("container_states", container_id.to_s)
-  end
-
-  def container_open?(container_id)
-    state = container_state(container_id)
-    return state["open"] if state
-
-    # If no state exists, check if container starts closed
-    item_def = world_snapshot.dig("items", container_id.to_s)
-    return true unless item_def&.dig("starts_closed")
-
-    false
-  end
-
-  def open_container(container_id)
-    self.game_state ||= {}
-    game_state["container_states"] ||= {}
-    game_state["container_states"][container_id.to_s] = { "open" => true }
-    save!
-  end
-
-  def close_container(container_id)
-    self.game_state ||= {}
-    game_state["container_states"] ||= {}
-    game_state["container_states"][container_id.to_s] = { "open" => false }
-    save!
-  end
-
-  def container_contents(container_id)
-    # Get original contents from world snapshot
-    original_contents = world_snapshot.dig("items", container_id.to_s, "contents") || []
-
-    # Get removed items from game state
-    removed_items = game_state.dig("container_states", container_id.to_s, "removed_items") || []
-
-    # Return contents minus removed items
-    original_contents - removed_items
-  end
-
-  def remove_from_container(container_id, item_id)
-    self.game_state ||= {}
-    game_state["container_states"] ||= {}
-    game_state["container_states"][container_id.to_s] ||= {}
-    game_state["container_states"][container_id.to_s]["removed_items"] ||= []
-    game_state["container_states"][container_id.to_s]["removed_items"] << item_id
-    game_state["container_states"][container_id.to_s]["removed_items"].uniq!
-    save!
-  end
-
-  def add_to_container(container_id, item_id)
-    self.game_state ||= {}
-    game_state["container_states"] ||= {}
-    game_state["container_states"][container_id.to_s] ||= {}
-    game_state["container_states"][container_id.to_s]["removed_items"] ||= []
-    game_state["container_states"][container_id.to_s]["removed_items"].delete(item_id)
-    save!
-  end
-
   def turn_count
     game_state["turn_count"] || 0
   end
@@ -203,12 +151,54 @@ class Game < ApplicationRecord
     save!
   end
 
+  def players_in_room(room_id)
+    states = game_state["player_states"] || {}
+    states.select { |_uid, state| state["current_room"] == room_id.to_s }
+          .transform_keys(&:to_i)
+  end
+
+  def all_player_user_ids
+    (game_state["player_states"] || {}).keys.map(&:to_i)
+  end
+
+  def character_name_for(user_id)
+    game_users.find_by(user_id: user_id)&.character_name
+  end
+
+  # Re-render every participant's terminal input (it follows the turn around
+  # the table) and the host's turn panel.
+  def broadcast_text_forms
+    return unless classic?
+
+    user_ids = game_users.pluck(:user_id)
+    user_ids << created_by unless user_ids.include?(created_by)
+    user_ids.uniq.each do |uid|
+      participant = User.find(uid)
+      Turbo::StreamsChannel.broadcast_replace_to(
+        self, "turn_for_#{uid}",
+        target: "text_form_content",
+        partial: "games/text_form",
+        locals: { game: self, user: participant }
+      )
+    end
+    broadcast_turn_panel
+  end
+
+  def broadcast_turn_panel
+    Turbo::StreamsChannel.broadcast_replace_to(
+      self, "turn_for_#{created_by}",
+      target: "host_turn_panel",
+      partial: "games/turn_panel",
+      locals: { game: self }
+    )
+  end
+
   private
 
-    def initialize_player_state(_user_id)
+    def initialize_player_state(user_id)
       starting_room = world_snapshot.dig("meta", "starting_room") || world_snapshot["rooms"]&.keys&.first
 
-      {
+      state = {
         "current_room" => starting_room,
         "inventory" => [],
         "health" => starting_hp || 10,
@@ -216,6 +206,13 @@ class Game < ApplicationRecord
         "visited_rooms" => [],
         "flags" => {}
       }
+
+      self.game_state ||= {}
+      game_state["player_states"] ||= {}
+      game_state["player_states"][user_id.to_s] = state
+      register_player_turn_order(user_id)
+      save!
+      state
     end
 
     def initialize_room_state(room_id)
@@ -262,7 +259,8 @@ class Game < ApplicationRecord
                 "global_flags" => {},
                 "container_states" => {},
                 "turn_count" => 0,
-                "npc_movement" => {}
+                "npc_movement" => {},
+                "turn_state" => { "turn_order" => [], "current_index" => 0 }
               })
 
       # Generate starting room description

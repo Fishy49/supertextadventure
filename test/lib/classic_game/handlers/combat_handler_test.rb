@@ -58,23 +58,21 @@ class CombatHandlerTest < ActiveSupport::TestCase
 
   # ─── ATTACK ─────────────────────────────────────────────────────────────────
 
-  test "attack damages the creature" do
+  test "attack damages the creature via shared combat_state" do
     game = in_combat_game(creature_id: "goblin", creature_health: 50)
     handle(game, "attack")
 
-    # creature_health should be less than 50 after the attack
-    assert game.player_state(USER_ID).dig("combat", "creature_health") < 50
+    assert game.combat_state["creature_health"] < 50
   end
 
-  test "attack increments round number" do
+  test "attack marks the turn as consumed" do
     game = in_combat_game(creature_id: "goblin", creature_health: 50)
-    initial_round = game.player_state(USER_ID).dig("combat", "round_number")
-    handle(game, "attack")
+    result = handle(game, "attack")
 
-    assert_equal initial_round + 1, game.player_state(USER_ID).dig("combat", "round_number")
+    assert_equal true, result.dig(:state_changes, :combat_turn_consumed)
   end
 
-  test "attack response mentions player damage and creature retaliation" do
+  test "attack response mentions player damage to the creature" do
     game = in_combat_game(creature_id: "goblin", creature_health: 50)
     result = handle(game, "attack")
 
@@ -88,7 +86,8 @@ class CombatHandlerTest < ActiveSupport::TestCase
     game = in_combat_game(creature_id: "goblin", creature_health: 1)
     handle(game, "attack")
 
-    assert_nil game.player_state(USER_ID)["combat"]
+    assert_nil game.combat_state, "game-level combat_state cleared"
+    assert_nil game.player_state(USER_ID)["combat"], "per-player combat cleared"
   end
 
   test "defeating creature removes it from the room" do
@@ -111,64 +110,26 @@ class CombatHandlerTest < ActiveSupport::TestCase
     assert_includes game.room_state("arena")["items"], "goblin_sword"
   end
 
-  # ─── Player death ───────────────────────────────────────────────────────────
-
-  test "player death returns game over message" do
-    world = build_world(
-      starting_room: "arena",
-      rooms: { "arena" => { "name" => "Arena", "description" => ".", "exits" => {}, "creatures" => ["knight"] } },
-      creatures: { "knight" => DEADLY_CREATURE.dup }
-    )
-    game = in_combat_game(world: world, creature_id: "knight", creature_health: 999, player_health: 1)
-    result = handle(game, "attack")
-
-    assert_not result[:success]
-    assert_includes result[:response], "GAME OVER"
-  end
-
   # ─── DEFEND ─────────────────────────────────────────────────────────────────
 
-  test "defend response mentions blocking damage" do
+  test "defend sets the defending flag and raises guard" do
     game = in_combat_game(creature_id: "goblin", creature_health: 50)
     result = handle(game, "defend")
 
     assert result[:success]
     assert_includes result[:response].downcase, "guard"
-  end
-
-  test "defend still deals damage to player (but less than attack would)" do
-    # With a 0-attack goblin, min damage is 1, so defend always takes exactly 1
-    # (attack=0, randomness=-2..2 but capped at 1 minimum, player_defense=0, defending adds +3 so 0+(-2..2)-3 = always <=0 → capped at 1)
-    # Actually: creature_attack(0) + rand(-2..2) - player_defense(0) - defending_bonus(3) -> floor at 1
-    game = in_combat_game(creature_id: "goblin", creature_health: 50, player_health: 10)
-    handle(game, "defend")
-
-    # Player should have taken at least 1 damage
-    assert game.player_state(USER_ID)["health"] < 10
+    assert_equal true, game.player_state(USER_ID).dig("combat", "defending")
+    assert_equal true, result.dig(:state_changes, :combat_turn_consumed)
   end
 
   # ─── FLEE ───────────────────────────────────────────────────────────────────
 
-  test "flee returns a success response regardless of outcome" do
+  test "flee returns success and consumes the combat turn" do
     game = in_combat_game(creature_id: "goblin", creature_health: 50, player_health: 10)
     result = handle(game, "flee")
 
-    # Flee always returns success: even a failed flee attempt is a valid action
-    # (player death would return failure, but goblin's 0-attack can't one-shot 10 HP)
     assert result[:success]
     assert_includes result[:response].downcase, "flee"
-  end
-
-  test "flee always produces a coherent game state" do
-    game = in_combat_game(creature_id: "goblin", creature_health: 50, player_health: 10)
-    handle(game, "flee")
-
-    combat = game.player_state(USER_ID)["combat"]
-    health = game.player_state(USER_ID)["health"]
-
-    # Either combat was cleared (successful flee) or health decreased (failed flee with damage)
-    assert combat.nil? || health < 10,
-           "Expected either combat cleared or health reduced, got combat=#{combat.inspect}, health=#{health}"
   end
 
   # ─── USE in combat ──────────────────────────────────────────────────────────
@@ -178,9 +139,8 @@ class CombatHandlerTest < ActiveSupport::TestCase
                           inventory: ["health_potion"])
     handle(game, "use potion")
 
-    # Health should be higher than 3 (even accounting for creature counterattack)
-    # Player had 3 HP, healed 5 → 8 HP, then goblin deals at least 1 → at most 7
-    assert game.player_state(USER_ID)["health"] > 3
+    # Player had 3 HP, healed 5 → 8 HP (no inline counterattack any more)
+    assert_equal 8, game.player_state(USER_ID)["health"]
   end
 
   test "use consumable potion removes it from inventory after use" do
@@ -209,18 +169,24 @@ class CombatHandlerTest < ActiveSupport::TestCase
 
     def in_combat_game(creature_id:, creature_health:, world: nil, player_health: 10, inventory: [])
       world ||= @world
-      combat_state = {
-        "active" => true,
-        "creature_id" => creature_id,
-        "creature_health" => creature_health,
-        "creature_max_health" => creature_health,
-        "round_number" => 1,
-        "defending" => false
-      }
-      build_game(
+      game = build_game(
         world_data: world, player_id: USER_ID,
         player_state: player_state_in("arena", health: player_health, max_health: 10,
-                                               inventory: inventory, combat: combat_state)
+                                               inventory: inventory,
+                                               combat: { "active" => true, "defending" => false })
       )
+      game.set_combat_state(
+        room_id: "arena",
+        creature_id: creature_id,
+        creature_health: creature_health
+      )
+      game.game_state["turn_state"] = game.turn_state.merge(
+        "combat_turn_order" => [
+          { "id" => USER_ID.to_s, "type" => "player", "initiative" => 10 },
+          { "id" => creature_id.to_s, "type" => "creature", "initiative" => 5 }
+        ],
+        "combat_current_index" => 0
+      )
+      game
     end
 end

@@ -6,6 +6,11 @@ module ClassicGameTestHelper
   class FakeGame
     attr_accessor :game_state, :character_names
 
+    # In-memory stand-in for ActiveRecord's row lock: no database, so just yield.
+    def with_lock
+      yield
+    end
+
     def initialize(world_data:)
       @game_state = {
         "world_snapshot" => world_data,

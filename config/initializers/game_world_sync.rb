@@ -4,7 +4,10 @@
 # JSON files whose meta.name doesn't already exist in the database.
 
 Rails.application.config.after_initialize do
-  unless ActiveRecord::Base.connection_pool.with_connection { ActiveRecord::Base.connection.table_exists?("worlds") }
+  # Skip entirely when no database is reachable (asset precompile, image builds).
+  begin
+    next unless ActiveRecord::Base.connection_pool.with_connection { |conn| conn.table_exists?("worlds") }
+  rescue ActiveRecord::NoDatabaseError, ActiveRecord::ConnectionNotEstablished
     next
   end
 

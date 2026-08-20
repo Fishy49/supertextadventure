@@ -15,7 +15,7 @@ module CombatState
 
   def set_combat_state(room_id:, creature_id:, creature_health:)
     self.game_state ||= {}
-    self.game_state["combat_state"] = {
+    game_state["combat_state"] = {
       "room_id" => room_id.to_s,
       "creature_id" => creature_id.to_s,
       "creature_health" => creature_health,
@@ -26,14 +26,14 @@ module CombatState
 
   def clear_combat_state
     self.game_state ||= {}
-    self.game_state.delete("combat_state")
+    game_state.delete("combat_state")
     save!
   end
 
   def update_creature_health(new_health)
     return unless in_combat?
 
-    self.game_state["combat_state"] = combat_state.merge("creature_health" => new_health)
+    game_state["combat_state"] = combat_state.merge("creature_health" => new_health)
     save!
   end
 
@@ -61,7 +61,7 @@ module CombatState
     current = ts["combat_current_index"] || 0
     current = (current + 1) % order.length
     ts["combat_current_index"] = current
-    self.game_state["turn_state"] = ts
+    game_state["turn_state"] = ts
     save!
     order[current]
   end

@@ -4,62 +4,13 @@ module ClassicGame
   class Engine
     class << self
       def execute(game:, user:, command_text:)
-        # Check if we're waiting for restart confirmation
-        return handle_restart_confirmation(game, command_text) if game.game_state["pending_restart"]
-
-        # Check if a dice roll is pending — route all input to RollHandler
-        ps = game.player_state(user.id)
-        if ps["pending_roll"]
-          result = ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
-            ClassicGame::CommandParser.parse(command_text)
-          )
-          result = process_npc_movement(game, user, result)
-          advance_turn_if_ready(game, user)
-          return result
+        # Row-lock the game so concurrent commands are serialized: handlers
+        # read-modify-write the shared game_state blob, and unlocked overlap
+        # would silently clobber it. The transaction also makes each command
+        # atomic - a failed command rolls back instead of half-applying.
+        game.with_lock do
+          execute_locked(game: game, user: user, command_text: command_text)
         end
-
-        # Check turn order — block off-turn players
-        unless TurnManager.can_act?(game, user.id)
-          return {
-            success: false,
-            response: TurnManager.waiting_message(game, user.id),
-            state_changes: { turn_blocked: true }
-          }
-        end
-
-        # Parse the command
-        command = CommandParser.parse(command_text)
-
-        if command[:verb] == :wait
-          advance_turn_if_ready(game, user)
-          return { success: true, response: "", state_changes: {} }
-        end
-
-        # Route to appropriate handler
-        handler = get_handler(command[:verb], game: game, user_id: user.id)
-
-        result = if handler
-                   handler.handle(command)
-                 else
-                   unknown_command_response(command)
-                 end
-
-        # If a player's combat action consumed a turn, advance the combat
-        # order past them and run any creature turns that follow.
-        if game.in_combat? && result.dig(:state_changes, :combat_turn_consumed)
-          result = run_combat_turns(game, result, advance_first: true, acting_user_id: user.id)
-        end
-
-        # Aggro may start combat mid-action; run creature turns from the
-        # current slot (combat_current_index is on the aggressor creature).
-        result = check_aggressive_creatures(game, user, command, result)
-        if game.in_combat? && result.dig(:state_changes, :aggro_started_combat)
-          result = run_combat_turns(game, result, advance_first: false, acting_user_id: user.id)
-        end
-
-        result = process_npc_movement(game, user, result)
-        advance_turn_if_ready(game, user) unless game.in_combat?
-        result
       rescue StandardError => e
         Rails.logger.error("ClassicGame::Engine error: #{e.message}")
         Rails.logger.error(e.backtrace.join("\n"))
@@ -89,6 +40,65 @@ module ClassicGame
       end
 
       private
+
+        def execute_locked(game:, user:, command_text:)
+          # Check if we're waiting for restart confirmation
+          return handle_restart_confirmation(game, command_text) if game.game_state["pending_restart"]
+
+          # Check if a dice roll is pending - route all input to RollHandler
+          ps = game.player_state(user.id)
+          if ps["pending_roll"]
+            result = ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
+              ClassicGame::CommandParser.parse(command_text)
+            )
+            result = process_npc_movement(game, user, result)
+            advance_turn_if_ready(game, user)
+            return result
+          end
+
+          # Check turn order - block off-turn players
+          unless TurnManager.can_act?(game, user.id)
+            return {
+              success: false,
+              response: TurnManager.waiting_message(game, user.id),
+              state_changes: { turn_blocked: true }
+            }
+          end
+
+          # Parse the command
+          command = CommandParser.parse(command_text)
+
+          if command[:verb] == :wait
+            advance_turn_if_ready(game, user)
+            return { success: true, response: "", state_changes: {} }
+          end
+
+          # Route to appropriate handler
+          handler = get_handler(command[:verb], game: game, user_id: user.id)
+
+          result = if handler
+                     handler.handle(command)
+                   else
+                     unknown_command_response(command)
+                   end
+
+          # If a player's combat action consumed a turn, advance the combat
+          # order past them and run any creature turns that follow.
+          if game.in_combat? && result.dig(:state_changes, :combat_turn_consumed)
+            result = run_combat_turns(game, result, advance_first: true, acting_user_id: user.id)
+          end
+
+          # Aggro may start combat mid-action; run creature turns from the
+          # current slot (combat_current_index is on the aggressor creature).
+          result = check_aggressive_creatures(game, user, command, result)
+          if game.in_combat? && result.dig(:state_changes, :aggro_started_combat)
+            result = run_combat_turns(game, result, advance_first: false, acting_user_id: user.id)
+          end
+
+          result = process_npc_movement(game, user, result)
+          advance_turn_if_ready(game, user) unless game.in_combat?
+          result
+        end
 
         def advance_turn_if_ready(game, user)
           return if (game.turn_state["turn_order"] || []).length <= 1

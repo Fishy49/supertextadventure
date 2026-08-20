@@ -15,7 +15,7 @@ gem "sprockets-rails"
 gem "pg", "~> 1.1"
 
 # Use the Puma web server [https://github.com/puma/puma]
-gem "puma", "~> 6.4"
+gem "puma", "~> 8.0"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
@@ -29,11 +29,9 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
-# Use Redis adapter to run Action Cable in production
-gem "redis", "~> 4.0"
-
-# Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
-# gem "kredis"
+# Database-backed adapters for Action Cable and Active Job [https://github.com/rails/solid_cable]
+gem "solid_cable"
+gem "solid_queue"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1"
@@ -81,8 +79,6 @@ group :test do
 end
 
 gem "classes", "~> 0.1.0"
-
-gem "sucker_punch", "~> 3.0"
 
 gem "tailwindcss-rails", "~> 2.0"
 

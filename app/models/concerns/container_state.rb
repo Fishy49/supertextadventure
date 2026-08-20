@@ -19,15 +19,15 @@ module ContainerState
 
   def open_container(container_id)
     self.game_state ||= {}
-    self.game_state["container_states"] ||= {}
-    self.game_state["container_states"][container_id.to_s] = { "open" => true }
+    game_state["container_states"] ||= {}
+    game_state["container_states"][container_id.to_s] = { "open" => true }
     save!
   end
 
   def close_container(container_id)
     self.game_state ||= {}
-    self.game_state["container_states"] ||= {}
-    self.game_state["container_states"][container_id.to_s] = { "open" => false }
+    game_state["container_states"] ||= {}
+    game_state["container_states"][container_id.to_s] = { "open" => false }
     save!
   end
 
@@ -39,20 +39,20 @@ module ContainerState
 
   def remove_from_container(container_id, item_id)
     self.game_state ||= {}
-    self.game_state["container_states"] ||= {}
-    self.game_state["container_states"][container_id.to_s] ||= {}
-    self.game_state["container_states"][container_id.to_s]["removed_items"] ||= []
-    self.game_state["container_states"][container_id.to_s]["removed_items"] << item_id
-    self.game_state["container_states"][container_id.to_s]["removed_items"].uniq!
+    game_state["container_states"] ||= {}
+    game_state["container_states"][container_id.to_s] ||= {}
+    game_state["container_states"][container_id.to_s]["removed_items"] ||= []
+    game_state["container_states"][container_id.to_s]["removed_items"] << item_id
+    game_state["container_states"][container_id.to_s]["removed_items"].uniq!
     save!
   end
 
   def add_to_container(container_id, item_id)
     self.game_state ||= {}
-    self.game_state["container_states"] ||= {}
-    self.game_state["container_states"][container_id.to_s] ||= {}
-    self.game_state["container_states"][container_id.to_s]["removed_items"] ||= []
-    self.game_state["container_states"][container_id.to_s]["removed_items"].delete(item_id)
+    game_state["container_states"] ||= {}
+    game_state["container_states"][container_id.to_s] ||= {}
+    game_state["container_states"][container_id.to_s]["removed_items"] ||= []
+    game_state["container_states"][container_id.to_s]["removed_items"].delete(item_id)
     save!
   end
 end

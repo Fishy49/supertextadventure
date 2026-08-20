@@ -178,7 +178,7 @@ class WorldsController < ApplicationController
   private
 
     def set_world
-      @world = World.find(params[:id])
+      @world = World.find(params.expect(:id))
     end
 
     def pluralize(entity_type)

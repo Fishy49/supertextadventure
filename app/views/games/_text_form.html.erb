@@ -13,7 +13,8 @@
       stimulus_controllers: ["game"],
       stimulus_values: {
         "game-id": game.id,
-        "game-user-id": game.game_user(user)&.id || (game.host?(user) ? :host : nil)
+        "game-user-id": game.game_user(user)&.id || (game.host?(user) ? :host : nil),
+        "game-game-type": game.game_type
       }
     )) %>
   </div>

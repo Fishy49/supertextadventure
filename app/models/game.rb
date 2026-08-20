@@ -68,8 +68,8 @@ class Game < ApplicationRecord
 
   def update_player_state(user_id, new_state)
     self.game_state ||= {}
-    self.game_state["player_states"] ||= {}
-    self.game_state["player_states"][user_id.to_s] = new_state
+    game_state["player_states"] ||= {}
+    game_state["player_states"][user_id.to_s] = new_state
     save!
   end
 
@@ -79,8 +79,8 @@ class Game < ApplicationRecord
 
   def update_room_state(room_id, new_state)
     self.game_state ||= {}
-    self.game_state["room_states"] ||= {}
-    self.game_state["room_states"][room_id.to_s] = new_state
+    game_state["room_states"] ||= {}
+    game_state["room_states"][room_id.to_s] = new_state
     save!
   end
 
@@ -90,16 +90,16 @@ class Game < ApplicationRecord
 
   def set_flag(flag_name, value)
     self.game_state ||= {}
-    self.game_state["global_flags"] ||= {}
-    self.game_state["global_flags"][flag_name.to_s] = value
+    game_state["global_flags"] ||= {}
+    game_state["global_flags"][flag_name.to_s] = value
     save!
   end
 
   def unlock_exit(room_id, direction)
     self.game_state ||= {}
-    self.game_state["unlocked_exits"] ||= {}
+    game_state["unlocked_exits"] ||= {}
     exit_key = "#{room_id}_#{direction}"
-    self.game_state["unlocked_exits"][exit_key] = true
+    game_state["unlocked_exits"][exit_key] = true
     save!
   end
 
@@ -110,9 +110,9 @@ class Game < ApplicationRecord
 
   def reveal_exit(room_id, direction)
     self.game_state ||= {}
-    self.game_state["revealed_exits"] ||= {}
+    game_state["revealed_exits"] ||= {}
     exit_key = "#{room_id}_#{direction}"
-    self.game_state["revealed_exits"][exit_key] = true
+    game_state["revealed_exits"][exit_key] = true
     save!
   end
 
@@ -139,15 +139,15 @@ class Game < ApplicationRecord
 
   def open_container(container_id)
     self.game_state ||= {}
-    self.game_state["container_states"] ||= {}
-    self.game_state["container_states"][container_id.to_s] = { "open" => true }
+    game_state["container_states"] ||= {}
+    game_state["container_states"][container_id.to_s] = { "open" => true }
     save!
   end
 
   def close_container(container_id)
     self.game_state ||= {}
-    self.game_state["container_states"] ||= {}
-    self.game_state["container_states"][container_id.to_s] = { "open" => false }
+    game_state["container_states"] ||= {}
+    game_state["container_states"][container_id.to_s] = { "open" => false }
     save!
   end
 
@@ -164,20 +164,20 @@ class Game < ApplicationRecord
 
   def remove_from_container(container_id, item_id)
     self.game_state ||= {}
-    self.game_state["container_states"] ||= {}
-    self.game_state["container_states"][container_id.to_s] ||= {}
-    self.game_state["container_states"][container_id.to_s]["removed_items"] ||= []
-    self.game_state["container_states"][container_id.to_s]["removed_items"] << item_id
-    self.game_state["container_states"][container_id.to_s]["removed_items"].uniq!
+    game_state["container_states"] ||= {}
+    game_state["container_states"][container_id.to_s] ||= {}
+    game_state["container_states"][container_id.to_s]["removed_items"] ||= []
+    game_state["container_states"][container_id.to_s]["removed_items"] << item_id
+    game_state["container_states"][container_id.to_s]["removed_items"].uniq!
     save!
   end
 
   def add_to_container(container_id, item_id)
     self.game_state ||= {}
-    self.game_state["container_states"] ||= {}
-    self.game_state["container_states"][container_id.to_s] ||= {}
-    self.game_state["container_states"][container_id.to_s]["removed_items"] ||= []
-    self.game_state["container_states"][container_id.to_s]["removed_items"].delete(item_id)
+    game_state["container_states"] ||= {}
+    game_state["container_states"][container_id.to_s] ||= {}
+    game_state["container_states"][container_id.to_s]["removed_items"] ||= []
+    game_state["container_states"][container_id.to_s]["removed_items"].delete(item_id)
     save!
   end
 
@@ -187,7 +187,7 @@ class Game < ApplicationRecord
 
   def increment_turn_count
     self.game_state ||= {}
-    self.game_state["turn_count"] = turn_count + 1
+    game_state["turn_count"] = turn_count + 1
     save!
     game_state["turn_count"]
   end
@@ -198,8 +198,8 @@ class Game < ApplicationRecord
 
   def update_npc_movement_state(entity_id, state)
     self.game_state ||= {}
-    self.game_state["npc_movement"] ||= {}
-    self.game_state["npc_movement"][entity_id.to_s] = state
+    game_state["npc_movement"] ||= {}
+    game_state["npc_movement"][entity_id.to_s] = state
     save!
   end
 

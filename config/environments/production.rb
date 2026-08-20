@@ -52,7 +52,9 @@ Rails.application.configure do
   # config.cache_store = :mem_cache_store
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
-  # config.active_job.queue_adapter = :resque
+  # Solid Queue runs against the primary database (no config.solid_queue.connects_to)
+  # and, on Fly, inside the Puma process via SOLID_QUEUE_IN_PUMA (see config/puma.rb).
+  config.active_job.queue_adapter = :solid_queue
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

@@ -12,10 +12,10 @@ Rails.application.configure do
     policy.font_src    :self, :data, "https://fonts.gstatic.com"
     policy.img_src     :self, :data
     policy.object_src  :none
-    policy.script_src      :self, "https://analytics.richardcagle.dev", "https://ga.jspm.io"
-    policy.script_src_elem :self, "https://analytics.richardcagle.dev", "https://ga.jspm.io"
+    policy.script_src      :self, "https://ga.jspm.io"
+    policy.script_src_elem :self, "https://ga.jspm.io"
     policy.style_src   :self, :unsafe_inline, "https://fonts.googleapis.com"
-    policy.connect_src :self, :wss, "https://analytics.richardcagle.dev", "https://ga.jspm.io"
+    policy.connect_src :self, :wss, "https://ga.jspm.io"
   end
 
   # Generate session nonces for permitted importmap, inline scripts, and inline styles.

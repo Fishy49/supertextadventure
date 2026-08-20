@@ -25,7 +25,7 @@ class GameUsersController < ApplicationController
   end
 
   def mute_or_unmute_all_players
-    game = Game.find(params[:game_id])
+    game = Game.find(params.expect(:game_id))
 
     game.game_users.update_all(can_message: game_user_params[:can_message] == "true") # rubocop:disable Rails/SkipsModelValidations
 
@@ -47,11 +47,11 @@ class GameUsersController < ApplicationController
   private
 
     def set_game_user
-      @game_user = GameUser.find(params[:id])
+      @game_user = GameUser.find(params.expect(:id))
     end
 
     def require_host
-      game = @game_user&.game || Game.find(params[:game_id])
+      game = @game_user&.game || Game.find(params.expect(:game_id))
       head :forbidden unless game.host?(current_user)
     end
 

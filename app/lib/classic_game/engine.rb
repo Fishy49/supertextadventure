@@ -4,33 +4,13 @@ module ClassicGame
   class Engine
     class << self
       def execute(game:, user:, command_text:)
-        # Check if we're waiting for restart confirmation
-        return handle_restart_confirmation(game, command_text) if game.game_state["pending_restart"]
-
-        # Check if a dice roll is pending — route all input to RollHandler
-        ps = game.player_state(user.id)
-        if ps["pending_roll"]
-          result = ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
-            ClassicGame::CommandParser.parse(command_text)
-          )
-          return process_npc_movement(game, user, result)
+        # Row-lock the game so concurrent commands are serialized: handlers
+        # read-modify-write the shared game_state blob, and unlocked overlap
+        # would silently clobber it. The transaction also makes each command
+        # atomic - a failed command rolls back instead of half-applying.
+        game.with_lock do
+          execute_locked(game: game, user: user, command_text: command_text)
         end
-
-        # Parse the command
-        command = CommandParser.parse(command_text)
-
-        # Route to appropriate handler
-        handler = get_handler(command[:verb], game: game, user_id: user.id)
-
-        result = if handler
-                   handler.handle(command)
-                 else
-                   unknown_command_response(command)
-                 end
-
-        # Check for aggressive creatures after the player acts
-        result = check_aggressive_creatures(game, user, command, result)
-        process_npc_movement(game, user, result)
       rescue StandardError => e
         Rails.logger.error("ClassicGame::Engine error: #{e.message}")
         Rails.logger.error(e.backtrace.join("\n"))
@@ -60,6 +40,36 @@ module ClassicGame
       end
 
       private
+
+        def execute_locked(game:, user:, command_text:)
+          # Check if we're waiting for restart confirmation
+          return handle_restart_confirmation(game, command_text) if game.game_state["pending_restart"]
+
+          # Check if a dice roll is pending - route all input to RollHandler
+          ps = game.player_state(user.id)
+          if ps["pending_roll"]
+            result = ClassicGame::Handlers::RollHandler.new(game: game, user_id: user.id).handle(
+              ClassicGame::CommandParser.parse(command_text)
+            )
+            return process_npc_movement(game, user, result)
+          end
+
+          # Parse the command
+          command = CommandParser.parse(command_text)
+
+          # Route to appropriate handler
+          handler = get_handler(command[:verb], game: game, user_id: user.id)
+
+          result = if handler
+                     handler.handle(command)
+                   else
+                     unknown_command_response(command)
+                   end
+
+          # Check for aggressive creatures after the player acts
+          result = check_aggressive_creatures(game, user, command, result)
+          process_npc_movement(game, user, result)
+        end
 
         def process_npc_movement(game, user, result)
           messages = ClassicGame::NpcMovementProcessor.process(game: game, user_id: user.id)

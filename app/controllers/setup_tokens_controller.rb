@@ -19,7 +19,7 @@ class SetupTokensController < ApplicationController
   end
 
   def destroy
-    token = SetupToken.find(params[:id])
+    token = SetupToken.find(params.expect(:id))
     token.destroy
     respond_to do |format|
       format.turbo_stream do

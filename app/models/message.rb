@@ -51,6 +51,6 @@ class Message < ApplicationRecord
     end
 
     def enqueue_classic_command
-      ClassicCommandJob.perform_async(id)
+      ClassicCommandJob.perform_later(id)
     end
 end

@@ -155,7 +155,7 @@
 <h2 id="room-state" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Room State</h2>
 
 <p class="text-xl pt-4 pb-3">
-  Each room tracks what's currently in it. This changes as players take items, creatures are defeated, etc.
+  Each room tracks what's currently in it. It starts as a copy of the room's <code>items</code>, <code>npcs</code>, and <code>creatures</code> arrays from the <a href="/docs/world-structure#room-state" class="text-terminal-bright hover:underline">world definition</a>, then changes as players take items, creatures are defeated, etc.
 </p>
 
 <pre class="doc-code text-terminal-green mt-2">{

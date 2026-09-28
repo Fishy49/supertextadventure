@@ -60,6 +60,12 @@
       <td><span class="badge badge-optional">optional</span></td>
       <td>Version identifier for your game world.</td>
     </tr>
+    <tr>
+      <td><code>author</code></td>
+      <td>string</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Who wrote the world. Informational only.</td>
+    </tr>
   </tbody>
 </table>
 
@@ -78,7 +84,7 @@
 <h2 id="items" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">items</h2>
 
 <p class="text-xl pt-4 pb-3">
-  An object where each key is a unique item ID and each value is an <a href="/docs/items" class="text-terminal-bright hover:underline">Item definition</a>. Items are placed in rooms via <a href="/docs/flags-and-state#room-state" class="text-terminal-bright hover:underline">room state</a>.
+  An object where each key is a unique item ID and each value is an <a href="/docs/items" class="text-terminal-bright hover:underline">Item definition</a>. Items are placed by listing their IDs in a room's <code>items</code> array. See <a href="#room-state" class="text-terminal-bright hover:underline">Placing Entities in Rooms</a>.
 </p>
 
 <pre class="doc-code text-terminal-green mt-2"><span class="key">"items"</span>: {
@@ -90,7 +96,7 @@
 <h2 id="npcs" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">npcs</h2>
 
 <p class="text-xl pt-4 pb-3">
-  An object where each key is a unique NPC ID and each value is an <a href="/docs/npcs" class="text-terminal-bright hover:underline">NPC definition</a>. NPCs are placed in rooms via <a href="/docs/flags-and-state#room-state" class="text-terminal-bright hover:underline">room state</a>.
+  An object where each key is a unique NPC ID and each value is an <a href="/docs/npcs" class="text-terminal-bright hover:underline">NPC definition</a>. NPCs are placed by listing their IDs in a room's <code>npcs</code> array. See <a href="#room-state" class="text-terminal-bright hover:underline">Placing Entities in Rooms</a>.
 </p>
 
 <pre class="doc-code text-terminal-green mt-2"><span class="key">"npcs"</span>: {
@@ -101,7 +107,7 @@
 <h2 id="creatures" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">creatures</h2>
 
 <p class="text-xl pt-4 pb-3">
-  An object where each key is a unique creature ID and each value is a <a href="/docs/creatures" class="text-terminal-bright hover:underline">Creature definition</a>. Creatures are placed in rooms via <a href="/docs/flags-and-state#room-state" class="text-terminal-bright hover:underline">room state</a> and can be attacked to initiate <a href="/docs/combat#starting" class="text-terminal-bright hover:underline">combat</a>.
+  An object where each key is a unique creature ID and each value is a <a href="/docs/creatures" class="text-terminal-bright hover:underline">Creature definition</a>. Creatures are placed by listing their IDs in a room's <code>creatures</code> array (see <a href="#room-state" class="text-terminal-bright hover:underline">Placing Entities in Rooms</a>) and can be attacked to initiate <a href="/docs/combat#starting" class="text-terminal-bright hover:underline">combat</a>.
 </p>
 
 <pre class="doc-code text-terminal-green mt-2"><span class="key">"creatures"</span>: {
@@ -122,20 +128,21 @@
   <li>IDs are never shown to the player &mdash; they only see <code>name</code> fields</li>
 </ul>
 
-<h2 id="room-state" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Initial Room State</h2>
+<h2 id="room-state" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Placing Entities in Rooms</h2>
 
 <p class="text-xl pt-4 pb-3">
-  Items, NPCs, and creatures are placed into rooms via the initial room state, which is set up when the game starts. Each room gets a state object tracking what's currently in it:
+  Items, NPCs, and creatures are placed by listing their IDs on the room itself. Every room definition accepts three optional arrays:
 </p>
 
-<pre class="doc-code text-terminal-green mt-2"><span class="comment">// This is set up automatically by the engine from your world data.</span>
-<span class="comment">// You define which entities go in which rooms here:</span>
-{
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"tavern"</span>: {
+  <span class="key">"name"</span>: <span class="str">"The Tavern"</span>,
+  <span class="key">"description"</span>: <span class="str">"A dimly lit tavern with a roaring fireplace..."</span>,
+  <span class="key">"exits"</span>: { <span class="key">"north"</span>: <span class="str">"town_square"</span> },
   <span class="key">"items"</span>: [<span class="str">"rusty_sword"</span>, <span class="str">"health_potion"</span>],
   <span class="key">"npcs"</span>: [<span class="str">"bartender"</span>],
   <span class="key">"creatures"</span>: [<span class="str">"goblin"</span>]
 }</pre>
 
-<p class="text-xl pt-3">
-  See <a href="/docs/flags-and-state#room-state" class="text-terminal-bright hover:underline">Flags & State</a> for full details on how game state works.
+<p class="text-xl pt-4 pb-3">
+  When a game starts, the engine copies these arrays into each room's <a href="/docs/flags-and-state#room-state" class="text-terminal-bright hover:underline">room state</a>, which then changes as players take items and defeat creatures. Your world definition is never modified. Items that only ever come out of a <a href="/docs/containers" class="text-terminal-bright hover:underline">container</a>, a creature's <a href="/docs/creatures#loot" class="text-terminal-bright hover:underline">loot</a>, or an NPC's <code>gives_item</code> do not need to be listed in any room.
 </p>

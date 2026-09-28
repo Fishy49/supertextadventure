@@ -13,6 +13,9 @@
     <span class="key">"north"</span>: <span class="str">"town_square"</span>,
     <span class="key">"down"</span>: { <span class="comment">/* complex exit */</span> }
   },
+  <span class="key">"items"</span>: [<span class="str">"rusty_mug"</span>],
+  <span class="key">"npcs"</span>: [<span class="str">"bartender"</span>],
+  <span class="key">"creatures"</span>: [],
   <span class="key">"on_enter"</span>: {
     <span class="key">"type"</span>: <span class="str">"message"</span>,
     <span class="key">"text"</span>: <span class="str">"The smell of ale hits you as you enter."</span>
@@ -43,6 +46,24 @@
       <td>object</td>
       <td><span class="badge badge-required">required</span></td>
       <td>An object mapping direction names to destinations. Can be empty <code>{}</code>. See <a href="/docs/exits#simple" class="text-terminal-bright hover:underline">Exits</a>.</td>
+    </tr>
+    <tr>
+      <td><code>items</code></td>
+      <td>array</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Item IDs that start in this room. Defaults to <code>[]</code>. See <a href="/docs/world-structure#room-state" class="text-terminal-bright hover:underline">Placing Entities in Rooms</a>.</td>
+    </tr>
+    <tr>
+      <td><code>npcs</code></td>
+      <td>array</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>NPC IDs that start in this room. Defaults to <code>[]</code>.</td>
+    </tr>
+    <tr>
+      <td><code>creatures</code></td>
+      <td>array</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Creature IDs that start in this room. Defaults to <code>[]</code>.</td>
     </tr>
     <tr>
       <td><code>on_enter</code></td>
@@ -112,6 +133,9 @@
       <span class="key">"locked_msg"</span>: <span class="str">"The cellar door is locked tight."</span>
     }
   },
+  <span class="key">"items"</span>: [<span class="str">"tankard"</span>, <span class="str">"notice_board"</span>],
+  <span class="key">"npcs"</span>: [<span class="str">"bartender"</span>],
+  <span class="key">"creatures"</span>: [],
   <span class="key">"on_enter"</span>: {
     <span class="key">"type"</span>: <span class="str">"message"</span>,
     <span class="key">"text"</span>: <span class="str">"The warmth of the fire embraces you as you step inside. Several patrons glance up before returning to their drinks."</span>

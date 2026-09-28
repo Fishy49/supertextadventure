@@ -24,6 +24,9 @@
     <span class="key">"tavern"</span>: {
       <span class="key">"name"</span>: <span class="str">"The Rusty Flagon"</span>,
       <span class="key">"description"</span>: <span class="str">"A cozy tavern with a crackling fireplace. The bartender polishes glasses behind the bar. A wooden chest sits in the corner."</span>,
+      <span class="key">"items"</span>: [<span class="str">"rusty_sword"</span>, <span class="str">"tavern_chest"</span>, <span class="str">"old_map"</span>],
+      <span class="key">"npcs"</span>: [<span class="str">"wizard"</span>],
+      <span class="key">"creatures"</span>: [],
       <span class="key">"exits"</span>: {
         <span class="key">"north"</span>: <span class="str">"forest_edge"</span>
       },
@@ -35,6 +38,9 @@
     <span class="key">"forest_edge"</span>: {
       <span class="key">"name"</span>: <span class="str">"Forest Edge"</span>,
       <span class="key">"description"</span>: <span class="str">"Tall trees loom before you. A narrow path winds into the dark woods. You can hear something skittering in the undergrowth."</span>,
+      <span class="key">"items"</span>: [<span class="str">"rusty_key"</span>],
+      <span class="key">"npcs"</span>: [],
+      <span class="key">"creatures"</span>: [],
       <span class="key">"exits"</span>: {
         <span class="key">"south"</span>: <span class="str">"tavern"</span>,
         <span class="key">"north"</span>: <span class="str">"deep_forest"</span>
@@ -43,6 +49,9 @@
     <span class="key">"deep_forest"</span>: {
       <span class="key">"name"</span>: <span class="str">"Deep Forest"</span>,
       <span class="key">"description"</span>: <span class="str">"The canopy blocks out most of the light. Thick webs hang between the trees. An iron gate blocks the path further north."</span>,
+      <span class="key">"items"</span>: [],
+      <span class="key">"npcs"</span>: [],
+      <span class="key">"creatures"</span>: [<span class="str">"giant_spider"</span>],
       <span class="key">"exits"</span>: {
         <span class="key">"south"</span>: <span class="str">"forest_edge"</span>,
         <span class="key">"north"</span>: {
@@ -60,6 +69,9 @@
     <span class="key">"crystal_cave"</span>: {
       <span class="key">"name"</span>: <span class="str">"Crystal Cave"</span>,
       <span class="key">"description"</span>: <span class="str">"The cave glows with an ethereal blue light. In the center, a crystal floats above a stone pedestal."</span>,
+      <span class="key">"items"</span>: [<span class="str">"power_crystal"</span>],
+      <span class="key">"npcs"</span>: [],
+      <span class="key">"creatures"</span>: [],
       <span class="key">"exits"</span>: {
         <span class="key">"south"</span>: <span class="str">"deep_forest"</span>
       },
@@ -113,6 +125,7 @@
       <span class="key">"description"</span>: <span class="str">"A small wooden chest tucked in the corner."</span>,
       <span class="key">"keywords"</span>: [<span class="str">"chest"</span>, <span class="str">"box"</span>],
       <span class="key">"is_container"</span>: true,
+      <span class="key">"starts_closed"</span>: <span class="bool">true</span>,
       <span class="key">"takeable"</span>: false,
       <span class="key">"locked"</span>: false,
       <span class="key">"on_open_message"</span>: <span class="str">"The chest lid creaks open."</span>,
@@ -180,35 +193,11 @@
   }
 }</pre>
 
-<h2 id="room-states" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Initial Room States</h2>
+<h2 id="room-states" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Where Things Start</h2>
 
 <p class="text-xl pt-4 pb-3">
-  These define where entities start in the world:
+  Placement is part of each room definition above: the <code>items</code>, <code>npcs</code>, and <code>creatures</code> arrays say what is in the room when the game begins. In this world the sword, chest, and map start in the tavern with the wizard; the key lies at the forest edge; the spider waits in the deep forest; and the crystal sits in the cave. The health potion is never listed in a room because it starts inside the chest, and the spider silk and spell book only appear as loot and as the wizard's reward.
 </p>
-
-<pre class="doc-code text-terminal-green mt-2"><span class="comment">// Room states (set up when game initializes)</span>
-{
-  <span class="key">"tavern"</span>: {
-    <span class="key">"items"</span>: [<span class="str">"rusty_sword"</span>, <span class="str">"tavern_chest"</span>, <span class="str">"old_map"</span>],
-    <span class="key">"npcs"</span>: [<span class="str">"wizard"</span>],
-    <span class="key">"creatures"</span>: []
-  },
-  <span class="key">"forest_edge"</span>: {
-    <span class="key">"items"</span>: [<span class="str">"rusty_key"</span>],
-    <span class="key">"npcs"</span>: [],
-    <span class="key">"creatures"</span>: []
-  },
-  <span class="key">"deep_forest"</span>: {
-    <span class="key">"items"</span>: [],
-    <span class="key">"npcs"</span>: [],
-    <span class="key">"creatures"</span>: [<span class="str">"giant_spider"</span>]
-  },
-  <span class="key">"crystal_cave"</span>: {
-    <span class="key">"items"</span>: [<span class="str">"power_crystal"</span>],
-    <span class="key">"npcs"</span>: [],
-    <span class="key">"creatures"</span>: []
-  }
-}</pre>
 
 <h2 id="walkthrough" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Sample Walkthrough</h2>
 

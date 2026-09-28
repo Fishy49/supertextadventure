@@ -1,0 +1,204 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Containers</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  Containers are items that can hold other items. They can be opened, closed, locked, and unlocked. Think chests, boxes, cabinets, and bags.
+</p>
+
+<h2 id="schema" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Schema</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"wooden_chest"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Wooden Chest"</span>,
+  <span class="key">"description"</span>: <span class="str">"A sturdy wooden chest bound with iron bands."</span>,
+  <span class="key">"is_container"</span>: <span class="bool">true</span>,
+  <span class="key">"locked"</span>: <span class="bool">true</span>,
+  <span class="key">"unlock_item"</span>: <span class="str">"chest_key"</span>,
+  <span class="key">"unlock_flag"</span>: <span class="str">"chest_unlocked"</span>,
+  <span class="key">"locked_message"</span>: <span class="str">"The chest is locked tight."</span>,
+  <span class="key">"on_open_message"</span>: <span class="str">"The lid creaks open, revealing treasures inside!"</span>,
+  <span class="key">"on_close_message"</span>: <span class="str">"You close the chest lid."</span>,
+  <span class="key">"open_description"</span>: <span class="str">"An open wooden chest."</span>,
+  <span class="key">"closed_description"</span>: <span class="str">"A closed wooden chest with iron bands."</span>,
+  <span class="key">"empty_message"</span>: <span class="str">"The chest is empty."</span>,
+  <span class="key">"contents"</span>: [<span class="str">"gold_ring"</span>, <span class="str">"health_potion"</span>],
+  <span class="key">"takeable"</span>: <span class="bool">false</span>
+}</pre>
+
+<h2 id="fields" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Container Fields</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>is_container</code></td>
+      <td>boolean</td>
+      <td><code>false</code></td>
+      <td>Marks this item as a container. <span class="badge badge-required">required</span> for container behavior.</td>
+    </tr>
+    <tr>
+      <td><code>locked</code></td>
+      <td>boolean</td>
+      <td><code>false</code></td>
+      <td>If <code>true</code>, the container must be unlocked before opening.</td>
+    </tr>
+    <tr>
+      <td><code>unlock_item</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Item ID needed in inventory to unlock the container.</td>
+    </tr>
+    <tr>
+      <td><code>unlock_flag</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Global flag that must be <code>true</code> to unlock the container.</td>
+    </tr>
+    <tr>
+      <td><code>locked_message</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Message shown when trying to open a locked container.</td>
+    </tr>
+    <tr>
+      <td><code>on_open_message</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Message shown when the container is opened.</td>
+    </tr>
+    <tr>
+      <td><code>on_close_message</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Message shown when the container is closed.</td>
+    </tr>
+    <tr>
+      <td><code>open_description</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Description shown when examining an open container.</td>
+    </tr>
+    <tr>
+      <td><code>closed_description</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Description shown when examining a closed container.</td>
+    </tr>
+    <tr>
+      <td><code>empty_message</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Message shown when examining an open but empty container.</td>
+    </tr>
+    <tr>
+      <td><code>contents</code></td>
+      <td>array</td>
+      <td><code>[]</code></td>
+      <td>Item IDs initially inside the container.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="commands" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Container Commands</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Command</th><th>Effect</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>open [container]</code></td>
+      <td>Opens the container (must be unlocked). Shows contents.</td>
+    </tr>
+    <tr>
+      <td><code>close [container]</code></td>
+      <td>Closes the container.</td>
+    </tr>
+    <tr>
+      <td><code>examine [container]</code></td>
+      <td>Shows open/closed description and lists contents if open.</td>
+    </tr>
+    <tr>
+      <td><code>take [item] from [container]</code></td>
+      <td>Takes an item from an open container.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="unlock" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Unlocking Containers</h2>
+
+<p class="text-xl pt-4 pb-3">
+  A locked container can be unlocked in two ways:
+</p>
+
+<div class="text-xl space-y-4 pt-2">
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">1. By item (unlock_item)</div>
+    <p class="pt-1">The player must have the specified item in their inventory. The item is <strong>not consumed</strong> &mdash; it just needs to be present. The container unlocks when the player tries to <code>open</code> it.</p>
+  </div>
+
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">2. By flag (unlock_flag)</div>
+    <p class="pt-1">A global flag must be <code>true</code>. This lets you gate containers behind quests, dialogue, or other events.</p>
+  </div>
+</div>
+
+<p class="text-xl pt-4 text-terminal-dim">
+  If both <code>unlock_item</code> and <code>unlock_flag</code> are set, having <em>either</em> one satisfied will unlock the container.
+</p>
+
+<h2 id="nesting" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Nested Containers</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Containers can hold other containers, creating nested structures. The engine supports recursive searching through open containers.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="comment">// A chest containing a box containing a ring</span>
+<span class="key">"big_chest"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Big Chest"</span>,
+  <span class="key">"is_container"</span>: <span class="bool">true</span>,
+  <span class="key">"contents"</span>: [<span class="str">"small_box"</span>]
+}
+
+<span class="key">"small_box"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Small Box"</span>,
+  <span class="key">"is_container"</span>: <span class="bool">true</span>,
+  <span class="key">"contents"</span>: [<span class="str">"gold_ring"</span>]
+}</pre>
+
+<div class="border border-terminal-dim rounded p-4 mt-4">
+  <div class="text-xl text-terminal-bright">Important:</div>
+  <p class="text-xl pt-2 text-terminal-dim">
+    Only <strong>open</strong> containers are searchable. If the Big Chest is open but the Small Box inside it is closed, the player can see the Small Box but can't access the Gold Ring until they also open the Small Box.
+  </p>
+</div>
+
+<h2 id="examine" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Examining Containers</h2>
+
+<p class="text-xl pt-4 pb-3">When a player examines a container, they see:</p>
+
+<ul class="text-xl list-disc list-inside space-y-2 pt-2">
+  <li><strong>Closed:</strong> The <code>closed_description</code> (or default description)</li>
+  <li><strong>Open with items:</strong> The <code>open_description</code> + a list of contents</li>
+  <li><strong>Open and empty:</strong> The <code>empty_message</code> (or a default "It's empty.")</li>
+</ul>
+
+<h2 id="example" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Full Example</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"ornate_cabinet"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Ornate Cabinet"</span>,
+  <span class="key">"description"</span>: <span class="str">"A tall cabinet with glass doors and golden trim."</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"cabinet"</span>, <span class="str">"cupboard"</span>],
+  <span class="key">"is_container"</span>: <span class="bool">true</span>,
+  <span class="key">"takeable"</span>: <span class="bool">false</span>,
+  <span class="key">"cant_take_msg"</span>: <span class="str">"The cabinet is bolted to the wall."</span>,
+  <span class="key">"locked"</span>: <span class="bool">true</span>,
+  <span class="key">"unlock_item"</span>: <span class="str">"cabinet_key"</span>,
+  <span class="key">"locked_message"</span>: <span class="str">"The glass doors are locked. You can see items inside but can't reach them."</span>,
+  <span class="key">"on_open_message"</span>: <span class="str">"The glass doors swing open with a gentle chime."</span>,
+  <span class="key">"on_close_message"</span>: <span class="str">"You carefully close the cabinet doors."</span>,
+  <span class="key">"open_description"</span>: <span class="str">"The cabinet stands open, its shelves exposed."</span>,
+  <span class="key">"closed_description"</span>: <span class="str">"Through the glass, you can make out shapes on the shelves."</span>,
+  <span class="key">"empty_message"</span>: <span class="str">"The shelves are bare."</span>,
+  <span class="key">"contents"</span>: [<span class="str">"ancient_map"</span>, <span class="str">"silver_dagger"</span>]
+}</pre>

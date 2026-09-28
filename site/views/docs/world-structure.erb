@@ -1,0 +1,141 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">World Structure</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  The world data is a single JSON object with five top-level keys. This is the root document that defines your entire game.
+</p>
+
+<h2 id="schema" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Schema</h2>
+
+<pre class="doc-code text-terminal-green mt-4">{
+  <span class="key">"meta"</span>: {
+    <span class="key">"name"</span>: <span class="str">"My Adventure"</span>,        <span class="comment">// Required - human-readable game name</span>
+    <span class="key">"description"</span>: <span class="str">"A short quest..."</span>, <span class="comment">// Required - game description</span>
+    <span class="key">"starting_room"</span>: <span class="str">"room_id"</span>,   <span class="comment">// Required - where the player begins</span>
+    <span class="key">"version"</span>: <span class="str">"1.0"</span>              <span class="comment">// Optional - version identifier</span>
+  },
+  <span class="key">"rooms"</span>: {
+    <span class="str">"room_id"</span>: { <span class="comment">/* room definition */</span> }
+  },
+  <span class="key">"items"</span>: {
+    <span class="str">"item_id"</span>: { <span class="comment">/* item definition */</span> }
+  },
+  <span class="key">"npcs"</span>: {
+    <span class="str">"npc_id"</span>: { <span class="comment">/* NPC definition */</span> }
+  },
+  <span class="key">"creatures"</span>: {
+    <span class="str">"creature_id"</span>: { <span class="comment">/* creature definition */</span> }
+  }
+}</pre>
+
+<h2 id="meta" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">meta</h2>
+
+<p class="text-xl pt-4 pb-3">Controls game-wide configuration.</p>
+
+<table class="doc-table">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Human-readable name for the game, displayed to players.</td>
+    </tr>
+    <tr>
+      <td><code>description</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>A short description of the game or its premise.</td>
+    </tr>
+    <tr>
+      <td><code>starting_room</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>The room ID where the player begins. Must match a key in <code>rooms</code>.</td>
+    </tr>
+    <tr>
+      <td><code>version</code></td>
+      <td>string</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Version identifier for your game world.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="rooms" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">rooms</h2>
+
+<p class="text-xl pt-4 pb-3">
+  An object where each key is a unique room ID and each value is a <a href="/docs/rooms" class="text-terminal-bright hover:underline">Room definition</a>. Room IDs are used throughout the world data to reference locations.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"rooms"</span>: {
+  <span class="key">"tavern"</span>: { <span class="comment">/* ... */</span> },
+  <span class="key">"cellar"</span>: { <span class="comment">/* ... */</span> },
+  <span class="key">"forest_clearing"</span>: { <span class="comment">/* ... */</span> }
+}</pre>
+
+<h2 id="items" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">items</h2>
+
+<p class="text-xl pt-4 pb-3">
+  An object where each key is a unique item ID and each value is an <a href="/docs/items" class="text-terminal-bright hover:underline">Item definition</a>. Items are placed in rooms via <a href="/docs/flags-and-state#room-state" class="text-terminal-bright hover:underline">room state</a>.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"items"</span>: {
+  <span class="key">"rusty_sword"</span>: { <span class="comment">/* ... */</span> },
+  <span class="key">"health_potion"</span>: { <span class="comment">/* ... */</span> },
+  <span class="key">"wooden_chest"</span>: { <span class="comment">/* ... */</span> }
+}</pre>
+
+<h2 id="npcs" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">npcs</h2>
+
+<p class="text-xl pt-4 pb-3">
+  An object where each key is a unique NPC ID and each value is an <a href="/docs/npcs" class="text-terminal-bright hover:underline">NPC definition</a>. NPCs are placed in rooms via <a href="/docs/flags-and-state#room-state" class="text-terminal-bright hover:underline">room state</a>.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"npcs"</span>: {
+  <span class="key">"bartender"</span>: { <span class="comment">/* ... */</span> },
+  <span class="key">"mysterious_wizard"</span>: { <span class="comment">/* ... */</span> }
+}</pre>
+
+<h2 id="creatures" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">creatures</h2>
+
+<p class="text-xl pt-4 pb-3">
+  An object where each key is a unique creature ID and each value is a <a href="/docs/creatures" class="text-terminal-bright hover:underline">Creature definition</a>. Creatures are placed in rooms via <a href="/docs/flags-and-state#room-state" class="text-terminal-bright hover:underline">room state</a> and can be attacked to initiate <a href="/docs/combat#starting" class="text-terminal-bright hover:underline">combat</a>.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"creatures"</span>: {
+  <span class="key">"goblin"</span>: { <span class="comment">/* ... */</span> },
+  <span class="key">"dragon"</span>: { <span class="comment">/* ... */</span> }
+}</pre>
+
+<h2 id="ids" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">About IDs</h2>
+
+<p class="text-xl pt-4 pb-3">
+  All IDs (room, item, NPC, creature) are strings you define. They are used internally to reference entities across the world data. Recommendations:
+</p>
+
+<ul class="text-xl list-disc list-inside space-y-2 pt-2">
+  <li>Use lowercase with underscores: <code class="text-terminal-bright">old_sword</code>, <code class="text-terminal-bright">dark_forest</code></li>
+  <li>Keep them descriptive but concise</li>
+  <li>IDs must be unique within their category (rooms, items, npcs, creatures)</li>
+  <li>IDs are never shown to the player &mdash; they only see <code>name</code> fields</li>
+</ul>
+
+<h2 id="room-state" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Initial Room State</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Items, NPCs, and creatures are placed into rooms via the initial room state, which is set up when the game starts. Each room gets a state object tracking what's currently in it:
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="comment">// This is set up automatically by the engine from your world data.</span>
+<span class="comment">// You define which entities go in which rooms here:</span>
+{
+  <span class="key">"items"</span>: [<span class="str">"rusty_sword"</span>, <span class="str">"health_potion"</span>],
+  <span class="key">"npcs"</span>: [<span class="str">"bartender"</span>],
+  <span class="key">"creatures"</span>: [<span class="str">"goblin"</span>]
+}</pre>
+
+<p class="text-xl pt-3">
+  See <a href="/docs/flags-and-state#room-state" class="text-terminal-bright hover:underline">Flags & State</a> for full details on how game state works.
+</p>

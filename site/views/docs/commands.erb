@@ -1,0 +1,254 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Commands Reference</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  Every command the player can type, with all synonyms and how the engine parses them.
+</p>
+
+<h2 id="parsing" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">How Commands Are Parsed</h2>
+
+<p class="text-xl pt-4 pb-3">
+  The CommandParser breaks player input into three parts:
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="comment">// "use key on door" becomes:</span>
+{
+  <span class="key">"verb"</span>:     <span class="str">"use"</span>,      <span class="comment">// the action</span>
+  <span class="key">"target"</span>:   <span class="str">"key"</span>,      <span class="comment">// first object</span>
+  <span class="key">"modifier"</span>: <span class="str">"door"</span>,     <span class="comment">// second object (after preposition)</span>
+  <span class="key">"raw"</span>:      <span class="str">"use key on door"</span>
+}</pre>
+
+<p class="text-xl pt-3">
+  Articles (<code>the</code>, <code>a</code>, <code>an</code>) and prepositions (<code>to</code>, <code>at</code>, <code>on</code>, <code>with</code>, <code>from</code>, <code>of</code>) are stripped during parsing.
+</p>
+
+<h2 id="movement" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Movement</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Command</th><th>Synonyms</th><th>Usage</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>go</code></td>
+      <td>go, move, walk, travel, head</td>
+      <td><code>go north</code>, <code>walk east</code>, <code>n</code></td>
+    </tr>
+    <tr>
+      <td><code>enter</code></td>
+      <td>enter</td>
+      <td><code>enter cave</code></td>
+    </tr>
+    <tr>
+      <td><code>leave</code></td>
+      <td>leave, exit</td>
+      <td><code>leave</code>, <code>exit</code></td>
+    </tr>
+    <tr>
+      <td><code>climb</code></td>
+      <td>climb, scale</td>
+      <td><code>climb up</code>, <code>scale wall</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="text-xl pt-4">
+  Bare directions also work as movement commands: typing <code class="text-terminal-bright">north</code> or just <code class="text-terminal-bright">n</code> is the same as <code>go north</code>.
+</p>
+
+<h3 class="text-2xl pt-4 pb-2 text-terminal-bright">Direction Shortcuts</h3>
+
+<table class="doc-table mt-2">
+  <thead>
+    <tr><th>Full</th><th>Short</th><th>Full</th><th>Short</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>north</td><td>n</td><td>south</td><td>s</td></tr>
+    <tr><td>east</td><td>e</td><td>west</td><td>w</td></tr>
+    <tr><td>northeast</td><td>ne</td><td>northwest</td><td>nw</td></tr>
+    <tr><td>southeast</td><td>se</td><td>southwest</td><td>sw</td></tr>
+    <tr><td>up</td><td>u</td><td>down</td><td>d</td></tr>
+    <tr><td>in</td><td>&mdash;</td><td>out</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+
+<h2 id="observation" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Observation</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Command</th><th>Synonyms</th><th>Usage</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>look</code></td>
+      <td>look, l</td>
+      <td><code>look</code> &mdash; describes the current room</td>
+    </tr>
+    <tr>
+      <td><code>examine</code></td>
+      <td>examine, inspect, x, check, read</td>
+      <td><code>examine sword</code>, <code>x note</code>, <code>read sign</code></td>
+    </tr>
+    <tr>
+      <td><code>inventory</code></td>
+      <td>inventory, inv, i</td>
+      <td><code>i</code> &mdash; lists items you're carrying</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="items" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Item Interaction</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Command</th><th>Synonyms</th><th>Usage</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>take</code></td>
+      <td>take, get, grab, pickup, pick</td>
+      <td><code>take sword</code>, <code>grab key</code>, <code>get potion</code></td>
+    </tr>
+    <tr>
+      <td><code>drop</code></td>
+      <td>drop, discard</td>
+      <td><code>drop sword</code></td>
+    </tr>
+    <tr>
+      <td><code>use</code></td>
+      <td>use, activate, employ, apply</td>
+      <td><code>use key</code>, <code>use key on door</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="containers" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Containers</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Command</th><th>Synonyms</th><th>Usage</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>open</code></td>
+      <td>open, unlock</td>
+      <td><code>open chest</code>, <code>unlock cabinet</code></td>
+    </tr>
+    <tr>
+      <td><code>close</code></td>
+      <td>close, shut</td>
+      <td><code>close chest</code>, <code>shut door</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="social" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Social Interaction</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Command</th><th>Synonyms</th><th>Usage</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>talk</code></td>
+      <td>talk, speak, chat, ask, say</td>
+      <td><code>talk to wizard</code>, <code>ask wizard about quest</code>, <code>talk to rat</code> (for creatures with <code>talk_text</code>)</td>
+    </tr>
+    <tr>
+      <td><code>give</code></td>
+      <td>give, offer, hand</td>
+      <td><code>give gem to wizard</code>, <code>offer sword to knight</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="combat" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Combat</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Command</th><th>Synonyms</th><th>Usage</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>attack</code></td>
+      <td>attack, kill, hit, strike, fight</td>
+      <td><code>attack goblin</code>, <code>fight dragon</code></td>
+    </tr>
+    <tr>
+      <td><code>defend</code></td>
+      <td>defend, block, guard, parry</td>
+      <td><code>defend</code>, <code>block</code> (during combat)</td>
+    </tr>
+    <tr>
+      <td><code>flee</code></td>
+      <td>flee, run, escape, retreat</td>
+      <td><code>flee</code>, <code>run</code> (during combat)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="other" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Other</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Command</th><th>Synonyms</th><th>Usage</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>roll</code></td>
+      <td>roll</td>
+      <td><code>roll</code> &mdash; when prompted by a dice check</td>
+    </tr>
+    <tr>
+      <td><code>help</code></td>
+      <td>help, h, ?</td>
+      <td><code>help</code> &mdash; shows available commands in-game</td>
+    </tr>
+    <tr>
+      <td><code>restart</code></td>
+      <td>restart, reset</td>
+      <td><code>restart</code> &mdash; restart the game (with confirmation)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="routing" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Command Routing</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Commands are routed to handlers with these priority rules:
+</p>
+
+<div class="text-xl space-y-3 pt-2">
+  <div class="border-l-2 border-terminal-bright pl-4">
+    <div class="text-terminal-bright">1. Pending Roll (highest priority)</div>
+    <p class="pt-1">If a dice roll is pending, <strong>only</strong> the <code>roll</code> command is accepted. Everything else is rejected.</p>
+  </div>
+
+  <div class="border-l-2 border-terminal-bright pl-4">
+    <div class="text-terminal-bright">2. Active Combat</div>
+    <p class="pt-1">If in combat, only combat commands are accepted: <code>attack</code>, <code>defend</code>, <code>flee</code>, <code>use</code>, <code>inventory</code>, <code>examine</code>, <code>look</code>.</p>
+  </div>
+
+  <div class="border-l-2 border-terminal-bright pl-4">
+    <div class="text-terminal-bright">3. Normal Routing</div>
+    <p class="pt-1">Commands route to their appropriate handler based on verb.</p>
+  </div>
+</div>
+
+<h2 id="handler-map" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Handler Map</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Handler</th><th>Verbs</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>MovementHandler</td><td>go, enter, leave, climb</td></tr>
+    <tr><td>ExamineHandler</td><td>look, examine, inventory</td></tr>
+    <tr><td>ItemHandler</td><td>take, drop, use</td></tr>
+    <tr><td>ContainerHandler</td><td>open, close</td></tr>
+    <tr><td>InteractHandler</td><td>talk, give, attack (to start combat)</td></tr>
+    <tr><td>CombatHandler</td><td>attack, defend, flee, use (during combat)</td></tr>
+    <tr><td>RollHandler</td><td>roll</td></tr>
+    <tr><td>RestartHandler</td><td>restart</td></tr>
+  </tbody>
+</table>

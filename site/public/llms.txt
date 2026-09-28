@@ -1,0 +1,1861 @@
+# Super Text Adventure - Classic Game Engine Documentation
+
+> The Classic Game Engine powers text-based adventure games in Super Text Adventure. You define your entire game world as a JSON document, and the engine handles parsing player commands, managing state, and running all game mechanics.
+
+## What You Can Build
+
+- **Explorable Worlds**: Rooms connected by exits with descriptions, hidden passages, locked doors, and directional navigation.
+- **Items & Inventory**: Pickupable items, containers with locks, weapons, healing potions, and items that interact with the world.
+- **NPCs & Quests**: Characters with branching dialogue trees, item trading, quest flags, gated conversations, and patrol movement.
+- **Combat & Dice**: Turn-based combat with initiative, attack/defend/flee, weapons, armor, D&D-style dice rolls, and hostile creatures that ambush the player.
+
+## How It Works
+
+1. You write a JSON file describing your world -- rooms, items, NPCs, and creatures.
+2. The engine loads your JSON as the `world_data`.
+3. Players type natural-language commands like `go north`, `take sword`, or `talk to wizard`.
+4. The **CommandParser** translates input into structured commands (verb + target + modifier).
+5. The **Engine** routes commands to the appropriate **Handler** (movement, items, combat, etc.).
+6. The handler processes the command, updates game state, and returns a text response.
+
+---
+
+## World Structure
+
+The world data is a single JSON object with five top-level keys. This is the root document that defines your entire game.
+
+```json
+{
+  "meta": {
+    "name": "My Adventure",        // Required - human-readable game name
+    "description": "A short quest...", // Required - game description
+    "starting_room": "room_id",   // Required - where the player begins
+    "version": "1.0"              // Optional - version identifier
+  },
+  "rooms": {
+    "room_id": { /* room definition */ }
+  },
+  "items": {
+    "item_id": { /* item definition */ }
+  },
+  "npcs": {
+    "npc_id": { /* NPC definition */ }
+  },
+  "creatures": {
+    "creature_id": { /* creature definition */ }
+  }
+}
+```
+
+### meta
+
+Controls game-wide configuration.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | **required** | Human-readable name for the game, displayed to players. |
+| `description` | string | **required** | A short description of the game or its premise. |
+| `starting_room` | string | **required** | The room ID where the player begins. Must match a key in `rooms`. |
+| `version` | string | optional | Version identifier for your game world. |
+
+### rooms
+
+An object where each key is a unique room ID and each value is a [Room definition](#). Room IDs are used throughout the world data to reference locations.
+
+```json
+"rooms": {
+  "tavern": { /* ... */ },
+  "cellar": { /* ... */ },
+  "forest_clearing": { /* ... */ }
+}
+```
+
+### items
+
+An object where each key is a unique item ID and each value is an [Item definition](#). Items are placed in rooms via [room state](#room-state).
+
+```json
+"items": {
+  "rusty_sword": { /* ... */ },
+  "health_potion": { /* ... */ },
+  "wooden_chest": { /* ... */ }
+}
+```
+
+### npcs
+
+An object where each key is a unique NPC ID and each value is an [NPC definition](#). NPCs are placed in rooms via [room state](#room-state).
+
+```json
+"npcs": {
+  "bartender": { /* ... */ },
+  "mysterious_wizard": { /* ... */ }
+}
+```
+
+### creatures
+
+An object where each key is a unique creature ID and each value is a [Creature definition](#). Creatures are placed in rooms via [room state](#room-state) and can be attacked to initiate [combat](#starting).
+
+```json
+"creatures": {
+  "goblin": { /* ... */ },
+  "dragon": { /* ... */ }
+}
+```
+
+### About IDs
+
+All IDs (room, item, NPC, creature) are strings you define. They are used internally to reference entities across the world data. Recommendations:
+
+- Use lowercase with underscores: `old_sword`, `dark_forest`
+- Keep them descriptive but concise
+- IDs must be unique within their category (rooms, items, npcs, creatures)
+- IDs are never shown to the player -- they only see `name` fields
+
+### Initial Room State
+
+Items, NPCs, and creatures are placed into rooms via the initial room state, which is set up when the game starts. Each room gets a state object tracking what's currently in it:
+
+```
+// This is set up automatically by the engine from your world data.
+// You define which entities go in which rooms here:
+{
+  "items": ["rusty_sword", "health_potion"],
+  "npcs": ["bartender"],
+  "creatures": ["goblin"]
+}
+```
+
+See [Flags & State](#room-state) for full details on how game state works.
+
+---
+
+## Rooms
+
+Rooms are the core building blocks of your game world. Each room has a name, description, and a set of exits connecting it to other rooms.
+
+```json
+"room_id": {
+  "name": "The Tavern",
+  "description": "A dimly lit tavern with a roaring fireplace...",
+  "exits": {
+    "north": "town_square",
+    "down": { /* complex exit */ }
+  },
+  "on_enter": {
+    "type": "message",
+    "text": "The smell of ale hits you as you enter."
+  }
+}
+```
+
+### Fields
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | **required** | Display name shown to the player as a heading when they enter or look. |
+| `description` | string | **required** | The text description shown when the player enters or looks at the room. |
+| `exits` | object | **required** | An object mapping direction names to destinations. Can be empty `{}`. See [Exits](#simple). |
+| `on_enter` | object | optional | Event triggered the first time a player enters this room. |
+
+### on_enter
+
+The `on_enter` event fires only on the player's **first visit** to a room. It's tracked via the player's `visited_rooms` list. Use it for story events, atmospheric flavor, or one-time revelations.
+
+```json
+"on_enter": {
+  "type": "message",
+  "text": "A chill runs down your spine as you step into the darkness."
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `type` | string | Must be `"message"`. |
+| `text` | string | The message displayed to the player on first entry. |
+
+### What Players See
+
+When a player enters a room or uses the `look` command, the engine displays:
+
+1. The room `name` as a heading
+2. The room `description`
+3. The `on_enter` message (first visit only)
+4. A list of visible items in the room
+5. A list of NPCs present
+6. A list of creatures present
+7. Available exits (hidden unrevealed exits are excluded)
+
+### Example
+
+```json
+"tavern": {
+  "name": "The Rusty Flagon",
+  "description": "A cozy tavern filled with the murmur of conversation. A crackling fireplace warms the room. The bartender polishes glasses behind a weathered oak bar.",
+  "exits": {
+    "north": "town_square",
+    "east": "kitchen",
+    "down": {
+      "to": "cellar",
+      "requires": "cellar_key",
+      "locked_msg": "The cellar door is locked tight."
+    }
+  },
+  "on_enter": {
+    "type": "message",
+    "text": "The warmth of the fire embraces you as you step inside. Several patrons glance up before returning to their drinks."
+  }
+}
+```
+
+### Tips
+
+- Write descriptions in second person present tense: *"You see..."*, *"A torch flickers..."*
+- Include sensory details -- what the player sees, hears, and smells
+- Mention interactable objects in descriptions to hint at items and NPCs
+- Keep room IDs short and descriptive: `dark_cave`, `throne_room`
+- A room can have an empty exits object `{}` to create a dead end
+
+---
+
+## Exits
+
+Exits connect rooms together. They range from simple one-way pointers to complex locked passages with keywords, flags, and reveal mechanics.
+
+### Simple Exits
+
+The simplest exit is just a direction mapped to a destination room ID:
+
+```json
+"exits": {
+  "north": "town_square",
+  "east": "forest",
+  "up": "tower_top"
+}
+```
+
+Players can use `go north`, `n`, or `walk north` to move.
+
+### Available Directions
+
+| Direction | Shortcuts |
+|---|---|
+| north | n |
+| south | s |
+| east | e |
+| west | w |
+| northeast | ne |
+| northwest | nw |
+| southeast | se |
+| southwest | sw |
+| up | u |
+| down | d |
+| in | -- |
+| out | -- |
+
+### Complex Exits
+
+For exits with conditions, locks, or special behavior, use an object instead of a plain string:
+
+```json
+"north": {
+  "to": "throne_room",
+  "keywords": ["door", "iron door", "heavy door"],
+  "requires": "throne_key",
+  "locked_msg": "The iron door is locked. You need a key.",
+  "unlocked_msg": "The iron door stands open."
+}
+```
+
+### Complex Exit Fields
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `to` | string | **required** | Destination room ID. |
+| `keywords` | array | optional | Natural language names for the exit. Lets players say `use key on door` instead of `use key on north`. |
+| `requires` | string | optional | Item ID that must be in the player's inventory to pass. |
+| `requires_flag` | string | optional | A global flag that must be `true` for the exit to be usable. |
+| `locked_msg` | string | optional | Message shown when the player tries to use a locked exit. |
+| `unlocked_msg` | string | optional | Message shown when the exit is available/unlocked. |
+
+### Interactive Unlocking
+
+Exits can be unlocked by using a specific item on them. This gives you more control than the passive `requires` check.
+
+```json
+"east": {
+  "to": "secret_chamber",
+  "keywords": ["gate", "iron gate"],
+  "use_item": "skeleton_key",
+  "on_unlock": "The skeleton key turns with a satisfying click.",
+  "permanently_unlock": true,
+  "consume_item": true,
+  "sets_flag": "secret_chamber_unlocked",
+  "locked_msg": "An iron gate blocks the passage."
+}
+```
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `use_item` | string | -- | Item ID that can unlock this exit when used on it. |
+| `on_unlock` | string | -- | Message displayed when the exit is unlocked with the item. |
+| `permanently_unlock` | boolean | `false` | If `true`, the exit stays unlocked permanently after first use. |
+| `consume_item` | boolean | `false` | If `true`, the item is removed from inventory when used. |
+| `sets_flag` | string | -- | Global flag set to `true` when the exit is unlocked or used. |
+
+Players unlock interactive exits with: `use skeleton_key on gate` or `use skeleton_key on east`
+
+### Hidden Exits
+
+Hidden exits don't appear in the room's exit list until they are revealed. They can be revealed by examining items, using items, or setting flags.
+
+```json
+"west": {
+  "to": "hidden_passage",
+  "hidden": true,
+  "reveal_msg": "A hidden passage is revealed behind the bookcase!"
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `hidden` | boolean | If `true`, this exit is not shown in exit listings until revealed. |
+| `reveal_msg` | string | Message shown when the exit is revealed. |
+
+#### Ways to Reveal Hidden Exits
+
+- **1. Via item examination**: Set `on_examine.reveals_exit` on an item in the room: 
+```json
+"old_painting": {
+  "name": "old painting",
+  "description": "A landscape painting. Something seems off...",
+  "on_examine": {
+    "reveals_exit": "west",
+    "text": "Behind the painting, you discover a hidden lever!"
+  }
+}
+```
+
+ 2. Via item use Set `reveals_exit` on an item: 
+```json
+"magic_lens": {
+  "name": "magic lens",
+  "reveals_exit": {
+    "direction": "west",
+    "message": "Through the lens, a hidden door shimmers into view!"
+  }
+}
+```
+
+ 3. Via flag Use `requires_flag` -- when the flag is set, the exit auto-reveals.
+
+### Exit Keywords
+
+Keywords let players reference exits by name instead of direction. This makes interactions feel more natural:
+
+```json
+"north": {
+  "to": "castle_interior",
+  "keywords": ["drawbridge", "castle gate", "gate"],
+  "use_item": "castle_key",
+  "locked_msg": "The castle gate is sealed shut."
+}
+```
+
+Now players can type:
+
+- `use castle_key on gate` (instead of `use castle_key on north`)
+- `go drawbridge` (instead of `go north`)
+
+Keywords are case-insensitive and support multi-word phrases.
+
+### Full Example
+
+```json
+"exits": {
+  // Simple exit
+  "north": "town_square",
+
+  // Locked exit requiring inventory item
+  "east": {
+    "to": "treasury",
+    "requires": "gold_key",
+    "locked_msg": "The door is locked."
+  },
+
+  // Interactive unlock with keywords
+  "south": {
+    "to": "dungeon",
+    "keywords": ["trapdoor", "hatch"],
+    "use_item": "crowbar",
+    "on_unlock": "You pry open the trapdoor with a groan of metal.",
+    "permanently_unlock": true,
+    "consume_item": false,
+    "locked_msg": "A heavy trapdoor. It won't budge by hand."
+  },
+
+  // Hidden exit
+  "west": {
+    "to": "secret_room",
+    "hidden": true,
+    "reveal_msg": "A section of wall slides away!"
+  }
+}
+```
+
+---
+
+## Items
+
+Items are objects players can interact with -- pick up, drop, use, examine, and equip. Items can also be weapons, containers, keys, healing potions, and more.
+
+```json
+"item_id": {
+  "name": "Rusty Sword",
+  "description": "A dull blade, but still sharp enough to cut.",
+  "keywords": ["sword", "blade", "rusty blade"],
+  "takeable": true,
+  "consumable": false
+}
+```
+
+### Base Fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `name` | string | **required** | Display name shown to the player. |
+| `description` | string | **required** | Text shown when the player examines the item. |
+| `keywords` | array | `[]` | Alternative names for fuzzy matching. Players can refer to the item by any keyword. |
+| `takeable` | boolean | `true` | Whether the player can pick up this item. |
+| `cant_take_msg` | string | -- | Custom message when trying to take a non-takeable item. |
+| `consumable` | boolean | `false` | If `true`, the item is removed from inventory when used. |
+
+### Weapons & Armor
+
+Items can provide combat bonuses when in the player's inventory.
+
+```json
+"iron_sword": {
+  "name": "Iron Sword",
+  "description": "A well-forged iron blade.",
+  "weapon_damage": 8
+}
+
+"leather_shield": {
+  "name": "Leather Shield",
+  "description": "A sturdy shield made of hardened leather.",
+  "defense_bonus": 3
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `weapon_damage` | number | Bonus damage added to attacks. Only the **highest** weapon_damage in inventory is used (not stacked). |
+| `defense_bonus` | number | Bonus to defense. All defense bonuses in inventory are **stacked** (summed). |
+
+Combat bonus behavior:
+- **Weapons:** Only the best weapon counts. If you have a sword (8 dmg) and a dagger (3 dmg), your bonus is 8.
+- **Armor:** All defense bonuses stack. Shield (3) + helmet (2) = 5 total defense bonus.
+- Items provide bonuses passively just by being in inventory -- no "equip" action needed.
+
+### combat_effect
+
+Items with `combat_effect` can be used during combat for special actions like healing.
+
+```json
+"health_potion": {
+  "name": "Health Potion",
+  "description": "A glowing red potion.",
+  "consumable": true,
+  "combat_effect": {
+    "type": "heal",
+    "amount": 15
+  }
+}
+```
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `type` | string | -- | Effect type. Currently only `"heal"` is supported. |
+| `amount` | number | `10` | Amount of HP restored. Capped at player's max health. |
+
+### on_use
+
+Defines what happens when a player uses the item outside of combat.
+
+```json
+"on_use": {
+  "type": "unlock",        // or "message", "heal", "script"
+  "requires_target": true,  // for "unlock": needs a target
+  "sets_flag": "flag_name",
+  "success_msg": "You use the item successfully."
+}
+```
+
+| type | Behavior |
+|---|---|
+| `"unlock"` | Sets a flag and shows a success message. Use with `requires_target` to require the player to specify what they're unlocking. |
+| `"message"` | Simply displays the `text` field to the player. |
+| `"heal"` | Restores HP by `amount`. Item is consumed if `consumable: true`. |
+
+#### on_use Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `type` | string | One of: `"unlock"`, `"message"`, `"heal"` |
+| `requires_target` | boolean | For "unlock" -- requires player to specify a target |
+| `sets_flag` | string | Flag to set when used |
+| `success_msg` | string | Message shown on successful use |
+| `text` | string | Message shown (for "message" type) |
+| `amount` | number | HP restored (for "heal" type) |
+
+### reveals_exit
+
+Using the item reveals a hidden exit in the current room.
+
+```json
+"magic_lens": {
+  "name": "Magic Lens",
+  "description": "A lens that reveals hidden things.",
+  "reveals_exit": {
+    "direction": "west",
+    "message": "Through the lens, a hidden doorway shimmers into view!"
+  }
+}
+```
+
+### on_examine
+
+Special behavior when the item is examined. Can reveal exits or show custom text.
+
+```json
+"suspicious_bookcase": {
+  "name": "suspicious bookcase",
+  "description": "A tall bookcase. One shelf seems slightly askew.",
+  "takeable": false,
+  "on_examine": {
+    "reveals_exit": "west",
+    "text": "Pulling a book triggers a mechanism. The bookcase swings open!"
+  }
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `reveals_exit` | string | Direction of the exit to reveal in the current room. |
+| `text` | string | Custom text shown instead of the normal description. |
+
+### dice_roll
+
+Items can trigger D&D-style dice rolls when used. See [Dice Rolls](#schema) for full details.
+
+```json
+"lockpick": {
+  "name": "Lockpick",
+  "description": "A thin metal pick for opening locks.",
+  "consumable": true,
+  "dice_roll": {
+    "dc": 12,
+    "dice": "1d20",
+    "attempt_message": "You carefully insert the lockpick...",
+    "consume_on": "failure",
+    "on_success": { /* ... */ },
+    "on_failure": { /* ... */ }
+  }
+}
+```
+
+### Non-Takeable Items
+
+Some items are part of the environment and shouldn't be picked up. Set `takeable: false` and optionally provide a custom rejection message.
+
+```json
+"fountain": {
+  "name": "stone fountain",
+  "description": "A beautiful fountain with crystal-clear water.",
+  "takeable": false,
+  "cant_take_msg": "The fountain is far too heavy to move."
+}
+```
+
+### Fuzzy Matching
+
+The engine matches player input against items using this priority:
+
+1. **Exact ID match** -- e.g., `take rusty_sword` matches item ID `rusty_sword`
+2. **Keyword match** -- checks if any keyword contains the search term (or vice versa)
+3. **Name match** -- checks if the item's `name` contains the search term
+
+All matching is case-insensitive. Good keywords make your items easier to interact with.
+
+---
+
+## NPCs & Dialogue
+
+NPCs are characters the player can talk to, give items to, and interact with. They support branching dialogue trees with gated topics and quest mechanics.
+
+```json
+"npc_id": {
+  "name": "Old Wizard",
+  "description": "A wizened old man in flowing robes.",
+  "keywords": ["wizard", "old man", "mage"],
+  "dialogue": { /* dialogue system */ },
+  "movement": { /* optional patrol/triggered movement */ },
+  "accepts_item": "magic_gem",
+  "gives_item": "spell_book",
+  "accept_message": "The wizard takes the gem eagerly...",
+  "sets_flag": "helped_wizard"
+}
+```
+
+### Base Fields
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | **required** | Display name shown to the player. |
+| `description` | string | **required** | Text shown when the player examines the NPC. |
+| `keywords` | array | optional | Alternative names for fuzzy matching. |
+| `dialogue` | object | optional | The NPC's dialogue tree. See below. |
+| `movement` | object | optional | Patrol or trigger-based movement. See [Movement](#movement). |
+
+### Dialogue System
+
+The dialogue object defines what the NPC says when talked to.
+
+```json
+"dialogue": {
+  "greeting": "Welcome, traveler! What brings you to these parts?",
+  "default": "I don't know about that.",
+  "sets_flag": "met_wizard",
+  "topics": {
+    /* topic definitions */
+  }
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `greeting` | string | Response when the player talks to the NPC without specifying a topic. |
+| `default` | string | Fallback response when a topic isn't recognized. Used if `greeting` is not set. |
+| `sets_flag` | string | Flag set when the player first greets this NPC. |
+| `topics` | object | Named conversation topics the player can ask about. |
+
+### Dialogue Topics
+
+Topics allow branching conversations. Players trigger them with `talk to wizard about quest`.
+
+```json
+"topics": {
+  "quest": {
+    "keywords": ["quest", "mission", "task"],
+    "text": "I need you to retrieve the Crystal of Power from the dark cave.",
+    "sets_flag": "quest_started",
+    "leads_to": ["crystal", "cave"]
+  },
+  "crystal": {
+    "keywords": ["crystal", "crystal of power"],
+    "text": "The Crystal glows with ancient magic. Handle it carefully.",
+    "requires_flag": "quest_started",
+    "locked_text": "I have nothing to say about that yet."
+  },
+  "cave": {
+    "keywords": ["cave", "dark cave"],
+    "text": "The cave lies to the north. Beware the guardian.",
+    "requires_item": "map",
+    "locked_text": "Find a map first, then we can discuss the cave."
+  }
+}
+```
+
+#### Topic Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `keywords` | array | Words or phrases that trigger this topic. Case-insensitive. |
+| `text` | string | The NPC's response when this topic is discussed. |
+| `sets_flag` | string | Flag set when the player hears this topic. |
+| `requires_flag` | string | Topic is locked until this flag is `true`. |
+| `requires_item` | string | Topic is locked unless the player has this item. |
+| `locked_text` | string | Message shown when the topic is locked. |
+| `leads_to` | array | Topic IDs that become available after this topic is discussed. |
+
+### Dialogue Flow
+
+1. Player says `talk to wizard` -> Shows `greeting` or `default`
+2. Player says `talk to wizard about quest` -> Engine matches "quest" against topic keywords
+3. If the topic is gated by `requires_flag` or `requires_item`, checks those conditions
+4. If locked, shows `locked_text`. If unlocked, shows `text`
+5. If the topic has `leads_to`, those topics become accessible
+6. If the topic has `sets_flag`, that flag is set to `true`
+
+**Topic gating with leads_to:** Topics listed in `leads_to` are unlocked *only* when the parent topic has been discussed. This creates natural conversation progression where the player must first ask about a general topic before specific follow-ups become available.
+
+### Quest Mechanics (Item Trading)
+
+NPCs can accept items from the player and optionally give items in return. This is the core quest/trade mechanic.
+
+```json
+"blacksmith": {
+  "name": "Blacksmith",
+  "description": "A burly smith working the forge.",
+  "accepts_item": "iron_ore",
+  "gives_item": "iron_sword",
+  "accept_message": "The blacksmith takes the ore and hammers it into a fine blade. 'Here you go!'",
+  "sets_flag": "sword_forged"
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `accepts_item` | string | Item ID that this NPC will accept from the player. |
+| `gives_item` | string | Item ID given to the player in return (optional). |
+| `accept_message` | string | Custom message shown when the item is accepted. |
+| `sets_flag` | string | Flag set when the NPC accepts the item. |
+
+Players give items with: `give iron_ore to blacksmith`
+
+### Movement
+
+NPCs (and creatures) can move between rooms on their own. Movement ticks once per player action and fires `depart_msg` and `arrive_msg` when the entity enters or leaves the room the player is currently in.
+
+There are two movement types: `patrol` for cyclic routes and `triggered` for one-shot moves tied to a game flag. The schema applies equally to entries in both `npcs` and `creatures`.
+
+**In combat:** A creature currently engaged in combat with the player will **not** move, even if its movement schedule says it should. Combat always wins.
+
+#### Patrol Movement
+
+Patrol movement cycles an entity through a list of rooms, each with a duration (in turns). When the duration is up, the entity moves to the next step. The schedule loops forever.
+
+```json
+"movement": {
+  "type": "patrol",
+  "schedule": [
+    { "room": "tavern_floor", "duration": 3 },
+    { "room": "village_square", "duration": 3 }
+  ],
+  "depart_msg": "Bardric slings his lute over his shoulder and wanders off.",
+  "arrive_msg": "Bardric strolls in, already mid-song."
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `type` | string | Must be `"patrol"`. |
+| `schedule` | array | Ordered list of schedule steps. Each step has a `room` and `duration`. The entity cycles through them in order, looping back to the first once the last is complete. |
+| `depart_msg` | string | Message shown when the entity leaves the player's current room. Defaults to *"The [name] leaves."* |
+| `arrive_msg` | string | Message shown when the entity arrives in the player's current room. Defaults to *"The [name] arrives."* |
+
+#### Schedule Step Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `room` | string | Room ID where the entity sits for this step. |
+| `duration` | number | Number of player turns the entity stays in this room before moving to the next step. |
+| `blocked_while_player_in` | array | Optional list of room IDs. If the player is currently in any of them, the transition to *this* step is deferred until the player leaves. Use this to prevent an NPC from awkwardly walking into the player's face. |
+
+#### Triggered Movement
+
+Triggered movement is a one-shot: the entity moves to a destination room the first time a given flag is `true`, then stops moving forever. Use it for an NPC that arrives after a quest milestone, or a creature that storms in after the player rings a bell.
+
+```json
+"movement": {
+  "type": "triggered",
+  "trigger_flag": "bell_rung",
+  "destination": "village_square",
+  "depart_msg": "The guard marches out, hand on her sword.",
+  "arrive_msg": "A guard storms into the square, summoned by the alarm."
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `type` | string | Must be `"triggered"`. |
+| `trigger_flag` | string | Global flag that must be `true` for the move to fire. The move fires once and then the entity will not move again. |
+| `destination` | string | Room ID the entity should move to when triggered. |
+| `depart_msg` | string | Message shown when the entity leaves the player's current room. |
+| `arrive_msg` | string | Message shown when the entity arrives in the player's current room. |
+
+### Full Example
+
+```json
+"mysterious_wizard": {
+  "name": "Mysterious Wizard",
+  "description": "An ancient wizard with a long silver beard. His eyes shimmer with arcane knowledge.",
+  "keywords": ["wizard", "mage", "old man"],
+  "dialogue": {
+    "greeting": "Ah, an adventurer! I have been expecting you. Ask me about the quest if you dare.",
+    "default": "Hmm, I know not of such things.",
+    "sets_flag": "met_wizard",
+    "topics": {
+      "quest": {
+        "keywords": ["quest", "adventure", "mission"],
+        "text": "Deep in the Darkwood Forest lies a crystal of immense power. Retrieve it, and I shall reward you greatly.",
+        "sets_flag": "quest_accepted",
+        "leads_to": ["forest", "reward"]
+      },
+      "forest": {
+        "keywords": ["forest", "darkwood", "woods"],
+        "text": "The forest entrance is to the north. Take a torch -- the darkness there is unnatural.",
+        "locked_text": "First, ask me about the quest."
+      },
+      "reward": {
+        "keywords": ["reward", "payment"],
+        "text": "Bring me the crystal and I will grant you a powerful spell.",
+        "locked_text": "Complete the quest first, then we can discuss compensation."
+      }
+    }
+  },
+  "accepts_item": "power_crystal",
+  "gives_item": "spell_book",
+  "accept_message": "The wizard's eyes light up. 'You found it! As promised, take this spell book. May it serve you well.'",
+  "sets_flag": "quest_complete"
+}
+```
+
+---
+
+## Creatures
+
+Creatures are hostile entities that players can attack to initiate turn-based combat. They have health, attack power, and can drop loot when defeated.
+
+```json
+"creature_id": {
+  "name": "Cave Troll",
+  "description": "A massive troll with stone-like skin.",
+  "keywords": ["troll", "monster"],
+  "health": 30,
+  "attack": 8,
+  "defense": 2,
+  "hostile": true,
+  "talk_text": "The troll grunts at you, clearly unimpressed.",
+  "aggro_text": "The Cave Troll roars and lunges at you!",
+  "attack_condition": { "moves": 3 },
+  "on_defeat_msg": "The troll crashes to the ground with a thunderous boom!",
+  "on_flee_msg": "The troll roars as you escape!",
+  "loot": ["troll_gem", "troll_club"],
+  "sets_flag_on_defeat": "troll_slain"
+}
+```
+
+### Fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `name` | string | **required** | Display name shown to the player. |
+| `description` | string | **required** | Text shown when the player examines the creature. |
+| `keywords` | array | `[]` | Alternative names for fuzzy matching. |
+| `health` | number | **required** | Maximum hit points. This is both starting and max HP. |
+| `attack` | number | `5` | Base attack power. Actual damage = attack + rand(-2..2) - player defense. |
+| `defense` | number | `0` | Defense value subtracted from player's attack damage. |
+| `hostile` | boolean | `false` | If `true`, the creature can auto-attack the player. See [Hostile Creatures](#hostile). |
+| `talk_text` | string | -- | What the creature "says" when the player uses `talk to [creature]`. Defaults to *"It has no clue what you're saying."* |
+| `aggro_text` | string | -- | Message shown when a hostile creature begins attacking. Defaults to *"The [name] attacks you!"* |
+| `attack_condition` | object | -- | When a hostile creature auto-attacks. See [Attack Conditions](#attack-conditions). |
+| `movement` | object | -- | Optional patrol or triggered movement. See [Movement](#movement) on the NPCs page -- the schema is identical. |
+| `on_defeat_msg` | string | -- | Custom message displayed when the creature is defeated. |
+| `on_flee_msg` | string | -- | Custom message displayed when the player flees from combat. |
+| `loot` | array | `[]` | Array of item IDs dropped into the room when the creature is defeated. |
+| `sets_flag_on_defeat` | string | -- | Global flag set to `true` when the creature is defeated. |
+
+### Talking to Creatures
+
+Creatures don't have dialogue trees like NPCs, but the player can still `talk to [creature]`. The engine responds with the creature's `talk_text` -- useful for flavor, warnings, or hostile creatures with an `on_talk` attack condition.
+
+```json
+"tavern_rat": {
+  "name": "Tavern Rat",
+  "description": "A fat, lazy rat lounging near the fireplace.",
+  "keywords": ["rat", "tavern rat"],
+  "health": 3,
+  "attack": 1,
+  "talk_text": "The rat squeaks and twitches its whiskers at you."
+}
+```
+
+**NPC priority:** If a room contains both an NPC and a creature matching the same keyword, the NPC wins -- `talk to bob` always prefers an NPC named Bob over a creature named Bob the Beast.
+
+### Hostile Creatures
+
+Set `"hostile": true` to let a creature auto-attack the player without waiting to be attacked first. After every player action in the same room, the engine checks whether the creature should initiate combat.
+
+1. The player takes any action (`look`, `take`, `go`, `talk`, etc.)
+2. The engine checks each hostile creature in the current room
+3. If the creature's `attack_condition` is met (or there is none), it initiates combat
+4. The `aggro_text` is displayed, then initiative is rolled
+
+**Non-hostile creatures:** A creature without `hostile: true` will never initiate combat on its own. The player must `attack` it directly.
+
+### Attack Conditions
+
+An `attack_condition` controls *when* a hostile creature actually attacks. Without one, a hostile creature attacks on the very first player action in the room.
+
+```
+// Attack after the player has taken 3 actions in the room
+"attack_condition": { "moves": 3 }
+
+// Attack the second time the player enters the room
+"attack_condition": { "room_entries": 2 }
+
+// Attack only when the player tries to talk to the creature
+"attack_condition": { "on_talk": true }
+```
+
+| Condition | Type | Behavior |
+|---|---|---|
+| `moves` | number | Creature attacks after the player has taken at least this many actions in the current room. Lets the player look around and prepare first. |
+| `room_entries` | number | Creature attacks once the player has entered the room at least this many times. Useful for "first visit is safe" encounters. |
+| `on_talk` | boolean | Creature only attacks when the player `talk`s to it. Great for a creature that you can try to parley with, but that turns hostile when provoked. |
+
+Only one condition type is evaluated per creature. If an unknown key is set, the creature defers attacking indefinitely.
+
+### Balancing Combat Stats
+
+Damage formula:
+
+```
+// Creature attacking player:
+damage = creature.attack + rand(-2..2) - player_defense
+damage = [damage, 1].max  // minimum 1 damage
+
+// Player attacking creature:
+damage = 5 + weapon_damage + rand(-2..2) - creature.defense
+damage = [damage, 1].max  // minimum 1 damage
+```
+
+Player base attack: 5 (hardcoded)
+
+Player starting HP: 10 (default)
+
+Variance: -2 to +2 on each attack
+
+Minimum damage: 1 (always deal at least 1 HP)
+
+#### Example Difficulty Tiers
+
+| Tier | Health | Attack | Defense | Notes |
+|---|---|---|---|---|
+| Easy | 10-15 | 3-5 | 0 | Beatable without weapons |
+| Medium | 20-30 | 5-8 | 1-2 | Weapon recommended |
+| Hard | 40-60 | 8-12 | 3-5 | Needs good gear + potions |
+| Boss | 80+ | 12+ | 5+ | Bring everything you've got |
+
+### Loot System
+
+When a creature is defeated, all items in its `loot` array are dropped into the current room. Players can then `take` them normally.
+
+```
+// The items must be defined in the top-level "items" object
+"loot": ["dragon_scale", "gold_coins"]
+```
+
+Loot items should be defined in your `items` object but don't need to be placed in any room initially -- they'll appear when the creature drops them.
+
+### Example
+
+```json
+"forest_spider": {
+  "name": "Giant Forest Spider",
+  "description": "A spider the size of a dog, with dripping fangs and eight gleaming eyes.",
+  "keywords": ["spider", "giant spider"],
+  "health": 15,
+  "attack": 4,
+  "defense": 0,
+  "hostile": true,
+  "talk_text": "The spider hisses at you menacingly.",
+  "aggro_text": "The Giant Forest Spider lunges at you!",
+  "attack_condition": { "moves": 3 },
+  "on_defeat_msg": "The spider curls up and stops moving. A silk-wrapped bundle falls from its web.",
+  "on_flee_msg": "You stumble backward through the webs as the spider hisses.",
+  "loot": ["spider_silk"],
+  "sets_flag_on_defeat": "spider_cleared"
+}
+```
+
+The player enters the room, has three turns to look around, grab items, or prepare, and on the fourth action the spider attacks.
+
+---
+
+## Combat
+
+The combat system is turn-based with initiative rolls, attack/defend/flee actions, weapon bonuses, and healing items. Combat starts when a player attacks a creature.
+
+### Starting Combat
+
+Combat begins when the player types `attack [creature]`. The engine then:
+
+1. Finds the creature in the current room
+2. Initializes player health if not already set (default: 10 HP)
+3. Rolls initiative for both sides (1d20 each)
+4. Whoever rolls higher goes first
+5. If the creature wins initiative, it immediately attacks
+
+### Combat Actions
+
+During combat, the player's commands are restricted to combat-related actions:
+
+| Command | Effect |
+|---|---|
+| `attack` | Attack the creature. Damage = 5 + weapon_damage + rand(-2..2) - creature defense. Creature counterattacks. |
+| `defend` / `block` / `guard` / `parry` | Raise your guard. Adds +3 to defense for this round. Creature still attacks but deals less damage. |
+| `flee` / `run` / `escape` / `retreat` | 50% chance to escape. On failure, creature gets a free attack. |
+| `use [item]` | Use a combat item (e.g., healing potion). Creature counterattacks after. |
+| `inventory` | Check your inventory (no turn cost). |
+| `examine [target]` / `look` | Examine something (no turn cost). |
+
+**Important:** While in combat, all non-combat commands (movement, talking, taking items) are blocked. The player must defeat the creature, flee, or die.
+
+### Damage Calculation
+
+#### Player Attacking
+
+```
+base_attack      = 5
+weapon_bonus     = max(weapon_damage from inventory items)
+variance         = rand(-2..2)
+creature_defense = creature.defense
+
+damage = base_attack + weapon_bonus + variance - creature_defense
+damage = max(damage, 1)  // always at least 1
+```
+
+#### Creature Attacking
+
+```
+creature_attack  = creature.attack  // default: 5
+variance         = rand(-2..2)
+player_defense   = sum(defense_bonus from inventory items)
+defending_bonus  = 3 if player used "defend", else 0
+
+damage = creature_attack + variance - player_defense - defending_bonus
+damage = max(damage, 1)  // always at least 1
+```
+
+### Weapon & Armor Bonuses
+
+- **Weapons (weapon_damage)**: Only the **highest** weapon_damage value from your inventory is used. Having multiple weapons doesn't stack -- only the best one counts.
+- **Armor (defense_bonus)**: All defense_bonus values from inventory items are **summed together**. Shield + helmet + armor all contribute.
+- **Passive**: Items provide bonuses just by being in your inventory. No "equip" command needed.
+
+### Using Items in Combat
+
+Items with `combat_effect` can be used during combat. Currently only `"heal"` is supported.
+
+```
+// Using a health potion in combat:
+// 1. Player uses the item
+// 2. Health is restored (capped at max_health)
+// 3. Item is consumed if consumable: true
+// 4. Creature counterattacks
+
+"health_potion": {
+  "name": "Health Potion",
+  "consumable": true,
+  "combat_effect": {
+    "type": "heal",
+    "amount": 15
+  }
+}
+```
+
+Using an item in combat costs your turn -- the creature gets to attack afterward.
+
+### Fleeing
+
+Success rate: 50%
+
+On success: Combat ends, player stays in the room, creature remains
+
+On failure: Creature gets a free attack, combat continues
+
+The creature's `on_flee_msg` is shown when the player successfully flees.
+
+### Creature Defeat
+
+When a creature's HP reaches 0:
+
+1. The `on_defeat_msg` is displayed (if set)
+2. All `loot` items are dropped into the current room
+3. The creature is removed from the room
+4. The `sets_flag_on_defeat` flag is set (if specified)
+5. Combat ends
+
+### Player Death
+
+When the player's HP reaches 0:
+
+1. A game over message is displayed
+2. The game enters `pending_restart` mode
+3. The player is prompted to restart the game
+
+### Combat Flow Diagram
+
+```
+Player types: "attack goblin"
+         |
+    [Initiative Roll]
+    Player: 1d20    Creature: 1d20
+         |
+    Higher goes first
+         |
+    +-----------+
+    | COMBAT    |
+    | ROUND     |
+    +-----------+
+         |
+    Player chooses action:
+    |             |           |            |
+  ATTACK       DEFEND       FLEE       USE ITEM
+    |             |           |            |
+  Deal dmg    +3 defense   50/50       Heal/effect
+    |             |         /    \          |
+    |             |     Escape  Fail       |
+    |             |       |      |         |
+    +------+------+       |   Free atk    |
+           |              |      |         |
+    Creature attacks      End    |         |
+           |              combat |         |
+    Check player HP        +-----+---------+
+           |                     |
+    Dead? --YES--> Game Over + Restart
+           |
+    Check creature HP
+           |
+    Dead? --YES--> Victory + Loot
+           |
+    Next round...
+```
+
+---
+
+## Dice Rolls
+
+The dice roll system adds D&D-style skill checks to items. When a player uses an item with a `dice_roll`, they must roll against a difficulty class (DC) with branching outcomes.
+
+```json
+"dice_roll": {
+  "dc": 12,
+  "dice": "1d20",
+  "attempt_message": "You carefully try to pick the lock...",
+  "completed_message": "You've already picked this lock.",
+  "consume_on": "failure",
+  "on_success": {
+    "message": "Click! The lock opens.",
+    "sets_flag": "lock_picked",
+    "unlocks_dialogue": {
+      "topic": "secret_info"
+    },
+    "unlocks_exit": {
+      "direction": "east",
+      "room": "current_room_id"
+    }
+  },
+  "on_failure": {
+    "message": "The pick snaps! You'll need another.",
+    "sets_flag": "failed_lockpick"
+  }
+}
+```
+
+### Fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `dc` | number | **required** | Difficulty class (1-20). The roll must meet or exceed this number to succeed. |
+| `dice` | string | `"1d20"` | Dice notation. Standard format: `NdS` (N dice with S sides). |
+| `attempt_message` | string | -- | Message shown when the roll is initiated, before the player types ROLL. |
+| `completed_message` | string | -- | Message shown if the player tries to use the item after a successful roll. |
+| `consume_on` | string | -- | When to consume the item. One of: `"failure"`, `"success"`, `"any"`. |
+| `on_success` | object | **required** | Outcome when the roll meets or exceeds the DC. |
+| `on_failure` | object | **required** | Outcome when the roll is below the DC. |
+
+### Outcome Objects
+
+Both `on_success` and `on_failure` support the same set of directives:
+
+| Field | Type | Description |
+|---|---|---|
+| `message` | string | Text displayed to the player describing the outcome. |
+| `sets_flag` | string | Global flag set to `true`. |
+| `unlocks_dialogue` | object | Unlocks a dialogue topic. Contains `topic` (string). |
+| `unlocks_exit` | object | Unlocks an exit. Contains `direction` (string) and optional `room` (string, defaults to current room). |
+
+### consume_on
+
+Controls when the item is removed from inventory after the roll:
+
+| Value | Behavior |
+|---|---|
+| `"failure"` | Item is consumed only on a failed roll. Lets the player retry on success. |
+| `"success"` | Item is consumed only on a successful roll. |
+| `"any"` | Item is always consumed regardless of outcome. |
+| *(omitted)* | Item is never consumed by the roll. |
+
+**Validation:** The engine validates dice_roll items at startup. Items with `dice_roll` **must** have both `on_success` and `on_failure`, and `consume_on` must be one of `"failure"`, `"success"`, or `"any"`. Invalid values produce validation errors.
+
+### Roll Flow
+
+1. Player types `use lockpick`
+2. Engine shows the `attempt_message` and prompts: *"Type ROLL to roll the dice."*
+3. A `pending_roll` is set on the player state, blocking all other commands
+4. Player types `roll`
+5. Engine rolls the dice (e.g., 1d20), compares to DC
+6. Executes the appropriate outcome (on_success or on_failure)
+7. Applies directives (sets_flag, unlocks_dialogue, unlocks_exit)
+8. Consumes item if consume_on matches the outcome
+9. Clears the pending_roll, resuming normal gameplay
+
+### Difficulty Class Guide
+
+| DC | Difficulty | Success Rate (1d20) |
+|---|---|---|
+| 5 | Very Easy | 80% |
+| 8 | Easy | 65% |
+| 10 | Medium | 55% |
+| 12 | Moderate | 45% |
+| 15 | Hard | 30% |
+| 18 | Very Hard | 15% |
+| 20 | Nearly Impossible | 5% |
+
+### Full Example
+
+```json
+"ancient_scroll": {
+  "name": "Ancient Scroll",
+  "description": "A fragile scroll covered in arcane runes.",
+  "keywords": ["scroll", "runes"],
+  "dice_roll": {
+    "dc": 14,
+    "dice": "1d20",
+    "attempt_message": "You begin to decipher the ancient runes...",
+    "completed_message": "You've already deciphered this scroll.",
+    "consume_on": "any",
+    "on_success": {
+      "message": "The runes glow and you understand their meaning! A hidden path is revealed.",
+      "sets_flag": "scroll_deciphered",
+      "unlocks_exit": {
+        "direction": "north"
+      }
+    },
+    "on_failure": {
+      "message": "The scroll crumbles to dust before you can finish reading it.",
+      "sets_flag": "scroll_destroyed"
+    }
+  }
+}
+```
+
+---
+
+## Flags & State
+
+The engine tracks game state across several structures. Global flags are the primary mechanism for tracking progress, gating content, and connecting game events.
+
+### Global Flags
+
+Flags are named booleans stored in a global `global_flags` object. They're the glue that connects different parts of your game world.
+
+```
+// Flags are strings mapped to booleans
+{
+  "met_wizard": true,
+  "quest_accepted": true,
+  "dragon_slain": false,
+  "secret_door_found": true
+}
+```
+
+#### Where Flags Are Set
+
+| Source | Field | When |
+|---|---|---|
+| Exit | `sets_flag` | When the exit is unlocked or used |
+| Item (on_use) | `on_use.sets_flag` | When the item is used |
+| NPC (dialogue) | `dialogue.sets_flag` | When the player first greets the NPC |
+| NPC (topic) | `topics.*.sets_flag` | When a dialogue topic is discussed |
+| NPC (quest) | `sets_flag` | When the NPC accepts an item |
+| Creature | `sets_flag_on_defeat` | When the creature is defeated |
+| Dice Roll | `on_success.sets_flag` / `on_failure.sets_flag` | When a roll succeeds or fails |
+
+#### Where Flags Are Checked
+
+| Context | Field | Effect |
+|---|---|---|
+| Exit | `requires_flag` | Exit is blocked until the flag is true |
+| Dialogue topic | `requires_flag` | Topic is locked until the flag is true |
+| Container | `unlock_flag` | Container stays locked until the flag is true |
+
+### Game State Structure
+
+The full game state maintained by the engine:
+
+```json
+{
+  "world_snapshot": { /* full copy of world_data at game start */ },
+  "player_states":   { /* per-player state, keyed by user ID */ },
+  "room_states":     { /* per-room state tracking contents */ },
+  "global_flags":    { /* named boolean flags */ },
+  "container_states": { /* open/closed state and contents */ },
+  "pending_restart": false
+}
+```
+
+### Player State
+
+Each player has their own state tracked by user ID:
+
+```json
+{
+  "current_room": "tavern",
+  "inventory": ["rusty_sword", "health_potion"],
+  "health": 10,
+  "max_health": 10,
+  "visited_rooms": ["tavern", "town_square"],
+
+  // Set when a dice roll is pending
+  "pending_roll": {
+    "dc": 12,
+    "dice": "1d20",
+    "on_success": { /* ... */ },
+    "on_failure": { /* ... */ },
+    "source_item": "lockpick"
+  },
+
+  // Set when in combat
+  "combat": {
+    "active": true,
+    "creature_id": "goblin",
+    "creature_health": 12,
+    "creature_max_health": 15,
+    "round_number": 3,
+    "defending": false,
+    "turn_order": "player"
+  }
+}
+```
+
+| Field | Description |
+|---|---|
+| `current_room` | ID of the room the player is currently in. |
+| `inventory` | Array of item IDs the player is carrying. |
+| `health` | Current hit points. Initialized on first combat. |
+| `max_health` | Maximum hit points. Default: 10. |
+| `visited_rooms` | Tracks rooms visited for `on_enter` first-visit events. |
+| `pending_roll` | Active dice roll awaiting the player to type ROLL. |
+| `combat` | Active combat state. See [Combat](#actions). |
+
+### Room State
+
+Each room tracks what's currently in it. This changes as players take items, creatures are defeated, etc.
+
+```json
+{
+  "items": ["rusty_sword", "torch"],
+  "npcs": ["bartender"],
+  "creatures": ["rat"],
+  "modified": false
+}
+```
+
+### Exit & Container State
+
+The engine also tracks persistent exit and container states:
+
+- **Revealed exits**: Hidden exits that have been discovered. Once revealed, they stay revealed.
+- **Unlocked exits**: Exits with `permanently_unlock: true` that have been unlocked. They stay unlocked.
+- **Container states**: Tracks which containers are open/closed and their current contents.
+
+### Restart
+
+When a player types `restart` (or dies), the engine enters `pending_restart` mode and prompts for confirmation. On `YES`:
+
+- All player state is reset
+- All room state is reset
+- All flags are cleared
+- All container states are reset
+- The world is re-snapshotted from the original data
+- The player starts back in `meta.starting_room`
+
+---
+
+## Containers
+
+Containers are items that can hold other items. They can be opened, closed, locked, and unlocked. Think chests, boxes, cabinets, and bags.
+
+```json
+"wooden_chest": {
+  "name": "Wooden Chest",
+  "description": "A sturdy wooden chest bound with iron bands.",
+  "is_container": true,
+  "locked": true,
+  "unlock_item": "chest_key",
+  "unlock_flag": "chest_unlocked",
+  "locked_message": "The chest is locked tight.",
+  "on_open_message": "The lid creaks open, revealing treasures inside!",
+  "on_close_message": "You close the chest lid.",
+  "open_description": "An open wooden chest.",
+  "closed_description": "A closed wooden chest with iron bands.",
+  "empty_message": "The chest is empty.",
+  "contents": ["gold_ring", "health_potion"],
+  "takeable": false
+}
+```
+
+### Container Fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `is_container` | boolean | `false` | Marks this item as a container. **required** for container behavior. |
+| `locked` | boolean | `false` | If `true`, the container must be unlocked before opening. |
+| `unlock_item` | string | -- | Item ID needed in inventory to unlock the container. |
+| `unlock_flag` | string | -- | Global flag that must be `true` to unlock the container. |
+| `locked_message` | string | -- | Message shown when trying to open a locked container. |
+| `on_open_message` | string | -- | Message shown when the container is opened. |
+| `on_close_message` | string | -- | Message shown when the container is closed. |
+| `open_description` | string | -- | Description shown when examining an open container. |
+| `closed_description` | string | -- | Description shown when examining a closed container. |
+| `empty_message` | string | -- | Message shown when examining an open but empty container. |
+| `contents` | array | `[]` | Item IDs initially inside the container. |
+
+### Container Commands
+
+| Command | Effect |
+|---|---|
+| `open [container]` | Opens the container (must be unlocked). Shows contents. |
+| `close [container]` | Closes the container. |
+| `examine [container]` | Shows open/closed description and lists contents if open. |
+| `take [item] from [container]` | Takes an item from an open container. |
+
+### Unlocking Containers
+
+A locked container can be unlocked in two ways:
+
+- **1. By item (unlock_item)**: The player must have the specified item in their inventory. The item is **not consumed** -- it just needs to be present. The container unlocks when the player tries to `open` it.
+- **2. By flag (unlock_flag)**: A global flag must be `true`. This lets you gate containers behind quests, dialogue, or other events.
+
+If both `unlock_item` and `unlock_flag` are set, having *either* one satisfied will unlock the container.
+
+### Nested Containers
+
+Containers can hold other containers, creating nested structures. The engine supports recursive searching through open containers.
+
+```
+// A chest containing a box containing a ring
+"big_chest": {
+  "name": "Big Chest",
+  "is_container": true,
+  "contents": ["small_box"]
+}
+
+"small_box": {
+  "name": "Small Box",
+  "is_container": true,
+  "contents": ["gold_ring"]
+}
+```
+
+**Important:** Only **open** containers are searchable. If the Big Chest is open but the Small Box inside it is closed, the player can see the Small Box but can't access the Gold Ring until they also open the Small Box.
+
+### Examining Containers
+
+When a player examines a container, they see:
+
+- **Closed:** The `closed_description` (or default description)
+- **Open with items:** The `open_description` + a list of contents
+- **Open and empty:** The `empty_message` (or a default "It's empty.")
+
+### Full Example
+
+```json
+"ornate_cabinet": {
+  "name": "Ornate Cabinet",
+  "description": "A tall cabinet with glass doors and golden trim.",
+  "keywords": ["cabinet", "cupboard"],
+  "is_container": true,
+  "takeable": false,
+  "cant_take_msg": "The cabinet is bolted to the wall.",
+  "locked": true,
+  "unlock_item": "cabinet_key",
+  "locked_message": "The glass doors are locked. You can see items inside but can't reach them.",
+  "on_open_message": "The glass doors swing open with a gentle chime.",
+  "on_close_message": "You carefully close the cabinet doors.",
+  "open_description": "The cabinet stands open, its shelves exposed.",
+  "closed_description": "Through the glass, you can make out shapes on the shelves.",
+  "empty_message": "The shelves are bare.",
+  "contents": ["ancient_map", "silver_dagger"]
+}
+```
+
+---
+
+## Commands Reference
+
+Every command the player can type, with all synonyms and how the engine parses them.
+
+### How Commands Are Parsed
+
+The CommandParser breaks player input into three parts:
+
+```
+// "use key on door" becomes:
+{
+  "verb":     "use",      // the action
+  "target":   "key",      // first object
+  "modifier": "door",     // second object (after preposition)
+  "raw":      "use key on door"
+}
+```
+
+Articles (`the`, `a`, `an`) and prepositions (`to`, `at`, `on`, `with`, `from`, `of`) are stripped during parsing.
+
+### Movement
+
+| Command | Synonyms | Usage |
+|---|---|---|
+| `go` | go, move, walk, travel, head | `go north`, `walk east`, `n` |
+| `enter` | enter | `enter cave` |
+| `leave` | leave, exit | `leave`, `exit` |
+| `climb` | climb, scale | `climb up`, `scale wall` |
+
+Bare directions also work as movement commands: typing `north` or just `n` is the same as `go north`.
+
+#### Direction Shortcuts
+
+| Full | Short | Full | Short |
+|---|---|---|---|
+| north | n | south | s |
+| east | e | west | w |
+| northeast | ne | northwest | nw |
+| southeast | se | southwest | sw |
+| up | u | down | d |
+| in | -- | out | -- |
+
+### Observation
+
+| Command | Synonyms | Usage |
+|---|---|---|
+| `look` | look, l | `look` -- describes the current room |
+| `examine` | examine, inspect, x, check, read | `examine sword`, `x note`, `read sign` |
+| `inventory` | inventory, inv, i | `i` -- lists items you're carrying |
+
+### Item Interaction
+
+| Command | Synonyms | Usage |
+|---|---|---|
+| `take` | take, get, grab, pickup, pick | `take sword`, `grab key`, `get potion` |
+| `drop` | drop, discard | `drop sword` |
+| `use` | use, activate, employ, apply | `use key`, `use key on door` |
+
+### Containers
+
+| Command | Synonyms | Usage |
+|---|---|---|
+| `open` | open, unlock | `open chest`, `unlock cabinet` |
+| `close` | close, shut | `close chest`, `shut door` |
+
+### Social Interaction
+
+| Command | Synonyms | Usage |
+|---|---|---|
+| `talk` | talk, speak, chat, ask, say | `talk to wizard`, `ask wizard about quest`, `talk to rat` (for creatures with `talk_text`) |
+| `give` | give, offer, hand | `give gem to wizard`, `offer sword to knight` |
+
+### Combat
+
+| Command | Synonyms | Usage |
+|---|---|---|
+| `attack` | attack, kill, hit, strike, fight | `attack goblin`, `fight dragon` |
+| `defend` | defend, block, guard, parry | `defend`, `block` (during combat) |
+| `flee` | flee, run, escape, retreat | `flee`, `run` (during combat) |
+
+### Other
+
+| Command | Synonyms | Usage |
+|---|---|---|
+| `roll` | roll | `roll` -- when prompted by a dice check |
+| `help` | help, h, ? | `help` -- shows available commands in-game |
+| `restart` | restart, reset | `restart` -- restart the game (with confirmation) |
+
+### Command Routing
+
+Commands are routed to handlers with these priority rules:
+
+- **1. Pending Roll (highest priority)**: If a dice roll is pending, **only** the `roll` command is accepted. Everything else is rejected.
+- **2. Active Combat**: If in combat, only combat commands are accepted: `attack`, `defend`, `flee`, `use`, `inventory`, `examine`, `look`.
+- **3. Normal Routing**: Commands route to their appropriate handler based on verb.
+
+### Handler Map
+
+| Handler | Verbs |
+|---|---|
+| MovementHandler | go, enter, leave, climb |
+| ExamineHandler | look, examine, inventory |
+| ItemHandler | take, drop, use |
+| ContainerHandler | open, close |
+| InteractHandler | talk, give, attack (to start combat) |
+| CombatHandler | attack, defend, flee, use (during combat) |
+| RollHandler | roll |
+| RestartHandler | restart |
+
+---
+
+## Full Example
+
+A complete game world JSON demonstrating rooms, items, NPCs, creatures, exits, containers, dice rolls, and quest flags working together.
+
+### Game Overview
+
+This example creates a small adventure where the player starts in a tavern, talks to a wizard to receive a quest, explores a forest, fights a spider, uses a lockpick to open a locked gate, and retrieves a crystal from a cave.
+
+### Complete JSON
+
+```json
+{
+  "meta": {
+    "name": "The Crystal Quest",
+    "description": "Retrieve the Crystal of Power from the forest cave and return it to the wizard.",
+    "starting_room": "tavern",
+    "version": "1.0"
+  },
+
+  "rooms": {
+    "tavern": {
+      "name": "The Rusty Flagon",
+      "description": "A cozy tavern with a crackling fireplace. The bartender polishes glasses behind the bar. A wooden chest sits in the corner.",
+      "exits": {
+        "north": "forest_edge"
+      },
+      "on_enter": {
+        "type": "message",
+        "text": "The warmth of the fire embraces you. A wizard in the corner catches your eye."
+      }
+    },
+    "forest_edge": {
+      "name": "Forest Edge",
+      "description": "Tall trees loom before you. A narrow path winds into the dark woods. You can hear something skittering in the undergrowth.",
+      "exits": {
+        "south": "tavern",
+        "north": "deep_forest"
+      }
+    },
+    "deep_forest": {
+      "name": "Deep Forest",
+      "description": "The canopy blocks out most of the light. Thick webs hang between the trees. An iron gate blocks the path further north.",
+      "exits": {
+        "south": "forest_edge",
+        "north": {
+          "to": "crystal_cave",
+          "keywords": ["gate", "iron gate"],
+          "use_item": "rusty_key",
+          "on_unlock": "The rusty key turns in the lock with a grinding screech. The gate swings open.",
+          "permanently_unlock": true,
+          "consume_item": true,
+          "locked_msg": "An iron gate blocks the way. It's locked.",
+          "sets_flag": "gate_opened"
+        }
+      }
+    },
+    "crystal_cave": {
+      "name": "Crystal Cave",
+      "description": "The cave glows with an ethereal blue light. In the center, a crystal floats above a stone pedestal.",
+      "exits": {
+        "south": "deep_forest"
+      },
+      "on_enter": {
+        "type": "message",
+        "text": "The air hums with magical energy. You feel the crystal calling to you."
+      }
+    }
+  },
+
+  "items": {
+    "rusty_sword": {
+      "name": "Rusty Sword",
+      "description": "A dull but serviceable blade. Better than nothing.",
+      "keywords": ["sword", "blade"],
+      "weapon_damage": 5
+    },
+    "health_potion": {
+      "name": "Health Potion",
+      "description": "A small vial of glowing red liquid.",
+      "keywords": ["potion", "vial"],
+      "consumable": true,
+      "combat_effect": {
+        "type": "heal",
+        "amount": 15
+      }
+    },
+    "rusty_key": {
+      "name": "Rusty Key",
+      "description": "An old iron key covered in rust. It might fit the gate in the forest.",
+      "keywords": ["key", "iron key"]
+    },
+    "power_crystal": {
+      "name": "Crystal of Power",
+      "description": "A brilliant blue crystal that pulses with magical energy.",
+      "keywords": ["crystal", "blue crystal"]
+    },
+    "spider_silk": {
+      "name": "Spider Silk",
+      "description": "A bundle of incredibly strong silk from the giant spider.",
+      "keywords": ["silk", "web"],
+      "defense_bonus": 2
+    },
+    "spell_book": {
+      "name": "Spell Book",
+      "description": "A leather-bound tome filled with arcane knowledge.",
+      "keywords": ["book", "tome"]
+    },
+    "tavern_chest": {
+      "name": "Wooden Chest",
+      "description": "A small wooden chest tucked in the corner.",
+      "keywords": ["chest", "box"],
+      "is_container": true,
+      "takeable": false,
+      "locked": false,
+      "on_open_message": "The chest lid creaks open.",
+      "contents": ["health_potion"]
+    },
+    "old_map": {
+      "name": "Faded Map",
+      "description": "A map showing the forest paths. There's an X marked at a cave.",
+      "keywords": ["map"],
+      "takeable": false,
+      "on_examine": {
+        "text": "Studying the map carefully, you notice a hidden trail marked with small runes."
+      }
+    }
+  },
+
+  "npcs": {
+    "wizard": {
+      "name": "Old Wizard",
+      "description": "An elderly wizard in blue robes. His beard nearly touches the floor.",
+      "keywords": ["wizard", "old man", "mage"],
+      "dialogue": {
+        "greeting": "Ah, a brave soul! I've been waiting for someone like you. Ask me about the quest.",
+        "default": "Hmm, I know nothing of that.",
+        "sets_flag": "met_wizard",
+        "topics": {
+          "quest": {
+            "keywords": ["quest", "mission", "adventure"],
+            "text": "Deep in the forest lies a Crystal of Power. Retrieve it and bring it to me. Take this key -- you'll need it for the gate. And take the sword by the bar, you'll need it too.",
+            "sets_flag": "quest_started",
+            "leads_to": ["crystal", "danger"]
+          },
+          "crystal": {
+            "keywords": ["crystal", "power"],
+            "text": "The Crystal of Power is an ancient artifact. It must not fall into the wrong hands.",
+            "locked_text": "Ask me about the quest first."
+          },
+          "danger": {
+            "keywords": ["danger", "warning", "monster"],
+            "text": "Beware the giant spider that guards the forest path. It won't let you pass easily.",
+            "locked_text": "There's nothing to warn you about yet."
+          }
+        }
+      },
+      "accepts_item": "power_crystal",
+      "gives_item": "spell_book",
+      "accept_message": "The wizard's eyes widen. 'You found it! The Crystal of Power! As promised, take this spell book. You've earned it, adventurer.'",
+      "sets_flag": "quest_complete"
+    }
+  },
+
+  "creatures": {
+    "giant_spider": {
+      "name": "Giant Spider",
+      "description": "A spider the size of a large dog. Its fangs drip with venom.",
+      "keywords": ["spider"],
+      "health": 20,
+      "attack": 6,
+      "defense": 1,
+      "on_defeat_msg": "The spider collapses, its legs curling inward. A bundle of silk falls from its web.",
+      "on_flee_msg": "You scramble away from the spider's reach!",
+      "loot": ["spider_silk"],
+      "sets_flag_on_defeat": "spider_defeated"
+    }
+  }
+}
+```
+
+### Initial Room States
+
+These define where entities start in the world:
+
+```
+// Room states (set up when game initializes)
+{
+  "tavern": {
+    "items": ["rusty_sword", "tavern_chest", "old_map"],
+    "npcs": ["wizard"],
+    "creatures": []
+  },
+  "forest_edge": {
+    "items": ["rusty_key"],
+    "npcs": [],
+    "creatures": []
+  },
+  "deep_forest": {
+    "items": [],
+    "npcs": [],
+    "creatures": ["giant_spider"]
+  },
+  "crystal_cave": {
+    "items": ["power_crystal"],
+    "npcs": [],
+    "creatures": []
+  }
+}
+```
+
+### Sample Walkthrough
+
+A player might complete this game like this:
+
+```
+# Start in tavern
+> look
+> talk to wizard
+> talk to wizard about quest      # Starts quest, unlocks topics
+> talk to wizard about danger      # Learn about the spider
+> take sword
+> open chest                       # Find health potion
+> take potion
+
+# Head into the forest
+> go north                         # Forest Edge
+> take key
+> go north                         # Deep Forest
+
+# Fight the spider
+> attack spider                    # Combat begins
+> attack                           # Deal damage
+> attack                           # Keep fighting
+> use potion                       # Heal if needed
+> attack                           # Defeat spider, get silk
+> take silk
+
+# Unlock the gate
+> use key on gate                  # Unlock the iron gate
+> go north                         # Crystal Cave
+
+# Get the crystal
+> take crystal
+
+# Return to the wizard
+> go south
+> go south
+> go south                         # Back to tavern
+> give crystal to wizard           # Quest complete! Get spell book
+```
+
+### Flags Used
+
+| Flag | Set By | Used For |
+|---|---|---|
+| `met_wizard` | Talking to wizard | Tracking NPC interaction |
+| `quest_started` | Asking about quest | Unlocking dialogue topics (crystal, danger) |
+| `spider_defeated` | Defeating the spider | Tracking combat completion |
+| `gate_opened` | Using key on gate | Tracking exit unlock |
+| `quest_complete` | Giving crystal to wizard | Game completion state |

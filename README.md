@@ -69,3 +69,8 @@ This is very much a work-in-progress and certain app code might be orphaned/outd
 
 Getting the app running and navigating to `/dev/game` will fire up a QA world that is small but representative of a lot of what can be done in the classic game engine. This world isn't really meant to be "fun" but allows you to quickly test things:
 <img width="1645" height="959" alt="image" src="https://github.com/user-attachments/assets/edd9a96d-d224-4347-95d3-539d4de9073d" />
+
+## Website and Docs
+
+The public site and the Classic Game Engine documentation live in `site/` and
+deploy separately as a free static site. See `site/README.md`.

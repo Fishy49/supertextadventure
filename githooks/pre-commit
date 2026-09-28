@@ -1,0 +1,44 @@
+#!/bin/sh
+# Auto-regenerate site/public/llms.txt when the site docs change.
+#
+# Runs site/bin/build-llms if any site/views/docs/*.erb or the script itself
+# is staged for commit, then adds the regenerated llms.txt to the commit.
+#
+# Unstaged changes to the source files (site/views/docs/*.erb, build-llms)
+# are stashed temporarily so the regen reflects exactly what's being
+# committed, not incidental WIP. Unstaged llms.txt changes are left alone
+# -- they'll be overwritten by the fresh build anyway.
+#
+# Install:  git config core.hooksPath githooks
+# Bypass:   git commit --no-verify
+
+set -e
+
+# Nothing relevant staged -> nothing to do.
+if ! git diff --cached --name-only | grep -qE '^(site/views/docs/.*\.erb|site/bin/build-llms)$'; then
+  exit 0
+fi
+
+# Stash unstaged changes to source files only (NOT site/public/llms.txt).
+# Listing files explicitly avoids pathspec glob portability issues.
+unstaged_sources=$(git diff --name-only -- 'site/views/docs/' 'site/bin/build-llms')
+stashed=""
+if [ -n "$unstaged_sources" ]; then
+  stashed="yes"
+  # shellcheck disable=SC2086
+  git stash push --keep-index --quiet -m "build-llms pre-commit hook" -- $unstaged_sources
+fi
+
+restore() {
+  if [ -n "$stashed" ]; then
+    git stash pop --quiet 2>/dev/null || true
+  fi
+}
+trap restore EXIT INT TERM
+
+./site/bin/build-llms
+
+if ! git diff --quiet -- site/public/llms.txt 2>/dev/null; then
+  git add site/public/llms.txt
+  echo "pre-commit: regenerated site/public/llms.txt"
+fi

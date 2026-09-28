@@ -1,0 +1,204 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Flags & State</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  The engine tracks game state across several structures. Global flags are the primary mechanism for tracking progress, gating content, and connecting game events.
+</p>
+
+<h2 id="flags" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Global Flags</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Flags are named booleans stored in a global <code class="text-terminal-bright">global_flags</code> object. They're the glue that connects different parts of your game world.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="comment">// Flags are strings mapped to booleans</span>
+{
+  <span class="key">"met_wizard"</span>: <span class="bool">true</span>,
+  <span class="key">"quest_accepted"</span>: <span class="bool">true</span>,
+  <span class="key">"dragon_slain"</span>: <span class="bool">false</span>,
+  <span class="key">"secret_door_found"</span>: <span class="bool">true</span>
+}</pre>
+
+<h3 class="text-2xl pt-6 pb-2 text-terminal-bright">Where Flags Are Set</h3>
+
+<table class="doc-table mt-2">
+  <thead>
+    <tr><th>Source</th><th>Field</th><th>When</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Exit</td>
+      <td><code>sets_flag</code></td>
+      <td>When the exit is unlocked or used</td>
+    </tr>
+    <tr>
+      <td>Item (on_use)</td>
+      <td><code>on_use.sets_flag</code></td>
+      <td>When the item is used</td>
+    </tr>
+    <tr>
+      <td>NPC (dialogue)</td>
+      <td><code>dialogue.sets_flag</code></td>
+      <td>When the player first greets the NPC</td>
+    </tr>
+    <tr>
+      <td>NPC (topic)</td>
+      <td><code>topics.*.sets_flag</code></td>
+      <td>When a dialogue topic is discussed</td>
+    </tr>
+    <tr>
+      <td>NPC (quest)</td>
+      <td><code>sets_flag</code></td>
+      <td>When the NPC accepts an item</td>
+    </tr>
+    <tr>
+      <td>Creature</td>
+      <td><code>sets_flag_on_defeat</code></td>
+      <td>When the creature is defeated</td>
+    </tr>
+    <tr>
+      <td>Dice Roll</td>
+      <td><code>on_success.sets_flag</code> / <code>on_failure.sets_flag</code></td>
+      <td>When a roll succeeds or fails</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="text-2xl pt-6 pb-2 text-terminal-bright">Where Flags Are Checked</h3>
+
+<table class="doc-table mt-2">
+  <thead>
+    <tr><th>Context</th><th>Field</th><th>Effect</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Exit</td>
+      <td><code>requires_flag</code></td>
+      <td>Exit is blocked until the flag is true</td>
+    </tr>
+    <tr>
+      <td>Dialogue topic</td>
+      <td><code>requires_flag</code></td>
+      <td>Topic is locked until the flag is true</td>
+    </tr>
+    <tr>
+      <td>Container</td>
+      <td><code>unlock_flag</code></td>
+      <td>Container stays locked until the flag is true</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="game-state" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Game State Structure</h2>
+
+<p class="text-xl pt-4 pb-3">
+  The full game state maintained by the engine:
+</p>
+
+<pre class="doc-code text-terminal-green mt-2">{
+  <span class="key">"world_snapshot"</span>: { <span class="comment">/* full copy of world_data at game start */</span> },
+  <span class="key">"player_states"</span>:   { <span class="comment">/* per-player state, keyed by user ID */</span> },
+  <span class="key">"room_states"</span>:     { <span class="comment">/* per-room state tracking contents */</span> },
+  <span class="key">"global_flags"</span>:    { <span class="comment">/* named boolean flags */</span> },
+  <span class="key">"container_states"</span>: { <span class="comment">/* open/closed state and contents */</span> },
+  <span class="key">"pending_restart"</span>: <span class="bool">false</span>
+}</pre>
+
+<h2 id="player-state" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Player State</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Each player has their own state tracked by user ID:
+</p>
+
+<pre class="doc-code text-terminal-green mt-2">{
+  <span class="key">"current_room"</span>: <span class="str">"tavern"</span>,
+  <span class="key">"inventory"</span>: [<span class="str">"rusty_sword"</span>, <span class="str">"health_potion"</span>],
+  <span class="key">"health"</span>: <span class="num">10</span>,
+  <span class="key">"max_health"</span>: <span class="num">10</span>,
+  <span class="key">"visited_rooms"</span>: [<span class="str">"tavern"</span>, <span class="str">"town_square"</span>],
+
+  <span class="comment">// Set when a dice roll is pending</span>
+  <span class="key">"pending_roll"</span>: {
+    <span class="key">"dc"</span>: <span class="num">12</span>,
+    <span class="key">"dice"</span>: <span class="str">"1d20"</span>,
+    <span class="key">"on_success"</span>: { <span class="comment">/* ... */</span> },
+    <span class="key">"on_failure"</span>: { <span class="comment">/* ... */</span> },
+    <span class="key">"source_item"</span>: <span class="str">"lockpick"</span>
+  },
+
+  <span class="comment">// Set when in combat</span>
+  <span class="key">"combat"</span>: {
+    <span class="key">"active"</span>: <span class="bool">true</span>,
+    <span class="key">"creature_id"</span>: <span class="str">"goblin"</span>,
+    <span class="key">"creature_health"</span>: <span class="num">12</span>,
+    <span class="key">"creature_max_health"</span>: <span class="num">15</span>,
+    <span class="key">"round_number"</span>: <span class="num">3</span>,
+    <span class="key">"defending"</span>: <span class="bool">false</span>,
+    <span class="key">"turn_order"</span>: <span class="str">"player"</span>
+  }
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>current_room</code></td><td>ID of the room the player is currently in.</td></tr>
+    <tr><td><code>inventory</code></td><td>Array of item IDs the player is carrying.</td></tr>
+    <tr><td><code>health</code></td><td>Current hit points. Initialized on first combat.</td></tr>
+    <tr><td><code>max_health</code></td><td>Maximum hit points. Default: 10.</td></tr>
+    <tr><td><code>visited_rooms</code></td><td>Tracks rooms visited for <code>on_enter</code> first-visit events.</td></tr>
+    <tr><td><code>pending_roll</code></td><td>Active dice roll awaiting the player to type ROLL.</td></tr>
+    <tr><td><code>combat</code></td><td>Active combat state. See <a href="/docs/combat#actions" class="text-terminal-bright hover:underline">Combat</a>.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="room-state" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Room State</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Each room tracks what's currently in it. This changes as players take items, creatures are defeated, etc.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2">{
+  <span class="key">"items"</span>: [<span class="str">"rusty_sword"</span>, <span class="str">"torch"</span>],
+  <span class="key">"npcs"</span>: [<span class="str">"bartender"</span>],
+  <span class="key">"creatures"</span>: [<span class="str">"rat"</span>],
+  <span class="key">"modified"</span>: <span class="bool">false</span>
+}</pre>
+
+<h2 id="exit-state" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Exit & Container State</h2>
+
+<p class="text-xl pt-4 pb-3">
+  The engine also tracks persistent exit and container states:
+</p>
+
+<div class="text-xl space-y-3 pt-2">
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">Revealed exits</div>
+    <p class="pt-1">Hidden exits that have been discovered. Once revealed, they stay revealed.</p>
+  </div>
+
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">Unlocked exits</div>
+    <p class="pt-1">Exits with <code>permanently_unlock: true</code> that have been unlocked. They stay unlocked.</p>
+  </div>
+
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">Container states</div>
+    <p class="pt-1">Tracks which containers are open/closed and their current contents.</p>
+  </div>
+</div>
+
+<h2 id="restart" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Restart</h2>
+
+<p class="text-xl pt-4 pb-3">
+  When a player types <code class="text-terminal-bright">restart</code> (or dies), the engine enters <code>pending_restart</code> mode and prompts for confirmation. On <code>YES</code>:
+</p>
+
+<ul class="text-xl list-disc list-inside space-y-2 pt-2">
+  <li>All player state is reset</li>
+  <li>All room state is reset</li>
+  <li>All flags are cleared</li>
+  <li>All container states are reset</li>
+  <li>The world is re-snapshotted from the original data</li>
+  <li>The player starts back in <code>meta.starting_room</code></li>
+</ul>

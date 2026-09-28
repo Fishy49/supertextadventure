@@ -1,0 +1,258 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Converts views/docs/*.erb into a single public/llms.txt file.
+#
+# Run it from anywhere; paths are resolved relative to the repo root:
+#
+#   bin/build-llms
+#
+# No gems required - pure stdlib Ruby.
+
+ROOT = File.expand_path("..", __dir__)
+DOCS_DIR = File.join(ROOT, "views", "docs")
+OUTPUT = File.join(ROOT, "public", "llms.txt")
+
+# Pages in llms.txt order. Each page can have an H2 title that wraps its
+# content; `nil` means "no wrapper" (used by overview, whose H1 is decorative).
+PAGES = [
+  { slug: "overview",        title: nil },
+  { slug: "world-structure", title: "World Structure" },
+  { slug: "rooms",           title: "Rooms" },
+  { slug: "exits",           title: "Exits" },
+  { slug: "items",           title: "Items" },
+  { slug: "npcs",            title: "NPCs & Dialogue" },
+  { slug: "creatures",       title: "Creatures" },
+  { slug: "combat",          title: "Combat" },
+  { slug: "dice-rolls",      title: "Dice Rolls" },
+  { slug: "flags-and-state", title: "Flags & State" },
+  { slug: "containers",      title: "Containers" },
+  { slug: "commands",        title: "Commands Reference" },
+  { slug: "examples",        title: "Full Example" }
+].freeze
+
+# Section headings to drop entirely (heading + content) per page slug.
+SKIP_SECTIONS = {
+  "overview" => ["Top-Level JSON Structure", "Quick Links"]
+}.freeze
+
+# H2 headings whose content we want but whose heading is redundant.
+# "Schema" is a UI label in the ERBs that just introduces a JSON block -
+# drop the heading so the code block follows the page intro directly.
+DROP_HEADINGS_KEEP_BODY = ["Schema"].freeze
+
+HEADER = <<~MD
+  # Super Text Adventure - Classic Game Engine Documentation
+
+  > The Classic Game Engine powers text-based adventure games in Super Text Adventure. You define your entire game world as a JSON document, and the engine handles parsing player commands, managing state, and running all game mechanics.
+
+MD
+
+def main
+  pages = PAGES.map { |p| convert_page(p) }.reject(&:empty?)
+  body = pages.join("\n\n---\n\n")
+  output = (HEADER + body).strip + "\n"
+  File.write(OUTPUT, output)
+  puts "wrote #{relative(OUTPUT)} - #{File.size(OUTPUT)} bytes, #{output.lines.size} lines, #{pages.size} pages"
+end
+
+def relative(path)
+  path.sub("#{ROOT}/", "")
+end
+
+def convert_page(entry)
+  slug = entry[:slug]
+  title = entry[:title]
+  path = File.join(DOCS_DIR, "#{slug}.erb")
+  return "" unless File.exist?(path)
+
+  html = File.read(path)
+
+  # Overview's intro paragraph duplicates the hardcoded HEADER blockquote.
+  if slug == "overview"
+    html = html.sub(%r{<p[^>]*text-terminal-bright[^>]*>\s*The Classic Game Engine powers.*?</p>}m, "")
+  end
+
+  # Pages with a title use H2 for the page, H3 for sections, H4 for details.
+  # Overview has no wrapper title, so its sections stay at H2/H3.
+  demote = !title.nil?
+  md = convert(html, demote: demote)
+  md = skip_sections(md, SKIP_SECTIONS[slug] || [])
+
+  out = +""
+  out << "## #{title}\n\n" if title
+  out << md.strip
+  out
+end
+
+# Top-level HTML→markdown pipeline. Order matters:
+#
+#   1. Yank <pre> and <table> into placeholders so later regexes don't touch
+#      their contents (code needs whitespace preserved; tables need custom
+#      formatting).
+#   2. Convert block-level tags (headings, lists, callouts, paragraphs).
+#   3. Strip any leftover <div>/<aside>/etc. while keeping their text.
+#   4. Normalize whitespace.
+#   5. Restore placeholders with their fully-formatted markdown.
+#
+# `demote: true` bumps each heading down one level (H2 -> H3, H3 -> H4) so
+# the script can wrap the page in a higher-level title.
+def convert(html, demote: false)
+  html = html.dup
+  html.gsub!(/<%.*?%>/m, "") # strip any ERB directives
+
+  pres = []
+  tables = []
+
+  html.gsub!(/<pre[^>]*>(.*?)<\/pre>/m) do
+    pres << Regexp.last_match(1)
+    "\u0000PRE#{pres.size - 1}\u0000"
+  end
+
+  html.gsub!(/<table[^>]*>(.*?)<\/table>/m) do
+    tables << Regexp.last_match(1)
+    "\u0000TBL#{tables.size - 1}\u0000"
+  end
+
+  # The HEADER owns the document's H1 - drop any H1 from the page source.
+  html.gsub!(/<h1[^>]*>.*?<\/h1>/m, "")
+
+  # Drop redundant headings (like "Schema") but keep their content.
+  DROP_HEADINGS_KEEP_BODY.each do |heading|
+    html.gsub!(%r{<h2[^>]*>\s*#{Regexp.escape(heading)}\s*</h2>}m, "")
+    html.gsub!(%r{<h3[^>]*>\s*#{Regexp.escape(heading)}\s*</h3>}m, "")
+  end
+
+  h2_prefix = demote ? "### " : "## "
+  h3_prefix = demote ? "#### " : "### "
+  html.gsub!(/<h2[^>]*>(.*?)<\/h2>/m) { "#{h2_prefix}#{inline(Regexp.last_match(1))}\n\n" }
+  html.gsub!(/<h3[^>]*>(.*?)<\/h3>/m) { "#{h3_prefix}#{inline(Regexp.last_match(1))}\n\n" }
+
+  html.gsub!(/<ol[^>]*>(.*?)<\/ol>/m) do
+    items = Regexp.last_match(1).scan(/<li[^>]*>(.*?)<\/li>/m).flatten
+    items.each_with_index.map { |it, i| "#{i + 1}. #{inline(it)}" }.join("\n") + "\n\n"
+  end
+
+  html.gsub!(/<ul[^>]*>(.*?)<\/ul>/m) do
+    items = Regexp.last_match(1).scan(/<li[^>]*>(.*?)<\/li>/m).flatten
+    items.map { |it| "- #{inline(it)}" }.join("\n") + "\n\n"
+  end
+
+  # Border+rounded div wrapping a title div and a <p> body = highlighted callout.
+  html.gsub!(
+    %r{<div[^>]*class="[^"]*border[^"]*rounded[^"]*"[^>]*>\s*<div[^>]*terminal-bright[^>]*>(.*?)</div>\s*<p[^>]*>(.*?)</p>\s*</div>}m
+  ) { "**#{inline(Regexp.last_match(1))}** #{inline(Regexp.last_match(2))}\n\n" }
+
+  # Border+rounded div wrapping two inner divs (title, body) = grid card.
+  html.gsub!(
+    %r{<div[^>]*class="[^"]*border[^"]*rounded[^"]*"[^>]*>\s*<div[^>]*terminal-bright[^>]*>(.*?)</div>\s*<div[^>]*>(.*?)</div>\s*</div>}m
+  ) { "- **#{inline(Regexp.last_match(1))}**: #{inline(Regexp.last_match(2))}\n" }
+
+  # Border-left bullet: title div + <p> body inside a left-bordered div.
+  html.gsub!(
+    %r{<div[^>]*border-l-2[^>]*>\s*<div[^>]*terminal-bright[^>]*>(.*?)</div>\s*<p[^>]*>(.*?)</p>\s*</div>}m
+  ) { "- **#{inline(Regexp.last_match(1))}**: #{inline(Regexp.last_match(2))}\n" }
+
+  html.gsub!(/<p[^>]*>(.*?)<\/p>/m) { "#{inline(Regexp.last_match(1))}\n\n" }
+
+  html.gsub!(/<\/?(?:div|aside|section|main|header|footer)[^>]*>/, "")
+
+  html.gsub!(/^[ \t]+/, "")            # strip leading indentation
+  html.gsub!(/\n{3,}/, "\n\n")         # collapse extra blank lines
+  html.gsub!(/(^\d+\.[^\n]+)\n\n(?=\d+\.)/, "\\1\n") # tighten numbered lists
+  html.gsub!(/(^- [^\n]+)\n\n(?=- )/, "\\1\n")       # tighten bullet lists
+
+  html.gsub!(/\u0000PRE(\d+)\u0000/) { format_pre(pres[Regexp.last_match(1).to_i]) }
+  html.gsub!(/\u0000TBL(\d+)\u0000/) { format_table(tables[Regexp.last_match(1).to_i]) }
+
+  html.gsub!(/\n{3,}/, "\n\n")
+  html
+end
+
+# Inline tag conversion. Safe to recurse for links.
+def inline(html)
+  result = html.dup
+  result.gsub!(/<code[^>]*>(.*?)<\/code>/m) { "`#{decode_entities(Regexp.last_match(1))}`" }
+  result.gsub!(/<strong[^>]*>(.*?)<\/strong>/m) { "**#{Regexp.last_match(1)}**" }
+  result.gsub!(/<b[^>]*>(.*?)<\/b>/m) { "**#{Regexp.last_match(1)}**" }
+  result.gsub!(/<em[^>]*>(.*?)<\/em>/m) { "*#{Regexp.last_match(1)}*" }
+  result.gsub!(/<i[^>]*>(.*?)<\/i>/m) { "*#{Regexp.last_match(1)}*" }
+  result.gsub!(/<a[^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/m) do
+    "[#{inline(Regexp.last_match(2))}](#{normalize_href(Regexp.last_match(1))})"
+  end
+  result.gsub!(/<span[^>]*badge-required[^>]*>(.*?)<\/span>/m) { "**#{Regexp.last_match(1)}**" }
+  result.gsub!(/<span[^>]*badge-optional[^>]*>(.*?)<\/span>/m) { Regexp.last_match(1) }
+  result.gsub!(/<span[^>]*>(.*?)<\/span>/m) { Regexp.last_match(1) }
+  result.gsub!(/<br[^>]*\/?>/, " ")
+  result.gsub!(/<[^>]+>/, "")
+  result = decode_entities(result)
+  result.gsub(/\s+/, " ").strip
+end
+
+def format_pre(content)
+  text = content.gsub(/<\/?span[^>]*>/, "")
+  text = decode_entities(text)
+  text = text.sub(/\A\n+/, "").sub(/\s+\z/, "")
+  first_char = text.lstrip[0]
+  lang = %w[{ "].include?(first_char) ? "json" : ""
+  "\n```#{lang}\n#{text}\n```\n\n"
+end
+
+def format_table(content)
+  header_row = content[/<thead[^>]*>.*?<tr[^>]*>(.*?)<\/tr>/m, 1].to_s
+  header_cells = header_row.scan(/<th[^>]*>(.*?)<\/th>/m).flatten.map { |c| inline(c) }
+
+  body = content[/<tbody[^>]*>(.*?)<\/tbody>/m, 1].to_s
+  rows = body.scan(/<tr[^>]*>(.*?)<\/tr>/m).flatten.map do |row|
+    row.scan(/<td[^>]*>(.*?)<\/td>/m).flatten.map { |c| inline(c) }
+  end
+
+  return "" if header_cells.empty?
+
+  width = header_cells.size
+  rows.each { |r| r << "" while r.size < width }
+
+  separator = "|#{Array.new(width, "---").join("|")}|"
+  lines = ["| #{header_cells.join(" | ")} |", separator]
+  rows.each { |row| lines << "| #{row.join(" | ")} |" }
+  "\n#{lines.join("\n")}\n\n"
+end
+
+def normalize_href(href)
+  stripped = href.sub(%r{\A/docs/[^#]*}, "")
+  stripped.empty? ? "#" : stripped
+end
+
+# LLM-friendly ASCII replacements. Matches the existing hand-written style.
+def decode_entities(s)
+  s
+    .gsub("&mdash;", "--")
+    .gsub("&ndash;", "-")
+    .gsub("&rarr;", "->")
+    .gsub("&larr;", "<-")
+    .gsub("&hellip;", "...")
+    .gsub("&nbsp;", " ")
+    .gsub("&amp;", "&")
+    .gsub("&lt;", "<")
+    .gsub("&gt;", ">")
+    .gsub("&quot;", '"')
+    .gsub("&apos;", "'")
+end
+
+def skip_sections(md, titles)
+  return md if titles.empty?
+
+  # Split on ANY heading level so this works both with and without demotion.
+  parts = md.split(/^(#+ .+)$/)
+  kept = [parts[0]]
+  parts[1..].each_slice(2) do |header, content|
+    clean_header = header.to_s.strip.sub(/\A#+\s*/, "")
+    next if titles.include?(clean_header)
+
+    kept << header
+    kept << content if content
+  end
+  kept.join
+end
+
+main

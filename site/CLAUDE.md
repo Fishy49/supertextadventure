@@ -1,0 +1,51 @@
+# CLAUDE.md (site/)
+
+## Static site
+
+This directory is the public site (supertextadventure.com), deployed as a
+free DigitalOcean App Platform static site, separate from the Rails app.
+`bin/build` renders the ERB templates in `views/` into `dist/` (gitignored),
+compiles `css/input.css` with the Tailwind CLI, and copies `public/` in.
+`.do/site.yaml` at the repo root is the app spec; it runs `ruby bin/build`
+with `site` as the source directory.
+
+Rendering is stdlib Ruby. The `Gemfile` here is intentionally empty and must
+stay that way: it exists only so DigitalOcean's buildpacks detect Ruby. The
+Tailwind CLI comes from `package.json` (`npm install` once).
+
+`bin/build` passes each docs page its slug as `page`; `views/docs_layout.erb`
+uses it for the active sidebar item and the `<title>`. New docs pages are
+picked up automatically from `views/docs/*.erb`, but the sidebar `nav` hash
+at the top of `docs_layout.erb`, the search index in its `<script>`, and
+`PAGES` in `bin/build-llms` are hand-maintained lists that need updating too.
+
+All Tailwind theme tokens (terminal colors, cursor blink, screen lines)
+live in `css/input.css`; both layouts link the compiled `/css/main.css`.
+Docs-only plain CSS (code blocks, tables, badges) stays inline in
+`views/docs_layout.erb`.
+
+## `public/llms.txt`
+
+`public/llms.txt` is generated from the ERB docs in `views/docs/` by
+`bin/build-llms`. Don't hand-edit `public/llms.txt` - edit the ERB sources
+and regenerate:
+
+```sh
+bin/build-llms
+```
+
+### Pre-commit hook
+
+`githooks/pre-commit` at the repo root auto-runs `site/bin/build-llms` when a
+commit touches `site/views/docs/*.erb` or `site/bin/build-llms`, then stages
+the refreshed `site/public/llms.txt` into the same commit. Unstaged changes
+to the source files are stashed during the rebuild so the regen reflects
+exactly what's being committed.
+
+Install once per clone, from the repo root:
+
+```sh
+git config core.hooksPath githooks
+```
+
+Bypass with `git commit --no-verify`.

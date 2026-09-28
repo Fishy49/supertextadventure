@@ -1,0 +1,279 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Items</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  Items are objects players can interact with &mdash; pick up, drop, use, examine, and equip. Items can also be weapons, containers, keys, healing potions, and more.
+</p>
+
+<h2 id="schema" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Schema</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"item_id"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Rusty Sword"</span>,
+  <span class="key">"description"</span>: <span class="str">"A dull blade, but still sharp enough to cut."</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"sword"</span>, <span class="str">"blade"</span>, <span class="str">"rusty blade"</span>],
+  <span class="key">"takeable"</span>: <span class="bool">true</span>,
+  <span class="key">"consumable"</span>: <span class="bool">false</span>
+}</pre>
+
+<h2 id="base-fields" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Base Fields</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Display name shown to the player.</td>
+    </tr>
+    <tr>
+      <td><code>description</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Text shown when the player examines the item.</td>
+    </tr>
+    <tr>
+      <td><code>keywords</code></td>
+      <td>array</td>
+      <td><code>[]</code></td>
+      <td>Alternative names for fuzzy matching. Players can refer to the item by any keyword.</td>
+    </tr>
+    <tr>
+      <td><code>takeable</code></td>
+      <td>boolean</td>
+      <td><code>true</code></td>
+      <td>Whether the player can pick up this item.</td>
+    </tr>
+    <tr>
+      <td><code>cant_take_msg</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Custom message when trying to take a non-takeable item.</td>
+    </tr>
+    <tr>
+      <td><code>consumable</code></td>
+      <td>boolean</td>
+      <td><code>false</code></td>
+      <td>If <code>true</code>, the item is removed from inventory when used.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="weapons" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Weapons & Armor</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Items can provide combat bonuses when in the player's inventory.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"iron_sword"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Iron Sword"</span>,
+  <span class="key">"description"</span>: <span class="str">"A well-forged iron blade."</span>,
+  <span class="key">"weapon_damage"</span>: <span class="num">8</span>
+}
+
+<span class="key">"leather_shield"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Leather Shield"</span>,
+  <span class="key">"description"</span>: <span class="str">"A sturdy shield made of hardened leather."</span>,
+  <span class="key">"defense_bonus"</span>: <span class="num">3</span>
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>weapon_damage</code></td>
+      <td>number</td>
+      <td>Bonus damage added to attacks. Only the <strong>highest</strong> weapon_damage in inventory is used (not stacked).</td>
+    </tr>
+    <tr>
+      <td><code>defense_bonus</code></td>
+      <td>number</td>
+      <td>Bonus to defense. All defense bonuses in inventory are <strong>stacked</strong> (summed).</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="border border-terminal-dim rounded p-4 mt-4">
+  <div class="text-xl text-terminal-bright">Combat bonus behavior:</div>
+  <ul class="text-xl list-disc list-inside space-y-1 pt-2">
+    <li><strong>Weapons:</strong> Only the best weapon counts. If you have a sword (8 dmg) and a dagger (3 dmg), your bonus is 8.</li>
+    <li><strong>Armor:</strong> All defense bonuses stack. Shield (3) + helmet (2) = 5 total defense bonus.</li>
+    <li>Items provide bonuses passively just by being in inventory &mdash; no "equip" action needed.</li>
+  </ul>
+</div>
+
+<h2 id="combat-effect" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">combat_effect</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Items with <code class="text-terminal-bright">combat_effect</code> can be used during combat for special actions like healing.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"health_potion"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Health Potion"</span>,
+  <span class="key">"description"</span>: <span class="str">"A glowing red potion."</span>,
+  <span class="key">"consumable"</span>: <span class="bool">true</span>,
+  <span class="key">"combat_effect"</span>: {
+    <span class="key">"type"</span>: <span class="str">"heal"</span>,
+    <span class="key">"amount"</span>: <span class="num">15</span>
+  }
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>type</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Effect type. Currently only <code class="text-terminal-bright">"heal"</code> is supported.</td>
+    </tr>
+    <tr>
+      <td><code>amount</code></td>
+      <td>number</td>
+      <td><code>10</code></td>
+      <td>Amount of HP restored. Capped at player's max health.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="on-use" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">on_use</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Defines what happens when a player uses the item outside of combat.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"on_use"</span>: {
+  <span class="key">"type"</span>: <span class="str">"unlock"</span>,        <span class="comment">// or "message", "heal", "script"</span>
+  <span class="key">"requires_target"</span>: <span class="bool">true</span>,  <span class="comment">// for "unlock": needs a target</span>
+  <span class="key">"sets_flag"</span>: <span class="str">"flag_name"</span>,
+  <span class="key">"success_msg"</span>: <span class="str">"You use the item successfully."</span>
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>type</th><th>Behavior</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>"unlock"</code></td>
+      <td>Sets a flag and shows a success message. Use with <code>requires_target</code> to require the player to specify what they're unlocking.</td>
+    </tr>
+    <tr>
+      <td><code>"message"</code></td>
+      <td>Simply displays the <code>text</code> field to the player.</td>
+    </tr>
+    <tr>
+      <td><code>"heal"</code></td>
+      <td>Restores HP by <code>amount</code>. Item is consumed if <code>consumable: true</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="text-2xl pt-6 pb-2 text-terminal-bright">on_use Fields</h3>
+
+<table class="doc-table mt-2">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>type</code></td><td>string</td><td>One of: <code>"unlock"</code>, <code>"message"</code>, <code>"heal"</code></td></tr>
+    <tr><td><code>requires_target</code></td><td>boolean</td><td>For "unlock" &mdash; requires player to specify a target</td></tr>
+    <tr><td><code>sets_flag</code></td><td>string</td><td>Flag to set when used</td></tr>
+    <tr><td><code>success_msg</code></td><td>string</td><td>Message shown on successful use</td></tr>
+    <tr><td><code>text</code></td><td>string</td><td>Message shown (for "message" type)</td></tr>
+    <tr><td><code>amount</code></td><td>number</td><td>HP restored (for "heal" type)</td></tr>
+  </tbody>
+</table>
+
+<h2 id="reveals-exit" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">reveals_exit</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Using the item reveals a hidden exit in the current room.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"magic_lens"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Magic Lens"</span>,
+  <span class="key">"description"</span>: <span class="str">"A lens that reveals hidden things."</span>,
+  <span class="key">"reveals_exit"</span>: {
+    <span class="key">"direction"</span>: <span class="str">"west"</span>,
+    <span class="key">"message"</span>: <span class="str">"Through the lens, a hidden doorway shimmers into view!"</span>
+  }
+}</pre>
+
+<h2 id="on-examine" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">on_examine</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Special behavior when the item is examined. Can reveal exits or show custom text.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"suspicious_bookcase"</span>: {
+  <span class="key">"name"</span>: <span class="str">"suspicious bookcase"</span>,
+  <span class="key">"description"</span>: <span class="str">"A tall bookcase. One shelf seems slightly askew."</span>,
+  <span class="key">"takeable"</span>: <span class="bool">false</span>,
+  <span class="key">"on_examine"</span>: {
+    <span class="key">"reveals_exit"</span>: <span class="str">"west"</span>,
+    <span class="key">"text"</span>: <span class="str">"Pulling a book triggers a mechanism. The bookcase swings open!"</span>
+  }
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>reveals_exit</code></td><td>string</td><td>Direction of the exit to reveal in the current room.</td></tr>
+    <tr><td><code>text</code></td><td>string</td><td>Custom text shown instead of the normal description.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="dice-roll" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">dice_roll</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Items can trigger D&D-style dice rolls when used. See <a href="/docs/dice-rolls#schema" class="text-terminal-bright hover:underline">Dice Rolls</a> for full details.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"lockpick"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Lockpick"</span>,
+  <span class="key">"description"</span>: <span class="str">"A thin metal pick for opening locks."</span>,
+  <span class="key">"consumable"</span>: <span class="bool">true</span>,
+  <span class="key">"dice_roll"</span>: {
+    <span class="key">"dc"</span>: <span class="num">12</span>,
+    <span class="key">"dice"</span>: <span class="str">"1d20"</span>,
+    <span class="key">"attempt_message"</span>: <span class="str">"You carefully insert the lockpick..."</span>,
+    <span class="key">"consume_on"</span>: <span class="str">"failure"</span>,
+    <span class="key">"on_success"</span>: { <span class="comment">/* ... */</span> },
+    <span class="key">"on_failure"</span>: { <span class="comment">/* ... */</span> }
+  }
+}</pre>
+
+<h2 id="non-takeable" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Non-Takeable Items</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Some items are part of the environment and shouldn't be picked up. Set <code class="text-terminal-bright">takeable: false</code> and optionally provide a custom rejection message.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"fountain"</span>: {
+  <span class="key">"name"</span>: <span class="str">"stone fountain"</span>,
+  <span class="key">"description"</span>: <span class="str">"A beautiful fountain with crystal-clear water."</span>,
+  <span class="key">"takeable"</span>: <span class="bool">false</span>,
+  <span class="key">"cant_take_msg"</span>: <span class="str">"The fountain is far too heavy to move."</span>
+}</pre>
+
+<h2 id="fuzzy-matching" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Fuzzy Matching</h2>
+
+<p class="text-xl pt-4 pb-3">
+  The engine matches player input against items using this priority:
+</p>
+
+<ol class="text-xl list-decimal list-inside space-y-2 pt-2">
+  <li><strong>Exact ID match</strong> &mdash; e.g., <code>take rusty_sword</code> matches item ID <code>rusty_sword</code></li>
+  <li><strong>Keyword match</strong> &mdash; checks if any keyword contains the search term (or vice versa)</li>
+  <li><strong>Name match</strong> &mdash; checks if the item's <code>name</code> contains the search term</li>
+</ol>
+
+<p class="text-xl pt-3 text-terminal-dim">All matching is case-insensitive. Good keywords make your items easier to interact with.</p>

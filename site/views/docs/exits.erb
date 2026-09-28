@@ -1,0 +1,277 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Exits</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  Exits connect rooms together. They range from simple one-way pointers to complex locked passages with keywords, flags, and reveal mechanics.
+</p>
+
+<h2 id="simple" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Simple Exits</h2>
+
+<p class="text-xl pt-4 pb-3">
+  The simplest exit is just a direction mapped to a destination room ID:
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"exits"</span>: {
+  <span class="key">"north"</span>: <span class="str">"town_square"</span>,
+  <span class="key">"east"</span>: <span class="str">"forest"</span>,
+  <span class="key">"up"</span>: <span class="str">"tower_top"</span>
+}</pre>
+
+<p class="text-xl pt-3">Players can use <code class="text-terminal-bright">go north</code>, <code class="text-terminal-bright">n</code>, or <code class="text-terminal-bright">walk north</code> to move.</p>
+
+<h2 id="directions" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Available Directions</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Direction</th><th>Shortcuts</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>north</td><td>n</td></tr>
+    <tr><td>south</td><td>s</td></tr>
+    <tr><td>east</td><td>e</td></tr>
+    <tr><td>west</td><td>w</td></tr>
+    <tr><td>northeast</td><td>ne</td></tr>
+    <tr><td>northwest</td><td>nw</td></tr>
+    <tr><td>southeast</td><td>se</td></tr>
+    <tr><td>southwest</td><td>sw</td></tr>
+    <tr><td>up</td><td>u</td></tr>
+    <tr><td>down</td><td>d</td></tr>
+    <tr><td>in</td><td>&mdash;</td></tr>
+    <tr><td>out</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+
+<h2 id="complex" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Complex Exits</h2>
+
+<p class="text-xl pt-4 pb-3">
+  For exits with conditions, locks, or special behavior, use an object instead of a plain string:
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"north"</span>: {
+  <span class="key">"to"</span>: <span class="str">"throne_room"</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"door"</span>, <span class="str">"iron door"</span>, <span class="str">"heavy door"</span>],
+  <span class="key">"requires"</span>: <span class="str">"throne_key"</span>,
+  <span class="key">"locked_msg"</span>: <span class="str">"The iron door is locked. You need a key."</span>,
+  <span class="key">"unlocked_msg"</span>: <span class="str">"The iron door stands open."</span>
+}</pre>
+
+<h2 id="complex-fields" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Complex Exit Fields</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>to</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Destination room ID.</td>
+    </tr>
+    <tr>
+      <td><code>keywords</code></td>
+      <td>array</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Natural language names for the exit. Lets players say <code>use key on door</code> instead of <code>use key on north</code>.</td>
+    </tr>
+    <tr>
+      <td><code>requires</code></td>
+      <td>string</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Item ID that must be in the player's inventory to pass.</td>
+    </tr>
+    <tr>
+      <td><code>requires_flag</code></td>
+      <td>string</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>A global flag that must be <code>true</code> for the exit to be usable.</td>
+    </tr>
+    <tr>
+      <td><code>locked_msg</code></td>
+      <td>string</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Message shown when the player tries to use a locked exit.</td>
+    </tr>
+    <tr>
+      <td><code>unlocked_msg</code></td>
+      <td>string</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Message shown when the exit is available/unlocked.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="interactive" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Interactive Unlocking</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Exits can be unlocked by using a specific item on them. This gives you more control than the passive <code>requires</code> check.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"east"</span>: {
+  <span class="key">"to"</span>: <span class="str">"secret_chamber"</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"gate"</span>, <span class="str">"iron gate"</span>],
+  <span class="key">"use_item"</span>: <span class="str">"skeleton_key"</span>,
+  <span class="key">"on_unlock"</span>: <span class="str">"The skeleton key turns with a satisfying click."</span>,
+  <span class="key">"permanently_unlock"</span>: <span class="bool">true</span>,
+  <span class="key">"consume_item"</span>: <span class="bool">true</span>,
+  <span class="key">"sets_flag"</span>: <span class="str">"secret_chamber_unlocked"</span>,
+  <span class="key">"locked_msg"</span>: <span class="str">"An iron gate blocks the passage."</span>
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>use_item</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Item ID that can unlock this exit when used on it.</td>
+    </tr>
+    <tr>
+      <td><code>on_unlock</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Message displayed when the exit is unlocked with the item.</td>
+    </tr>
+    <tr>
+      <td><code>permanently_unlock</code></td>
+      <td>boolean</td>
+      <td><code>false</code></td>
+      <td>If <code>true</code>, the exit stays unlocked permanently after first use.</td>
+    </tr>
+    <tr>
+      <td><code>consume_item</code></td>
+      <td>boolean</td>
+      <td><code>false</code></td>
+      <td>If <code>true</code>, the item is removed from inventory when used.</td>
+    </tr>
+    <tr>
+      <td><code>sets_flag</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Global flag set to <code>true</code> when the exit is unlocked or used.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="text-xl pt-4">
+  Players unlock interactive exits with: <code class="text-terminal-bright">use skeleton_key on gate</code> or <code class="text-terminal-bright">use skeleton_key on east</code>
+</p>
+
+<h2 id="hidden" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Hidden Exits</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Hidden exits don't appear in the room's exit list until they are revealed. They can be revealed by examining items, using items, or setting flags.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"west"</span>: {
+  <span class="key">"to"</span>: <span class="str">"hidden_passage"</span>,
+  <span class="key">"hidden"</span>: <span class="bool">true</span>,
+  <span class="key">"reveal_msg"</span>: <span class="str">"A hidden passage is revealed behind the bookcase!"</span>
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>hidden</code></td>
+      <td>boolean</td>
+      <td>If <code>true</code>, this exit is not shown in exit listings until revealed.</td>
+    </tr>
+    <tr>
+      <td><code>reveal_msg</code></td>
+      <td>string</td>
+      <td>Message shown when the exit is revealed.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="text-2xl pt-6 pb-2 text-terminal-bright">Ways to Reveal Hidden Exits</h3>
+
+<div class="text-xl space-y-4 pt-2">
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">1. Via item examination</div>
+    <p class="text-terminal-dim pt-1">Set <code>on_examine.reveals_exit</code> on an item in the room:</p>
+    <pre class="doc-code text-terminal-green mt-2"><span class="key">"old_painting"</span>: {
+  <span class="key">"name"</span>: <span class="str">"old painting"</span>,
+  <span class="key">"description"</span>: <span class="str">"A landscape painting. Something seems off..."</span>,
+  <span class="key">"on_examine"</span>: {
+    <span class="key">"reveals_exit"</span>: <span class="str">"west"</span>,
+    <span class="key">"text"</span>: <span class="str">"Behind the painting, you discover a hidden lever!"</span>
+  }
+}</pre>
+  </div>
+
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">2. Via item use</div>
+    <p class="text-terminal-dim pt-1">Set <code>reveals_exit</code> on an item:</p>
+    <pre class="doc-code text-terminal-green mt-2"><span class="key">"magic_lens"</span>: {
+  <span class="key">"name"</span>: <span class="str">"magic lens"</span>,
+  <span class="key">"reveals_exit"</span>: {
+    <span class="key">"direction"</span>: <span class="str">"west"</span>,
+    <span class="key">"message"</span>: <span class="str">"Through the lens, a hidden door shimmers into view!"</span>
+  }
+}</pre>
+  </div>
+
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">3. Via flag</div>
+    <p class="text-terminal-dim pt-1">Use <code>requires_flag</code> &mdash; when the flag is set, the exit auto-reveals.</p>
+  </div>
+</div>
+
+<h2 id="keywords" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Exit Keywords</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Keywords let players reference exits by name instead of direction. This makes interactions feel more natural:
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"north"</span>: {
+  <span class="key">"to"</span>: <span class="str">"castle_interior"</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"drawbridge"</span>, <span class="str">"castle gate"</span>, <span class="str">"gate"</span>],
+  <span class="key">"use_item"</span>: <span class="str">"castle_key"</span>,
+  <span class="key">"locked_msg"</span>: <span class="str">"The castle gate is sealed shut."</span>
+}</pre>
+
+<p class="text-xl pt-3">Now players can type:</p>
+<ul class="text-xl list-disc list-inside space-y-1 pt-2">
+  <li><code class="text-terminal-bright">use castle_key on gate</code> (instead of <code>use castle_key on north</code>)</li>
+  <li><code class="text-terminal-bright">go drawbridge</code> (instead of <code>go north</code>)</li>
+</ul>
+
+<p class="text-xl pt-3 text-terminal-dim">Keywords are case-insensitive and support multi-word phrases.</p>
+
+<h2 id="example" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Full Example</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"exits"</span>: {
+  <span class="comment">// Simple exit</span>
+  <span class="key">"north"</span>: <span class="str">"town_square"</span>,
+
+  <span class="comment">// Locked exit requiring inventory item</span>
+  <span class="key">"east"</span>: {
+    <span class="key">"to"</span>: <span class="str">"treasury"</span>,
+    <span class="key">"requires"</span>: <span class="str">"gold_key"</span>,
+    <span class="key">"locked_msg"</span>: <span class="str">"The door is locked."</span>
+  },
+
+  <span class="comment">// Interactive unlock with keywords</span>
+  <span class="key">"south"</span>: {
+    <span class="key">"to"</span>: <span class="str">"dungeon"</span>,
+    <span class="key">"keywords"</span>: [<span class="str">"trapdoor"</span>, <span class="str">"hatch"</span>],
+    <span class="key">"use_item"</span>: <span class="str">"crowbar"</span>,
+    <span class="key">"on_unlock"</span>: <span class="str">"You pry open the trapdoor with a groan of metal."</span>,
+    <span class="key">"permanently_unlock"</span>: <span class="bool">true</span>,
+    <span class="key">"consume_item"</span>: <span class="bool">false</span>,
+    <span class="key">"locked_msg"</span>: <span class="str">"A heavy trapdoor. It won't budge by hand."</span>
+  },
+
+  <span class="comment">// Hidden exit</span>
+  <span class="key">"west"</span>: {
+    <span class="key">"to"</span>: <span class="str">"secret_room"</span>,
+    <span class="key">"hidden"</span>: <span class="bool">true</span>,
+    <span class="key">"reveal_msg"</span>: <span class="str">"A section of wall slides away!"</span>
+  }
+}</pre>

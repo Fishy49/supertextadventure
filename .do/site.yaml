@@ -1,0 +1,32 @@
+# DigitalOcean App Platform spec for the public site (supertextadventure.com):
+# the landing page plus the Classic Game Engine docs, all under site/.
+#
+# It is deliberately its own app, separate from the Rails game, so it lands
+# on the free static-site tier. site/Gemfile (empty on purpose) is there so
+# DO's Ruby buildpack kicks in, and site/package.json brings Node for the
+# Tailwind CLI; `ruby bin/build` then writes the finished site to site/dist.
+#
+# Create the app from this file once the code is on main:
+#
+#   doctl apps create --spec .do/site.yaml
+#
+# Or in the control panel: Create App from the GitHub repo and match the
+# settings below (source directory site, build command, output directory,
+# domain). DNS for the domain lives at DNSimple, not DO, so after creation
+# point the apex at the app's default hostname with an ALIAS record to
+# <app-name>-<id>.ondigitalocean.app; the certificate issues once that
+# resolves, and the domain shows as pending until then.
+name: supertextadventure-site
+static_sites:
+  - name: site
+    github:
+      repo: Fishy49/supertextadventure
+      branch: main
+      deploy_on_push: true
+    source_dir: site
+    build_command: ruby bin/build
+    output_dir: dist
+    error_document: 404.html
+domains:
+  - domain: supertextadventure.com
+    type: PRIMARY

@@ -1,0 +1,9 @@
+{
+  "name": "supertextadventure.com",
+  "private": true,
+  "description": "Static site for supertextadventure.com. Only dependency is the Tailwind CLI used by bin/build.",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "tailwindcss": "^4.1.18"
+  }
+}

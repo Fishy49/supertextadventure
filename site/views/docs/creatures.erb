@@ -1,0 +1,278 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Creatures</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  Creatures are hostile entities that players can attack to initiate turn-based combat. They have health, attack power, and can drop loot when defeated.
+</p>
+
+<h2 id="schema" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Schema</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"creature_id"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Cave Troll"</span>,
+  <span class="key">"description"</span>: <span class="str">"A massive troll with stone-like skin."</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"troll"</span>, <span class="str">"monster"</span>],
+  <span class="key">"health"</span>: <span class="num">30</span>,
+  <span class="key">"attack"</span>: <span class="num">8</span>,
+  <span class="key">"defense"</span>: <span class="num">2</span>,
+  <span class="key">"hostile"</span>: <span class="bool">true</span>,
+  <span class="key">"talk_text"</span>: <span class="str">"The troll grunts at you, clearly unimpressed."</span>,
+  <span class="key">"aggro_text"</span>: <span class="str">"The Cave Troll roars and lunges at you!"</span>,
+  <span class="key">"attack_condition"</span>: { <span class="key">"moves"</span>: <span class="num">3</span> },
+  <span class="key">"on_defeat_msg"</span>: <span class="str">"The troll crashes to the ground with a thunderous boom!"</span>,
+  <span class="key">"on_flee_msg"</span>: <span class="str">"The troll roars as you escape!"</span>,
+  <span class="key">"loot"</span>: [<span class="str">"troll_gem"</span>, <span class="str">"troll_club"</span>],
+  <span class="key">"sets_flag_on_defeat"</span>: <span class="str">"troll_slain"</span>
+}</pre>
+
+<h2 id="fields" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Fields</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Display name shown to the player.</td>
+    </tr>
+    <tr>
+      <td><code>description</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Text shown when the player examines the creature.</td>
+    </tr>
+    <tr>
+      <td><code>keywords</code></td>
+      <td>array</td>
+      <td><code>[]</code></td>
+      <td>Alternative names for fuzzy matching.</td>
+    </tr>
+    <tr>
+      <td><code>health</code></td>
+      <td>number</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Maximum hit points. This is both starting and max HP.</td>
+    </tr>
+    <tr>
+      <td><code>attack</code></td>
+      <td>number</td>
+      <td><code>5</code></td>
+      <td>Base attack power. Actual damage = attack + rand(-2..2) - player defense.</td>
+    </tr>
+    <tr>
+      <td><code>defense</code></td>
+      <td>number</td>
+      <td><code>0</code></td>
+      <td>Defense value subtracted from player's attack damage.</td>
+    </tr>
+    <tr>
+      <td><code>hostile</code></td>
+      <td>boolean</td>
+      <td><code>false</code></td>
+      <td>If <code>true</code>, the creature can auto-attack the player. See <a href="#hostile" class="text-terminal-bright hover:underline">Hostile Creatures</a>.</td>
+    </tr>
+    <tr>
+      <td><code>talk_text</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>What the creature "says" when the player uses <code>talk to [creature]</code>. Defaults to <em>"It has no clue what you're saying."</em></td>
+    </tr>
+    <tr>
+      <td><code>aggro_text</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Message shown when a hostile creature begins attacking. Defaults to <em>"The [name] attacks you!"</em></td>
+    </tr>
+    <tr>
+      <td><code>attack_condition</code></td>
+      <td>object</td>
+      <td>&mdash;</td>
+      <td>When a hostile creature auto-attacks. See <a href="#attack-conditions" class="text-terminal-bright hover:underline">Attack Conditions</a>.</td>
+    </tr>
+    <tr>
+      <td><code>movement</code></td>
+      <td>object</td>
+      <td>&mdash;</td>
+      <td>Optional patrol or triggered movement. See <a href="/docs/npcs#movement" class="text-terminal-bright hover:underline">Movement</a> on the NPCs page &mdash; the schema is identical.</td>
+    </tr>
+    <tr>
+      <td><code>on_defeat_msg</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Custom message displayed when the creature is defeated.</td>
+    </tr>
+    <tr>
+      <td><code>on_flee_msg</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Custom message displayed when the player flees from combat.</td>
+    </tr>
+    <tr>
+      <td><code>loot</code></td>
+      <td>array</td>
+      <td><code>[]</code></td>
+      <td>Array of item IDs dropped into the room when the creature is defeated.</td>
+    </tr>
+    <tr>
+      <td><code>sets_flag_on_defeat</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Global flag set to <code>true</code> when the creature is defeated.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="talking" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Talking to Creatures</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Creatures don't have dialogue trees like NPCs, but the player can still <code class="text-terminal-bright">talk to [creature]</code>. The engine responds with the creature's <code>talk_text</code> &mdash; useful for flavor, warnings, or hostile creatures with an <code>on_talk</code> attack condition.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"tavern_rat"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Tavern Rat"</span>,
+  <span class="key">"description"</span>: <span class="str">"A fat, lazy rat lounging near the fireplace."</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"rat"</span>, <span class="str">"tavern rat"</span>],
+  <span class="key">"health"</span>: <span class="num">3</span>,
+  <span class="key">"attack"</span>: <span class="num">1</span>,
+  <span class="key">"talk_text"</span>: <span class="str">"The rat squeaks and twitches its whiskers at you."</span>
+}</pre>
+
+<div class="border border-terminal-dim rounded p-4 mt-4">
+  <div class="text-xl text-terminal-bright">NPC priority:</div>
+  <p class="text-xl pt-2 text-terminal-dim">
+    If a room contains both an NPC and a creature matching the same keyword, the NPC wins &mdash; <code>talk to bob</code> always prefers an NPC named Bob over a creature named Bob the Beast.
+  </p>
+</div>
+
+<h2 id="hostile" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Hostile Creatures</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Set <code class="text-terminal-bright">"hostile": true</code> to let a creature auto-attack the player without waiting to be attacked first. After every player action in the same room, the engine checks whether the creature should initiate combat.
+</p>
+
+<div class="text-xl space-y-3 pt-2">
+  <p><span class="text-terminal-bright">1.</span> The player takes any action (<code>look</code>, <code>take</code>, <code>go</code>, <code>talk</code>, etc.)</p>
+  <p><span class="text-terminal-bright">2.</span> The engine checks each hostile creature in the current room</p>
+  <p><span class="text-terminal-bright">3.</span> If the creature's <code>attack_condition</code> is met (or there is none), it initiates combat</p>
+  <p><span class="text-terminal-bright">4.</span> The <code>aggro_text</code> is displayed, then initiative is rolled</p>
+</div>
+
+<div class="border border-terminal-dim rounded p-4 mt-4">
+  <div class="text-xl text-terminal-bright">Non-hostile creatures:</div>
+  <p class="text-xl pt-2 text-terminal-dim">
+    A creature without <code>hostile: true</code> will never initiate combat on its own. The player must <code>attack</code> it directly.
+  </p>
+</div>
+
+<h2 id="attack-conditions" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Attack Conditions</h2>
+
+<p class="text-xl pt-4 pb-3">
+  An <code class="text-terminal-bright">attack_condition</code> controls <em>when</em> a hostile creature actually attacks. Without one, a hostile creature attacks on the very first player action in the room.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="comment">// Attack after the player has taken 3 actions in the room</span>
+<span class="key">"attack_condition"</span>: { <span class="key">"moves"</span>: <span class="num">3</span> }
+
+<span class="comment">// Attack the second time the player enters the room</span>
+<span class="key">"attack_condition"</span>: { <span class="key">"room_entries"</span>: <span class="num">2</span> }
+
+<span class="comment">// Attack only when the player tries to talk to the creature</span>
+<span class="key">"attack_condition"</span>: { <span class="key">"on_talk"</span>: <span class="bool">true</span> }</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Condition</th><th>Type</th><th>Behavior</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>moves</code></td>
+      <td>number</td>
+      <td>Creature attacks after the player has taken at least this many actions in the current room. Lets the player look around and prepare first.</td>
+    </tr>
+    <tr>
+      <td><code>room_entries</code></td>
+      <td>number</td>
+      <td>Creature attacks once the player has entered the room at least this many times. Useful for "first visit is safe" encounters.</td>
+    </tr>
+    <tr>
+      <td><code>on_talk</code></td>
+      <td>boolean</td>
+      <td>Creature only attacks when the player <code>talk</code>s to it. Great for a creature that you can try to parley with, but that turns hostile when provoked.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="text-xl pt-3 text-terminal-dim">
+  Only one condition type is evaluated per creature. If an unknown key is set, the creature defers attacking indefinitely.
+</p>
+
+<h2 id="combat-stats" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Balancing Combat Stats</h2>
+
+<div class="border border-terminal-dim rounded p-4 mt-4">
+  <div class="text-xl text-terminal-bright">Damage formula:</div>
+  <pre class="doc-code text-terminal-green mt-2"><span class="comment">// Creature attacking player:</span>
+damage = creature.attack + rand(-2..2) - player_defense
+damage = [damage, <span class="num">1</span>].max  <span class="comment">// minimum 1 damage</span>
+
+<span class="comment">// Player attacking creature:</span>
+damage = <span class="num">5</span> + weapon_damage + rand(-2..2) - creature.defense
+damage = [damage, <span class="num">1</span>].max  <span class="comment">// minimum 1 damage</span></pre>
+</div>
+
+<div class="text-xl space-y-3 pt-6">
+  <p><span class="text-terminal-bright">Player base attack:</span> 5 (hardcoded)</p>
+  <p><span class="text-terminal-bright">Player starting HP:</span> 10 (default)</p>
+  <p><span class="text-terminal-bright">Variance:</span> -2 to +2 on each attack</p>
+  <p><span class="text-terminal-bright">Minimum damage:</span> 1 (always deal at least 1 HP)</p>
+</div>
+
+<h3 class="text-2xl pt-6 pb-2 text-terminal-bright">Example Difficulty Tiers</h3>
+
+<table class="doc-table mt-2">
+  <thead>
+    <tr><th>Tier</th><th>Health</th><th>Attack</th><th>Defense</th><th>Notes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Easy</td><td>10-15</td><td>3-5</td><td>0</td><td>Beatable without weapons</td></tr>
+    <tr><td>Medium</td><td>20-30</td><td>5-8</td><td>1-2</td><td>Weapon recommended</td></tr>
+    <tr><td>Hard</td><td>40-60</td><td>8-12</td><td>3-5</td><td>Needs good gear + potions</td></tr>
+    <tr><td>Boss</td><td>80+</td><td>12+</td><td>5+</td><td>Bring everything you've got</td></tr>
+  </tbody>
+</table>
+
+<h2 id="loot" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Loot System</h2>
+
+<p class="text-xl pt-4 pb-3">
+  When a creature is defeated, all items in its <code class="text-terminal-bright">loot</code> array are dropped into the current room. Players can then <code>take</code> them normally.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="comment">// The items must be defined in the top-level "items" object</span>
+<span class="key">"loot"</span>: [<span class="str">"dragon_scale"</span>, <span class="str">"gold_coins"</span>]</pre>
+
+<p class="text-xl pt-3 text-terminal-dim">
+  Loot items should be defined in your <code>items</code> object but don't need to be placed in any room initially &mdash; they'll appear when the creature drops them.
+</p>
+
+<h2 id="example" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Example</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"forest_spider"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Giant Forest Spider"</span>,
+  <span class="key">"description"</span>: <span class="str">"A spider the size of a dog, with dripping fangs and eight gleaming eyes."</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"spider"</span>, <span class="str">"giant spider"</span>],
+  <span class="key">"health"</span>: <span class="num">15</span>,
+  <span class="key">"attack"</span>: <span class="num">4</span>,
+  <span class="key">"defense"</span>: <span class="num">0</span>,
+  <span class="key">"hostile"</span>: <span class="bool">true</span>,
+  <span class="key">"talk_text"</span>: <span class="str">"The spider hisses at you menacingly."</span>,
+  <span class="key">"aggro_text"</span>: <span class="str">"The Giant Forest Spider lunges at you!"</span>,
+  <span class="key">"attack_condition"</span>: { <span class="key">"moves"</span>: <span class="num">3</span> },
+  <span class="key">"on_defeat_msg"</span>: <span class="str">"The spider curls up and stops moving. A silk-wrapped bundle falls from its web."</span>,
+  <span class="key">"on_flee_msg"</span>: <span class="str">"You stumble backward through the webs as the spider hisses."</span>,
+  <span class="key">"loot"</span>: [<span class="str">"spider_silk"</span>],
+  <span class="key">"sets_flag_on_defeat"</span>: <span class="str">"spider_cleared"</span>
+}</pre>
+
+<p class="text-xl pt-4 text-terminal-dim">
+  The player enters the room, has three turns to look around, grab items, or prepare, and on the fourth action the spider attacks.
+</p>

@@ -1,0 +1,287 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Full Example</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  A complete game world JSON demonstrating rooms, items, NPCs, creatures, exits, containers, dice rolls, and quest flags working together.
+</p>
+
+<h2 id="overview" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Game Overview</h2>
+
+<p class="text-xl pt-4 pb-3">
+  This example creates a small adventure where the player starts in a tavern, talks to a wizard to receive a quest, explores a forest, fights a spider, uses a lockpick to open a locked gate, and retrieves a crystal from a cave.
+</p>
+
+<h2 id="json" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Complete JSON</h2>
+
+<pre class="doc-code text-terminal-green mt-4" style="font-size: 1rem;">{
+  <span class="key">"meta"</span>: {
+    <span class="key">"name"</span>: <span class="str">"The Crystal Quest"</span>,
+    <span class="key">"description"</span>: <span class="str">"Retrieve the Crystal of Power from the forest cave and return it to the wizard."</span>,
+    <span class="key">"starting_room"</span>: <span class="str">"tavern"</span>,
+    <span class="key">"version"</span>: <span class="str">"1.0"</span>
+  },
+
+  <span class="key">"rooms"</span>: {
+    <span class="key">"tavern"</span>: {
+      <span class="key">"name"</span>: <span class="str">"The Rusty Flagon"</span>,
+      <span class="key">"description"</span>: <span class="str">"A cozy tavern with a crackling fireplace. The bartender polishes glasses behind the bar. A wooden chest sits in the corner."</span>,
+      <span class="key">"exits"</span>: {
+        <span class="key">"north"</span>: <span class="str">"forest_edge"</span>
+      },
+      <span class="key">"on_enter"</span>: {
+        <span class="key">"type"</span>: <span class="str">"message"</span>,
+        <span class="key">"text"</span>: <span class="str">"The warmth of the fire embraces you. A wizard in the corner catches your eye."</span>
+      }
+    },
+    <span class="key">"forest_edge"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Forest Edge"</span>,
+      <span class="key">"description"</span>: <span class="str">"Tall trees loom before you. A narrow path winds into the dark woods. You can hear something skittering in the undergrowth."</span>,
+      <span class="key">"exits"</span>: {
+        <span class="key">"south"</span>: <span class="str">"tavern"</span>,
+        <span class="key">"north"</span>: <span class="str">"deep_forest"</span>
+      }
+    },
+    <span class="key">"deep_forest"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Deep Forest"</span>,
+      <span class="key">"description"</span>: <span class="str">"The canopy blocks out most of the light. Thick webs hang between the trees. An iron gate blocks the path further north."</span>,
+      <span class="key">"exits"</span>: {
+        <span class="key">"south"</span>: <span class="str">"forest_edge"</span>,
+        <span class="key">"north"</span>: {
+          <span class="key">"to"</span>: <span class="str">"crystal_cave"</span>,
+          <span class="key">"keywords"</span>: [<span class="str">"gate"</span>, <span class="str">"iron gate"</span>],
+          <span class="key">"use_item"</span>: <span class="str">"rusty_key"</span>,
+          <span class="key">"on_unlock"</span>: <span class="str">"The rusty key turns in the lock with a grinding screech. The gate swings open."</span>,
+          <span class="key">"permanently_unlock"</span>: true,
+          <span class="key">"consume_item"</span>: true,
+          <span class="key">"locked_msg"</span>: <span class="str">"An iron gate blocks the way. It's locked."</span>,
+          <span class="key">"sets_flag"</span>: <span class="str">"gate_opened"</span>
+        }
+      }
+    },
+    <span class="key">"crystal_cave"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Crystal Cave"</span>,
+      <span class="key">"description"</span>: <span class="str">"The cave glows with an ethereal blue light. In the center, a crystal floats above a stone pedestal."</span>,
+      <span class="key">"exits"</span>: {
+        <span class="key">"south"</span>: <span class="str">"deep_forest"</span>
+      },
+      <span class="key">"on_enter"</span>: {
+        <span class="key">"type"</span>: <span class="str">"message"</span>,
+        <span class="key">"text"</span>: <span class="str">"The air hums with magical energy. You feel the crystal calling to you."</span>
+      }
+    }
+  },
+
+  <span class="key">"items"</span>: {
+    <span class="key">"rusty_sword"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Rusty Sword"</span>,
+      <span class="key">"description"</span>: <span class="str">"A dull but serviceable blade. Better than nothing."</span>,
+      <span class="key">"keywords"</span>: [<span class="str">"sword"</span>, <span class="str">"blade"</span>],
+      <span class="key">"weapon_damage"</span>: 5
+    },
+    <span class="key">"health_potion"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Health Potion"</span>,
+      <span class="key">"description"</span>: <span class="str">"A small vial of glowing red liquid."</span>,
+      <span class="key">"keywords"</span>: [<span class="str">"potion"</span>, <span class="str">"vial"</span>],
+      <span class="key">"consumable"</span>: true,
+      <span class="key">"combat_effect"</span>: {
+        <span class="key">"type"</span>: <span class="str">"heal"</span>,
+        <span class="key">"amount"</span>: 15
+      }
+    },
+    <span class="key">"rusty_key"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Rusty Key"</span>,
+      <span class="key">"description"</span>: <span class="str">"An old iron key covered in rust. It might fit the gate in the forest."</span>,
+      <span class="key">"keywords"</span>: [<span class="str">"key"</span>, <span class="str">"iron key"</span>]
+    },
+    <span class="key">"power_crystal"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Crystal of Power"</span>,
+      <span class="key">"description"</span>: <span class="str">"A brilliant blue crystal that pulses with magical energy."</span>,
+      <span class="key">"keywords"</span>: [<span class="str">"crystal"</span>, <span class="str">"blue crystal"</span>]
+    },
+    <span class="key">"spider_silk"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Spider Silk"</span>,
+      <span class="key">"description"</span>: <span class="str">"A bundle of incredibly strong silk from the giant spider."</span>,
+      <span class="key">"keywords"</span>: [<span class="str">"silk"</span>, <span class="str">"web"</span>],
+      <span class="key">"defense_bonus"</span>: 2
+    },
+    <span class="key">"spell_book"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Spell Book"</span>,
+      <span class="key">"description"</span>: <span class="str">"A leather-bound tome filled with arcane knowledge."</span>,
+      <span class="key">"keywords"</span>: [<span class="str">"book"</span>, <span class="str">"tome"</span>]
+    },
+    <span class="key">"tavern_chest"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Wooden Chest"</span>,
+      <span class="key">"description"</span>: <span class="str">"A small wooden chest tucked in the corner."</span>,
+      <span class="key">"keywords"</span>: [<span class="str">"chest"</span>, <span class="str">"box"</span>],
+      <span class="key">"is_container"</span>: true,
+      <span class="key">"takeable"</span>: false,
+      <span class="key">"locked"</span>: false,
+      <span class="key">"on_open_message"</span>: <span class="str">"The chest lid creaks open."</span>,
+      <span class="key">"contents"</span>: [<span class="str">"health_potion"</span>]
+    },
+    <span class="key">"old_map"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Faded Map"</span>,
+      <span class="key">"description"</span>: <span class="str">"A map showing the forest paths. There's an X marked at a cave."</span>,
+      <span class="key">"keywords"</span>: [<span class="str">"map"</span>],
+      <span class="key">"takeable"</span>: false,
+      <span class="key">"on_examine"</span>: {
+        <span class="key">"text"</span>: <span class="str">"Studying the map carefully, you notice a hidden trail marked with small runes."</span>
+      }
+    }
+  },
+
+  <span class="key">"npcs"</span>: {
+    <span class="key">"wizard"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Old Wizard"</span>,
+      <span class="key">"description"</span>: <span class="str">"An elderly wizard in blue robes. His beard nearly touches the floor."</span>,
+      <span class="key">"keywords"</span>: [<span class="str">"wizard"</span>, <span class="str">"old man"</span>, <span class="str">"mage"</span>],
+      <span class="key">"dialogue"</span>: {
+        <span class="key">"greeting"</span>: <span class="str">"Ah, a brave soul! I've been waiting for someone like you. Ask me about the quest."</span>,
+        <span class="key">"default"</span>: <span class="str">"Hmm, I know nothing of that."</span>,
+        <span class="key">"sets_flag"</span>: <span class="str">"met_wizard"</span>,
+        <span class="key">"topics"</span>: {
+          <span class="key">"quest"</span>: {
+            <span class="key">"keywords"</span>: [<span class="str">"quest"</span>, <span class="str">"mission"</span>, <span class="str">"adventure"</span>],
+            <span class="key">"text"</span>: <span class="str">"Deep in the forest lies a Crystal of Power. Retrieve it and bring it to me. Take this key &mdash; you'll need it for the gate. And take the sword by the bar, you'll need it too."</span>,
+            <span class="key">"sets_flag"</span>: <span class="str">"quest_started"</span>,
+            <span class="key">"leads_to"</span>: [<span class="str">"crystal"</span>, <span class="str">"danger"</span>]
+          },
+          <span class="key">"crystal"</span>: {
+            <span class="key">"keywords"</span>: [<span class="str">"crystal"</span>, <span class="str">"power"</span>],
+            <span class="key">"text"</span>: <span class="str">"The Crystal of Power is an ancient artifact. It must not fall into the wrong hands."</span>,
+            <span class="key">"locked_text"</span>: <span class="str">"Ask me about the quest first."</span>
+          },
+          <span class="key">"danger"</span>: {
+            <span class="key">"keywords"</span>: [<span class="str">"danger"</span>, <span class="str">"warning"</span>, <span class="str">"monster"</span>],
+            <span class="key">"text"</span>: <span class="str">"Beware the giant spider that guards the forest path. It won't let you pass easily."</span>,
+            <span class="key">"locked_text"</span>: <span class="str">"There's nothing to warn you about yet."</span>
+          }
+        }
+      },
+      <span class="key">"accepts_item"</span>: <span class="str">"power_crystal"</span>,
+      <span class="key">"gives_item"</span>: <span class="str">"spell_book"</span>,
+      <span class="key">"accept_message"</span>: <span class="str">"The wizard's eyes widen. 'You found it! The Crystal of Power! As promised, take this spell book. You've earned it, adventurer.'"</span>,
+      <span class="key">"sets_flag"</span>: <span class="str">"quest_complete"</span>
+    }
+  },
+
+  <span class="key">"creatures"</span>: {
+    <span class="key">"giant_spider"</span>: {
+      <span class="key">"name"</span>: <span class="str">"Giant Spider"</span>,
+      <span class="key">"description"</span>: <span class="str">"A spider the size of a large dog. Its fangs drip with venom."</span>,
+      <span class="key">"keywords"</span>: [<span class="str">"spider"</span>],
+      <span class="key">"health"</span>: 20,
+      <span class="key">"attack"</span>: 6,
+      <span class="key">"defense"</span>: 1,
+      <span class="key">"on_defeat_msg"</span>: <span class="str">"The spider collapses, its legs curling inward. A bundle of silk falls from its web."</span>,
+      <span class="key">"on_flee_msg"</span>: <span class="str">"You scramble away from the spider's reach!"</span>,
+      <span class="key">"loot"</span>: [<span class="str">"spider_silk"</span>],
+      <span class="key">"sets_flag_on_defeat"</span>: <span class="str">"spider_defeated"</span>
+    }
+  }
+}</pre>
+
+<h2 id="room-states" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Initial Room States</h2>
+
+<p class="text-xl pt-4 pb-3">
+  These define where entities start in the world:
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="comment">// Room states (set up when game initializes)</span>
+{
+  <span class="key">"tavern"</span>: {
+    <span class="key">"items"</span>: [<span class="str">"rusty_sword"</span>, <span class="str">"tavern_chest"</span>, <span class="str">"old_map"</span>],
+    <span class="key">"npcs"</span>: [<span class="str">"wizard"</span>],
+    <span class="key">"creatures"</span>: []
+  },
+  <span class="key">"forest_edge"</span>: {
+    <span class="key">"items"</span>: [<span class="str">"rusty_key"</span>],
+    <span class="key">"npcs"</span>: [],
+    <span class="key">"creatures"</span>: []
+  },
+  <span class="key">"deep_forest"</span>: {
+    <span class="key">"items"</span>: [],
+    <span class="key">"npcs"</span>: [],
+    <span class="key">"creatures"</span>: [<span class="str">"giant_spider"</span>]
+  },
+  <span class="key">"crystal_cave"</span>: {
+    <span class="key">"items"</span>: [<span class="str">"power_crystal"</span>],
+    <span class="key">"npcs"</span>: [],
+    <span class="key">"creatures"</span>: []
+  }
+}</pre>
+
+<h2 id="walkthrough" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Sample Walkthrough</h2>
+
+<div class="text-xl space-y-2 pt-4">
+  <p class="text-terminal-dim">A player might complete this game like this:</p>
+
+  <pre class="doc-code text-terminal-green mt-3" style="font-size: 1.05rem;"><span class="comment"># Start in tavern</span>
+> <span class="str">look</span>
+> <span class="str">talk to wizard</span>
+> <span class="str">talk to wizard about quest</span>      <span class="comment"># Starts quest, unlocks topics</span>
+> <span class="str">talk to wizard about danger</span>      <span class="comment"># Learn about the spider</span>
+> <span class="str">take sword</span>
+> <span class="str">open chest</span>                       <span class="comment"># Find health potion</span>
+> <span class="str">take potion</span>
+
+<span class="comment"># Head into the forest</span>
+> <span class="str">go north</span>                         <span class="comment"># Forest Edge</span>
+> <span class="str">take key</span>
+> <span class="str">go north</span>                         <span class="comment"># Deep Forest</span>
+
+<span class="comment"># Fight the spider</span>
+> <span class="str">attack spider</span>                    <span class="comment"># Combat begins</span>
+> <span class="str">attack</span>                           <span class="comment"># Deal damage</span>
+> <span class="str">attack</span>                           <span class="comment"># Keep fighting</span>
+> <span class="str">use potion</span>                       <span class="comment"># Heal if needed</span>
+> <span class="str">attack</span>                           <span class="comment"># Defeat spider, get silk</span>
+> <span class="str">take silk</span>
+
+<span class="comment"># Unlock the gate</span>
+> <span class="str">use key on gate</span>                  <span class="comment"># Unlock the iron gate</span>
+> <span class="str">go north</span>                         <span class="comment"># Crystal Cave</span>
+
+<span class="comment"># Get the crystal</span>
+> <span class="str">take crystal</span>
+
+<span class="comment"># Return to the wizard</span>
+> <span class="str">go south</span>
+> <span class="str">go south</span>
+> <span class="str">go south</span>                         <span class="comment"># Back to tavern</span>
+> <span class="str">give crystal to wizard</span>           <span class="comment"># Quest complete! Get spell book</span></pre>
+</div>
+
+<h2 id="flags-used" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Flags Used</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Flag</th><th>Set By</th><th>Used For</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>met_wizard</code></td>
+      <td>Talking to wizard</td>
+      <td>Tracking NPC interaction</td>
+    </tr>
+    <tr>
+      <td><code>quest_started</code></td>
+      <td>Asking about quest</td>
+      <td>Unlocking dialogue topics (crystal, danger)</td>
+    </tr>
+    <tr>
+      <td><code>spider_defeated</code></td>
+      <td>Defeating the spider</td>
+      <td>Tracking combat completion</td>
+    </tr>
+    <tr>
+      <td><code>gate_opened</code></td>
+      <td>Using key on gate</td>
+      <td>Tracking exit unlock</td>
+    </tr>
+    <tr>
+      <td><code>quest_complete</code></td>
+      <td>Giving crystal to wizard</td>
+      <td>Game completion state</td>
+    </tr>
+  </tbody>
+</table>

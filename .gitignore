@@ -40,3 +40,9 @@ yarn.lock
 .node-version
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# Static site under site/ (see .do/site.yaml). Its build output is generated,
+# and its npm manifests are real files despite the global ignores above.
+/site/dist
+!/site/package.json
+!/site/package-lock.json

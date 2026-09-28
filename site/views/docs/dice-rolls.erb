@@ -1,0 +1,210 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Dice Rolls</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  The dice roll system adds D&D-style skill checks to items. When a player uses an item with a <code class="text-terminal-bright">dice_roll</code>, they must roll against a difficulty class (DC) with branching outcomes.
+</p>
+
+<h2 id="schema" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Schema</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"dice_roll"</span>: {
+  <span class="key">"dc"</span>: <span class="num">12</span>,
+  <span class="key">"dice"</span>: <span class="str">"1d20"</span>,
+  <span class="key">"attempt_message"</span>: <span class="str">"You carefully try to pick the lock..."</span>,
+  <span class="key">"completed_message"</span>: <span class="str">"You've already picked this lock."</span>,
+  <span class="key">"consume_on"</span>: <span class="str">"failure"</span>,
+  <span class="key">"on_success"</span>: {
+    <span class="key">"message"</span>: <span class="str">"Click! The lock opens."</span>,
+    <span class="key">"sets_flag"</span>: <span class="str">"lock_picked"</span>,
+    <span class="key">"unlocks_dialogue"</span>: {
+      <span class="key">"topic"</span>: <span class="str">"secret_info"</span>
+    },
+    <span class="key">"unlocks_exit"</span>: {
+      <span class="key">"direction"</span>: <span class="str">"east"</span>,
+      <span class="key">"room"</span>: <span class="str">"current_room_id"</span>
+    }
+  },
+  <span class="key">"on_failure"</span>: {
+    <span class="key">"message"</span>: <span class="str">"The pick snaps! You'll need another."</span>,
+    <span class="key">"sets_flag"</span>: <span class="str">"failed_lockpick"</span>
+  }
+}</pre>
+
+<h2 id="fields" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Fields</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>dc</code></td>
+      <td>number</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Difficulty class (1-20). The roll must meet or exceed this number to succeed.</td>
+    </tr>
+    <tr>
+      <td><code>dice</code></td>
+      <td>string</td>
+      <td><code>"1d20"</code></td>
+      <td>Dice notation. Standard format: <code>NdS</code> (N dice with S sides).</td>
+    </tr>
+    <tr>
+      <td><code>attempt_message</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Message shown when the roll is initiated, before the player types ROLL.</td>
+    </tr>
+    <tr>
+      <td><code>completed_message</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>Message shown if the player tries to use the item after a successful roll.</td>
+    </tr>
+    <tr>
+      <td><code>consume_on</code></td>
+      <td>string</td>
+      <td>&mdash;</td>
+      <td>When to consume the item. One of: <code>"failure"</code>, <code>"success"</code>, <code>"any"</code>.</td>
+    </tr>
+    <tr>
+      <td><code>on_success</code></td>
+      <td>object</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Outcome when the roll meets or exceeds the DC.</td>
+    </tr>
+    <tr>
+      <td><code>on_failure</code></td>
+      <td>object</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Outcome when the roll is below the DC.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="outcomes" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Outcome Objects</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Both <code class="text-terminal-bright">on_success</code> and <code class="text-terminal-bright">on_failure</code> support the same set of directives:
+</p>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>message</code></td>
+      <td>string</td>
+      <td>Text displayed to the player describing the outcome.</td>
+    </tr>
+    <tr>
+      <td><code>sets_flag</code></td>
+      <td>string</td>
+      <td>Global flag set to <code>true</code>.</td>
+    </tr>
+    <tr>
+      <td><code>unlocks_dialogue</code></td>
+      <td>object</td>
+      <td>Unlocks a dialogue topic. Contains <code>topic</code> (string).</td>
+    </tr>
+    <tr>
+      <td><code>unlocks_exit</code></td>
+      <td>object</td>
+      <td>Unlocks an exit. Contains <code>direction</code> (string) and optional <code>room</code> (string, defaults to current room).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="consume" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">consume_on</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Controls when the item is removed from inventory after the roll:
+</p>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Value</th><th>Behavior</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>"failure"</code></td>
+      <td>Item is consumed only on a failed roll. Lets the player retry on success.</td>
+    </tr>
+    <tr>
+      <td><code>"success"</code></td>
+      <td>Item is consumed only on a successful roll.</td>
+    </tr>
+    <tr>
+      <td><code>"any"</code></td>
+      <td>Item is always consumed regardless of outcome.</td>
+    </tr>
+    <tr>
+      <td><em>(omitted)</em></td>
+      <td>Item is never consumed by the roll.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="border border-terminal-dim rounded p-4 mt-4">
+  <div class="text-xl text-terminal-bright">Validation:</div>
+  <p class="text-xl pt-2 text-terminal-dim">
+    The engine validates dice_roll items at startup. Items with <code>dice_roll</code> <strong>must</strong> have both <code>on_success</code> and <code>on_failure</code>, and <code>consume_on</code> must be one of <code>"failure"</code>, <code>"success"</code>, or <code>"any"</code>. Invalid values produce validation errors.
+  </p>
+</div>
+
+<h2 id="flow" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Roll Flow</h2>
+
+<div class="text-xl space-y-3 pt-4">
+  <p><span class="text-terminal-bright">1.</span> Player types <code class="text-terminal-bright">use lockpick</code></p>
+  <p><span class="text-terminal-bright">2.</span> Engine shows the <code>attempt_message</code> and prompts: <em>"Type ROLL to roll the dice."</em></p>
+  <p><span class="text-terminal-bright">3.</span> A <code>pending_roll</code> is set on the player state, blocking all other commands</p>
+  <p><span class="text-terminal-bright">4.</span> Player types <code class="text-terminal-bright">roll</code></p>
+  <p><span class="text-terminal-bright">5.</span> Engine rolls the dice (e.g., 1d20), compares to DC</p>
+  <p><span class="text-terminal-bright">6.</span> Executes the appropriate outcome (on_success or on_failure)</p>
+  <p><span class="text-terminal-bright">7.</span> Applies directives (sets_flag, unlocks_dialogue, unlocks_exit)</p>
+  <p><span class="text-terminal-bright">8.</span> Consumes item if consume_on matches the outcome</p>
+  <p><span class="text-terminal-bright">9.</span> Clears the pending_roll, resuming normal gameplay</p>
+</div>
+
+<h2 id="dc-guide" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Difficulty Class Guide</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>DC</th><th>Difficulty</th><th>Success Rate (1d20)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>5</td><td>Very Easy</td><td>80%</td></tr>
+    <tr><td>8</td><td>Easy</td><td>65%</td></tr>
+    <tr><td>10</td><td>Medium</td><td>55%</td></tr>
+    <tr><td>12</td><td>Moderate</td><td>45%</td></tr>
+    <tr><td>15</td><td>Hard</td><td>30%</td></tr>
+    <tr><td>18</td><td>Very Hard</td><td>15%</td></tr>
+    <tr><td>20</td><td>Nearly Impossible</td><td>5%</td></tr>
+  </tbody>
+</table>
+
+<h2 id="example" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Full Example</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"ancient_scroll"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Ancient Scroll"</span>,
+  <span class="key">"description"</span>: <span class="str">"A fragile scroll covered in arcane runes."</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"scroll"</span>, <span class="str">"runes"</span>],
+  <span class="key">"dice_roll"</span>: {
+    <span class="key">"dc"</span>: <span class="num">14</span>,
+    <span class="key">"dice"</span>: <span class="str">"1d20"</span>,
+    <span class="key">"attempt_message"</span>: <span class="str">"You begin to decipher the ancient runes..."</span>,
+    <span class="key">"completed_message"</span>: <span class="str">"You've already deciphered this scroll."</span>,
+    <span class="key">"consume_on"</span>: <span class="str">"any"</span>,
+    <span class="key">"on_success"</span>: {
+      <span class="key">"message"</span>: <span class="str">"The runes glow and you understand their meaning! A hidden path is revealed."</span>,
+      <span class="key">"sets_flag"</span>: <span class="str">"scroll_deciphered"</span>,
+      <span class="key">"unlocks_exit"</span>: {
+        <span class="key">"direction"</span>: <span class="str">"north"</span>
+      }
+    },
+    <span class="key">"on_failure"</span>: {
+      <span class="key">"message"</span>: <span class="str">"The scroll crumbles to dust before you can finish reading it."</span>,
+      <span class="key">"sets_flag"</span>: <span class="str">"scroll_destroyed"</span>
+    }
+  }
+}</pre>

@@ -1,0 +1,6 @@
+# frozen_string_literal: true
+
+# Intentionally empty. bin/build is stdlib Ruby and needs no gems; this file
+# exists only so DigitalOcean App Platform detects Ruby (its buildpacks key
+# off a Gemfile) and includes it in the build alongside Node. Keep it empty.
+source "https://rubygems.org"

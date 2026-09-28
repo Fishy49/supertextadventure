@@ -1,0 +1,129 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Rooms</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  Rooms are the core building blocks of your game world. Each room has a name, description, and a set of exits connecting it to other rooms.
+</p>
+
+<h2 id="schema" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Schema</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"room_id"</span>: {
+  <span class="key">"name"</span>: <span class="str">"The Tavern"</span>,
+  <span class="key">"description"</span>: <span class="str">"A dimly lit tavern with a roaring fireplace..."</span>,
+  <span class="key">"exits"</span>: {
+    <span class="key">"north"</span>: <span class="str">"town_square"</span>,
+    <span class="key">"down"</span>: { <span class="comment">/* complex exit */</span> }
+  },
+  <span class="key">"on_enter"</span>: {
+    <span class="key">"type"</span>: <span class="str">"message"</span>,
+    <span class="key">"text"</span>: <span class="str">"The smell of ale hits you as you enter."</span>
+  }
+}</pre>
+
+<h2 id="fields" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Fields</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Display name shown to the player as a heading when they enter or look.</td>
+    </tr>
+    <tr>
+      <td><code>description</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>The text description shown when the player enters or looks at the room.</td>
+    </tr>
+    <tr>
+      <td><code>exits</code></td>
+      <td>object</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>An object mapping direction names to destinations. Can be empty <code>{}</code>. See <a href="/docs/exits#simple" class="text-terminal-bright hover:underline">Exits</a>.</td>
+    </tr>
+    <tr>
+      <td><code>on_enter</code></td>
+      <td>object</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Event triggered the first time a player enters this room.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="on-enter" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">on_enter</h2>
+
+<p class="text-xl pt-4 pb-3">
+  The <code class="text-terminal-bright">on_enter</code> event fires only on the player's <strong>first visit</strong> to a room. It's tracked via the player's <code>visited_rooms</code> list. Use it for story events, atmospheric flavor, or one-time revelations.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"on_enter"</span>: {
+  <span class="key">"type"</span>: <span class="str">"message"</span>,
+  <span class="key">"text"</span>: <span class="str">"A chill runs down your spine as you step into the darkness."</span>
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>type</code></td>
+      <td>string</td>
+      <td>Must be <code class="text-terminal-bright">"message"</code>.</td>
+    </tr>
+    <tr>
+      <td><code>text</code></td>
+      <td>string</td>
+      <td>The message displayed to the player on first entry.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="room-display" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">What Players See</h2>
+
+<p class="text-xl pt-4 pb-3">
+  When a player enters a room or uses the <code class="text-terminal-bright">look</code> command, the engine displays:
+</p>
+
+<ol class="text-xl list-decimal list-inside space-y-2 pt-2">
+  <li>The room <code class="text-terminal-bright">name</code> as a heading</li>
+  <li>The room <code class="text-terminal-bright">description</code></li>
+  <li>The <code class="text-terminal-bright">on_enter</code> message (first visit only)</li>
+  <li>A list of visible items in the room</li>
+  <li>A list of NPCs present</li>
+  <li>A list of creatures present</li>
+  <li>Available exits (hidden unrevealed exits are excluded)</li>
+</ol>
+
+<h2 id="example" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Example</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"tavern"</span>: {
+  <span class="key">"name"</span>: <span class="str">"The Rusty Flagon"</span>,
+  <span class="key">"description"</span>: <span class="str">"A cozy tavern filled with the murmur of conversation. A crackling fireplace warms the room. The bartender polishes glasses behind a weathered oak bar."</span>,
+  <span class="key">"exits"</span>: {
+    <span class="key">"north"</span>: <span class="str">"town_square"</span>,
+    <span class="key">"east"</span>: <span class="str">"kitchen"</span>,
+    <span class="key">"down"</span>: {
+      <span class="key">"to"</span>: <span class="str">"cellar"</span>,
+      <span class="key">"requires"</span>: <span class="str">"cellar_key"</span>,
+      <span class="key">"locked_msg"</span>: <span class="str">"The cellar door is locked tight."</span>
+    }
+  },
+  <span class="key">"on_enter"</span>: {
+    <span class="key">"type"</span>: <span class="str">"message"</span>,
+    <span class="key">"text"</span>: <span class="str">"The warmth of the fire embraces you as you step inside. Several patrons glance up before returning to their drinks."</span>
+  }
+}</pre>
+
+<h2 id="tips" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Tips</h2>
+
+<ul class="text-xl list-disc list-inside space-y-2 pt-2">
+  <li>Write descriptions in second person present tense: <em>"You see..."</em>, <em>"A torch flickers..."</em></li>
+  <li>Include sensory details &mdash; what the player sees, hears, and smells</li>
+  <li>Mention interactable objects in descriptions to hint at items and NPCs</li>
+  <li>Keep room IDs short and descriptive: <code class="text-terminal-bright">dark_cave</code>, <code class="text-terminal-bright">throne_room</code></li>
+  <li>A room can have an empty exits object <code>{}</code> to create a dead end</li>
+</ul>

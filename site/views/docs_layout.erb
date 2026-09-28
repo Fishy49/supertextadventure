@@ -1,0 +1,243 @@
+<%
+  # Sidebar sections. `page` (the current docs slug) is provided by bin/build.
+  nav = {
+    "Getting Started" => [
+      ["overview",        "Overview"]
+    ],
+    "JSON Schema" => [
+      ["world-structure", "World Structure"],
+      ["rooms",           "Rooms"],
+      ["exits",           "Exits"],
+      ["items",           "Items"],
+      ["npcs",            "NPCs &amp; Dialogue"],
+      ["creatures",       "Creatures"]
+    ],
+    "Game Systems" => [
+      ["combat",          "Combat"],
+      ["dice-rolls",      "Dice Rolls"],
+      ["flags-and-state", "Flags &amp; State"],
+      ["containers",      "Containers"]
+    ],
+    "Reference" => [
+      ["commands",        "Commands"],
+      ["examples",        "Full Example"]
+    ]
+  }
+  label = nav.values.flatten(1).to_h[page]
+  title = label && page != "overview" ? "#{label} - Docs" : "Docs"
+%>
+<!DOCTYPE html>
+<html class="before:bg-screen-lines before:content-[' '] before:block before:fixed before:inset-0 before:bg-[length:100%_2px,3px_100%] before:pointer-events-none">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> - Super Text Adventure</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/css/main.css">
+  <script data-site="PGXETER" src="https://analytics.richardcagle.dev/script.js" defer></script>
+  <style>
+    html { font-family: 'VT323', monospace; font-size: 20px; }
+    /* Normalize inline code to match surrounding text */
+    code { font-size: inherit; font-family: inherit; }
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1e1e1a; }
+    ::-webkit-scrollbar-thumb { background: #5a9e3d; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8fe86b; }
+    /* Smooth scroll */
+    html { scroll-behavior: smooth; }
+    /* Code block styling */
+    .doc-code {
+      background: #1e1e1a;
+      border: 1px solid #5a9e3d;
+      border-radius: 4px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    .doc-code .key { color: #8fe86b; }
+    .doc-code .str { color: #b5f5a0; }
+    .doc-code .num { color: #8fe86b; font-weight: bold; }
+    .doc-code .comment { color: #5a9e3d; }
+    .doc-code .bool { color: #b5f5a0; font-style: italic; }
+    /* Table styling */
+    .doc-table { border-collapse: collapse; width: 100%; }
+    .doc-table th, .doc-table td {
+      border: 1px solid #5a9e3d;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      font-size: 1rem;
+    }
+    .doc-table th { background: #1e1e1a; font-weight: bold; }
+    .doc-table tr:hover { background: rgba(143, 232, 107, 0.05); }
+    /* Search highlight */
+    mark { background: #5a9e3d; color: #282823; padding: 0 2px; }
+    /* Active nav item */
+    .nav-active { border-left: 3px solid #8fe86b; background: rgba(143, 232, 107, 0.08); }
+    /* Sidebar link hover */
+    .nav-link:hover { background: rgba(143, 232, 107, 0.05); }
+    /* Section anchors */
+    .doc-section { scroll-margin-top: 5rem; }
+    /* Heading anchor links */
+    .heading-anchor {
+      opacity: 0;
+      margin-left: 0.4em;
+      color: #5a9e3d;
+      text-decoration: none;
+      font-size: 0.8em;
+      transition: opacity 0.1s;
+    }
+    h1:hover .heading-anchor,
+    h2:hover .heading-anchor,
+    h3:hover .heading-anchor { opacity: 1; }
+    h2[id], h3[id] { cursor: pointer; }
+    /* Field badge */
+    .badge {
+      display: inline-block;
+      font-size: 0.95rem;
+      padding: 0 6px;
+      border-radius: 3px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .badge-required { background: #8fe86b; color: #282823; }
+    .badge-optional { background: #5a9e3d; color: #282823; }
+    .badge-default { border: 1px solid #5a9e3d; color: #5a9e3d; }
+  </style>
+</head>
+<body class="bg-terminal-black text-terminal-green">
+
+  <!-- Top bar -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-terminal-dark border-b border-terminal-dim">
+    <div class="flex items-center h-14 px-4">
+      <!-- Mobile menu toggle -->
+      <button id="sidebar-toggle" class="lg:hidden mr-3 text-3xl hover:text-terminal-bright" onclick="toggleSidebar()">
+        &#9776;
+      </button>
+
+      <a href="/" class="text-3xl hover:underline whitespace-nowrap mr-6">Super Text Adventure</a>
+      <span class="text-terminal-dim text-2xl mr-6 hidden sm:inline">/</span>
+      <a href="/docs" class="text-2xl hover:underline whitespace-nowrap mr-6 hidden sm:inline">Docs</a>
+
+      <!-- Search -->
+      <div class="relative flex-1 max-w-md ml-auto">
+        <input
+          id="docs-search"
+          type="text"
+          placeholder="> search docs..."
+          class="w-full bg-terminal-black border border-terminal-dim text-terminal-green text-xl px-3 py-1.5 rounded focus:outline-none focus:border-terminal-green placeholder-terminal-dim"
+          autocomplete="off"
+        >
+        <div id="search-results" class="absolute top-full left-0 right-0 bg-terminal-dark border border-terminal-dim rounded-b mt-0 max-h-80 overflow-y-auto hidden z-50">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed top-14 left-0 bottom-0 w-64 bg-terminal-dark border-r border-terminal-dim overflow-y-auto z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-200">
+    <nav class="py-4">
+<% nav.each_with_index do |(section, links), i| %>
+      <div class="px-4 <%= "pt-4 " unless i.zero? %>pb-3 text-terminal-dim text-lg uppercase tracking-wider"><%= section %></div>
+<% links.each do |slug, text| %>
+      <a href="<%= slug == "overview" ? "/docs" : "/docs/#{slug}" %>" class="nav-link block px-4 py-1.5 text-xl border-l-[3px] <%= slug == page ? "nav-active" : "border-transparent" %>"><%= text %></a>
+<% end %>
+<% end %>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <main class="lg:ml-64 pt-14">
+    <div class="max-w-4xl mx-auto px-6 py-8">
+      <%= yield %>
+    </div>
+
+    <footer class="text-center text-xl py-6 text-terminal-dim border-t border-terminal-dim mt-12">
+      <a href="/" class="hover:underline">Super Text Adventure</a> &middot;
+      Copyright &copy; 2022-<%= Time.now.year %> <a href="https://richardcagle.dev" class="hover:underline">Richard Cagle</a>
+    </footer>
+  </main>
+
+  <script>
+    // Inject anchor links into headings with IDs
+    document.querySelectorAll('h2[id], h3[id]').forEach(function(h) {
+      var a = document.createElement('a');
+      a.href = '#' + h.id;
+      a.className = 'heading-anchor';
+      a.textContent = '#';
+      a.title = 'Link to this section';
+      h.appendChild(a);
+    });
+
+    // Mobile sidebar toggle
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    }
+
+    // Search functionality
+    (function() {
+      const searchIndex = [
+        { title: "Overview", url: "/docs", keywords: "overview introduction getting started what is classic game engine json text adventure" },
+        { title: "World Structure", url: "/docs/world-structure", keywords: "world structure top level meta starting_room version rooms items npcs creatures schema" },
+        { title: "Rooms", url: "/docs/rooms", keywords: "rooms name description exits on_enter room definition location" },
+        { title: "Exits", url: "/docs/exits", keywords: "exits directions north south east west simple complex requires locked hidden keywords unlock permanently_unlock consume_item sets_flag use_item reveal" },
+        { title: "Items", url: "/docs/items", keywords: "items takeable consumable weapon_damage defense_bonus combat_effect on_use reveals_exit on_examine dice_roll keywords cant_take_msg" },
+        { title: "NPCs & Dialogue", url: "/docs/npcs", keywords: "npcs dialogue greeting default topics keywords text sets_flag requires_flag requires_item locked_text leads_to accepts_item gives_item quest conversation talk movement patrol triggered schedule duration trigger_flag destination depart_msg arrive_msg wander" },
+        { title: "Creatures", url: "/docs/creatures", keywords: "creatures health attack defense on_defeat_msg on_flee_msg loot sets_flag_on_defeat monster enemy hostile talk_text aggro_text attack_condition moves room_entries on_talk auto attack ambush movement patrol" },
+        { title: "Combat", url: "/docs/combat", keywords: "combat attack defend flee damage weapon defense bonus initiative rounds health death game over" },
+        { title: "Dice Rolls", url: "/docs/dice-rolls", keywords: "dice roll dc difficulty class 1d20 on_success on_failure consume_on attempt_message sets_flag unlocks_dialogue unlocks_exit" },
+        { title: "Flags & State", url: "/docs/flags-and-state", keywords: "flags state global game player inventory current_room visited_rooms health combat pending_roll room_states container_states" },
+        { title: "Containers", url: "/docs/containers", keywords: "containers is_container locked unlock_item unlock_flag locked_message on_open_message on_close_message contents open close nested" },
+        { title: "Commands", url: "/docs/commands", keywords: "commands verbs go move walk look examine inspect take get grab drop use open close talk speak attack fight defend flee roll help restart inventory synonyms directions" },
+        { title: "Full Example", url: "/docs/examples", keywords: "example full json world complete sample game adventure" },
+      ];
+
+      const input = document.getElementById('docs-search');
+      const resultsEl = document.getElementById('search-results');
+
+      input.addEventListener('input', function() {
+        const q = this.value.toLowerCase().trim();
+        if (!q) { resultsEl.classList.add('hidden'); return; }
+
+        const matches = searchIndex.filter(function(entry) {
+          return entry.title.toLowerCase().includes(q) || entry.keywords.includes(q);
+        });
+
+        if (matches.length === 0) {
+          resultsEl.innerHTML = '<div class="px-4 py-3 text-terminal-dim text-lg">No results found.</div>';
+        } else {
+          resultsEl.innerHTML = matches.map(function(m) {
+            return '<a href="' + m.url + '" class="block px-4 py-2 text-xl hover:bg-terminal-black border-b border-terminal-dim last:border-0">' +
+              '> ' + m.title + '</a>';
+          }).join('');
+        }
+        resultsEl.classList.remove('hidden');
+      });
+
+      input.addEventListener('blur', function() {
+        setTimeout(function() { resultsEl.classList.add('hidden'); }, 200);
+      });
+
+      input.addEventListener('focus', function() {
+        if (this.value.trim()) { this.dispatchEvent(new Event('input')); }
+      });
+
+      // Keyboard shortcut: / to focus search
+      document.addEventListener('keydown', function(e) {
+        if (e.key === '/' && document.activeElement !== input) {
+          e.preventDefault();
+          input.focus();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

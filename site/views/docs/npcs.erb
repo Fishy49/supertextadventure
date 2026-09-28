@@ -1,0 +1,407 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">NPCs & Dialogue</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  NPCs are characters the player can talk to, give items to, and interact with. They support branching dialogue trees with gated topics and quest mechanics.
+</p>
+
+<h2 id="schema" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Schema</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"npc_id"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Old Wizard"</span>,
+  <span class="key">"description"</span>: <span class="str">"A wizened old man in flowing robes."</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"wizard"</span>, <span class="str">"old man"</span>, <span class="str">"mage"</span>],
+  <span class="key">"dialogue"</span>: { <span class="comment">/* dialogue system */</span> },
+  <span class="key">"movement"</span>: { <span class="comment">/* optional patrol/triggered movement */</span> },
+  <span class="key">"accepts_item"</span>: <span class="str">"magic_gem"</span>,
+  <span class="key">"gives_item"</span>: <span class="str">"spell_book"</span>,
+  <span class="key">"accept_message"</span>: <span class="str">"The wizard takes the gem eagerly..."</span>,
+  <span class="key">"sets_flag"</span>: <span class="str">"helped_wizard"</span>
+}</pre>
+
+<h2 id="base-fields" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Base Fields</h2>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Display name shown to the player.</td>
+    </tr>
+    <tr>
+      <td><code>description</code></td>
+      <td>string</td>
+      <td><span class="badge badge-required">required</span></td>
+      <td>Text shown when the player examines the NPC.</td>
+    </tr>
+    <tr>
+      <td><code>keywords</code></td>
+      <td>array</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Alternative names for fuzzy matching.</td>
+    </tr>
+    <tr>
+      <td><code>dialogue</code></td>
+      <td>object</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>The NPC's dialogue tree. See below.</td>
+    </tr>
+    <tr>
+      <td><code>movement</code></td>
+      <td>object</td>
+      <td><span class="badge badge-optional">optional</span></td>
+      <td>Patrol or trigger-based movement. See <a href="#movement" class="text-terminal-bright hover:underline">Movement</a>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="dialogue" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Dialogue System</h2>
+
+<p class="text-xl pt-4 pb-3">
+  The dialogue object defines what the NPC says when talked to.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"dialogue"</span>: {
+  <span class="key">"greeting"</span>: <span class="str">"Welcome, traveler! What brings you to these parts?"</span>,
+  <span class="key">"default"</span>: <span class="str">"I don't know about that."</span>,
+  <span class="key">"sets_flag"</span>: <span class="str">"met_wizard"</span>,
+  <span class="key">"topics"</span>: {
+    <span class="comment">/* topic definitions */</span>
+  }
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>greeting</code></td>
+      <td>string</td>
+      <td>Response when the player talks to the NPC without specifying a topic.</td>
+    </tr>
+    <tr>
+      <td><code>default</code></td>
+      <td>string</td>
+      <td>Fallback response when a topic isn't recognized. Used if <code>greeting</code> is not set.</td>
+    </tr>
+    <tr>
+      <td><code>sets_flag</code></td>
+      <td>string</td>
+      <td>Flag set when the player first greets this NPC.</td>
+    </tr>
+    <tr>
+      <td><code>topics</code></td>
+      <td>object</td>
+      <td>Named conversation topics the player can ask about.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="topics" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Dialogue Topics</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Topics allow branching conversations. Players trigger them with <code class="text-terminal-bright">talk to wizard about quest</code>.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"topics"</span>: {
+  <span class="key">"quest"</span>: {
+    <span class="key">"keywords"</span>: [<span class="str">"quest"</span>, <span class="str">"mission"</span>, <span class="str">"task"</span>],
+    <span class="key">"text"</span>: <span class="str">"I need you to retrieve the Crystal of Power from the dark cave."</span>,
+    <span class="key">"sets_flag"</span>: <span class="str">"quest_started"</span>,
+    <span class="key">"leads_to"</span>: [<span class="str">"crystal"</span>, <span class="str">"cave"</span>]
+  },
+  <span class="key">"crystal"</span>: {
+    <span class="key">"keywords"</span>: [<span class="str">"crystal"</span>, <span class="str">"crystal of power"</span>],
+    <span class="key">"text"</span>: <span class="str">"The Crystal glows with ancient magic. Handle it carefully."</span>,
+    <span class="key">"requires_flag"</span>: <span class="str">"quest_started"</span>,
+    <span class="key">"locked_text"</span>: <span class="str">"I have nothing to say about that yet."</span>
+  },
+  <span class="key">"cave"</span>: {
+    <span class="key">"keywords"</span>: [<span class="str">"cave"</span>, <span class="str">"dark cave"</span>],
+    <span class="key">"text"</span>: <span class="str">"The cave lies to the north. Beware the guardian."</span>,
+    <span class="key">"requires_item"</span>: <span class="str">"map"</span>,
+    <span class="key">"locked_text"</span>: <span class="str">"Find a map first, then we can discuss the cave."</span>
+  }
+}</pre>
+
+<h3 class="text-2xl pt-6 pb-2 text-terminal-bright">Topic Fields</h3>
+
+<table class="doc-table mt-2">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>keywords</code></td>
+      <td>array</td>
+      <td>Words or phrases that trigger this topic. Case-insensitive.</td>
+    </tr>
+    <tr>
+      <td><code>text</code></td>
+      <td>string</td>
+      <td>The NPC's response when this topic is discussed.</td>
+    </tr>
+    <tr>
+      <td><code>sets_flag</code></td>
+      <td>string</td>
+      <td>Flag set when the player hears this topic.</td>
+    </tr>
+    <tr>
+      <td><code>requires_flag</code></td>
+      <td>string</td>
+      <td>Topic is locked until this flag is <code>true</code>.</td>
+    </tr>
+    <tr>
+      <td><code>requires_item</code></td>
+      <td>string</td>
+      <td>Topic is locked unless the player has this item.</td>
+    </tr>
+    <tr>
+      <td><code>locked_text</code></td>
+      <td>string</td>
+      <td>Message shown when the topic is locked.</td>
+    </tr>
+    <tr>
+      <td><code>leads_to</code></td>
+      <td>array</td>
+      <td>Topic IDs that become available after this topic is discussed.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="topic-flow" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Dialogue Flow</h2>
+
+<div class="text-xl space-y-3 pt-4">
+  <p><span class="text-terminal-bright">1.</span> Player says <code class="text-terminal-bright">talk to wizard</code> &rarr; Shows <code>greeting</code> or <code>default</code></p>
+  <p><span class="text-terminal-bright">2.</span> Player says <code class="text-terminal-bright">talk to wizard about quest</code> &rarr; Engine matches "quest" against topic keywords</p>
+  <p><span class="text-terminal-bright">3.</span> If the topic is gated by <code>requires_flag</code> or <code>requires_item</code>, checks those conditions</p>
+  <p><span class="text-terminal-bright">4.</span> If locked, shows <code>locked_text</code>. If unlocked, shows <code>text</code></p>
+  <p><span class="text-terminal-bright">5.</span> If the topic has <code>leads_to</code>, those topics become accessible</p>
+  <p><span class="text-terminal-bright">6.</span> If the topic has <code>sets_flag</code>, that flag is set to <code>true</code></p>
+</div>
+
+<div class="border border-terminal-dim rounded p-4 mt-4">
+  <div class="text-xl text-terminal-bright">Topic gating with leads_to:</div>
+  <p class="text-xl pt-2 text-terminal-dim">
+    Topics listed in <code>leads_to</code> are unlocked <em>only</em> when the parent topic has been discussed. This creates natural conversation progression where the player must first ask about a general topic before specific follow-ups become available.
+  </p>
+</div>
+
+<h2 id="quest" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Quest Mechanics (Item Trading)</h2>
+
+<p class="text-xl pt-4 pb-3">
+  NPCs can accept items from the player and optionally give items in return. This is the core quest/trade mechanic.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"blacksmith"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Blacksmith"</span>,
+  <span class="key">"description"</span>: <span class="str">"A burly smith working the forge."</span>,
+  <span class="key">"accepts_item"</span>: <span class="str">"iron_ore"</span>,
+  <span class="key">"gives_item"</span>: <span class="str">"iron_sword"</span>,
+  <span class="key">"accept_message"</span>: <span class="str">"The blacksmith takes the ore and hammers it into a fine blade. 'Here you go!'"</span>,
+  <span class="key">"sets_flag"</span>: <span class="str">"sword_forged"</span>
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>accepts_item</code></td>
+      <td>string</td>
+      <td>Item ID that this NPC will accept from the player.</td>
+    </tr>
+    <tr>
+      <td><code>gives_item</code></td>
+      <td>string</td>
+      <td>Item ID given to the player in return (optional).</td>
+    </tr>
+    <tr>
+      <td><code>accept_message</code></td>
+      <td>string</td>
+      <td>Custom message shown when the item is accepted.</td>
+    </tr>
+    <tr>
+      <td><code>sets_flag</code></td>
+      <td>string</td>
+      <td>Flag set when the NPC accepts the item.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="text-xl pt-4">
+  Players give items with: <code class="text-terminal-bright">give iron_ore to blacksmith</code>
+</p>
+
+<h2 id="movement" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Movement</h2>
+
+<p class="text-xl pt-4 pb-3">
+  NPCs (and creatures) can move between rooms on their own. Movement ticks once per player action and fires <code>depart_msg</code> and <code>arrive_msg</code> when the entity enters or leaves the room the player is currently in.
+</p>
+
+<p class="text-xl pb-3">
+  There are two movement types: <code class="text-terminal-bright">patrol</code> for cyclic routes and <code class="text-terminal-bright">triggered</code> for one-shot moves tied to a game flag. The schema applies equally to entries in both <code>npcs</code> and <code>creatures</code>.
+</p>
+
+<div class="border border-terminal-dim rounded p-4 mt-4">
+  <div class="text-xl text-terminal-bright">In combat:</div>
+  <p class="text-xl pt-2 text-terminal-dim">
+    A creature currently engaged in combat with the player will <strong>not</strong> move, even if its movement schedule says it should. Combat always wins.
+  </p>
+</div>
+
+<h3 id="patrol" class="text-2xl pt-6 pb-2 text-terminal-bright">Patrol Movement</h3>
+
+<p class="text-xl pt-2 pb-3">
+  Patrol movement cycles an entity through a list of rooms, each with a duration (in turns). When the duration is up, the entity moves to the next step. The schedule loops forever.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"movement"</span>: {
+  <span class="key">"type"</span>: <span class="str">"patrol"</span>,
+  <span class="key">"schedule"</span>: [
+    { <span class="key">"room"</span>: <span class="str">"tavern_floor"</span>, <span class="key">"duration"</span>: <span class="num">3</span> },
+    { <span class="key">"room"</span>: <span class="str">"village_square"</span>, <span class="key">"duration"</span>: <span class="num">3</span> }
+  ],
+  <span class="key">"depart_msg"</span>: <span class="str">"Bardric slings his lute over his shoulder and wanders off."</span>,
+  <span class="key">"arrive_msg"</span>: <span class="str">"Bardric strolls in, already mid-song."</span>
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>type</code></td>
+      <td>string</td>
+      <td>Must be <code>"patrol"</code>.</td>
+    </tr>
+    <tr>
+      <td><code>schedule</code></td>
+      <td>array</td>
+      <td>Ordered list of schedule steps. Each step has a <code>room</code> and <code>duration</code>. The entity cycles through them in order, looping back to the first once the last is complete.</td>
+    </tr>
+    <tr>
+      <td><code>depart_msg</code></td>
+      <td>string</td>
+      <td>Message shown when the entity leaves the player's current room. Defaults to <em>"The [name] leaves."</em></td>
+    </tr>
+    <tr>
+      <td><code>arrive_msg</code></td>
+      <td>string</td>
+      <td>Message shown when the entity arrives in the player's current room. Defaults to <em>"The [name] arrives."</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="text-2xl pt-6 pb-2 text-terminal-bright">Schedule Step Fields</h3>
+
+<table class="doc-table mt-2">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>room</code></td>
+      <td>string</td>
+      <td>Room ID where the entity sits for this step.</td>
+    </tr>
+    <tr>
+      <td><code>duration</code></td>
+      <td>number</td>
+      <td>Number of player turns the entity stays in this room before moving to the next step.</td>
+    </tr>
+    <tr>
+      <td><code>blocked_while_player_in</code></td>
+      <td>array</td>
+      <td>Optional list of room IDs. If the player is currently in any of them, the transition to <em>this</em> step is deferred until the player leaves. Use this to prevent an NPC from awkwardly walking into the player's face.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="triggered" class="text-2xl pt-6 pb-2 text-terminal-bright">Triggered Movement</h3>
+
+<p class="text-xl pt-2 pb-3">
+  Triggered movement is a one-shot: the entity moves to a destination room the first time a given flag is <code>true</code>, then stops moving forever. Use it for an NPC that arrives after a quest milestone, or a creature that storms in after the player rings a bell.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="key">"movement"</span>: {
+  <span class="key">"type"</span>: <span class="str">"triggered"</span>,
+  <span class="key">"trigger_flag"</span>: <span class="str">"bell_rung"</span>,
+  <span class="key">"destination"</span>: <span class="str">"village_square"</span>,
+  <span class="key">"depart_msg"</span>: <span class="str">"The guard marches out, hand on her sword."</span>,
+  <span class="key">"arrive_msg"</span>: <span class="str">"A guard storms into the square, summoned by the alarm."</span>
+}</pre>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>type</code></td>
+      <td>string</td>
+      <td>Must be <code>"triggered"</code>.</td>
+    </tr>
+    <tr>
+      <td><code>trigger_flag</code></td>
+      <td>string</td>
+      <td>Global flag that must be <code>true</code> for the move to fire. The move fires once and then the entity will not move again.</td>
+    </tr>
+    <tr>
+      <td><code>destination</code></td>
+      <td>string</td>
+      <td>Room ID the entity should move to when triggered.</td>
+    </tr>
+    <tr>
+      <td><code>depart_msg</code></td>
+      <td>string</td>
+      <td>Message shown when the entity leaves the player's current room.</td>
+    </tr>
+    <tr>
+      <td><code>arrive_msg</code></td>
+      <td>string</td>
+      <td>Message shown when the entity arrives in the player's current room.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="example" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Full Example</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="key">"mysterious_wizard"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Mysterious Wizard"</span>,
+  <span class="key">"description"</span>: <span class="str">"An ancient wizard with a long silver beard. His eyes shimmer with arcane knowledge."</span>,
+  <span class="key">"keywords"</span>: [<span class="str">"wizard"</span>, <span class="str">"mage"</span>, <span class="str">"old man"</span>],
+  <span class="key">"dialogue"</span>: {
+    <span class="key">"greeting"</span>: <span class="str">"Ah, an adventurer! I have been expecting you. Ask me about the quest if you dare."</span>,
+    <span class="key">"default"</span>: <span class="str">"Hmm, I know not of such things."</span>,
+    <span class="key">"sets_flag"</span>: <span class="str">"met_wizard"</span>,
+    <span class="key">"topics"</span>: {
+      <span class="key">"quest"</span>: {
+        <span class="key">"keywords"</span>: [<span class="str">"quest"</span>, <span class="str">"adventure"</span>, <span class="str">"mission"</span>],
+        <span class="key">"text"</span>: <span class="str">"Deep in the Darkwood Forest lies a crystal of immense power. Retrieve it, and I shall reward you greatly."</span>,
+        <span class="key">"sets_flag"</span>: <span class="str">"quest_accepted"</span>,
+        <span class="key">"leads_to"</span>: [<span class="str">"forest"</span>, <span class="str">"reward"</span>]
+      },
+      <span class="key">"forest"</span>: {
+        <span class="key">"keywords"</span>: [<span class="str">"forest"</span>, <span class="str">"darkwood"</span>, <span class="str">"woods"</span>],
+        <span class="key">"text"</span>: <span class="str">"The forest entrance is to the north. Take a torch &mdash; the darkness there is unnatural."</span>,
+        <span class="key">"locked_text"</span>: <span class="str">"First, ask me about the quest."</span>
+      },
+      <span class="key">"reward"</span>: {
+        <span class="key">"keywords"</span>: [<span class="str">"reward"</span>, <span class="str">"payment"</span>],
+        <span class="key">"text"</span>: <span class="str">"Bring me the crystal and I will grant you a powerful spell."</span>,
+        <span class="key">"locked_text"</span>: <span class="str">"Complete the quest first, then we can discuss compensation."</span>
+      }
+    }
+  },
+  <span class="key">"accepts_item"</span>: <span class="str">"power_crystal"</span>,
+  <span class="key">"gives_item"</span>: <span class="str">"spell_book"</span>,
+  <span class="key">"accept_message"</span>: <span class="str">"The wizard's eyes light up. 'You found it! As promised, take this spell book. May it serve you well.'"</span>,
+  <span class="key">"sets_flag"</span>: <span class="str">"quest_complete"</span>
+}</pre>

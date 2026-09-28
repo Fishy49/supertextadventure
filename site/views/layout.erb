@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html class="before:bg-screen-lines before:content-[' '] before:block before:fixed before:inset-0 before:bg-[length:100%_2px,3px_100%] before:pointer-events-none">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Super Text Adventure</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=VT323&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/css/main.css">
+  <script data-site="PGXETER" src="https://analytics.richardcagle.dev/script.js" defer></script>
+</head>
+<body class="bg-terminal-black text-terminal-green">
+  <%= erb :header %>
+  <div class="container w-2/3 mx-auto max-w-xl">
+    <%= yield %>
+  </div>
+  <%= erb :footer %>
+</body>
+</html>

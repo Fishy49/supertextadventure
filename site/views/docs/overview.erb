@@ -1,0 +1,74 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">
+  Classic Game Engine<span class="inline-block w-[12px] h-[26px] bg-terminal-green ml-[4px] mb-[-2px] animate-cursor-blink"></span>
+</h1>
+
+<p class="text-2xl pt-6 pb-4 text-terminal-bright">
+  The Classic Game Engine powers text-based adventure games in Super Text Adventure. You define your entire game world as a JSON document, and the engine handles parsing player commands, managing state, and running all game mechanics.
+</p>
+
+<h2 class="text-3xl pt-6 pb-3 border-b border-terminal-dim">What You Can Build</h2>
+
+<div class="grid sm:grid-cols-2 gap-4 pt-4">
+  <div class="border border-terminal-dim rounded p-4">
+    <div class="text-2xl text-terminal-bright pb-2">Explorable Worlds</div>
+    <div class="text-xl text-terminal-dim">Rooms connected by exits with descriptions, hidden passages, locked doors, and directional navigation.</div>
+  </div>
+  <div class="border border-terminal-dim rounded p-4">
+    <div class="text-2xl text-terminal-bright pb-2">Items & Inventory</div>
+    <div class="text-xl text-terminal-dim">Pickupable items, containers with locks, weapons, healing potions, and items that interact with the world.</div>
+  </div>
+  <div class="border border-terminal-dim rounded p-4">
+    <div class="text-2xl text-terminal-bright pb-2">NPCs & Quests</div>
+    <div class="text-xl text-terminal-dim">Characters with branching dialogue trees, item trading, quest flags, gated conversations, and patrol movement.</div>
+  </div>
+  <div class="border border-terminal-dim rounded p-4">
+    <div class="text-2xl text-terminal-bright pb-2">Combat & Dice</div>
+    <div class="text-xl text-terminal-dim">Turn-based combat with initiative, attack/defend/flee, weapons, armor, D&D-style dice rolls, and hostile creatures that ambush the player.</div>
+  </div>
+</div>
+
+<h2 class="text-3xl pt-8 pb-3 border-b border-terminal-dim">How It Works</h2>
+
+<div class="pt-4 text-xl space-y-3">
+  <p><span class="text-terminal-bright">1.</span> You write a JSON file describing your world &mdash; rooms, items, NPCs, and creatures.</p>
+  <p><span class="text-terminal-bright">2.</span> The engine loads your JSON as the <code class="text-terminal-bright">world_data</code>.</p>
+  <p><span class="text-terminal-bright">3.</span> Players type natural-language commands like <code class="text-terminal-bright">go north</code>, <code class="text-terminal-bright">take sword</code>, or <code class="text-terminal-bright">talk to wizard</code>.</p>
+  <p><span class="text-terminal-bright">4.</span> The <strong>CommandParser</strong> translates input into structured commands (verb + target + modifier).</p>
+  <p><span class="text-terminal-bright">5.</span> The <strong>Engine</strong> routes commands to the appropriate <strong>Handler</strong> (movement, items, combat, etc.).</p>
+  <p><span class="text-terminal-bright">6.</span> The handler processes the command, updates game state, and returns a text response.</p>
+</div>
+
+<h2 class="text-3xl pt-8 pb-3 border-b border-terminal-dim">Top-Level JSON Structure</h2>
+
+<p class="text-xl pt-4 pb-3">Every game world is defined by a single JSON object with these top-level keys:</p>
+
+<pre class="doc-code text-terminal-green"><span class="comment">// world_data.json</span>
+{
+  <span class="key">"meta"</span>: {
+    <span class="key">"name"</span>: <span class="str">"My Adventure"</span>,
+    <span class="key">"description"</span>: <span class="str">"A short quest to retrieve the Crystal of Power."</span>,
+    <span class="key">"starting_room"</span>: <span class="str">"tavern"</span>,
+    <span class="key">"version"</span>: <span class="str">"1.0"</span>
+  },
+  <span class="key">"rooms"</span>:     { <span class="comment">/* room definitions */</span> },
+  <span class="key">"items"</span>:     { <span class="comment">/* item definitions */</span> },
+  <span class="key">"npcs"</span>:      { <span class="comment">/* NPC definitions */</span> },
+  <span class="key">"creatures"</span>: { <span class="comment">/* creature definitions */</span> }
+}</pre>
+
+<h2 class="text-3xl pt-8 pb-3 border-b border-terminal-dim">Quick Links</h2>
+
+<div class="pt-2 text-xl space-y-2">
+  <p><a href="/docs/world-structure" class="text-terminal-bright hover:underline">> World Structure</a> &mdash; Full top-level schema details</p>
+  <p><a href="/docs/rooms" class="text-terminal-bright hover:underline">> Rooms</a> &mdash; Defining rooms, descriptions, and entry events</p>
+  <p><a href="/docs/exits" class="text-terminal-bright hover:underline">> Exits</a> &mdash; Simple and complex exits, locks, hidden passages</p>
+  <p><a href="/docs/items" class="text-terminal-bright hover:underline">> Items</a> &mdash; All item types: weapons, consumables, keys, and more</p>
+  <p><a href="/docs/npcs" class="text-terminal-bright hover:underline">> NPCs & Dialogue</a> &mdash; Characters, dialogue trees, and quests</p>
+  <p><a href="/docs/creatures" class="text-terminal-bright hover:underline">> Creatures</a> &mdash; Enemies and their combat stats</p>
+  <p><a href="/docs/combat" class="text-terminal-bright hover:underline">> Combat</a> &mdash; Turn-based combat mechanics</p>
+  <p><a href="/docs/dice-rolls" class="text-terminal-bright hover:underline">> Dice Rolls</a> &mdash; D&D-style skill checks</p>
+  <p><a href="/docs/flags-and-state" class="text-terminal-bright hover:underline">> Flags & State</a> &mdash; Global flags and game state tracking</p>
+  <p><a href="/docs/containers" class="text-terminal-bright hover:underline">> Containers</a> &mdash; Openable and lockable containers</p>
+  <p><a href="/docs/commands" class="text-terminal-bright hover:underline">> Commands</a> &mdash; All player commands and synonyms</p>
+  <p><a href="/docs/examples" class="text-terminal-bright hover:underline">> Full Example</a> &mdash; A complete game world JSON</p>
+</div>

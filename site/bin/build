@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Builds the static site into dist/.
+#
+#   bin/build
+#
+# Output mirrors the routes the old Sinatra app served:
+#
+#   dist/index.html              <- views/home.erb          in views/layout.erb
+#   dist/404.html                <- views/404.erb           in views/layout.erb
+#   dist/docs/index.html         <- views/docs/overview.erb in views/docs_layout.erb
+#   dist/docs/<slug>/index.html  <- views/docs/<slug>.erb   in views/docs_layout.erb
+#   dist/css/main.css            <- css/input.css, compiled by the Tailwind CLI
+#   dist/*                       <- everything in public/
+#
+# Rendering is stdlib Ruby. The CSS step uses the Tailwind CLI from
+# package.json, so run `npm install` once first (Netlify does it for you).
+
+require "erb"
+require "fileutils"
+
+ROOT = File.expand_path("..", __dir__)
+VIEWS = File.join(ROOT, "views")
+PUBLIC = File.join(ROOT, "public")
+DIST = File.join(ROOT, "dist")
+CSS_IN = File.join(ROOT, "css", "input.css")
+CSS_OUT = File.join(DIST, "css", "main.css")
+TAILWIND = File.join(ROOT, "node_modules", ".bin", "tailwindcss")
+
+# The templates were written for Sinatra, so this provides the few helpers
+# they lean on: `erb :name` renders a partial, `yield` inside a layout
+# inserts the page body, and `page` is the current docs slug (used for nav
+# highlighting and the <title>).
+class Page
+  attr_reader :page
+
+  def initialize(page = nil)
+    @page = page
+  end
+
+  def erb(name, layout: nil)
+    body = render(name)
+    return body unless layout
+
+    render(layout) { body }
+  end
+
+  private
+
+  # `binding` carries the block passed to this method, so a `yield` inside
+  # the template returns the page body - the same trick Sinatra/Tilt use.
+  def render(name)
+    template = File.read(File.join(VIEWS, "#{name}.erb"))
+    ERB.new(template, trim_mode: "<>").result(binding)
+  end
+end
+
+def write(rel_path, html)
+  path = File.join(DIST, rel_path)
+  FileUtils.mkdir_p(File.dirname(path))
+  File.write(path, html)
+  puts "  #{rel_path}"
+end
+
+unless File.executable?(TAILWIND)
+  abort "bin/build: #{TAILWIND} not found. Run `npm install` first."
+end
+
+FileUtils.rm_rf(DIST)
+FileUtils.mkdir_p(DIST)
+
+puts "copying public/ -> dist/"
+FileUtils.cp_r(Dir[File.join(PUBLIC, "*")], DIST)
+
+puts "rendering views -> dist/"
+write("index.html", Page.new.erb(:home, layout: :layout))
+write("404.html", Page.new.erb(:"404", layout: :layout))
+
+slugs = Dir[File.join(VIEWS, "docs", "*.erb")].map { |f| File.basename(f, ".erb") }.sort
+slugs.each do |slug|
+  html = Page.new(slug).erb(:"docs/#{slug}", layout: :docs_layout)
+  write(slug == "overview" ? "docs/index.html" : "docs/#{slug}/index.html", html)
+end
+
+puts "compiling css -> dist/css/main.css"
+system(TAILWIND, "-i", CSS_IN, "-o", CSS_OUT, "--minify", exception: true)
+
+puts "done: #{slugs.size} docs pages + home + 404 + css"

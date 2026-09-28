@@ -1,0 +1,26 @@
+@import "tailwindcss" source("../views");
+
+@theme {
+  --color-terminal-black: #282823;
+  --color-terminal-green: #8fe86b;
+  --color-terminal-dim: #5a9e3d;
+  --color-terminal-bright: #b5f5a0;
+  --color-terminal-dark: #1e1e1a;
+
+  --animate-cursor-blink: blink .4s linear infinite alternate;
+
+  --background-image-screen-lines: linear-gradient(rgba(18, 16, 16, 0) 50%,rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg,rgba(255, 0, 0, 0.06),rgba(0, 255, 0, 0.02),rgba(0, 0, 255, 0.06));
+
+  @keyframes blink {
+    0% { opacity: 1; }
+    40% { opacity: 1; }
+    60% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+}
+
+@layer base {
+  html {
+    font-family: 'VT323', monospace;
+  }
+}

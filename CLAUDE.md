@@ -51,3 +51,10 @@ The file `test/lib/classic_game/full_game_system_test.rb` is a comprehensive end
 ## Preferences
 > **Important:** Every shell command must be a single, simple call — no `$()`,
 > no `&&` chains. Use separate tool calls and carry values between them.
+
+## Static site (`site/`)
+
+`site/` holds the public site at supertextadventure.com: the landing page and
+the Classic Game Engine docs. It is a separate, free DigitalOcean static-site
+app built by `site/bin/build`; see `site/CLAUDE.md` and `.do/site.yaml`. It is
+excluded from the Rails Docker image and from RuboCop's `bin` checks.

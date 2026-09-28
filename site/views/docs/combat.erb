@@ -1,0 +1,197 @@
+<h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Combat</h1>
+
+<p class="text-2xl pt-6 pb-4">
+  The combat system is turn-based with initiative rolls, attack/defend/flee actions, weapon bonuses, and healing items. Combat starts when a player attacks a creature.
+</p>
+
+<h2 id="starting" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Starting Combat</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Combat begins when the player types <code class="text-terminal-bright">attack [creature]</code>. The engine then:
+</p>
+
+<ol class="text-xl list-decimal list-inside space-y-2 pt-2">
+  <li>Finds the creature in the current room</li>
+  <li>Initializes player health if not already set (default: 10 HP)</li>
+  <li>Rolls initiative for both sides (1d20 each)</li>
+  <li>Whoever rolls higher goes first</li>
+  <li>If the creature wins initiative, it immediately attacks</li>
+</ol>
+
+<h2 id="actions" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Combat Actions</h2>
+
+<p class="text-xl pt-4 pb-3">
+  During combat, the player's commands are restricted to combat-related actions:
+</p>
+
+<table class="doc-table mt-4">
+  <thead>
+    <tr><th>Command</th><th>Effect</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>attack</code></td>
+      <td>Attack the creature. Damage = 5 + weapon_damage + rand(-2..2) - creature defense. Creature counterattacks.</td>
+    </tr>
+    <tr>
+      <td><code>defend</code> / <code>block</code> / <code>guard</code> / <code>parry</code></td>
+      <td>Raise your guard. Adds +3 to defense for this round. Creature still attacks but deals less damage.</td>
+    </tr>
+    <tr>
+      <td><code>flee</code> / <code>run</code> / <code>escape</code> / <code>retreat</code></td>
+      <td>50% chance to escape. On failure, creature gets a free attack.</td>
+    </tr>
+    <tr>
+      <td><code>use [item]</code></td>
+      <td>Use a combat item (e.g., healing potion). Creature counterattacks after.</td>
+    </tr>
+    <tr>
+      <td><code>inventory</code></td>
+      <td>Check your inventory (no turn cost).</td>
+    </tr>
+    <tr>
+      <td><code>examine [target]</code> / <code>look</code></td>
+      <td>Examine something (no turn cost).</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="border border-terminal-dim rounded p-4 mt-4">
+  <div class="text-xl text-terminal-bright">Important:</div>
+  <p class="text-xl pt-2 text-terminal-dim">
+    While in combat, all non-combat commands (movement, talking, taking items) are blocked. The player must defeat the creature, flee, or die.
+  </p>
+</div>
+
+<h2 id="damage" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Damage Calculation</h2>
+
+<h3 class="text-2xl pt-4 pb-2 text-terminal-bright">Player Attacking</h3>
+
+<pre class="doc-code text-terminal-green mt-2">base_attack      = <span class="num">5</span>
+weapon_bonus     = max(weapon_damage from inventory items)
+variance         = rand(-<span class="num">2</span>..<span class="num">2</span>)
+creature_defense = creature.defense
+
+damage = base_attack + weapon_bonus + variance - creature_defense
+damage = max(damage, <span class="num">1</span>)  <span class="comment">// always at least 1</span></pre>
+
+<h3 class="text-2xl pt-6 pb-2 text-terminal-bright">Creature Attacking</h3>
+
+<pre class="doc-code text-terminal-green mt-2">creature_attack  = creature.attack  <span class="comment">// default: 5</span>
+variance         = rand(-<span class="num">2</span>..<span class="num">2</span>)
+player_defense   = sum(defense_bonus from inventory items)
+defending_bonus  = <span class="num">3</span> if player used <span class="str">"defend"</span>, else <span class="num">0</span>
+
+damage = creature_attack + variance - player_defense - defending_bonus
+damage = max(damage, <span class="num">1</span>)  <span class="comment">// always at least 1</span></pre>
+
+<h2 id="weapons" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Weapon & Armor Bonuses</h2>
+
+<div class="text-xl space-y-3 pt-4">
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">Weapons (weapon_damage)</div>
+    <p class="pt-1">Only the <strong>highest</strong> weapon_damage value from your inventory is used. Having multiple weapons doesn't stack &mdash; only the best one counts.</p>
+  </div>
+
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">Armor (defense_bonus)</div>
+    <p class="pt-1">All defense_bonus values from inventory items are <strong>summed together</strong>. Shield + helmet + armor all contribute.</p>
+  </div>
+
+  <div class="border-l-2 border-terminal-dim pl-4">
+    <div class="text-terminal-bright">Passive</div>
+    <p class="pt-1">Items provide bonuses just by being in your inventory. No "equip" command needed.</p>
+  </div>
+</div>
+
+<h2 id="healing" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Using Items in Combat</h2>
+
+<p class="text-xl pt-4 pb-3">
+  Items with <code class="text-terminal-bright">combat_effect</code> can be used during combat. Currently only <code>"heal"</code> is supported.
+</p>
+
+<pre class="doc-code text-terminal-green mt-2"><span class="comment">// Using a health potion in combat:</span>
+<span class="comment">// 1. Player uses the item</span>
+<span class="comment">// 2. Health is restored (capped at max_health)</span>
+<span class="comment">// 3. Item is consumed if consumable: true</span>
+<span class="comment">// 4. Creature counterattacks</span>
+
+<span class="key">"health_potion"</span>: {
+  <span class="key">"name"</span>: <span class="str">"Health Potion"</span>,
+  <span class="key">"consumable"</span>: <span class="bool">true</span>,
+  <span class="key">"combat_effect"</span>: {
+    <span class="key">"type"</span>: <span class="str">"heal"</span>,
+    <span class="key">"amount"</span>: <span class="num">15</span>
+  }
+}</pre>
+
+<p class="text-xl pt-3 text-terminal-dim">
+  Using an item in combat costs your turn &mdash; the creature gets to attack afterward.
+</p>
+
+<h2 id="flee" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Fleeing</h2>
+
+<div class="text-xl space-y-3 pt-4">
+  <p><span class="text-terminal-bright">Success rate:</span> 50%</p>
+  <p><span class="text-terminal-bright">On success:</span> Combat ends, player stays in the room, creature remains</p>
+  <p><span class="text-terminal-bright">On failure:</span> Creature gets a free attack, combat continues</p>
+  <p>The creature's <code class="text-terminal-bright">on_flee_msg</code> is shown when the player successfully flees.</p>
+</div>
+
+<h2 id="defeat" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Creature Defeat</h2>
+
+<p class="text-xl pt-4 pb-3">When a creature's HP reaches 0:</p>
+
+<ol class="text-xl list-decimal list-inside space-y-2 pt-2">
+  <li>The <code class="text-terminal-bright">on_defeat_msg</code> is displayed (if set)</li>
+  <li>All <code class="text-terminal-bright">loot</code> items are dropped into the current room</li>
+  <li>The creature is removed from the room</li>
+  <li>The <code class="text-terminal-bright">sets_flag_on_defeat</code> flag is set (if specified)</li>
+  <li>Combat ends</li>
+</ol>
+
+<h2 id="death" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Player Death</h2>
+
+<p class="text-xl pt-4 pb-3">When the player's HP reaches 0:</p>
+
+<ol class="text-xl list-decimal list-inside space-y-2 pt-2">
+  <li>A game over message is displayed</li>
+  <li>The game enters <code class="text-terminal-bright">pending_restart</code> mode</li>
+  <li>The player is prompted to restart the game</li>
+</ol>
+
+<h2 id="flow" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Combat Flow Diagram</h2>
+
+<pre class="doc-code text-terminal-green mt-4"><span class="comment">Player types: "attack goblin"</span>
+         |
+    [Initiative Roll]
+    Player: 1d20    Creature: 1d20
+         |
+    Higher goes first
+         |
+    +-----------+
+    | COMBAT    |
+    | ROUND     |
+    +-----------+
+         |
+    Player chooses action:
+    |             |           |            |
+  ATTACK       DEFEND       FLEE       USE ITEM
+    |             |           |            |
+  Deal dmg    +3 defense   50/50       Heal/effect
+    |             |         /    \          |
+    |             |     Escape  Fail       |
+    |             |       |      |         |
+    +------+------+       |   Free atk    |
+           |              |      |         |
+    Creature attacks      End    |         |
+           |              combat |         |
+    Check player HP        +-----+---------+
+           |                     |
+    Dead? --YES--> Game Over + Restart
+           |
+    Check creature HP
+           |
+    Dead? --YES--> Victory + Loot
+           |
+    Next round...</pre>

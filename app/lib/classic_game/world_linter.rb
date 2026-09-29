@@ -16,7 +16,7 @@ module ClassicGame
     LEVELS = %w[error warn info].freeze
     LINT_CODES = %w[
       flag.never_set flag.never_checked
-      exit.key_unplaced exit.flag_never_set exit.redundant_use_item room.unreachable
+      exit.key_unplaced exit.flag_never_set exit.redundant_use_item room.unreachable room.describes_takeable
       item.unplaced item.message_without_text item.reveals_unknown_exit
       container.no_unlock container.locked_but_open item.contents_without_container item.consumable_not_takeable
       movement.bad_duration
@@ -161,10 +161,35 @@ module ClassicGame
 
           exits = room["exits"].is_a?(Hash) ? room["exits"] : {}
           exits.each { |direction, exit_def| lint_exit(rid, direction, exit_def) if exit_def.is_a?(Hash) }
+          lint_room_prose(rid, room)
           next unless truthy?(start) && truthy?(rooms[start]) && @reachable.exclude?(rid)
 
           report("warn", "room.unreachable", "rooms.#{rid}", "Room is unreachable from the starting room by any exit.")
         end
+      end
+
+      # Room text never changes, so prose that names a takeable item still
+      # describes it after the player has pocketed it.
+      def lint_room_prose(rid, room)
+        return unless room["description"].is_a?(String) && room["items"].is_a?(Array)
+
+        text = room["description"].downcase
+        room["items"].each do |iid|
+          item = section("items")[iid]
+          next unless item.is_a?(Hash) && item["takeable"] != false
+
+          term = mentioned_term(text, item)
+          next unless term
+
+          report("info", "room.describes_takeable", "rooms.#{rid}.description",
+                 "Description mentions \"#{term}\", but #{entity_name('item', iid)} is takeable " \
+                 "and the text will not change once it is taken.")
+        end
+      end
+
+      def mentioned_term(text, item)
+        terms = [item["name"]] + (item["keywords"].is_a?(Array) ? item["keywords"] : [])
+        terms.find { |t| t.is_a?(String) && !t.empty? && text.match?(/\b#{Regexp.escape(t.downcase)}\b/) }
       end
 
       def lint_exit(rid, direction, exit_def)

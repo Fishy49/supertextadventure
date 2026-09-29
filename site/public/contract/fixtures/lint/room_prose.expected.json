@@ -1,0 +1,5 @@
+{
+  "lint": [
+    "room.describes_takeable rooms.start.description"
+  ]
+}

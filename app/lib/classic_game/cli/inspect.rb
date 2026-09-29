@@ -29,6 +29,8 @@ module ClassicGame
                                       "Drop one of them."],
         "room.unreachable" => ["No chain of exits leads here from the starting room.",
                                "Link it: bin/world link FILE FROM DIRECTION ROOM --both."],
+        "room.describes_takeable" => ["The description names an item the player can take, and room text never changes.",
+                                      "Describe the spot, not the item; the You see line shows what is really there."],
         "item.unplaced" => ["The item exists but is not in any room, container, loot list, or NPC gift.",
                             "Place it, or remove it: bin/world rm FILE items ID."],
         "item.message_without_text" => ["on_use is type message but has no text.", "Add on_use.text."],

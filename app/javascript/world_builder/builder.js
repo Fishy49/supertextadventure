@@ -785,12 +785,28 @@ export function mountWorldBuilder(root, host) {
     return zone;
   }
   function titleRow(type, name) { return el('div', { class: 'insp-title' }, el('span', { class: 'kind t-' + type }, LABEL[type]), el('h2', {}, name || '(unnamed)')); }
+  /* Where an entity is placed, with a remove control on each placement, plus a picker to place it
+     somewhere new. Items can go into rooms or containers; NPCs and creatures only into rooms. */
   function appearsIn(kind, id) {
     const rs = refs.filter(r => r.kind === kind && r.id === id && r.mode === 'place');
     const box = el('div', { class: 'where' });
     if (!rs.length) box.append(el('span', { class: 'none' }, kind === 'item' ? 'Nowhere yet. Place it in a room, a container, a loot list, or have an NPC give it.' : 'Not in any room yet.'));
-    for (const r of rs) box.append(el('span', {}, r.label + ' ', el('span', { class: 'chip link', onclick: () => select(r.owner.type, r.owner.id) }, el('span', { class: 'dot bg-' + r.owner.type }), entityName(r.owner.type, r.owner.id))));
-    const p = picker({ value: '', options: refOptions('room'), none: false, type: 'room', placeholder: 'Place in room...', onChange: v => { if (!v) return; pushUndo(); const r = W.rooms[v]; const k = PLURAL[kind]; r[k] = Array.isArray(r[k]) ? r[k] : []; if (!r[k].includes(id)) r[k].push(id); commit({ inspector: true }); toast('Placed in ' + entityName('room', v)); } });
+    for (const r of rs) box.append(el('span', {}, r.label + ' ', el('span', { class: 'chip link' },
+      el('span', { class: 'dot bg-' + r.owner.type }),
+      el('span', { onclick: () => select(r.owner.type, r.owner.id) }, entityName(r.owner.type, r.owner.id)),
+      el('span', { class: 'x', title: 'Remove from here', onclick: () => { pushUndo(); r.remove(); commit({ inspector: true }); toast('Removed from ' + entityName(r.owner.type, r.owner.id)); } }, '\u00d7'))));
+    const options = refOptions('room').map(x => Object.assign({}, x, { value: 'room:' + x.value }));
+    if (kind === 'item') {
+      const containers = Object.keys(W.items).filter(cid => cid !== id && isObj(W.items[cid]) && W.items[cid].is_container).sort((a, b) => entityName('item', a).localeCompare(entityName('item', b)));
+      for (const cid of containers) options.push({ value: 'item:' + cid, label: entityName('item', cid), sub: cid, type: 'item', meta: 'container' });
+    }
+    const p = picker({ value: '', options, none: false, placeholder: kind === 'item' ? 'Place in room or container...' : 'Place in room...', onChange: v => {
+      if (!v) return; const sep = v.indexOf(':'); const t = v.slice(0, sep), tid = v.slice(sep + 1);
+      pushUndo();
+      if (t === 'room') { const r = W.rooms[tid]; const k = PLURAL[kind]; r[k] = Array.isArray(r[k]) ? r[k] : []; if (!r[k].includes(id)) r[k].push(id); }
+      else { const c = W.items[tid]; c.contents = Array.isArray(c.contents) ? c.contents : []; if (!c.contents.includes(id)) c.contents.push(id); }
+      commit({ inspector: true }); toast('Placed in ' + entityName(t, tid));
+    } });
     return el('div', { class: 'field' }, lbl('Appears in'), box, el('div', { class: 'addrow' }, p));
   }
 

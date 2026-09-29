@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "name": "Room prose",
+    "description": "Lint fixture.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Forge",
+      "description": "A lantern hangs from a hook beside a heavy anvil. A brass key glints on the floor. Nobody mentions the coins.",
+      "items": [
+        "lantern",
+        "anvil",
+        "brass_key",
+        "coin"
+      ],
+      "exits": {}
+    }
+  },
+  "items": {
+    "lantern": {
+      "name": "Lantern",
+      "description": "Takeable and named in the prose."
+    },
+    "anvil": {
+      "name": "Anvil",
+      "description": "Named in the prose but not takeable.",
+      "takeable": false
+    },
+    "brass_key": {
+      "name": "Brass Key",
+      "description": "Takeable; matched by name.",
+      "keywords": [
+        "key"
+      ]
+    },
+    "coin": {
+      "name": "Coin",
+      "description": "Takeable; the prose says coins, which is a different word.",
+      "keywords": [
+        "coin"
+      ]
+    }
+  }
+}

@@ -173,7 +173,7 @@ export const CONTRACT_CODES = ["schema.invalid", "starting_room.missing", "ref.m
 
 export const LINT_CODES = [
   "flag.never_set", "flag.never_checked",
-  "exit.key_unplaced", "exit.flag_never_set", "exit.redundant_use_item", "room.unreachable",
+  "exit.key_unplaced", "exit.flag_never_set", "exit.redundant_use_item", "room.unreachable", "room.describes_takeable",
   "item.unplaced", "item.message_without_text", "item.reveals_unknown_exit",
   "container.no_unlock", "container.locked_but_open", "item.contents_without_container", "item.consumable_not_takeable",
   "movement.bad_duration",
@@ -238,6 +238,14 @@ export function lintWorld(world, contract) {
       if (truthy(ex.requires_flag) && !flagSet(ex.requires_flag)) report("warn", "exit.flag_never_set", base + ".requires_flag", "Exit " + d + ' is gated on flag "' + ex.requires_flag + '", which nothing ever sets.');
       if (truthy(ex.use_item) && truthy(ex.requires) && ex.use_item === ex.requires) report("info", "exit.redundant_use_item", base, "Exit " + d + " sets both requires and use_item to the same item; requires alone already lets the player through.");
     }
+    if (typeof r.description === "string" && Array.isArray(r.items)) {
+      const text = r.description.toLowerCase();
+      for (const iid of r.items) {
+        const it = items[iid]; if (!isObj(it) || it.takeable === false) continue;
+        const term = mentionedTerm(text, it);
+        if (term) report("info", "room.describes_takeable", "rooms." + rid + ".description", 'Description mentions "' + term + '", but ' + itemName(iid) + " is takeable and the text will not change once it is taken.");
+      }
+    }
     if (truthy(start) && truthy(rooms[start]) && !reachable.has(rid)) report("warn", "room.unreachable", "rooms." + rid, "Room is unreachable from the starting room by any exit.");
   }
 
@@ -298,4 +306,10 @@ export function lintWorld(world, contract) {
     patrolCheck(base, c.movement);
   }
   return out;
+}
+
+// The first of an item's name and keywords that appears as a whole word in the text.
+function mentionedTerm(text, item) {
+  const terms = [item.name].concat(Array.isArray(item.keywords) ? item.keywords : []);
+  return terms.find(t => typeof t === "string" && t.length && new RegExp("\\b" + t.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b").test(text));
 }

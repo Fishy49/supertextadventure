@@ -43,6 +43,7 @@
       "exits_and_keys.json",
       "flags.json",
       "npcs_and_creatures.json",
+      "room_prose.json",
       "unreachable_room.json"
     ]
   },

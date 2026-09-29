@@ -75,37 +75,37 @@
     <tr>
       <td><code>talk_text</code></td>
       <td>string</td>
-      <td>&mdash;</td>
+      <td> - </td>
       <td>What the creature "says" when the player uses <code>talk to [creature]</code>. Defaults to <em>"It has no clue what you're saying."</em></td>
     </tr>
     <tr>
       <td><code>aggro_text</code></td>
       <td>string</td>
-      <td>&mdash;</td>
+      <td> - </td>
       <td>Message shown when a hostile creature begins attacking. Defaults to <em>"The [name] attacks you!"</em></td>
     </tr>
     <tr>
       <td><code>attack_condition</code></td>
       <td>object</td>
-      <td>&mdash;</td>
+      <td> - </td>
       <td>When a hostile creature auto-attacks. See <a href="#attack-conditions" class="text-terminal-bright hover:underline">Attack Conditions</a>.</td>
     </tr>
     <tr>
       <td><code>movement</code></td>
       <td>object</td>
-      <td>&mdash;</td>
-      <td>Optional patrol or triggered movement. See <a href="/docs/npcs#movement" class="text-terminal-bright hover:underline">Movement</a> on the NPCs page &mdash; the schema is identical.</td>
+      <td> - </td>
+      <td>Optional patrol or triggered movement. See <a href="/docs/npcs#movement" class="text-terminal-bright hover:underline">Movement</a> on the NPCs page - the schema is identical.</td>
     </tr>
     <tr>
       <td><code>on_defeat_msg</code></td>
       <td>string</td>
-      <td>&mdash;</td>
+      <td> - </td>
       <td>Custom message displayed when the creature is defeated.</td>
     </tr>
     <tr>
       <td><code>on_flee_msg</code></td>
       <td>string</td>
-      <td>&mdash;</td>
+      <td> - </td>
       <td>Custom message displayed when the player flees from combat.</td>
     </tr>
     <tr>
@@ -117,7 +117,7 @@
     <tr>
       <td><code>sets_flag_on_defeat</code></td>
       <td>string</td>
-      <td>&mdash;</td>
+      <td> - </td>
       <td>Global flag set to <code>true</code> when the creature is defeated.</td>
     </tr>
   </tbody>
@@ -126,7 +126,7 @@
 <h2 id="talking" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Talking to Creatures</h2>
 
 <p class="text-xl pt-4 pb-3">
-  Creatures don't have dialogue trees like NPCs, but the player can still <code class="text-terminal-bright">talk to [creature]</code>. The engine responds with the creature's <code>talk_text</code> &mdash; useful for flavor, warnings, or hostile creatures with an <code>on_talk</code> attack condition.
+  Creatures don't have dialogue trees like NPCs, but the player can still <code class="text-terminal-bright">talk to [creature]</code>. The engine responds with the creature's <code>talk_text</code> - useful for flavor, warnings, or hostile creatures with an <code>on_talk</code> attack condition.
 </p>
 
 <pre class="doc-code text-terminal-green mt-2"><span class="key">"tavern_rat"</span>: {
@@ -141,7 +141,7 @@
 <div class="border border-terminal-dim rounded p-4 mt-4">
   <div class="text-xl text-terminal-bright">NPC priority:</div>
   <p class="text-xl pt-2 text-terminal-dim">
-    If a room contains both an NPC and a creature matching the same keyword, the NPC wins &mdash; <code>talk to bob</code> always prefers an NPC named Bob over a creature named Bob the Beast.
+    If a room contains both an NPC and a creature matching the same keyword, the NPC wins - <code>talk to bob</code> always prefers an NPC named Bob over a creature named Bob the Beast.
   </p>
 </div>
 
@@ -251,7 +251,7 @@ damage = [damage, <span class="num">1</span>].max  <span class="comment">// mini
 <span class="key">"loot"</span>: [<span class="str">"dragon_scale"</span>, <span class="str">"gold_coins"</span>]</pre>
 
 <p class="text-xl pt-3 text-terminal-dim">
-  Loot items should be defined in your <code>items</code> object but don't need to be placed in any room initially &mdash; they'll appear when the creature drops them.
+  Loot items should be defined in your <code>items</code> object but don't need to be placed in any room initially - they'll appear when the creature drops them.
 </p>
 
 <h2 id="example" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Example</h2>

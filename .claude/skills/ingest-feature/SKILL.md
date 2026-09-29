@@ -11,13 +11,13 @@ context: fork
 # Ingest Feature Spec
 
 Register a spec file in `specs/` by creating a branch, opening a draft PR,
-and linking the two together. Does not implement anything — that is a separate step.
+and linking the two together. Does not implement anything - that is a separate step.
 
 **When called with no argument:** auto-selects if exactly one unprocessed spec
 exists, otherwise fails with a list of candidates.
 **When called with a `pr-X-` prefixed file:** reports current PR state and exits.
 
-> **Important:** Every shell command must be a single, simple call — no `$()`,
+> **Important:** Every shell command must be a single, simple call - no `$()`,
 > no `&&` chains. Use separate tool calls and carry values between them.
 
 ---
@@ -31,7 +31,7 @@ Otherwise:
 2. Identify unprocessed files: filename does NOT start with `pr-`.
 3. If none: print "No unprocessed specs found in specs/" and stop.
 4. If exactly one: proceed with it.
-5. If multiple: print "Multiple unprocessed specs found — pass a filename as an argument:" followed by the list, then stop.
+5. If multiple: print "Multiple unprocessed specs found - pass a filename as an argument:" followed by the list, then stop.
 6. If `$ARGUMENTS` names a `pr-X-` file: run `gh pr view {number} --json state,isDraft,title` and report the result, then stop.
 
 ## Phase 2: Validate the spec
@@ -60,7 +60,7 @@ Run each command as a separate tool call:
 
    Spec: specs/pr-{number}-{original_filename}
    ```
-   The PR URL is printed by `gh pr create` — parse the PR number from that URL directly.
+   The PR URL is printed by `gh pr create` - parse the PR number from that URL directly.
    Do not run a second command to fetch the PR number.
 
 ## Phase 4: Rename the spec file and add PR link
@@ -80,5 +80,5 @@ Run each command as a separate tool call:
 
 Print a single summary line:
 ```
-✓ PR #{number} created: https://github.com/Fishy49/supertextadventure/pull/{number} — specs/pr-{number}-{filename}
+✓ PR #{number} created: https://github.com/Fishy49/supertextadventure/pull/{number} - specs/pr-{number}-{filename}
 ```

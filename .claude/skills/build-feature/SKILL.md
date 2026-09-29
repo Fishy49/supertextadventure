@@ -1,6 +1,6 @@
 ---
 name: build-feature
-description: Full pipeline — ingest a spec, plan the implementation, implement it, and mark the PR ready for review. No human checkpoints.
+description: Full pipeline - ingest a spec, plan the implementation, implement it, and mark the PR ready for review. No human checkpoints.
 argument-hint: [spec-filename (optional)]
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(git *), Bash(gh *), Bash(bin/rails *), Bash(bundle *), Skill
 model: sonnet
@@ -12,9 +12,9 @@ context: fork
 
 Orchestrates the complete feature factory by calling each skill in sequence:
 
-1. `/ingest-feature` — create branch, draft PR, rename spec file
-2. `/plan-feature` — explore codebase, write implementation plan
-3. `/implement-feature` — tests first, then code, mark PR ready
+1. `/ingest-feature` - create branch, draft PR, rename spec file
+2. `/plan-feature` - explore codebase, write implementation plan
+3. `/implement-feature` - tests first, then code, mark PR ready
 
 No human checkpoints. The first human touchpoint is the PR ready for review.
 
@@ -51,7 +51,7 @@ Rules:
 - Write the full PR body to a temp file and use `--body-file` to avoid shell quoting issues.
 
 Update the checklist at these six points:
-1. After ingest succeeds — initialize checklist with ingest done, plan/implement pending
+1. After ingest succeeds - initialize checklist with ingest done, plan/implement pending
 2. Before plan starts
 3. After plan succeeds (or fails)
 4. Before implement starts
@@ -68,7 +68,7 @@ Otherwise:
 2. Find unprocessed files: filename does NOT start with `pr-`.
 3. If none: print "No unprocessed specs found." and stop.
 4. If exactly one: use it.
-5. If multiple: print "Multiple unprocessed specs — pass a filename:" followed by the list, then stop.
+5. If multiple: print "Multiple unprocessed specs - pass a filename:" followed by the list, then stop.
 
 ## Phase 2: Ingest
 
@@ -90,7 +90,7 @@ Invoke the skill:
 /plan-feature pr-{number}-{filename}
 ```
 
-If it prints open questions or ambiguities, note them but continue — do not stop for human input. If it fails, update the checklist to show Plan failed, then stop and report.
+If it prints open questions or ambiguities, note them but continue - do not stop for human input. If it fails, update the checklist to show Plan failed, then stop and report.
 
 Update the checklist to show Plan finished.
 

@@ -40,7 +40,7 @@ module ClassicGame
             unlocked_by_item = unlock_item && item?(unlock_item)
 
             if unlocked_by_flag || unlocked_by_item
-              # Unlocked via flag or key — open the container
+              # Unlocked via flag or key - open the container
               game.open_container(container_id)
               message = container_def["on_open_message"] || "You unlock and open the #{container_def['name']}."
 

@@ -47,7 +47,7 @@ The player is back in the starting room with empty inventory in under a second.
 - No real authentication is performed. The spoofed user id is a fixed constant
   (e.g. `0` or a clearly fake value like `999999`) that cannot collide with
   real user ids.
-- The dev game is identified by the spoofed user id — there is exactly one dev
+- The dev game is identified by the spoofed user id - there is exactly one dev
   game at any time. If one already exists, reuse it; don't create duplicates.
 - The QA test world must exist (seeded via `db/seeds/feature_test_world.rb`).
   If it doesn't exist, show a clear error message with the seed command to run.
@@ -79,17 +79,17 @@ The player is back in the starting room with empty inventory in under a second.
 
 ### 1. Files to create
 
-- `app/controllers/dev/game_controller.rb` — handles `GET /dev/game` (find-or-create dev game, set spoofed session, redirect) and `DELETE /dev/game` (reset: destroy + redirect back); enforces development-only access via before_action
-- `app/views/games/_debug_bar.html.erb` — partial rendered conditionally in games/show for dev sessions; shows room id, inventory, and flags with a Reset Game button using `button_to`
-- `app/views/dev/game/missing_world.html.erb` — error page shown when QA Test World has not been seeded; displays the seed command
-- `db/seeds/feature_test_world.rb` — seeds the QA test world ("QA Test World") used by the dev game
-- `test/controllers/dev/game_controller_test.rb` — integration tests covering all acceptance criteria
+- `app/controllers/dev/game_controller.rb` - handles `GET /dev/game` (find-or-create dev game, set spoofed session, redirect) and `DELETE /dev/game` (reset: destroy + redirect back); enforces development-only access via before_action
+- `app/views/games/_debug_bar.html.erb` - partial rendered conditionally in games/show for dev sessions; shows room id, inventory, and flags with a Reset Game button using `button_to`
+- `app/views/dev/game/missing_world.html.erb` - error page shown when QA Test World has not been seeded; displays the seed command
+- `db/seeds/feature_test_world.rb` - seeds the QA test world ("QA Test World") used by the dev game
+- `test/controllers/dev/game_controller_test.rb` - integration tests covering all acceptance criteria
 
 ### 2. Files to modify
 
-- `config/routes.rb` — add `if Rails.env.development?` block containing `namespace :dev do; resource :game, only: %i[show destroy]; end`; in production the routes simply do not exist, causing Rails to raise a routing error (404)
-- `app/views/games/show.html.erb` — prepend conditional render of `_debug_bar` partial, guarded by `Rails.env.development? && session[:dev_game_id] == @game.id`
-- `db/seeds.rb` — append `load Rails.root.join("db/seeds/feature_test_world.rb")` after the existing dungeon load
+- `config/routes.rb` - add `if Rails.env.development?` block containing `namespace :dev do; resource :game, only: %i[show destroy]; end`; in production the routes simply do not exist, causing Rails to raise a routing error (404)
+- `app/views/games/show.html.erb` - prepend conditional render of `_debug_bar` partial, guarded by `Rails.env.development? && session[:dev_game_id] == @game.id`
+- `db/seeds.rb` - append `load Rails.root.join("db/seeds/feature_test_world.rb")` after the existing dungeon load
 
 ### 3. Implementation steps
 
@@ -153,15 +153,15 @@ All tests in `test/controllers/dev/game_controller_test.rb` using `ActionDispatc
 - Expected: `assert_redirected_to "/dev/game"`; `assert_nil Game.find_by(created_by: 999_999, game_type: "classic")`
 
 **Test: production guard raises routing error**
-- Use `stub` on `Rails.env` to return `"production"` (or test the before_action raises RoutingError directly by calling `require_development!` on a controller instance with a stubbed env). Alternatively: verify the route does not exist by asserting the route helper `dev_game_path` is not defined when env is not development — but since tests run in test env (not production), we test the before_action guard directly.
+- Use `stub` on `Rails.env` to return `"production"` (or test the before_action raises RoutingError directly by calling `require_development!` on a controller instance with a stubbed env). Alternatively: verify the route does not exist by asserting the route helper `dev_game_path` is not defined when env is not development - but since tests run in test env (not production), we test the before_action guard directly.
 
 ### 5. Gotchas and constraints
 
 - **`ApplicationController#current_user` calls `User.find`**: will raise `ActiveRecord::RecordNotFound` for id `999_999`. Must override `current_user` in `Dev::GameController` to intercept the spoofed id. Do not modify `ApplicationController`.
 - **`check_for_setup` before_action**: calls `User.where(is_owner: true).any?`. In a fresh dev DB with no owner, this redirects to setup before the dev controller even runs. Acceptable behaviour per spec; developer must run setup once.
-- **CanCan**: `Dev::GameController` does not call `load_resource` or `authorize_resource`, so no ability checks are performed — correct.
+- **CanCan**: `Dev::GameController` does not call `load_resource` or `authorize_resource`, so no ability checks are performed - correct.
 - **`setup_classic_game` callback**: fires `after_create_commit` only, so `find_or_create_by!` triggers it only on first create. The callback requires `world` to be set; pass it in the `find_or_create_by!` block: `Game.find_or_create_by!(created_by: DEV_USER_ID, game_type: :classic) { |g| g.world = world; g.name = "Dev Game" }`.
-- **`game.host?`** in `games/show.html.erb` calls `created_by == user&.id`; our overridden `current_user` returns an object with `id == 999_999` and the game has `created_by == 999_999`, so the host view branch is taken — which is the desired behaviour.
+- **`game.host?`** in `games/show.html.erb` calls `created_by == user&.id`; our overridden `current_user` returns an object with `id == 999_999` and the game has `created_by == 999_999`, so the host view branch is taken - which is the desired behaviour.
 - **`DEV_USER_ID`** must use numeric underscore (`999_999`) per RuboCop `Style/NumericLiterals`.
 - **frozen_string_literal**: all new Ruby files must begin with `# frozen_string_literal: true`.
 - **`button_to` CSRF**: `button_to` generates a form with a CSRF token automatically; no manual authenticity token needed.

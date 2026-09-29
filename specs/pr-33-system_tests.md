@@ -12,7 +12,7 @@
 
 ## Overview
 
-Add a comprehensive system test suite that exercises the full browser stack using Capybara + Cuprite (Chrome DevTools Protocol, no Node/chromedriver process). These tests run in CI and catch regressions that unit/controller tests miss — things like Turbo Stream wiring, Stimulus controller behaviour, and multi-step user flows.
+Add a comprehensive system test suite that exercises the full browser stack using Capybara + Cuprite (Chrome DevTools Protocol, no Node/chromedriver process). These tests run in CI and catch regressions that unit/controller tests miss - things like Turbo Stream wiring, Stimulus controller behaviour, and multi-step user flows.
 
 The existing `test/system/login_test.rb` uses Selenium + Chrome and will be migrated to Cuprite as part of this work.
 
@@ -21,56 +21,56 @@ The existing `test/system/login_test.rb` uses Selenium + Chrome and will be migr
 - Use Cuprite as the sole system test driver (CDP-based, faster, no chromedriver required)
 - Add system tests for all critical user-facing flows
 - Run headlessly in CI (`CI=true` or `HEADLESS=true` env var)
-- Tests must be self-contained — no reliance on pre-existing DB rows beyond fixtures
+- Tests must be self-contained - no reliance on pre-existing DB rows beyond fixtures
 
 ## Driver: Cuprite
 
-Add `cuprite` and `capybara-cuprite` gems to the `:test` group. Remove `selenium-webdriver` and `webdrivers`. Update `ApplicationSystemTestCase` to always use Cuprite. Cuprite connects directly to Chrome via CDP — no chromedriver process needed. Chrome runs headlessly when `CI=true` or `HEADLESS=true`.
+Add `cuprite` and `capybara-cuprite` gems to the `:test` group. Remove `selenium-webdriver` and `webdrivers`. Update `ApplicationSystemTestCase` to always use Cuprite. Cuprite connects directly to Chrome via CDP - no chromedriver process needed. Chrome runs headlessly when `CI=true` or `HEADLESS=true`.
 
 ## Test Cases
 
 ### Authentication (`test/system/auth_test.rb`)
 
-- **Login with valid credentials** — fill username/password, submit, see success flash
-- **Login with invalid credentials** — see error message, stay on login page
-- **Logout** — click logout, redirected to root, session cleared
+- **Login with valid credentials** - fill username/password, submit, see success flash
+- **Login with invalid credentials** - see error message, stay on login page
+- **Logout** - click logout, redirected to root, session cleared
 
 ### User Registration (`test/system/registration_test.rb`)
 
-- **Setup token flow** — admin creates setup token, user visits activation URL, fills in username/password, account created and logged in
+- **Setup token flow** - admin creates setup token, user visits activation URL, fills in username/password, account created and logged in
 
 ### Game Lobby (`test/system/lobby_test.rb`)
 
-- **Browse open games** — logged-in user visits `/games/list`, sees at least one open game
-- **Join a game** — click join on an open game, redirected to game lobby, player appears in player list
+- **Browse open games** - logged-in user visits `/games/list`, sees at least one open game
+- **Join a game** - click join on an open game, redirected to game lobby, player appears in player list
 
 ### Game Hosting (`test/system/host_test.rb`)
 
-- **Create a game** — fill in name, select world, submit, redirected to game lobby
-- **Start the game** — host submits first action from game page, message appears in terminal
-- **Mute all players** — host clicks "Mute All", all player `can_message` toggled
-- **Player list updates via Turbo** — second player joins (background request), host sidebar updates without page reload
+- **Create a game** - fill in name, select world, submit, redirected to game lobby
+- **Start the game** - host submits first action from game page, message appears in terminal
+- **Mute all players** - host clicks "Mute All", all player `can_message` toggled
+- **Player list updates via Turbo** - second player joins (background request), host sidebar updates without page reload
 
 ### Classic Game Play (`test/system/classic_game_test.rb`)
 
 This is the highest-value suite. Uses `/dev/game` (the debug shortcut) to skip auth/lobby setup.
 
-- **Debug mode loads** — `GET /dev/game` redirects to game page, debug bar is visible at top
-- **Initial room description** — after page load, terminal shows starting room description (Turbo Stream delivery confirmed)
-- **Send a command** — type `look`, press Enter, response appears in terminal within timeout
-- **Navigation command** — type a valid `go <direction>`, room description updates
-- **Unknown command** — type gibberish, engine returns an "I don't understand" message
-- **Reset game** — click "Reset Game" in debug bar, redirects back to `/dev/game`, fresh game created, terminal shows starting room again
+- **Debug mode loads** - `GET /dev/game` redirects to game page, debug bar is visible at top
+- **Initial room description** - after page load, terminal shows starting room description (Turbo Stream delivery confirmed)
+- **Send a command** - type `look`, press Enter, response appears in terminal within timeout
+- **Navigation command** - type a valid `go <direction>`, room description updates
+- **Unknown command** - type gibberish, engine returns an "I don't understand" message
+- **Reset game** - click "Reset Game" in debug bar, redirects back to `/dev/game`, fresh game created, terminal shows starting room again
 
 ### World Editor (`test/system/world_editor_test.rb`)
 
-- **View world** — visit `/worlds/:id`, page renders world details
-- **Edit room** — click edit on a room, update description, save, see updated text
+- **View world** - visit `/worlds/:id`, page renders world details
+- **Edit room** - click edit on a room, update description, save, see updated text
 
 ### Error / Edge Cases
 
-- **404 page** — visit a nonexistent path, see a friendly error page (not a Rails stack trace)
-- **Unauthenticated redirect** — visit `/games/new` while logged out, redirected to login
+- **404 page** - visit a nonexistent path, see a friendly error page (not a Rails stack trace)
+- **Unauthenticated redirect** - visit `/games/new` while logged out, redirected to login
 
 ## CI Integration
 
@@ -88,7 +88,7 @@ Set `HEADLESS=true` (or rely on `CI=true`) so Chrome runs headlessly. The job sh
 - Cuprite requires Chrome/Chromium to be installed on the CI runner. If using GitHub Actions, `actions/setup-chrome` or the default Ubuntu runner (which has Chrome) covers this.
 - System tests are slow. Keep each test focused on a single flow. Use `Capybara.default_max_wait_time = 5` for Turbo Stream assertions.
 - The `classic_game_test.rb` tests depend on `SuckerPunch` processing jobs inline. Either configure `SuckerPunch::Testing.inline!` in test setup or assert against the job being enqueued and fire it manually.
-- Do not use `sleep` — use `assert_text` / `have_text` with Capybara's built-in retry.
+- Do not use `sleep` - use `assert_text` / `have_text` with Capybara's built-in retry.
 
 ---
 
@@ -123,7 +123,7 @@ Set `HEADLESS=true` (or rely on `CI=true`) so Chrome runs headlessly. The job sh
 
 ### 3. Implementation steps
 
-**Step 1 — Swap gems**
+**Step 1 - Swap gems**
 
 In `Gemfile`, inside `group :test do`:
 - Add `gem "cuprite"` (headless Chrome via CDP, no chromedriver)
@@ -132,7 +132,7 @@ In `Gemfile`, inside `group :test do`:
 
 Run `bundle install` after editing.
 
-**Step 2 — Update `ApplicationSystemTestCase`**
+**Step 2 - Update `ApplicationSystemTestCase`**
 
 File: `test/application_system_test_case.rb`
 
@@ -155,20 +155,20 @@ end
 
 Why: Cuprite is always used. Headless mode activates automatically in CI or when `HEADLESS=true`. The `no-sandbox` flag is required on Linux CI runners.
 
-**Step 3 — Add `system_test_helper.rb`**
+**Step 3 - Add `system_test_helper.rb`**
 
 File: `test/support/system_test_helper.rb`
 
 Define module `SystemTestHelper` with two methods:
 
-- `sign_in_as(user, password: "testpassword")` — visits `login_url`, fills username/password fields by label text, clicks "Login", asserts `assert_text "THOU HATH LOGGETHED IN!"`.
-- `create_qa_world` — creates (or finds) a `World` with `name: "QA Test World"` and the minimal world_data hash from `db/seeds/feature_test_world.rb` (test_room with name "Test Chamber"). Returns the world. Used only in tests that cannot rely on the fixture.
+- `sign_in_as(user, password: "testpassword")` - visits `login_url`, fills username/password fields by label text, clicks "Login", asserts `assert_text "THOU HATH LOGGETHED IN!"`.
+- `create_qa_world` - creates (or finds) a `World` with `name: "QA Test World"` and the minimal world_data hash from `db/seeds/feature_test_world.rb` (test_room with name "Test Chamber"). Returns the world. Used only in tests that cannot rely on the fixture.
 
 Include this module in `ApplicationSystemTestCase` by adding `include SystemTestHelper` to that class.
 
-**Step 4 — Add world and game fixtures**
+**Step 4 - Add world and game fixtures**
 
-File: `test/fixtures/worlds.yml` — add:
+File: `test/fixtures/worlds.yml` - add:
 
 ```yaml
 qa_test_world:
@@ -183,7 +183,7 @@ qa_test_world:
 
 Note: `world_data` is stored as JSONB; YAML ERB can produce the JSON string which Rails will parse on load.
 
-File: `test/fixtures/games.yml` — add:
+File: `test/fixtures/games.yml` - add:
 
 ```yaml
 classic_open:
@@ -201,7 +201,7 @@ classic_open:
   }.to_json %>
 ```
 
-File: `test/fixtures/game_users.yml` — add:
+File: `test/fixtures/game_users.yml` - add:
 
 ```yaml
 owner_in_classic_open:
@@ -210,7 +210,7 @@ owner_in_classic_open:
   character_name: "Dev Player"
 ```
 
-**Step 5 — Fix debug-bar visibility for test env**
+**Step 5 - Fix debug-bar visibility for test env**
 
 File: `app/views/games/show.html.erb`
 
@@ -234,7 +234,7 @@ to:
 
 Why: The debug bar and the game-state debugger panel are gated on `development?` only. System tests run in `test` env; without this change, `classic_game_test.rb` cannot assert the debug bar is visible.
 
-**Step 6 — Update CI workflow**
+**Step 6 - Update CI workflow**
 
 File: `.github/workflows/ci.yml`
 
@@ -252,69 +252,69 @@ After the existing "Run tests" step, add:
 
 The "Set up Chrome" step must come before "Run system tests". The Ubuntu `ubuntu-latest` runner has Chrome pre-installed, but `browser-actions/setup-chrome@v1` pins a known version, which is more reliable. Either approach works; the explicit step is preferred for reproducibility.
 
-**Step 7 — Write `test/system/auth_test.rb`**
+**Step 7 - Write `test/system/auth_test.rb`**
 
 Three tests using `users(:owner)` fixture:
 
-1. `"login with valid credentials"` — calls `sign_in_as(users(:owner))`; asserts `assert_text "THOU HATH LOGGETHED IN!"`.
-2. `"login with invalid credentials"` — visits `login_url`, fills incorrect password, clicks Login; asserts `assert_text` the invalid-login flash (check `config/locales/en.yml` or `t(:invalid_login)` for the exact string).
-3. `"logout"` — `sign_in_as`, then visits `logout_url` (GET destroy), asserts `assert_text` the logged-out flash (`t(:logged_out)`).
+1. `"login with valid credentials"` - calls `sign_in_as(users(:owner))`; asserts `assert_text "THOU HATH LOGGETHED IN!"`.
+2. `"login with invalid credentials"` - visits `login_url`, fills incorrect password, clicks Login; asserts `assert_text` the invalid-login flash (check `config/locales/en.yml` or `t(:invalid_login)` for the exact string).
+3. `"logout"` - `sign_in_as`, then visits `logout_url` (GET destroy), asserts `assert_text` the logged-out flash (`t(:logged_out)`).
 
-**Step 8 — Write `test/system/registration_test.rb`**
+**Step 8 - Write `test/system/registration_test.rb`**
 
 One test: `"setup token activation flow"`.
 
 Setup: `token = SetupToken.create!`
 Steps: visit `user_activation_url(code: token.uuid)`, fill username + password + password_confirmation, click submit, assert redirect to root and `assert_text` success flash.
 
-**Step 9 — Write `test/system/lobby_test.rb`**
+**Step 9 - Write `test/system/lobby_test.rb`**
 
 Two tests, both with `sign_in_as(users(:owner))` in `setup`.
 
-1. `"browse open games"` — visits `games_list_url`, `assert_text "Classic Open Game"` (from fixture).
-2. `"join a game"` — visits `games_list_url`, clicks "Join" link for `classic_open` game (use `click_link` with text or `data-game-id` attribute), fills character name, submits; asserts redirect to game path and `assert_text users(:owner).username` in the players list.
+1. `"browse open games"` - visits `games_list_url`, `assert_text "Classic Open Game"` (from fixture).
+2. `"join a game"` - visits `games_list_url`, clicks "Join" link for `classic_open` game (use `click_link` with text or `data-game-id` attribute), fills character name, submits; asserts redirect to game path and `assert_text users(:owner).username` in the players list.
 
 Note: The game must have room for another player. Use `users(:player1)` as the `created_by` user so the owner can join, or adjust the `classic_open` fixture `created_by` to `player1 (id: 2)` instead of `owner (id: 1)`.
 
-**Step 10 — Write `test/system/host_test.rb`**
+**Step 10 - Write `test/system/host_test.rb`**
 
 Four tests, `setup` with `sign_in_as(users(:owner))`.
 
-1. `"create a game"` — visits games path, clicks "New Game" (or navigates to `new_game_url`), fills name, selects world (classic type), submits; asserts redirect to game show page and `assert_text` game name.
-2. `"start the game (first command)"` — uses the `classic_open` fixture game; visits `game_url(games(:classic_open).uuid)`; fills terminal input with "look"; submits; `assert_text "Test Chamber"` (the starting room name from the world snapshot).
-3. `"mute all players"` — visits game show, clicks "Mute All" button; asserts (via Turbo) all player `can_message` are false (check for UI feedback text or absence of input).
-4. `"player list updates via Turbo"` — signs in as owner, visits game; in a separate request (use `Capybara.using_session`) sign in as player2 and join the game; switch back to owner session; `assert_text users(:player2).username` without reloading the page.
+1. `"create a game"` - visits games path, clicks "New Game" (or navigates to `new_game_url`), fills name, selects world (classic type), submits; asserts redirect to game show page and `assert_text` game name.
+2. `"start the game (first command)"` - uses the `classic_open` fixture game; visits `game_url(games(:classic_open).uuid)`; fills terminal input with "look"; submits; `assert_text "Test Chamber"` (the starting room name from the world snapshot).
+3. `"mute all players"` - visits game show, clicks "Mute All" button; asserts (via Turbo) all player `can_message` are false (check for UI feedback text or absence of input).
+4. `"player list updates via Turbo"` - signs in as owner, visits game; in a separate request (use `Capybara.using_session`) sign in as player2 and join the game; switch back to owner session; `assert_text users(:player2).username` without reloading the page.
 
-**Step 11 — Write `test/system/classic_game_test.rb`**
+**Step 11 - Write `test/system/classic_game_test.rb`**
 
-Six tests. All rely on `GET /dev/game` which creates a dev user, finds/creates a game with `QA Test World`, and redirects. The `QA Test World` must exist in the test DB — the `qa_test_world` fixture (Step 4) provides this.
+Six tests. All rely on `GET /dev/game` which creates a dev user, finds/creates a game with `QA Test World`, and redirects. The `QA Test World` must exist in the test DB - the `qa_test_world` fixture (Step 4) provides this.
 
 In `setup`, call `SuckerPunch::Testing.inline!` so `ClassicCommandJob` runs synchronously.
 
 Tests:
 
-1. `"debug mode loads"` — `visit dev_game_url`; `assert_current_path` matches `/games/`; `assert_selector "[data-controller='game-state-debugger']"` (or `assert_text "[ DEV ]"` from debug bar).
-2. `"initial room description"` — `visit dev_game_url`; `assert_text "Test Chamber"` (first message already created on game setup).
-3. `"send look command"` — visit `/dev/game`; find terminal input, fill "look", submit; `assert_text "Test Chamber"` (engine describe-room response).
-4. `"unknown command"` — fill "xyzzy"; `assert_text "I don't understand"`.
-5. `"navigation command"` — QA Test World has no exits, so update the fixture to add a north exit in Step 4, OR test that "go north" returns a "can't go that way" message. The simpler path: assert `assert_text "can't go"` or whatever the movement handler returns for no exit.
-6. `"reset game"` — visit `/dev/game`; click "Reset Game" button (in debug bar, `method: :delete`, `data-turbo: false`); `assert_current_path dev_game_path`; `assert_text "Test Chamber"` (fresh game description).
+1. `"debug mode loads"` - `visit dev_game_url`; `assert_current_path` matches `/games/`; `assert_selector "[data-controller='game-state-debugger']"` (or `assert_text "[ DEV ]"` from debug bar).
+2. `"initial room description"` - `visit dev_game_url`; `assert_text "Test Chamber"` (first message already created on game setup).
+3. `"send look command"` - visit `/dev/game`; find terminal input, fill "look", submit; `assert_text "Test Chamber"` (engine describe-room response).
+4. `"unknown command"` - fill "xyzzy"; `assert_text "I don't understand"`.
+5. `"navigation command"` - QA Test World has no exits, so update the fixture to add a north exit in Step 4, OR test that "go north" returns a "can't go that way" message. The simpler path: assert `assert_text "can't go"` or whatever the movement handler returns for no exit.
+6. `"reset game"` - visit `/dev/game`; click "Reset Game" button (in debug bar, `method: :delete`, `data-turbo: false`); `assert_current_path dev_game_path`; `assert_text "Test Chamber"` (fresh game description).
 
-**Step 12 — Write `test/system/world_editor_test.rb`**
+**Step 12 - Write `test/system/world_editor_test.rb`**
 
 Two tests, `sign_in_as(users(:owner))` in setup.
 
-1. `"view world"` — `visit world_url(worlds(:qa_test_world))`; because `WorldsController#show` redirects to `edit_world_path`, assert `assert_selector "textarea#json-editor"` (the CodeMirror JSON editor).
-2. `"edit room description"` — visit `edit_world_url(worlds(:qa_test_world))`; the world editor uses a JS CodeMirror editor, so direct `fill_in` won't work on the `<textarea>` (it's hidden). Instead: use `page.execute_script` to update the world_editor Stimulus controller's `jsonInput` textarea value, then click "Save". Assert `assert_text "World updated successfully"` flash.
+1. `"view world"` - `visit world_url(worlds(:qa_test_world))`; because `WorldsController#show` redirects to `edit_world_path`, assert `assert_selector "textarea#json-editor"` (the CodeMirror JSON editor).
+2. `"edit room description"` - visit `edit_world_url(worlds(:qa_test_world))`; the world editor uses a JS CodeMirror editor, so direct `fill_in` won't work on the `<textarea>` (it's hidden). Instead: use `page.execute_script` to update the world_editor Stimulus controller's `jsonInput` textarea value, then click "Save". Assert `assert_text "World updated successfully"` flash.
 
 Alternative approach (simpler, no JS injection): Use `update_entity` endpoint directly via a form. Load the `entity_form` for a room, update the description field, and save via the entity modal. Requires clicking "Edit" on a room entry in the preview panel. Assert `assert_text` the new description in the preview panel after save.
 
-**Step 13 — Write `test/system/errors_test.rb`**
+**Step 13 - Write `test/system/errors_test.rb`**
 
 Two tests.
 
-1. `"404 page"` — `visit "/this-path-does-not-exist-12345"`; assert the response does not contain "Application Error" (no Rails stack trace); `assert_selector "body"` (page renders). Note: In test env the error page may differ from production; adjust assertion to `assert_no_text "ActionController::RoutingError"`.
-2. `"unauthenticated redirect"` — (no login) `visit new_game_url`; `assert_current_path` matches `check_for_setup` or root path (because `ApplicationController#check_for_setup` redirects unauthenticated users — actually it checks for owner user presence not auth, see notes below).
+1. `"404 page"` - `visit "/this-path-does-not-exist-12345"`; assert the response does not contain "Application Error" (no Rails stack trace); `assert_selector "body"` (page renders). Note: In test env the error page may differ from production; adjust assertion to `assert_no_text "ActionController::RoutingError"`.
+2. `"unauthenticated redirect"` - (no login) `visit new_game_url`; `assert_current_path` matches `check_for_setup` or root path (because `ApplicationController#check_for_setup` redirects unauthenticated users - actually it checks for owner user presence not auth, see notes below).
 
 ### 4. Test plan
 
@@ -336,7 +336,7 @@ Two tests.
 
 ---
 
-**AC: Auth — Login with valid credentials**
+**AC: Auth - Login with valid credentials**
 
 - **Test name**: `AuthTest#test_login_with_valid_credentials`
 - **Setup**: `users(:owner)` fixture (username: "Owner The User", password: "testpassword")
@@ -345,16 +345,16 @@ Two tests.
 
 ---
 
-**AC: Auth — Login with invalid credentials**
+**AC: Auth - Login with invalid credentials**
 
 - **Test name**: `AuthTest#test_login_with_invalid_credentials`
 - **Setup**: `users(:owner)` fixture
 - **Input**: Fill wrong password "wrongpassword", click "Login"
-- **Expected**: `assert_text` the invalid-login I18n string (e.g. "Invalid login" — verify exact string in locale file)
+- **Expected**: `assert_text` the invalid-login I18n string (e.g. "Invalid login" - verify exact string in locale file)
 
 ---
 
-**AC: Auth — Logout**
+**AC: Auth - Logout**
 
 - **Test name**: `AuthTest#test_logout`
 - **Setup**: `sign_in_as(users(:owner))`
@@ -363,7 +363,7 @@ Two tests.
 
 ---
 
-**AC: Registration — Setup token flow**
+**AC: Registration - Setup token flow**
 
 - **Test name**: `RegistrationTest#test_setup_token_activation_flow`
 - **Setup**: `token = SetupToken.create!`
@@ -372,7 +372,7 @@ Two tests.
 
 ---
 
-**AC: Lobby — Browse open games**
+**AC: Lobby - Browse open games**
 
 - **Test name**: `LobbyTest#test_browse_open_games`
 - **Setup**: `sign_in_as(users(:owner))`; `games(:classic_open)` fixture present with status "open"
@@ -381,7 +381,7 @@ Two tests.
 
 ---
 
-**AC: Lobby — Join a game**
+**AC: Lobby - Join a game**
 
 - **Test name**: `LobbyTest#test_join_a_game`
 - **Setup**: `sign_in_as(users(:player1))`; `games(:classic_open)` created_by `users(:owner)` (so player1 can join)
@@ -390,7 +390,7 @@ Two tests.
 
 ---
 
-**AC: Hosting — Create a game**
+**AC: Hosting - Create a game**
 
 - **Test name**: `HostTest#test_create_a_game`
 - **Setup**: `sign_in_as(users(:owner))`; `worlds(:qa_test_world)` fixture present
@@ -399,7 +399,7 @@ Two tests.
 
 ---
 
-**AC: Hosting — Start the game**
+**AC: Hosting - Start the game**
 
 - **Test name**: `HostTest#test_start_the_game`
 - **Setup**: `sign_in_as(users(:owner))`; visit `game_url(games(:classic_open).uuid)`; `SuckerPunch::Testing.inline!`
@@ -408,7 +408,7 @@ Two tests.
 
 ---
 
-**AC: Hosting — Mute all players**
+**AC: Hosting - Mute all players**
 
 - **Test name**: `HostTest#test_mute_all_players`
 - **Setup**: `sign_in_as(users(:owner))`; `games(:classic_open)` with `game_users(:owner_in_classic_open)` and player1 also joined
@@ -417,7 +417,7 @@ Two tests.
 
 ---
 
-**AC: Classic game — Debug mode loads**
+**AC: Classic game - Debug mode loads**
 
 - **Test name**: `ClassicGameTest#test_debug_mode_loads`
 - **Setup**: `worlds(:qa_test_world)` fixture; `SuckerPunch::Testing.inline!`
@@ -426,7 +426,7 @@ Two tests.
 
 ---
 
-**AC: Classic game — Initial room description**
+**AC: Classic game - Initial room description**
 
 - **Test name**: `ClassicGameTest#test_initial_room_description`
 - **Setup**: same
@@ -435,7 +435,7 @@ Two tests.
 
 ---
 
-**AC: Classic game — Send a command**
+**AC: Classic game - Send a command**
 
 - **Test name**: `ClassicGameTest#test_send_look_command`
 - **Setup**: visit `/dev/game`; `SuckerPunch::Testing.inline!`
@@ -444,7 +444,7 @@ Two tests.
 
 ---
 
-**AC: Classic game — Unknown command**
+**AC: Classic game - Unknown command**
 
 - **Test name**: `ClassicGameTest#test_unknown_command`
 - **Setup**: visit `/dev/game`
@@ -453,7 +453,7 @@ Two tests.
 
 ---
 
-**AC: Classic game — Reset game**
+**AC: Classic game - Reset game**
 
 - **Test name**: `ClassicGameTest#test_reset_game`
 - **Setup**: visit `/dev/game`
@@ -462,7 +462,7 @@ Two tests.
 
 ---
 
-**AC: World editor — View world**
+**AC: World editor - View world**
 
 - **Test name**: `WorldEditorTest#test_view_world`
 - **Setup**: `sign_in_as(users(:owner))`; `worlds(:qa_test_world)` fixture
@@ -471,7 +471,7 @@ Two tests.
 
 ---
 
-**AC: World editor — Edit room**
+**AC: World editor - Edit room**
 
 - **Test name**: `WorldEditorTest#test_edit_room_description`
 - **Setup**: `sign_in_as(users(:owner))`; `worlds(:qa_test_world)` fixture
@@ -510,7 +510,7 @@ The debug bar (`_debug_bar.html.erb`) is only rendered when `Rails.env.developme
 
 **`/dev/game` route is excluded in production only**
 
-The route is defined with `unless Rails.env.production?` so it is available in test env. The `Dev::GameController#require_development!` guard checks `rails_env.production?` — this is fine for test env (not production). No change needed here.
+The route is defined with `unless Rails.env.production?` so it is available in test env. The `Dev::GameController#require_development!` guard checks `rails_env.production?` - this is fine for test env (not production). No change needed here.
 
 **SuckerPunch is asynchronous by default**
 
@@ -532,21 +532,21 @@ Rails fixtures for JSONB columns accept a raw JSON string (wrapped in ERB `<%= .
 
 Turbo Streams are delivered over Action Cable WebSocket. In system tests, Capybara drives a real browser (Chrome via Cuprite) against the test Rails server, so Action Cable works. However, ensure the test `cable.yml` uses `async` adapter (not Redis), which is the Rails default in test env. Confirm `config/cable.yml` has `test: adapter: test` or `adapter: async`.
 
-**RuboCop — double-quoted strings**
+**RuboCop - double-quoted strings**
 
 All new `.rb` files must use double-quoted strings (`Style/StringLiterals: EnforcedStyle: double_quotes`).
 
-**RuboCop — MethodLength max 60**
+**RuboCop - MethodLength max 60**
 
 Each test method must be under 60 lines. The large `setup` blocks or multi-step flows should be extracted to helper methods in `system_test_helper.rb`.
 
-**RuboCop — `rubocop-capybara` plugin**
+**RuboCop - `rubocop-capybara` plugin**
 
 The `.rubocop.yml` already loads `rubocop-capybara`. This will enforce Capybara best practices: no `sleep`, use `have_selector` over `find` for assertions, use `fill_in` label over CSS selectors, etc.
 
 **`check_for_setup` before-action**
 
-`ApplicationController` runs `check_for_setup` on every request, redirecting to `/setup` if no owner user exists. Fixtures include `users(:owner)` with `is_owner: true`, so this is satisfied for all tests. The `errors_test.rb` unauthenticated redirect test will also pass through this check first — since the owner fixture exists, it will not redirect to setup.
+`ApplicationController` runs `check_for_setup` on every request, redirecting to `/setup` if no owner user exists. Fixtures include `users(:owner)` with `is_owner: true`, so this is satisfied for all tests. The `errors_test.rb` unauthenticated redirect test will also pass through this check first - since the owner fixture exists, it will not redirect to setup.
 
 **World editor JS editor**
 

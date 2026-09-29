@@ -4,7 +4,7 @@
 
 ## What You Can Build
 
-**Explorable Worlds Rooms connected by exits with descriptions, hidden passages, locked doors, and directional navigation. Items & Inventory Pickupable items, containers with locks, weapons, healing potions, and items that interact with the world. NPCs & Quests Characters with branching dialogue trees, item trading, quest flags, gated conversations, and patrol movement. Combat & Dice Turn-based combat with initiative, attack/defend/flee, weapons, armor, D&D-style dice rolls, and hostile creatures that ambush the player. ## How It Works 1. You write a JSON file describing your world -- rooms, items, NPCs, and creatures. 2. The engine loads your JSON as the `world_data`. 3. Players type natural-language commands like `go north`, `take sword`, or `talk to wizard`. 4. The **CommandParser** translates input into structured commands (verb + target + modifier). 5. The **Engine** routes commands to the appropriate **Handler** (movement, items, combat, etc.). 6. The handler processes the command, updates game state, and returns a text response. ## Top-Level JSON Structure Every game world is defined by a single JSON object with these top-level keys: 
+**Explorable Worlds Rooms connected by exits with descriptions, hidden passages, locked doors, and directional navigation. Items & Inventory Pickupable items, containers with locks, weapons, healing potions, and items that interact with the world. NPCs & Quests Characters with branching dialogue trees, item trading, quest flags, gated conversations, and patrol movement. Combat & Dice Turn-based combat with initiative, attack/defend/flee, weapons, armor, D&D-style dice rolls, and hostile creatures that ambush the player. ## How It Works 1. You write a JSON file describing your world - rooms, items, NPCs, and creatures. 2. The engine loads your JSON as the `world_data`. 3. Players type natural-language commands like `go north`, `take sword`, or `talk to wizard`. 4. The **CommandParser** translates input into structured commands (verb + target + modifier). 5. The **Engine** routes commands to the appropriate **Handler** (movement, items, combat, etc.). 6. The handler processes the command, updates game state, and returns a text response. ## Top-Level JSON Structure Every game world is defined by a single JSON object with these top-level keys: 
 ```
 // world_data.json
 {
@@ -21,7 +21,7 @@
 }
 ```
 
- ## Validation Contract The engine checks every world against a machine-readable contract before a game starts, and the same files are published here so other tools can validate worlds exactly the same way: [> world.schema.json](/contract/world.schema.json) - JSON Schema for the document shape, with engine defaults recorded on the fields [> world.refs.json](/contract/world.refs.json) - every place an id is referenced and which collection it must exist in [> index.json](/contract/index.json) - a corpus of valid and invalid worlds; each invalid one lists the error codes a validator must produce** Error codes are stable: `schema.invalid`, `starting_room.missing`, `ref.missing`, `topic.missing`, `dice.outcomes`, `dice.consume_on`, and `attack_condition.invalid`. Unknown keys are allowed everywhere except `attack_condition`, and `meta.editor` is reserved for editor tooling and never validated. ## Quick Links [> World Builder](/builder/) - build and validate a world in your browser, no account needed; works offline [> World Structure](#) -- Full top-level schema details [> Rooms](#) -- Defining rooms, descriptions, and entry events [> Exits](#) -- Simple and complex exits, locks, hidden passages [> Items](#) -- All item types: weapons, consumables, keys, and more [> NPCs & Dialogue](#) -- Characters, dialogue trees, and quests [> Creatures](#) -- Enemies and their combat stats [> Combat](#) -- Turn-based combat mechanics [> Dice Rolls](#) -- D&D-style skill checks [> Flags & State](#) -- Global flags and game state tracking [> Containers](#) -- Openable and lockable containers [> Commands](#) -- All player commands and synonyms [> Full Example](#) -- A complete game world JSON
+ ## Validation Contract The engine checks every world against a machine-readable contract before a game starts, and the same files are published here so other tools can validate worlds exactly the same way: [> world.schema.json](/contract/world.schema.json) - JSON Schema for the document shape, with engine defaults recorded on the fields [> world.refs.json](/contract/world.refs.json) - every place an id is referenced and which collection it must exist in [> index.json](/contract/index.json) - a corpus of valid and invalid worlds; each invalid one lists the error codes a validator must produce** Error codes are stable: `schema.invalid`, `starting_room.missing`, `ref.missing`, `topic.missing`, `dice.outcomes`, `dice.consume_on`, and `attack_condition.invalid`. Unknown keys are allowed everywhere except `attack_condition`, and `meta.editor` is reserved for editor tooling and never validated. ## Quick Links [> World Builder](/builder/) - build and validate a world in your browser, no account needed; works offline [> World Structure](#) - Full top-level schema details [> Rooms](#) - Defining rooms, descriptions, and entry events [> Exits](#) - Simple and complex exits, locks, hidden passages [> Items](#) - All item types: weapons, consumables, keys, and more [> NPCs & Dialogue](#) - Characters, dialogue trees, and quests [> Creatures](#) - Enemies and their combat stats [> Combat](#) - Turn-based combat mechanics [> Dice Rolls](#) - D&D-style skill checks [> Flags & State](#) - Global flags and game state tracking [> Containers](#) - Openable and lockable containers [> Commands](#) - All player commands and synonyms [> Full Example](#) - A complete game world JSON
 
 ---
 
@@ -117,7 +117,7 @@ All IDs (room, item, NPC, creature) are strings you define. They are used intern
 - Use lowercase with underscores: `old_sword`, `dark_forest`
 - Keep them descriptive but concise
 - IDs must be unique within their category (rooms, items, npcs, creatures)
-- IDs are never shown to the player -- they only see `name` fields
+- IDs are never shown to the player - they only see `name` fields
 
 ### Placing Entities in Rooms
 
@@ -228,7 +228,7 @@ When a player enters a room or uses the `look` command, the engine displays:
 ### Tips
 
 - Write descriptions in second person present tense: *"You see..."*, *"A torch flickers..."*
-- Include sensory details -- what the player sees, hears, and smells
+- Include sensory details - what the player sees, hears, and smells
 - Mention interactable objects in descriptions to hint at items and NPCs
 - Keep room IDs short and descriptive: `dark_cave`, `throne_room`
 - A room can have an empty exits object `{}` to create a dead end
@@ -267,8 +267,8 @@ Players can use `go north`, `n`, or `walk north` to move.
 | southwest | sw |
 | up | u |
 | down | d |
-| in | -- |
-| out | -- |
+| in | - |
+| out | - |
 
 ### Complex Exits
 
@@ -314,11 +314,11 @@ Exits can be unlocked by using a specific item on them. This gives you more cont
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `use_item` | string | -- | Item ID that can unlock this exit when used on it. |
-| `on_unlock` | string | -- | Message displayed when the exit is unlocked with the item. |
+| `use_item` | string | - | Item ID that can unlock this exit when used on it. |
+| `on_unlock` | string | - | Message displayed when the exit is unlocked with the item. |
 | `permanently_unlock` | boolean | `false` | If `true`, the exit stays unlocked permanently after first use. |
 | `consume_item` | boolean | `false` | If `true`, the item is removed from inventory when used. |
-| `sets_flag` | string | -- | Global flag set to `true` when the exit is unlocked or used. |
+| `sets_flag` | string | - | Global flag set to `true` when the exit is unlocked or used. |
 
 Players unlock interactive exits with: `use skeleton_key on gate` or `use skeleton_key on east`
 
@@ -364,7 +364,7 @@ Hidden exits don't appear in the room's exit list until they are revealed. They 
 }
 ```
 
- 3. Via flag Use `requires_flag` -- when the flag is set, the exit auto-reveals.
+ 3. Via flag Use `requires_flag` - when the flag is set, the exit auto-reveals.
 
 ### Exit Keywords
 
@@ -424,7 +424,7 @@ Keywords are case-insensitive and support multi-word phrases.
 
 ## Items
 
-Items are objects players can interact with -- pick up, drop, use, examine, and equip. Items can also be weapons, containers, keys, healing potions, and more.
+Items are objects players can interact with - pick up, drop, use, examine, and equip. Items can also be weapons, containers, keys, healing potions, and more.
 
 ```json
 "item_id": {
@@ -444,7 +444,7 @@ Items are objects players can interact with -- pick up, drop, use, examine, and 
 | `description` | string | **required** | Text shown when the player examines the item. |
 | `keywords` | array | `[]` | Alternative names for fuzzy matching. Players can refer to the item by any keyword. |
 | `takeable` | boolean | `true` | Whether the player can pick up this item. |
-| `cant_take_msg` | string | -- | Custom message when trying to take a non-takeable item. |
+| `cant_take_msg` | string | - | Custom message when trying to take a non-takeable item. |
 | `consumable` | boolean | `false` | If `true`, the item is removed from inventory when used. |
 
 ### Weapons & Armor
@@ -473,7 +473,7 @@ Items can provide combat bonuses when in the player's inventory.
 Combat bonus behavior:
 - **Weapons:** Only the best weapon counts. If you have a sword (8 dmg) and a dagger (3 dmg), your bonus is 8.
 - **Armor:** All defense bonuses stack. Shield (3) + helmet (2) = 5 total defense bonus.
-- Items provide bonuses passively just by being in inventory -- no "equip" action needed.
+- Items provide bonuses passively just by being in inventory - no "equip" action needed.
 
 ### combat_effect
 
@@ -493,7 +493,7 @@ Items with `combat_effect` can be used during combat for special actions like he
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `type` | string | -- | Effect type. Currently only `"heal"` is supported. |
+| `type` | string | - | Effect type. Currently only `"heal"` is supported. |
 | `amount` | number | `10` | Amount of HP restored. Capped at player's max health. |
 
 ### on_use
@@ -520,7 +520,7 @@ Defines what happens when a player uses the item outside of combat.
 | Field | Type | Description |
 |---|---|---|
 | `type` | string | One of: `"unlock"`, `"message"`, `"heal"` |
-| `requires_target` | boolean | For "unlock" -- requires player to specify a target |
+| `requires_target` | boolean | For "unlock" - requires player to specify a target |
 | `sets_flag` | string | Flag to set when used |
 | `success_msg` | string | Message shown on successful use |
 | `text` | string | Message shown (for "message" type) |
@@ -599,9 +599,9 @@ Some items are part of the environment and shouldn't be picked up. Set `takeable
 
 The engine matches player input against items using this priority:
 
-1. **Exact ID match** -- e.g., `take rusty_sword` matches item ID `rusty_sword`
-2. **Keyword match** -- checks if any keyword contains the search term (or vice versa)
-3. **Name match** -- checks if the item's `name` contains the search term
+1. **Exact ID match** - e.g., `take rusty_sword` matches item ID `rusty_sword`
+2. **Keyword match** - checks if any keyword contains the search term (or vice versa)
+3. **Name match** - checks if the item's `name` contains the search term
 
 All matching is case-insensitive. Good keywords make your items easier to interact with.
 
@@ -812,7 +812,7 @@ Triggered movement is a one-shot: the entity moves to a destination room the fir
       },
       "forest": {
         "keywords": ["forest", "darkwood", "woods"],
-        "text": "The forest entrance is to the north. Take a torch -- the darkness there is unnatural.",
+        "text": "The forest entrance is to the north. Take a torch - the darkness there is unnatural.",
         "locked_text": "First, ask me about the quest."
       },
       "reward": {
@@ -865,18 +865,18 @@ Creatures are hostile entities that players can attack to initiate turn-based co
 | `attack` | number | `5` | Base attack power. Actual damage = attack + rand(-2..2) - player defense. |
 | `defense` | number | `0` | Defense value subtracted from player's attack damage. |
 | `hostile` | boolean | `false` | If `true`, the creature can auto-attack the player. See [Hostile Creatures](#hostile). |
-| `talk_text` | string | -- | What the creature "says" when the player uses `talk to [creature]`. Defaults to *"It has no clue what you're saying."* |
-| `aggro_text` | string | -- | Message shown when a hostile creature begins attacking. Defaults to *"The [name] attacks you!"* |
-| `attack_condition` | object | -- | When a hostile creature auto-attacks. See [Attack Conditions](#attack-conditions). |
-| `movement` | object | -- | Optional patrol or triggered movement. See [Movement](#movement) on the NPCs page -- the schema is identical. |
-| `on_defeat_msg` | string | -- | Custom message displayed when the creature is defeated. |
-| `on_flee_msg` | string | -- | Custom message displayed when the player flees from combat. |
+| `talk_text` | string | - | What the creature "says" when the player uses `talk to [creature]`. Defaults to *"It has no clue what you're saying."* |
+| `aggro_text` | string | - | Message shown when a hostile creature begins attacking. Defaults to *"The [name] attacks you!"* |
+| `attack_condition` | object | - | When a hostile creature auto-attacks. See [Attack Conditions](#attack-conditions). |
+| `movement` | object | - | Optional patrol or triggered movement. See [Movement](#movement) on the NPCs page - the schema is identical. |
+| `on_defeat_msg` | string | - | Custom message displayed when the creature is defeated. |
+| `on_flee_msg` | string | - | Custom message displayed when the player flees from combat. |
 | `loot` | array | `[]` | Array of item IDs dropped into the room when the creature is defeated. |
-| `sets_flag_on_defeat` | string | -- | Global flag set to `true` when the creature is defeated. |
+| `sets_flag_on_defeat` | string | - | Global flag set to `true` when the creature is defeated. |
 
 ### Talking to Creatures
 
-Creatures don't have dialogue trees like NPCs, but the player can still `talk to [creature]`. The engine responds with the creature's `talk_text` -- useful for flavor, warnings, or hostile creatures with an `on_talk` attack condition.
+Creatures don't have dialogue trees like NPCs, but the player can still `talk to [creature]`. The engine responds with the creature's `talk_text` - useful for flavor, warnings, or hostile creatures with an `on_talk` attack condition.
 
 ```json
 "tavern_rat": {
@@ -889,7 +889,7 @@ Creatures don't have dialogue trees like NPCs, but the player can still `talk to
 }
 ```
 
-**NPC priority:** If a room contains both an NPC and a creature matching the same keyword, the NPC wins -- `talk to bob` always prefers an NPC named Bob over a creature named Bob the Beast.
+**NPC priority:** If a room contains both an NPC and a creature matching the same keyword, the NPC wins - `talk to bob` always prefers an NPC named Bob over a creature named Bob the Beast.
 
 ### Hostile Creatures
 
@@ -965,7 +965,7 @@ When a creature is defeated, all items in its `loot` array are dropped into the 
 "loot": ["dragon_scale", "gold_coins"]
 ```
 
-Loot items should be defined in your `items` object but don't need to be placed in any room initially -- they'll appear when the creature drops them.
+Loot items should be defined in your `items` object but don't need to be placed in any room initially - they'll appear when the creature drops them.
 
 ### Example
 
@@ -1049,7 +1049,7 @@ damage = max(damage, 1)  // always at least 1
 
 ### Weapon & Armor Bonuses
 
-- **Weapons (weapon_damage)**: Only the **highest** weapon_damage value from your inventory is used. Having multiple weapons doesn't stack -- only the best one counts.
+- **Weapons (weapon_damage)**: Only the **highest** weapon_damage value from your inventory is used. Having multiple weapons doesn't stack - only the best one counts.
 - **Armor (defense_bonus)**: All defense_bonus values from inventory items are **summed together**. Shield + helmet + armor all contribute.
 - **Passive**: Items provide bonuses just by being in your inventory. No "equip" command needed.
 
@@ -1074,7 +1074,7 @@ Items with `combat_effect` can be used during combat. Currently only `"heal"` is
 }
 ```
 
-Using an item in combat costs your turn -- the creature gets to attack afterward.
+Using an item in combat costs your turn - the creature gets to attack afterward.
 
 ### Fleeing
 
@@ -1179,9 +1179,9 @@ The dice roll system adds D&D-style skill checks to items. When a player uses an
 |---|---|---|---|
 | `dc` | number | **required** | Difficulty class (1-20). The roll must meet or exceed this number to succeed. |
 | `dice` | string | `"1d20"` | Dice notation. Standard format: `NdS` (N dice with S sides). |
-| `attempt_message` | string | -- | Message shown when the roll is initiated, before the player types ROLL. |
-| `completed_message` | string | -- | Message shown if the player tries to use the item after a successful roll. |
-| `consume_on` | string | -- | When to consume the item. One of: `"failure"`, `"success"`, `"any"`. |
+| `attempt_message` | string | - | Message shown when the roll is initiated, before the player types ROLL. |
+| `completed_message` | string | - | Message shown if the player tries to use the item after a successful roll. |
+| `consume_on` | string | - | When to consume the item. One of: `"failure"`, `"success"`, `"any"`. |
 | `on_success` | object | **required** | Outcome when the roll meets or exceeds the DC. |
 | `on_failure` | object | **required** | Outcome when the roll is below the DC. |
 
@@ -1424,14 +1424,14 @@ Containers are items that can hold other items. They can be opened, closed, lock
 | `is_container` | boolean | `false` | Marks this item as a container. **required** for container behavior. |
 | `starts_closed` | boolean | `true` | Containers begin the game closed. Set to `false` for one that starts open. A locked container must start closed, or the lock is never checked. |
 | `locked` | boolean | `false` | If `true`, the container must be unlocked before opening. |
-| `unlock_item` | string | -- | Item ID needed in inventory to unlock the container. |
-| `unlock_flag` | string | -- | Global flag that must be `true` to unlock the container. |
-| `locked_message` | string | -- | Message shown when trying to open a locked container. |
-| `on_open_message` | string | -- | Message shown when the container is opened. |
-| `on_close_message` | string | -- | Message shown when the container is closed. |
-| `open_description` | string | -- | Description shown when examining an open container. |
-| `closed_description` | string | -- | Description shown when examining a closed container. |
-| `empty_message` | string | -- | Message shown when examining an open but empty container. |
+| `unlock_item` | string | - | Item ID needed in inventory to unlock the container. |
+| `unlock_flag` | string | - | Global flag that must be `true` to unlock the container. |
+| `locked_message` | string | - | Message shown when trying to open a locked container. |
+| `on_open_message` | string | - | Message shown when the container is opened. |
+| `on_close_message` | string | - | Message shown when the container is closed. |
+| `open_description` | string | - | Description shown when examining an open container. |
+| `closed_description` | string | - | Description shown when examining a closed container. |
+| `empty_message` | string | - | Message shown when examining an open but empty container. |
 | `contents` | array | `[]` | Item IDs initially inside the container. |
 
 ### Closed by Default
@@ -1451,7 +1451,7 @@ Every container begins the game closed: the player has to `open` it before its c
 
 A locked container can be unlocked in two ways:
 
-- **1. By item (unlock_item)**: The player must have the specified item in their inventory. The item is **not consumed** -- it just needs to be present. The container unlocks when the player tries to `open` it.
+- **1. By item (unlock_item)**: The player must have the specified item in their inventory. The item is **not consumed** - it just needs to be present. The container unlocks when the player tries to `open` it.
 - **2. By flag (unlock_flag)**: A global flag must be `true`. This lets you gate containers behind quests, dialogue, or other events.
 
 If both `unlock_item` and `unlock_flag` are set, having *either* one satisfied will unlock the container.
@@ -1549,15 +1549,15 @@ Bare directions also work as movement commands: typing `north` or just `n` is th
 | northeast | ne | northwest | nw |
 | southeast | se | southwest | sw |
 | up | u | down | d |
-| in | -- | out | -- |
+| in | - | out | - |
 
 ### Observation
 
 | Command | Synonyms | Usage |
 |---|---|---|
-| `look` | look, l | `look` -- describes the current room |
+| `look` | look, l | `look` - describes the current room |
 | `examine` | examine, inspect, x, check, read | `examine sword`, `x note`, `read sign` |
-| `inventory` | inventory, inv, i | `i` -- lists items you're carrying |
+| `inventory` | inventory, inv, i | `i` - lists items you're carrying |
 
 ### Item Interaction
 
@@ -1593,9 +1593,9 @@ Bare directions also work as movement commands: typing `north` or just `n` is th
 
 | Command | Synonyms | Usage |
 |---|---|---|
-| `roll` | roll | `roll` -- when prompted by a dice check |
-| `help` | help, h, ? | `help` -- shows available commands in-game |
-| `restart` | restart, reset | `restart` -- restart the game (with confirmation) |
+| `roll` | roll | `roll` - when prompted by a dice check |
+| `help` | help, h, ? | `help` - shows available commands in-game |
+| `restart` | restart, reset | `restart` - restart the game (with confirmation) |
 
 ### Command Routing
 
@@ -1772,7 +1772,7 @@ This example creates a small adventure where the player starts in a tavern, talk
         "topics": {
           "quest": {
             "keywords": ["quest", "mission", "adventure"],
-            "text": "Deep in the forest lies a Crystal of Power. Retrieve it and bring it to me. Take this key -- you'll need it for the gate. And take the sword by the bar, you'll need it too.",
+            "text": "Deep in the forest lies a Crystal of Power. Retrieve it and bring it to me. Take this key - you'll need it for the gate. And take the sword by the bar, you'll need it too.",
             "sets_flag": "quest_started",
             "leads_to": ["crystal", "danger"]
           },

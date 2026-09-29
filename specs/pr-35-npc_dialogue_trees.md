@@ -9,7 +9,7 @@ topic, and optionally on world state (flags/inventory).
 
 ## Player-facing behaviour
 
-### Talk with no topic — shows greeting
+### Talk with no topic - shows greeting
 ```
 > talk to innkeeper
 Innkeeper says: "Welcome, traveller. What brings you to these parts?"
@@ -55,7 +55,7 @@ Blacksmith says: "Bring me something worth appraising."
 Blacksmith says: "Fine craftsmanship. That blade is worth 50 gold."
 ```
 
-### No match — default response
+### No match - default response
 ```
 > talk to innkeeper about dragons
 Innkeeper says: "I wouldn't know anything about that."

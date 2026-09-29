@@ -133,7 +133,7 @@ class CreatureInteractionTest < ActiveSupport::TestCase
     # Move back to room1
     ClassicGame::Engine.execute(game: game, user: user, command_text: "go west")
 
-    # Entry 2: move to room2 again — should trigger
+    # Entry 2: move to room2 again - should trigger
     result2 = ClassicGame::Engine.execute(game: game, user: user, command_text: "go east")
     assert_includes result2[:response].downcase, "attacks you"
   end

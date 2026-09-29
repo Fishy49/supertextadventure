@@ -1,7 +1,7 @@
 <h1 class="text-4xl pb-4 border-b border-dashed border-terminal-dim">Items</h1>
 
 <p class="text-2xl pt-6 pb-4">
-  Items are objects players can interact with &mdash; pick up, drop, use, examine, and equip. Items can also be weapons, containers, keys, healing potions, and more.
+  Items are objects players can interact with - pick up, drop, use, examine, and equip. Items can also be weapons, containers, keys, healing potions, and more.
 </p>
 
 <h2 id="schema" class="doc-section text-3xl pt-6 pb-3 border-b border-terminal-dim">Schema</h2>
@@ -48,7 +48,7 @@
     <tr>
       <td><code>cant_take_msg</code></td>
       <td>string</td>
-      <td>&mdash;</td>
+      <td> - </td>
       <td>Custom message when trying to take a non-takeable item.</td>
     </tr>
     <tr>
@@ -101,7 +101,7 @@
   <ul class="text-xl list-disc list-inside space-y-1 pt-2">
     <li><strong>Weapons:</strong> Only the best weapon counts. If you have a sword (8 dmg) and a dagger (3 dmg), your bonus is 8.</li>
     <li><strong>Armor:</strong> All defense bonuses stack. Shield (3) + helmet (2) = 5 total defense bonus.</li>
-    <li>Items provide bonuses passively just by being in inventory &mdash; no "equip" action needed.</li>
+    <li>Items provide bonuses passively just by being in inventory - no "equip" action needed.</li>
   </ul>
 </div>
 
@@ -129,7 +129,7 @@
     <tr>
       <td><code>type</code></td>
       <td>string</td>
-      <td>&mdash;</td>
+      <td> - </td>
       <td>Effect type. Currently only <code class="text-terminal-bright">"heal"</code> is supported.</td>
     </tr>
     <tr>
@@ -182,7 +182,7 @@
   </thead>
   <tbody>
     <tr><td><code>type</code></td><td>string</td><td>One of: <code>"unlock"</code>, <code>"message"</code>, <code>"heal"</code></td></tr>
-    <tr><td><code>requires_target</code></td><td>boolean</td><td>For "unlock" &mdash; requires player to specify a target</td></tr>
+    <tr><td><code>requires_target</code></td><td>boolean</td><td>For "unlock" - requires player to specify a target</td></tr>
     <tr><td><code>sets_flag</code></td><td>string</td><td>Flag to set when used</td></tr>
     <tr><td><code>success_msg</code></td><td>string</td><td>Message shown on successful use</td></tr>
     <tr><td><code>text</code></td><td>string</td><td>Message shown (for "message" type)</td></tr>
@@ -271,9 +271,9 @@
 </p>
 
 <ol class="text-xl list-decimal list-inside space-y-2 pt-2">
-  <li><strong>Exact ID match</strong> &mdash; e.g., <code>take rusty_sword</code> matches item ID <code>rusty_sword</code></li>
-  <li><strong>Keyword match</strong> &mdash; checks if any keyword contains the search term (or vice versa)</li>
-  <li><strong>Name match</strong> &mdash; checks if the item's <code>name</code> contains the search term</li>
+  <li><strong>Exact ID match</strong> - e.g., <code>take rusty_sword</code> matches item ID <code>rusty_sword</code></li>
+  <li><strong>Keyword match</strong> - checks if any keyword contains the search term (or vice versa)</li>
+  <li><strong>Name match</strong> - checks if the item's <code>name</code> contains the search term</li>
 </ol>
 
 <p class="text-xl pt-3 text-terminal-dim">All matching is case-insensitive. Good keywords make your items easier to interact with.</p>

@@ -4,7 +4,7 @@ require "application_system_test_case"
 
 # Full end-to-end browser playthrough of the QA Test World.
 #
-# Exercises every game mechanic through the actual UI — typing commands into the
+# Exercises every game mechanic through the actual UI - typing commands into the
 # terminal input and verifying responses render on the page.
 #
 # Mechanics covered: look, help, inventory, examine, take, drop, use (consumable),
@@ -72,7 +72,7 @@ module QaWorld
       end
 
       # ─── Phase 2: Item Basics ─────────────────────────────────────
-      # Take, examine, drop, retake — and verify via inventory.
+      # Take, examine, drop, retake - and verify via inventory.
       def phase_item_basics
         cmd "take key"
         assert_text "You take the Rusty Key"
@@ -113,7 +113,7 @@ module QaWorld
         cmd "talk to innkeeper"
         assert_text "Welcome to the tavern"
 
-        # Flag-gated topic (requires spoke_to_crier) — sets tower_unlocked
+        # Flag-gated topic (requires spoke_to_crier) - sets tower_unlocked
         cmd "talk to innkeeper about tower"
         assert_text "tower can be unlocked"
 
@@ -164,7 +164,7 @@ module QaWorld
         cmd "look"
         assert_text "You need to ROLL first"
 
-        # Resolve the roll (outcome varies — DC 12 on d20)
+        # Resolve the roll (outcome varies - DC 12 on d20)
         cmd "roll"
         assert_text(/Success!|Failed\./)
         assert_text "TOTAL:"

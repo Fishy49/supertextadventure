@@ -17,7 +17,7 @@ separate agent can execute without further codebase exploration.
 **When called with no argument:** auto-selects if exactly one ingested-but-unplanned
 spec exists, otherwise fails with a list of candidates.
 
-> **Important:** Every shell command must be a single, simple call — no `$()`,
+> **Important:** Every shell command must be a single, simple call - no `$()`,
 > no `&&` chains. Use separate tool calls and carry values between them.
 
 ---
@@ -31,13 +31,13 @@ Otherwise:
 2. Find files with a `pr-` prefix that do NOT already contain `## Implementation plan`.
 3. If none: print "No specs awaiting a plan." and stop.
 4. If exactly one: proceed with it.
-5. If multiple: print "Multiple specs awaiting a plan — pass a filename:" followed by the list, then stop.
+5. If multiple: print "Multiple specs awaiting a plan - pass a filename:" followed by the list, then stop.
 
 ## Phase 2: Check preconditions
 
 1. File must have a `pr-X-` prefix. If not, print "Run /ingest-feature first." and stop.
 2. Extract the PR number by reading the `> PR: ...` line at the top of the file.
-3. Run `gh pr view {number} --json state,isDraft` — if merged or closed, print the state and stop.
+3. Run `gh pr view {number} --json state,isDraft` - if merged or closed, print the state and stop.
 4. If `## Implementation plan` already exists in the file, print "Plan already exists for PR #{number}." and stop.
 
 ## Phase 3: Explore the codebase
@@ -105,15 +105,15 @@ Then run each git command as a separate tool call:
 3. `git push`
 
 Then update the PR body:
-1. Run `gh pr view {number} --json body -q .body` — capture the output as the current body
-2. Run `gh pr edit {number} --body "{current body}\n\n**Implementation plan added** — see spec file."`
+1. Run `gh pr view {number} --json body -q .body` - capture the output as the current body
+2. Run `gh pr edit {number} --body "{current body}\n\n**Implementation plan added** - see spec file."`
    where `{current body}` is the literal text returned in step 1
 
 ## Output
 
 Print a single summary line:
 ```
-✓ Implementation plan written for PR #{number} — ready to implement.
+✓ Implementation plan written for PR #{number} - ready to implement.
 ```
 
 Then print any open questions or ambiguities the implementer should be aware of.

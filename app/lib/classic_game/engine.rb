@@ -84,7 +84,7 @@ module ClassicGame
             next unless creature_def["hostile"]
             next if should_defer_attack?(creature_def, ps, room_id, command, creature_id)
 
-            # Creature attacks — build attack via InteractHandler
+            # Creature attacks - build attack via InteractHandler
             attack_command = { verb: :attack, target: creature_id, modifier: nil, raw: "attack #{creature_id}" }
             handler = ClassicGame::Handlers::InteractHandler.new(game: game, user_id: user.id)
             attack_result = handler.handle(attack_command)
@@ -120,7 +120,7 @@ module ClassicGame
             return !(command[:verb] == :talk && talk_targets_creature?(command, creature_id, creature_def))
           end
 
-          # Unknown condition type — don't attack
+          # Unknown condition type - don't attack
           true
         end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# QA Test World — used by the debug game mode route (/dev/game).
+# QA Test World - used by the debug game mode route (/dev/game).
 # Full-featured world for manual QA and system tests.
 
 require_relative "../../test/support/qa_world_data"

@@ -38,7 +38,7 @@ class MobileTest < MobileSystemTestCase
   test "game page desktop footer hidden on mobile" do
     sign_in_as(@user)
     visit dev_game_path
-    # The footer has hidden md:grid — at mobile width it should be hidden
+    # The footer has hidden md:grid - at mobile width it should be hidden
     assert_selector "footer.hidden", visible: false
     # Mobile nav is visible
     assert_selector "[data-controller='mobile-nav']", visible: true

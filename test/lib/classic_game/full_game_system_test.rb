@@ -271,7 +271,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
       assert_includes r[:response], "helpful traveler"
     end
 
-    # Phase 2: NPC dialogue — greeting, leads_to chain, requires_flag topic
+    # Phase 2: NPC dialogue - greeting, leads_to chain, requires_flag topic
     def phase_dialogue(game, user)
       r = ex(game, user, "talk to guide")
       assert r[:success], "PHASE 2: greeting should succeed"
@@ -400,11 +400,11 @@ class FullGameSystemTest < ActiveSupport::TestCase
       assert_includes r[:response], "growls menacingly"
       assert_not game.player_state(USER_ID).dig("combat", "active"), "no combat after talking (moves:4)"
 
-      # 3rd room action — still below threshold
+      # 3rd room action - still below threshold
       ex(game, user, "look")
       assert_not game.player_state(USER_ID).dig("combat", "active"), "no combat on 3rd action"
 
-      # 4th room action — troll attacks!
+      # 4th room action - troll attacks!
       r = ex(game, user, "look")
       assert_includes r[:response], "troll snarls", "aggro_text should appear on 4th action"
       assert game.player_state(USER_ID).dig("combat", "active"), "troll should have initiated combat"
@@ -436,7 +436,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
       assert_includes r[:response], "Wizard's Tower"
 
       r = ex(game, user, "give gem to wizard")
-      assert r[:success], "give should succeed — wizard accepts the gem"
+      assert r[:success], "give should succeed - wizard accepts the gem"
       assert_includes r[:response], "Glowing Gem"
       assert_includes r[:response], "Enchanted Blade"
       assert_includes game.player_state(USER_ID)["inventory"], "enchanted_blade"
@@ -463,7 +463,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
       assert_includes game.player_state(USER_ID)["inventory"], "victory_crown"
     end
 
-    # Phase 9: NPC movement — merchant patrols entrance ↔ storeroom
+    # Phase 9: NPC movement - merchant patrols entrance ↔ storeroom
     def phase_npc_movement(game, user)
       # Player is currently in the alcove after phase_final_room.
       # Navigate back to entrance to observe the merchant.

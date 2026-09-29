@@ -118,7 +118,7 @@ module QaWorld
 
       roll_until_outcome("Success!")
 
-      # Lockpick survives success (consume_on: failure) — try to use it again
+      # Lockpick survives success (consume_on: failure) - try to use it again
       find(".terminal-input").send_keys("use lockpick", :return)
       assert_text "The chest lock is already open"
     end

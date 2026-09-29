@@ -259,7 +259,7 @@ module TestSupport
       {
         "keywords" => ["tower"],
         "text" => "The tower can be unlocked with the right knowledge. " \
-                  "I've done it for you — the gate should open now.",
+                  "I've done it for you - the gate should open now.",
         "requires_flag" => "spoke_to_crier",
         "locked_text" => "The innkeeper eyes you suspiciously. " \
                          "'I don't share secrets with strangers. Perhaps the town crier can vouch for you.'",

@@ -19,7 +19,7 @@ Rails.application.config.after_initialize do
     name = data.dig("meta", "name")
 
     unless name
-      Rails.logger.warn("game_world_sync: Skipping #{File.basename(file_path)} — missing meta.name")
+      Rails.logger.warn("game_world_sync: Skipping #{File.basename(file_path)} - missing meta.name")
       next
     end
 
@@ -29,6 +29,6 @@ Rails.application.config.after_initialize do
       Rails.logger.info("game_world_sync: Created world '#{name}' from #{File.basename(file_path)}")
     end
   rescue JSON::ParserError => e
-    Rails.logger.warn("game_world_sync: Skipping #{File.basename(file_path)} — #{e.message}")
+    Rails.logger.warn("game_world_sync: Skipping #{File.basename(file_path)} - #{e.message}")
   end
 end

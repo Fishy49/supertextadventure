@@ -15,7 +15,7 @@ Additionally, this app supports a chat-like interface with a few handy tools (Di
 
 ### Prerequisites
 
-- Ruby (version managed via `mise` — see `mise.toml`)
+- Ruby (version managed via `mise` - see `mise.toml`)
 - Bundler
 - PostgreSQL
 
@@ -39,7 +39,7 @@ bin/dev
 
 1. Visit `http://localhost:3000`
 2. You'll be redirected to the **Setup** page where you create the **owner** account (username + password)
-3. After setup you'll land on the **Invites** page — this is where you generate links to share with friends
+3. After setup you'll land on the **Invites** page - this is where you generate links to share with friends
 
 ### Inviting Players
 

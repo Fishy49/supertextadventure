@@ -121,7 +121,7 @@ module ClassicGameTestHelper
     end
 
     def save!
-      # no-op — state is stored in-memory
+      # no-op - state is stored in-memory
     end
 
     def update!(attrs)
@@ -168,7 +168,7 @@ module ClassicGameTestHelper
 
   # Route a command through the full Engine (handles pending rolls, aggro checks,
   # restart confirmation, and handler dispatch). Accepts any object that responds
-  # to #id — use FakeUser.new(some_id) as the user argument.
+  # to #id - use FakeUser.new(some_id) as the user argument.
   def execute_engine(game, user, command_text)
     ClassicGame::Engine.execute(game: game, user: user, command_text: command_text)
   end

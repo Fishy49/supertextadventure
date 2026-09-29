@@ -64,18 +64,18 @@ The player should be able to navigate the app comfortably on a mobile screen. Th
 | **`app/views/layouts/application.html.erb`** | (1) Add `md:grid-areas-layout` and a new `grid-areas-mobile` class so the mobile grid takes effect below `md` breakpoint. (2) Hide the sidebar div on mobile by default (`hidden md:block`), and wrap it in a container with a Stimulus-controlled slide-over panel for mobile. (3) Add `<%= render "mobile_nav" %>` before the footer. (4) Hide the footer on mobile (`hidden md:grid`). (5) On the message-form div, remove `pb-[150px]` on mobile and ensure it sticks to the bottom. (6) Add `overflow-hidden` on body for mobile to prevent double scrollbars. |
 | **`app/views/application/_header.html.erb`** | (1) Reduce heading text to `text-lg md:text-xl` for mobile. (2) Truncate the greeting on very small screens using `truncate` class. |
 | **`app/views/application/_footer.html.erb`** | (1) Add `hidden md:grid` to hide the entire hotkey footer on mobile (it will be replaced by the mobile nav drawer). |
-| **`app/views/application/_mobile_nav.html.erb`** | (New file — see Files to create.) Contains a fixed-position bottom bar visible only on mobile (`md:hidden`) with: a hamburger/menu button to toggle the navigation drawer, and a sidebar toggle button (book/info icon) to reveal the sidebar as a slide-over panel. Uses `data-controller="mobile-nav"`. |
-| **`app/javascript/controllers/mobile_nav_controller.js`** | (New file — see Files to create.) Stimulus controller with targets: `drawer`, `sidebar`, `overlay`. Actions: `toggleDrawer` (open/close nav links), `toggleSidebar` (slide sidebar panel in from the right), `closeAll`. Manages `translate-x-full` / `translate-x-0` transitions. |
+| **`app/views/application/_mobile_nav.html.erb`** | (New file - see Files to create.) Contains a fixed-position bottom bar visible only on mobile (`md:hidden`) with: a hamburger/menu button to toggle the navigation drawer, and a sidebar toggle button (book/info icon) to reveal the sidebar as a slide-over panel. Uses `data-controller="mobile-nav"`. |
+| **`app/javascript/controllers/mobile_nav_controller.js`** | (New file - see Files to create.) Stimulus controller with targets: `drawer`, `sidebar`, `overlay`. Actions: `toggleDrawer` (open/close nav links), `toggleSidebar` (slide sidebar panel in from the right), `closeAll`. Manages `translate-x-full` / `translate-x-0` transitions. |
 | **`app/views/games/show.html.erb`** | (1) Ensure the sidebar content is duplicated or moved into a mobile-friendly slide-over container that the `mobile-nav` controller can toggle. Wrap the `content_for :sidebar` block so it also populates a mobile-visible panel. |
 | **`app/views/shared/_terminal_input.html.erb`** | (1) On the contenteditable div, add responsive text sizing: `text-base md:text-lg`. (2) Ensure the prompt span doesn't overflow on narrow screens by adding `whitespace-nowrap`. |
-| **`app/components/terminal_input_component.rb`** | (1) In `input_classes`, no changes needed — the ERB partial handles responsive classes. |
+| **`app/components/terminal_input_component.rb`** | (1) In `input_classes`, no changes needed - the ERB partial handles responsive classes. |
 | **`app/views/ascii/_wrapper.html.erb`** | (1) Add `overflow-x-auto` and `max-w-full` to the outer div so ASCII art scrolls horizontally on narrow screens instead of breaking the layout. (2) Add `text-[0.55rem] md:text-xs` on the `<pre>` to scale ASCII art down on mobile. |
 | **`app/views/games/_current_context.html.erb`** | (1) Add `max-w-full overflow-x-auto` to the context container so ASCII art inside the sidebar context box is scrollable on mobile. |
 | **`app/views/games/_lobby.html.erb`** | (1) On the join form, ensure `text_field` and `text_area` inputs take `w-full` on mobile. No changes expected since they already use full width via base styles. |
 | **`app/views/home/index.html.erb`** | (1) Add `px-2 md:px-0` for better mobile padding on the main content text. |
-| **`app/views/games/index.html.erb`** | (1) Ensure the tavern layout renders well on mobile — the sidebar content (game list) needs to be accessible. Add a note/link or integrate with mobile sidebar toggle. |
+| **`app/views/games/index.html.erb`** | (1) Ensure the tavern layout renders well on mobile - the sidebar content (game list) needs to be accessible. Add a note/link or integrate with mobile sidebar toggle. |
 | **`config/tailwind.config.js`** | (1) Add `screens` config to `theme.extend` if not already present to ensure `md` breakpoint is 768px (Tailwind default). No change actually needed since defaults apply, but verify. |
-| **`test/application_system_test_case.rb`** | No changes — the default desktop size stays at 1400x1400. Mobile tests use their own base class. |
+| **`test/application_system_test_case.rb`** | No changes - the default desktop size stays at 1400x1400. Mobile tests use their own base class. |
 
 ### 3. Implementation steps
 
@@ -92,7 +92,7 @@ The player should be able to navigate the app comfortably on a mobile screen. Th
       "message-form";
   }
   ```
-- The sidebar and footer grid areas are omitted on mobile — they'll be hidden or shown via overlay.
+- The sidebar and footer grid areas are omitted on mobile - they'll be hidden or shown via overlay.
 
 **Step 2: Update application layout for responsive grid**
 - File: `app/views/layouts/application.html.erb`
@@ -136,7 +136,7 @@ The player should be able to navigate the app comfortably on a mobile screen. Th
 
 **Step 8: Make sidebar content accessible on mobile for games/show**
 - File: `app/views/games/show.html.erb`
-- The `content_for :sidebar` block already populates the sidebar div. On mobile, this content will be inside the slide-over panel toggled by the mobile-nav controller. No duplicate content needed — the sidebar div exists in the DOM but is hidden until toggled.
+- The `content_for :sidebar` block already populates the sidebar div. On mobile, this content will be inside the slide-over panel toggled by the mobile-nav controller. No duplicate content needed - the sidebar div exists in the DOM but is hidden until toggled.
 
 **Step 9: Make game context area responsive**
 - File: `app/views/games/_current_context.html.erb`
@@ -183,9 +183,9 @@ The player should be able to navigate the app comfortably on a mobile screen. Th
 
 ### 5. Gotchas and constraints
 
-- **Tailwind v4 / build pipeline**: The project uses `@tailwindcss/forms`, `@tailwindcss/typography`, and `@savvywombat/tailwindcss-grid-areas`. The custom grid-areas CSS in `application.tailwind.css` is hand-written, not from the plugin — so the mobile grid must also be hand-written in the same `@layer base` block. Do NOT rely on the `@savvywombat/tailwindcss-grid-areas` plugin for mobile layout.
+- **Tailwind v4 / build pipeline**: The project uses `@tailwindcss/forms`, `@tailwindcss/typography`, and `@savvywombat/tailwindcss-grid-areas`. The custom grid-areas CSS in `application.tailwind.css` is hand-written, not from the plugin - so the mobile grid must also be hand-written in the same `@layer base` block. Do NOT rely on the `@savvywombat/tailwindcss-grid-areas` plugin for mobile layout.
 - **Cuprite / Ferrum for mobile tests**: Cuprite uses Chrome DevTools Protocol. To simulate a mobile viewport, set `screen_size: [375, 667]` in `driven_by`. The browser will render at that size. There is no built-in "mobile emulation" mode in Cuprite, so tests rely on CSS media queries responding to the actual window width.
-- **contenteditable input**: The terminal input uses `contenteditable` divs, not standard `<input>` elements. On mobile, this may behave differently with virtual keyboards. The existing `focus()` call in `terminal_controller.js` handles initial focus. Do not change this behavior — just ensure the input area is visible above the keyboard by keeping it at the bottom of the viewport.
+- **contenteditable input**: The terminal input uses `contenteditable` divs, not standard `<input>` elements. On mobile, this may behave differently with virtual keyboards. The existing `focus()` call in `terminal_controller.js` handles initial focus. Do not change this behavior - just ensure the input area is visible above the keyboard by keeping it at the bottom of the viewport.
 - **pb-[150px] on message container**: This large bottom padding exists on desktop to ensure messages don't hide behind the fixed-position form. On mobile, with a stacked layout, this should be reduced to `pb-4` to prevent wasted space.
 - **Turbo Stream / MutationObserver in game_controller.js**: The `game_controller.js` references `.grid-in-message-container` by class name. This class still exists on mobile (the grid area name doesn't change, just the grid definition does). Ensure the class remains on the message container div.
 - **RuboCop rules**: Double-quoted strings enforced (`Style/StringLiterals`). Method max 60 lines. The new Ruby files (test support class) must follow these conventions.
@@ -193,4 +193,4 @@ The player should be able to navigate the app comfortably on a mobile screen. Th
 - **Sidebar on non-game pages**: Pages like Home, Tavern, About, and Setup all use `content_for :sidebar`. On mobile, this content should be accessible via the sidebar toggle. The sidebar div is in the layout, so the toggle will work for all pages.
 - **Existing desktop layout must not change**: All changes use responsive prefixes (`md:`) to preserve the desktop experience. The mobile classes apply below the `md` breakpoint (768px).
 - **Stimulus controller registration**: New controllers in `app/javascript/controllers/` are auto-discovered via `eagerLoadControllersFrom` in `index.js`. The file must be named `mobile_nav_controller.js` (underscores become hyphens in Stimulus: `data-controller="mobile-nav"`).
-- **Footer links conditional logic**: The mobile nav must replicate the same conditional logic from `_footer.html.erb` — checking `logged_in?`, `current_user.is_owner?`, and the platform-specific symbol display. The mobile version can simplify by using text labels instead of hotkey symbols.
+- **Footer links conditional logic**: The mobile nav must replicate the same conditional logic from `_footer.html.erb` - checking `logged_in?`, `current_user.is_owner?`, and the platform-specific symbol display. The mobile version can simplify by using text labels instead of hotkey symbols.

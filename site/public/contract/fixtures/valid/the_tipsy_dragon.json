@@ -114,7 +114,7 @@
   "items": {
     "sticky_mug": {
       "name": "Suspiciously Sticky Mug",
-      "description": "A tavern mug so sticky it briefly adheres to everything it touches. Whatever was in here last night, it was not entirely liquid. The bottom is engraved with the words 'Property of The Tipsy Dragon — STEAL THIS AND BE CURSED.'",
+      "description": "A tavern mug so sticky it briefly adheres to everything it touches. Whatever was in here last night, it was not entirely liquid. The bottom is engraved with the words 'Property of The Tipsy Dragon - STEAL THIS AND BE CURSED.'",
       "keywords": [
         "mug",
         "sticky mug",
@@ -147,7 +147,7 @@
     },
     "notice_board": {
       "name": "Village Notice Board",
-      "description": "A weathered notice board. Most postings are mundane ('Lost cat — answers to Lord Fluffington III'), but one stands out: 'WANTED: Brave adventurer to retrieve the Golden Acorn from the Dreaded Clearing. REWARD: Enough gold to pay off even the most irresponsible tavern tab. Ask the wizard in the square for details.'",
+      "description": "A weathered notice board. Most postings are mundane ('Lost cat - answers to Lord Fluffington III'), but one stands out: 'WANTED: Brave adventurer to retrieve the Golden Acorn from the Dreaded Clearing. REWARD: Enough gold to pay off even the most irresponsible tavern tab. Ask the wizard in the square for details.'",
       "keywords": [
         "notice board",
         "board",
@@ -244,7 +244,7 @@
         "innkeeper"
       ],
       "dialogue": {
-        "default": "Greta looks you up and down. 'Oh, you're ALIVE. Good. That means you can PAY. One thousand gold pieces. Don't look at me like that — you ordered a whole boar. A WHOLE BOAR. Who does that?' She gestures vaguely toward the village square. 'The wizard outside might know where to find some coin. Now stop dripping on my floor.'",
+        "default": "Greta looks you up and down. 'Oh, you're ALIVE. Good. That means you can PAY. One thousand gold pieces. Don't look at me like that - you ordered a whole boar. A WHOLE BOAR. Who does that?' She gestures vaguely toward the village square. 'The wizard outside might know where to find some coin. Now stop dripping on my floor.'",
         "topics": {
           "tab": {
             "keywords": [
@@ -272,13 +272,13 @@
               "swine",
               "food"
             ],
-            "text": "You stood on a table, pointed at the kitchen, and yelled — and I quote — BRING ME YOUR FINEST SWINE. Then you ate the whole thing. With your hands. The bard wrote a song about it. It was not flattering."
+            "text": "You stood on a table, pointed at the kitchen, and yelled - and I quote - BRING ME YOUR FINEST SWINE. Then you ate the whole thing. With your hands. The bard wrote a song about it. It was not flattering."
           }
         }
       },
       "accepts_item": "gold_pouch",
       "gives_item": "rusty_pan",
-      "accept_message": "Greta snatches the gold pouch and counts every single coin while you stand there awkwardly. '...nine hundred ninety-eight, nine hundred ninety-nine, one thousand. Right then.' Her expression softens almost imperceptibly. 'Debt's paid. And here —' she slides a battered frying pan across the counter '— a souvenir. You used it as a pillow last night. Figured you'd grown attached.' She almost smiles. Almost. 'Now get out of my tavern. Or stay and order something. Just... no more boars.'",
+      "accept_message": "Greta snatches the gold pouch and counts every single coin while you stand there awkwardly. '...nine hundred ninety-eight, nine hundred ninety-nine, one thousand. Right then.' Her expression softens almost imperceptibly. 'Debt's paid. And here - ' she slides a battered frying pan across the counter ' - a souvenir. You used it as a pillow last night. Figured you'd grown attached.' She almost smiles. Almost. 'Now get out of my tavern. Or stay and order something. Just... no more boars.'",
       "sets_flag": "debt_paid"
     },
     "confused_wizard": {
@@ -310,7 +310,7 @@
               "bird",
               "hen"
             ],
-            "text": "El Pollo Terrible! The Scourge of the Clearing! It — it took my hat right off my head. Just... WHOOSH. Gone. The clearing is through the forest path, east of here. Be warned: it fights dirty. Mostly pecking. So much pecking."
+            "text": "El Pollo Terrible! The Scourge of the Clearing! It - it took my hat right off my head. Just... WHOOSH. Gone. The clearing is through the forest path, east of here. Be warned: it fights dirty. Mostly pecking. So much pecking."
           },
           "hat": {
             "keywords": [
@@ -331,7 +331,7 @@
       },
       "accepts_item": "golden_acorn",
       "gives_item": "healing_herb",
-      "accept_message": "'THE ACORN! You found it! You brave, foolish, wonderful person!' Wizbert does a little jig that makes several concerning popping sounds. 'Here, take this healing herb. You look like you need it. The hermit's cave across the bridge has the gold reward — just get past old Thinksworth first. Try agreeing with him. He likes that.'",
+      "accept_message": "'THE ACORN! You found it! You brave, foolish, wonderful person!' Wizbert does a little jig that makes several concerning popping sounds. 'Here, take this healing herb. You look like you need it. The hermit's cave across the bridge has the gold reward - just get past old Thinksworth first. Try agreeing with him. He likes that.'",
       "sets_flag": "wizard_helped"
     },
     "philosophical_troll": {
@@ -382,7 +382,7 @@
       },
       "accepts_item": "sticky_mug",
       "gives_item": "wizard_hat",
-      "accept_message": "'A gift? For ME?' Thinksworth examines the sticky mug with delight. 'It's... it's the stickiest mug I've ever seen. This raises so many questions. What MADE it this sticky? Is stickiness an inherent property or an acquired one?' A tear rolls down his massive cheek. 'This is the most thoughtful thing anyone has ever given me. Here, take this hat I found — some wizard lost it ages ago. And please, cross freely!' He tucks the mug into his waistcoat pocket, beaming.",
+      "accept_message": "'A gift? For ME?' Thinksworth examines the sticky mug with delight. 'It's... it's the stickiest mug I've ever seen. This raises so many questions. What MADE it this sticky? Is stickiness an inherent property or an acquired one?' A tear rolls down his massive cheek. 'This is the most thoughtful thing anyone has ever given me. Here, take this hat I found - some wizard lost it ages ago. And please, cross freely!' He tucks the mug into his waistcoat pocket, beaming.",
       "sets_flag": "troll_satisfied"
     },
     "wandering_bard": {
@@ -395,7 +395,7 @@
         "minstrel"
       ],
       "dialogue": {
-        "default": "'AH! A PATRON!' Bardric strums dramatically. 'Allow me to regale you with THE BALLAD OF THE BOAR EATER — a stirring tale of one hero's magnificent gluttony, based on real events from LAST NIGHT!' You consider asking him to stop. You decide against it. He would only sing louder.",
+        "default": "'AH! A PATRON!' Bardric strums dramatically. 'Allow me to regale you with THE BALLAD OF THE BOAR EATER - a stirring tale of one hero's magnificent gluttony, based on real events from LAST NIGHT!' You consider asking him to stop. You decide against it. He would only sing louder.",
         "topics": {
           "song": {
             "keywords": [
@@ -414,7 +414,7 @@
               "tip",
               "bird"
             ],
-            "text": "'Ah yes — the CHICKEN INCIDENT.' Bardric looks wounded. 'You tried to tip me with a LIVE CHICKEN. I do not accept poultry as payment. It took hours to catch. The chicken, I mean. Though also the tip."
+            "text": "'Ah yes - the CHICKEN INCIDENT.' Bardric looks wounded. 'You tried to tip me with a LIVE CHICKEN. I do not accept poultry as payment. It took hours to catch. The chicken, I mean. Though also the tip."
           },
           "boar": {
             "keywords": [
@@ -495,7 +495,7 @@
       "loot": [
         "wizard_hat"
       ],
-      "on_defeat_msg": "El Pollo Terrible lets out one final dramatic BAWK, drops the wizard's hat, and struts away with wounded dignity. It's not defeated — it's simply choosing to leave. There's a difference, and the chicken wants you to know that.",
+      "on_defeat_msg": "El Pollo Terrible lets out one final dramatic BAWK, drops the wizard's hat, and struts away with wounded dignity. It's not defeated - it's simply choosing to leave. There's a difference, and the chicken wants you to know that.",
       "on_flee_msg": "El Pollo Terrible clucks triumphantly as you retreat, then resumes sitting on its twig throne like the tiny tyrant it is."
     }
   }

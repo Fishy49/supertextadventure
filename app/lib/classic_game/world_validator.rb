@@ -104,9 +104,8 @@ module ClassicGame
       def reference_errors
         out = []
         self.class.refs.each do |rule|
-          each_at(world, rule["path"].split("."), []) do |path, value|
+          WorldPaths.each_at(world, rule["path"].split(".")) do |path, value|
             next unless value.is_a?(String)
-            next if rule["when"] == "string" && !value.is_a?(String)
 
             error = check_reference(rule, path, value)
             out << error if error
@@ -141,26 +140,6 @@ module ClassicGame
 
         { code: "topic.missing", path: path,
           message: "#{path} names dialogue topic '#{value}', which no matching NPC defines." }
-      end
-
-      # Walks a dotted path with * wildcards, yielding [dotted_path, value] for
-      # every value the path reaches.
-      def each_at(node, segments, trail, &)
-        if segments.empty?
-          yield trail.join("."), node
-          return
-        end
-
-        seg = segments.first
-        rest = segments.drop(1)
-        if seg == "*"
-          case node
-          when Hash then node.each { |k, v| each_at(v, rest, trail + [k], &) }
-          when Array then node.each_with_index { |v, i| each_at(v, rest, trail + [i.to_s], &) }
-          end
-        elsif node.is_a?(Hash) && node.key?(seg)
-          each_at(node[seg], rest, trail + [seg], &)
-        end
       end
   end
 end

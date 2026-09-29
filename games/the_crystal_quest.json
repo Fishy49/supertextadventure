@@ -149,7 +149,8 @@
       "locked": false,
       "on_open_message": "The chest lid creaks open.",
       "contents": [
-        "health_potion"
+        "health_potion",
+        "lockpick"
       ]
     },
     "old_map": {
@@ -244,8 +245,8 @@
       "keywords": [
         "spider"
       ],
-      "health": 20,
-      "attack": 6,
+      "health": 12,
+      "attack": 3,
       "defense": 1,
       "hostile": true,
       "attack_condition": {

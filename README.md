@@ -70,6 +70,25 @@ This is very much a work-in-progress and certain app code might be orphaned/outd
 Getting the app running and navigating to `/dev/game` will fire up a QA world that is small but representative of a lot of what can be done in the classic game engine. This world isn't really meant to be "fun" but allows you to quickly test things:
 <img width="1645" height="959" alt="image" src="https://github.com/user-attachments/assets/edd9a96d-d224-4347-95d3-539d4de9073d" />
 
+## World CLI
+
+`bin/world` builds, inspects, validates, and play-tests worlds from a shell,
+and is written so an agent can drive it: every command has `--json`, edits
+write the file and then report what the validator found, and `play` runs a
+world through the real engine with no database.
+
+```sh
+bin/world new games/my_world.json --name "My World"
+bin/world add games/my_world.json rooms hall --name "The Hall" --in start
+bin/world link games/my_world.json start north hall --both
+bin/world check games/my_world.json
+bin/world play games/my_world.json --script games/my_world.walkthrough.txt
+```
+
+Run `bin/world help` for every command and `bin/world explain` for the check
+codes. Each shipped game in `games/` has a walkthrough script next to it that
+the test suite plays through, so a game that cannot be finished fails CI.
+
 ## Website and Docs
 
 The public site and the Classic Game Engine documentation live in `site/` and

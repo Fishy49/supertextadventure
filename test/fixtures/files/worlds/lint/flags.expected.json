@@ -1,0 +1,8 @@
+{
+  "lint": [
+    "exit.flag_never_set rooms.start.exits.north.requires_flag",
+    "flag.never_checked rooms.hall.exits.west.sets_flag",
+    "flag.never_set rooms.start.exits.north.requires_flag",
+    "item.unplaced items.lamp"
+  ]
+}

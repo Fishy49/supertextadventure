@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "name": "People",
+    "description": "Lint fixture.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Room",
+      "description": "A room.",
+      "npcs": [
+        "greeter"
+      ],
+      "creatures": [
+        "guard"
+      ],
+      "items": [
+        "potion",
+        "sign"
+      ]
+    }
+  },
+  "items": {
+    "potion": {
+      "name": "Potion",
+      "description": "Consumable but not takeable.",
+      "takeable": false,
+      "consumable": true
+    },
+    "sign": {
+      "name": "Sign",
+      "description": "Message with no text.",
+      "takeable": false,
+      "on_use": {
+        "type": "message"
+      }
+    },
+    "gift": {
+      "name": "Gift",
+      "description": "Given by the greeter."
+    }
+  },
+  "npcs": {
+    "greeter": {
+      "name": "Greeter",
+      "description": "Talks.",
+      "dialogue": {
+        "greeting": "Hi.",
+        "topics": {
+          "weather": {
+            "keywords": [
+              "weather"
+            ]
+          },
+          "secret": {
+            "text": "Psst.",
+            "keywords": [
+              "secret"
+            ],
+            "requires_flag": "trusted"
+          },
+          "silent": {}
+        }
+      },
+      "gives_item": "gift"
+    },
+    "ghost": {
+      "name": "Ghost",
+      "description": "Placed nowhere, with empty dialogue.",
+      "dialogue": {
+        "topics": {}
+      }
+    },
+    "walker": {
+      "name": "Walker",
+      "description": "Patrols with a bad stop.",
+      "movement": {
+        "type": "patrol",
+        "schedule": [
+          {
+            "room": "start"
+          },
+          {
+            "room": "start",
+            "duration": 2
+          }
+        ]
+      }
+    }
+  },
+  "creatures": {
+    "guard": {
+      "name": "Guard",
+      "description": "Has a condition but is not hostile.",
+      "health": 5,
+      "attack_condition": {
+        "moves": 2
+      }
+    },
+    "stray": {
+      "name": "Stray",
+      "description": "Placed nowhere.",
+      "health": 3
+    }
+  }
+}

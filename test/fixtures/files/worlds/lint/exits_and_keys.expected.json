@@ -1,0 +1,8 @@
+{
+  "lint": [
+    "exit.key_unplaced rooms.start.exits.north.use_item",
+    "exit.redundant_use_item rooms.start.exits.east",
+    "item.reveals_unknown_exit items.lever.reveals_exit",
+    "item.unplaced items.iron_key"
+  ]
+}

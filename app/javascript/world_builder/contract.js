@@ -168,3 +168,134 @@ export function validateContract(world, contract) {
 }
 
 export const CONTRACT_CODES = ["schema.invalid", "starting_room.missing", "ref.missing", "topic.missing", "dice.outcomes", "dice.consume_on", "attack_condition.invalid"];
+
+// ---------- lint ----------
+
+export const LINT_CODES = [
+  "flag.never_set", "flag.never_checked",
+  "exit.key_unplaced", "exit.flag_never_set", "exit.redundant_use_item", "room.unreachable",
+  "item.unplaced", "item.message_without_text", "item.reveals_unknown_exit",
+  "container.no_unlock", "container.locked_but_open", "item.contents_without_container", "item.consumable_not_takeable",
+  "movement.bad_duration",
+  "npc.unplaced", "dialogue.empty", "topic.no_text", "topic.no_keywords", "topic.gated_without_locked_text",
+  "npc.gives_without_accepts",
+  "creature.unplaced", "creature.condition_without_hostile"
+];
+
+// Everything worth telling an author: contract errors at level "error", plus
+// warnings and infos about worlds that validate but will not play well.
+// Returns [{ code, level, path, message, target: { type, id } }], the same
+// codes and paths as ClassicGame::WorldLinter.
+export function lintWorld(world, contract) {
+  const w = isObj(world) ? world : {};
+  const out = validateContract(w, contract).map(e => ({ code: e.code, level: "error", path: e.path, message: e.message, target: ownerOf(e.path) }));
+  const meta = isObj(w.meta) ? w.meta : {};
+  const rooms = isObj(w.rooms) ? w.rooms : {};
+  const items = isObj(w.items) ? w.items : {};
+  const npcs = isObj(w.npcs) ? w.npcs : {};
+  const creatures = isObj(w.creatures) ? w.creatures : {};
+  const truthy = v => !(v === undefined || v === null || v === false || v === 0 || v === "");
+  const itemName = id => (isObj(items[id]) && truthy(items[id].name) ? items[id].name : id);
+  const report = (level, code, path, message, target) => out.push({ code, level, path, message, target: target || ownerOf(path) });
+
+  const placed = { item: new Set(), npc: new Set(), creature: new Set() };
+  const flags = {};
+  walkRefs(w, contract.refs, ({ rule, id, segments }) => {
+    const kind = rule.kind === "flag" || rule.kind === "topic" ? rule.kind : rule.kind.replace(/s$/, "");
+    const mode = rule.mode || "ref";
+    if (mode === "place" && placed[kind]) placed[kind].add(id);
+    if (kind === "flag") { const e = flags[id] || (flags[id] = { set: [], check: [] }); e[mode === "set" ? "set" : "check"].push(segments.join(".")); }
+  });
+  const flagSet = f => !!(flags[f] && flags[f].set.length);
+
+  const start = meta.starting_room;
+  const reachable = new Set();
+  if (truthy(rooms[start])) {
+    const queue = [start]; reachable.add(start);
+    while (queue.length) {
+      const r = rooms[queue.shift()]; if (!isObj(r)) continue;
+      const exits = isObj(r.exits) ? r.exits : {};
+      for (const d in exits) { const ex = exits[d]; const to = typeof ex === "string" ? ex : (isObj(ex) ? ex.to : null); if (truthy(to) && truthy(rooms[to]) && !reachable.has(to)) { reachable.add(to); queue.push(to); } }
+    }
+  }
+
+  for (const f in flags) {
+    const e = flags[f]; const target = { type: "flag", id: f };
+    if (!e.set.length) report("warn", "flag.never_set", e.check.slice().sort()[0], 'Flag "' + f + '" is checked but nothing ever sets it (' + e.check.join(", ") + ").", target);
+    else if (!e.check.length) report("info", "flag.never_checked", e.set.slice().sort()[0], 'Flag "' + f + '" is set but never checked.', target);
+  }
+
+  const hiddenDirs = new Set();
+  for (const rid in rooms) {
+    const r = rooms[rid]; if (!isObj(r)) continue;
+    const exits = isObj(r.exits) ? r.exits : {};
+    for (const d in exits) {
+      const ex = exits[d]; if (!isObj(ex)) continue;
+      const base = "rooms." + rid + ".exits." + d;
+      if (truthy(ex.hidden)) hiddenDirs.add(d);
+      const keyField = truthy(ex.use_item) ? "use_item" : "requires"; const key = ex[keyField];
+      if (truthy(key) && isObj(items[key]) && !placed.item.has(key)) report("warn", "exit.key_unplaced", base + "." + keyField, "Exit " + d + ' is locked and its key "' + itemName(key) + '" is never placed anywhere.');
+      if (truthy(ex.requires_flag) && !flagSet(ex.requires_flag)) report("warn", "exit.flag_never_set", base + ".requires_flag", "Exit " + d + ' is gated on flag "' + ex.requires_flag + '", which nothing ever sets.');
+      if (truthy(ex.use_item) && truthy(ex.requires) && ex.use_item === ex.requires) report("info", "exit.redundant_use_item", base, "Exit " + d + " sets both requires and use_item to the same item; requires alone already lets the player through.");
+    }
+    if (truthy(start) && truthy(rooms[start]) && !reachable.has(rid)) report("warn", "room.unreachable", "rooms." + rid, "Room is unreachable from the starting room by any exit.");
+  }
+
+  for (const iid in items) {
+    const it = items[iid]; if (!isObj(it)) continue;
+    const base = "items." + iid;
+    if (!placed.item.has(iid)) report("warn", "item.unplaced", base, "Item is never placed: not in a room, container, loot list, or given by an NPC.");
+    if (isObj(it.on_use) && it.on_use.type === "message" && !truthy(it.on_use.text)) report("warn", "item.message_without_text", base + ".on_use", "on_use of type message has no text.");
+    if (isObj(it.reveals_exit) && truthy(it.reveals_exit.direction) && !hiddenDirs.has(it.reveals_exit.direction)) report("warn", "item.reveals_unknown_exit", base + ".reveals_exit", 'reveals_exit "' + it.reveals_exit.direction + '" but no room has a hidden exit in that direction.');
+    if (isObj(it.on_examine) && truthy(it.on_examine.reveals_exit) && !hiddenDirs.has(it.on_examine.reveals_exit)) report("warn", "item.reveals_unknown_exit", base + ".on_examine", 'on_examine reveals "' + it.on_examine.reveals_exit + '" but no room has a hidden exit in that direction.');
+    if (truthy(it.is_container) && truthy(it.locked)) {
+      const itemOk = truthy(it.unlock_item) && isObj(items[it.unlock_item]) && placed.item.has(it.unlock_item);
+      const flagOk = truthy(it.unlock_flag) && flagSet(it.unlock_flag);
+      const reasons = [];
+      if (!truthy(it.unlock_item) && !truthy(it.unlock_flag)) reasons.push("no unlock_item or unlock_flag");
+      else {
+        if (truthy(it.unlock_item) && !itemOk) reasons.push(isObj(items[it.unlock_item]) ? 'unlock item "' + itemName(it.unlock_item) + '" is never placed' : 'unlock item "' + it.unlock_item + '" does not exist');
+        if (truthy(it.unlock_flag) && !flagOk) reasons.push('flag "' + it.unlock_flag + '" is never set');
+      }
+      if (!itemOk && !flagOk) report("warn", "container.no_unlock", base, "Container is locked and nothing can unlock it (" + reasons.join("; ") + ").");
+      if (it.starts_closed === false) report("warn", "container.locked_but_open", base, "Container is locked but starts open (starts_closed: false), so the lock never engages.");
+    }
+    if (!truthy(it.is_container) && Array.isArray(it.contents) && it.contents.length) report("warn", "item.contents_without_container", base, "Item has contents but is_container is not true.");
+    if (it.takeable === false && truthy(it.consumable)) report("info", "item.consumable_not_takeable", base, "Item is not takeable but is consumable; it can only be used from the floor.");
+  }
+
+  const hasMovement = e => isObj(e.movement) && truthy(e.movement.type);
+  const patrolCheck = (base, m) => {
+    if (!(isObj(m) && m.type === "patrol" && Array.isArray(m.schedule))) return;
+    m.schedule.forEach((s, i) => { if (isObj(s) && !(typeof s.duration === "number" && s.duration > 0)) report("warn", "movement.bad_duration", base + ".movement.schedule." + i, "Patrol stop " + (i + 1) + " should have a positive duration in turns."); });
+  };
+
+  for (const nid in npcs) {
+    const n = npcs[nid]; if (!isObj(n)) continue;
+    const base = "npcs." + nid;
+    if (!placed.npc.has(nid) && !hasMovement(n)) report("warn", "npc.unplaced", base, "NPC is not placed in any room and has no movement.");
+    if (isObj(n.dialogue)) {
+      const dlg = n.dialogue;
+      if (!truthy(dlg.greeting) && !truthy(dlg.default)) report("warn", "dialogue.empty", base + ".dialogue", 'Dialogue has neither greeting nor default; "talk to" will say nothing useful.');
+      const topics = isObj(dlg.topics) ? dlg.topics : {};
+      for (const tk in topics) {
+        const t = topics[tk]; if (!isObj(t)) continue;
+        const path = base + ".dialogue.topics." + tk;
+        if (!truthy(t.text)) report("warn", "topic.no_text", path, 'Topic "' + tk + '" has no text.');
+        if (!(Array.isArray(t.keywords) && t.keywords.length)) report("warn", "topic.no_keywords", path, 'Topic "' + tk + '" has no keywords, so players cannot ask about it.');
+        if ((truthy(t.requires_flag) || truthy(t.requires_item)) && !truthy(t.locked_text)) report("info", "topic.gated_without_locked_text", path, 'Topic "' + tk + '" is gated but has no locked_text.');
+      }
+    }
+    if (truthy(n.gives_item) && !truthy(n.accepts_item)) report("warn", "npc.gives_without_accepts", base, "gives_item without accepts_item never triggers.");
+    patrolCheck(base, n.movement);
+  }
+
+  for (const cid in creatures) {
+    const c = creatures[cid]; if (!isObj(c)) continue;
+    const base = "creatures." + cid;
+    if (!placed.creature.has(cid) && !hasMovement(c)) report("warn", "creature.unplaced", base, "Creature is not placed in any room and has no movement.");
+    if (truthy(c.attack_condition) && !truthy(c.hostile)) report("info", "creature.condition_without_hostile", base, "attack_condition has no effect unless hostile is true.");
+    patrolCheck(base, c.movement);
+  }
+  return out;
+}

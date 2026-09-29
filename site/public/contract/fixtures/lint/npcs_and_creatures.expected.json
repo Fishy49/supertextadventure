@@ -1,0 +1,17 @@
+{
+  "lint": [
+    "creature.condition_without_hostile creatures.guard",
+    "creature.unplaced creatures.stray",
+    "dialogue.empty npcs.ghost.dialogue",
+    "flag.never_set npcs.greeter.dialogue.topics.secret.requires_flag",
+    "item.consumable_not_takeable items.potion",
+    "item.message_without_text items.sign.on_use",
+    "movement.bad_duration npcs.walker.movement.schedule.0",
+    "npc.gives_without_accepts npcs.greeter",
+    "npc.unplaced npcs.ghost",
+    "topic.gated_without_locked_text npcs.greeter.dialogue.topics.secret",
+    "topic.no_keywords npcs.greeter.dialogue.topics.silent",
+    "topic.no_text npcs.greeter.dialogue.topics.silent",
+    "topic.no_text npcs.greeter.dialogue.topics.weather"
+  ]
+}

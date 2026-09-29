@@ -1,7 +1,7 @@
 // STA World Builder: a map-first editor for Classic Game Engine worlds.
 // Mount it into a host element with mountWorldBuilder(root, host); see the host comment below.
 // The same file runs inside the Rails app (via Stimulus) and as the offline page on the static site.
-import { validateContract, walkRefs, ownerOf } from "world_builder/contract";
+import { lintWorld, walkRefs, ownerOf } from "world_builder/contract";
 
 const TEMPLATE = `
 <div class="app" id="app">
@@ -272,59 +272,11 @@ export function mountWorldBuilder(root, host) {
     return seen;
   }
 
-  /* ---------- Validation ---------- */
+  /* ---------- Validation ----------
+     Errors, warnings, and infos all come from the shared contract (lintWorld), so the
+     builder, the Ruby validator, and bin/world check agree on every problem. */
   function validate() {
-    const P = [];
-    const warn = (msg, t) => P.push({ level:'warn', msg, target:t });
-    const info = (msg, t) => P.push({ level:'info', msg, target:t });
-    for (const e of validateContract(W, contract)) { const o = ownerOf(e.path); P.push({ level:'error', msg: e.message, target: { type: o.type, id: o.id }, code: e.code }); }
-
-    const placed = { item: new Set(), npc: new Set(), creature: new Set() };
-    for (const r of refs) if (r.mode === 'place' && placed[r.kind]) placed[r.kind].add(r.id);
-    const flagSet = f => !!(flagIndex[f] && flagIndex[f].set.length);
-    for (const f in flagIndex) { const fi = flagIndex[f]; if (!fi.set.length) warn('Flag "' + f + '" is checked but nothing ever sets it (' + fi.check.map(x => x.label).join(', ') + ').', { type:'flag', id:f }); else if (!fi.check.length) info('Flag "' + f + '" is set but never checked.', { type:'flag', id:f }); }
-
-    const hiddenDirs = new Set();
-    for (const rid in W.rooms) {
-      const r = W.rooms[rid]; const T = { type:'room', id:rid }; if (!isObj(r)) continue;
-      if (isObj(r.exits)) for (const d in r.exits) { const ex = r.exits[d]; if (!isObj(ex)) continue;
-        if (ex.hidden) hiddenDirs.add(d);
-        const key = ex.use_item || ex.requires; if (key && W.items[key] && !placed.item.has(key)) warn('Exit ' + d + ' is locked and its key "' + entityName('item', key) + '" is never placed anywhere.', T);
-        if (ex.requires_flag && !flagSet(ex.requires_flag)) warn('Exit ' + d + ' is gated on flag "' + ex.requires_flag + '", which nothing ever sets.', T);
-        if (ex.use_item && ex.requires && ex.use_item === ex.requires) info('Exit ' + d + ' sets both requires and use_item to the same item; requires alone already lets the player through.', T); }
-      if (W.meta.starting_room && W.rooms[W.meta.starting_room] && !reachable.has(rid)) warn('Room is unreachable from the starting room by any exit.', T);
-    }
-    for (const iid in W.items) {
-      const it = W.items[iid]; const T = { type:'item', id:iid }; if (!isObj(it)) continue;
-      if (!placed.item.has(iid)) warn('Item is never placed: not in a room, container, loot list, or given by an NPC.', T);
-      if (isObj(it.on_use) && it.on_use.type === 'message' && !it.on_use.text) warn('on_use of type message has no text.', T);
-      if (isObj(it.reveals_exit) && it.reveals_exit.direction && !hiddenDirs.has(it.reveals_exit.direction)) warn('reveals_exit "' + it.reveals_exit.direction + '" but no room has a hidden exit in that direction.', T);
-      if (isObj(it.on_examine) && it.on_examine.reveals_exit && !hiddenDirs.has(it.on_examine.reveals_exit)) warn('on_examine reveals "' + it.on_examine.reveals_exit + '" but no room has a hidden exit in that direction.', T);
-      if (it.is_container && it.locked) {
-        const itemOk = !!(it.unlock_item && W.items[it.unlock_item] && placed.item.has(it.unlock_item)); const flagOk = !!(it.unlock_flag && flagSet(it.unlock_flag)); const reasons = [];
-        if (!it.unlock_item && !it.unlock_flag) reasons.push('no unlock_item or unlock_flag');
-        else { if (it.unlock_item && !itemOk) reasons.push(W.items[it.unlock_item] ? 'unlock item "' + entityName('item', it.unlock_item) + '" is never placed' : 'unlock item "' + it.unlock_item + '" does not exist'); if (it.unlock_flag && !flagOk) reasons.push('flag "' + it.unlock_flag + '" is never set'); }
-        if (!itemOk && !flagOk) warn('Container is locked and nothing can unlock it (' + reasons.join('; ') + ').', T);
-        if (it.starts_closed === false) warn('Container is locked but starts open (starts_closed: false), so the lock never engages.', T);
-      }
-      if (!it.is_container && Array.isArray(it.contents) && it.contents.length) warn('Item has contents but is_container is not true.', T);
-      if (it.takeable === false && it.consumable) info('Item is not takeable but is consumable; it can only be used from the floor.', T);
-    }
-    const patrolCheck = (m, T) => { if (isObj(m) && m.type === 'patrol' && Array.isArray(m.schedule)) m.schedule.forEach((s, i) => { if (isObj(s) && !(typeof s.duration === 'number' && s.duration > 0)) warn('Patrol stop ' + (i + 1) + ' should have a positive duration in turns.', T); }); };
-    for (const nid in W.npcs) {
-      const n = W.npcs[nid]; const T = { type:'npc', id:nid }; if (!isObj(n)) continue;
-      if (!placed.npc.has(nid) && !(isObj(n.movement) && n.movement.type)) warn('NPC is not placed in any room and has no movement.', T);
-      if (isObj(n.dialogue)) { if (!n.dialogue.greeting && !n.dialogue.default) warn('Dialogue has neither greeting nor default; "talk to" will say nothing useful.', T); const topics = isObj(n.dialogue.topics) ? n.dialogue.topics : {}; for (const tk in topics) { const t = topics[tk]; if (!isObj(t)) continue; if (!t.text) warn('Topic "' + tk + '" has no text.', T); if (!Array.isArray(t.keywords) || !t.keywords.length) warn('Topic "' + tk + '" has no keywords, so players cannot ask about it.', T); if ((t.requires_flag || t.requires_item) && !t.locked_text) info('Topic "' + tk + '" is gated but has no locked_text.', T); } }
-      if (n.gives_item && !n.accepts_item) warn('gives_item without accepts_item never triggers.', T);
-      patrolCheck(n.movement, T);
-    }
-    for (const cid in W.creatures) {
-      const c = W.creatures[cid]; const T = { type:'creature', id:cid }; if (!isObj(c)) continue;
-      if (!placed.creature.has(cid) && !(isObj(c.movement) && c.movement.type)) warn('Creature is not placed in any room and has no movement.', T);
-      if (c.attack_condition && !c.hostile) info('attack_condition has no effect unless hostile is true.', T);
-      patrolCheck(c.movement, T);
-    }
-    return P;
+    return lintWorld(W, contract).map(p => ({ level: p.level, msg: p.message, target: p.target, code: p.code }));
   }
 
   function problemsFor(type, id) { return problems.filter(p => p.target.type === type && p.target.id === id); }

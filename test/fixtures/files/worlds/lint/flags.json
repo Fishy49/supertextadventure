@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "name": "Flags",
+    "description": "Lint fixture.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Room",
+      "description": "A room.",
+      "exits": {
+        "north": {
+          "to": "hall",
+          "requires_flag": "gate_open"
+        },
+        "east": {
+          "to": "hall",
+          "requires_flag": "lamp_lit"
+        }
+      }
+    },
+    "hall": {
+      "name": "Room",
+      "description": "A room.",
+      "exits": {
+        "south": "start",
+        "west": {
+          "to": "start",
+          "sets_flag": "visited_hall"
+        }
+      }
+    }
+  },
+  "items": {
+    "lamp": {
+      "name": "Lamp",
+      "description": "A lamp.",
+      "on_use": {
+        "type": "message",
+        "text": "Lit.",
+        "sets_flag": "lamp_lit"
+      }
+    }
+  }
+}

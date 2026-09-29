@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "name": "Unreachable",
+    "description": "Lint fixture.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Room",
+      "description": "A room.",
+      "exits": {
+        "north": "hall"
+      }
+    },
+    "hall": {
+      "name": "Room",
+      "description": "A room.",
+      "exits": {
+        "south": "start"
+      }
+    },
+    "attic": {
+      "name": "Room",
+      "description": "A room.",
+      "exits": {
+        "down": "hall"
+      }
+    },
+    "vault": {
+      "name": "Room",
+      "description": "A room."
+    }
+  }
+}

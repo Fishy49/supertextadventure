@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "name": "Clean",
+    "description": "Lint fixture.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Room",
+      "description": "A room.",
+      "exits": {
+        "north": {
+          "to": "hall",
+          "requires_flag": "door_open"
+        }
+      },
+      "items": [
+        "switch"
+      ],
+      "npcs": [
+        "keeper"
+      ],
+      "creatures": [
+        "dog"
+      ]
+    },
+    "hall": {
+      "name": "Room",
+      "description": "A room.",
+      "exits": {
+        "south": "start"
+      }
+    }
+  },
+  "items": {
+    "switch": {
+      "name": "Switch",
+      "description": "Opens the door.",
+      "takeable": false,
+      "on_use": {
+        "type": "message",
+        "text": "Clunk.",
+        "sets_flag": "door_open"
+      }
+    },
+    "bone": {
+      "name": "Bone",
+      "description": "Dropped by the dog."
+    }
+  },
+  "npcs": {
+    "keeper": {
+      "name": "Keeper",
+      "description": "Waits.",
+      "dialogue": {
+        "greeting": "Hello.",
+        "topics": {
+          "door": {
+            "keywords": [
+              "door"
+            ],
+            "text": "Use the switch."
+          }
+        }
+      }
+    }
+  },
+  "creatures": {
+    "dog": {
+      "name": "Dog",
+      "description": "Guards a bone.",
+      "health": 4,
+      "hostile": true,
+      "loot": [
+        "bone"
+      ]
+    }
+  }
+}

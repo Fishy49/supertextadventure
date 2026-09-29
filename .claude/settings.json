@@ -12,7 +12,8 @@
       "Bash(bin/rails db:*)",
       "Bash(bin/rails routes*)",
       "Bash(mv specs/*)",
-      "Bash(mkdir -p .claude/skills/*)"
+      "Bash(mkdir -p .claude/skills/*)",
+      "Bash(bin/world *)"
     ]
   }
 }

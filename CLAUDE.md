@@ -52,6 +52,19 @@ The file `test/lib/classic_game/full_game_system_test.rb` is a comprehensive end
 > **Important:** Every shell command must be a single, simple call - no `$()`,
 > no `&&` chains. Use separate tool calls and carry values between them.
 
+## World CLI (`bin/world`)
+
+Use `bin/world` to create or change worlds (`games/*.json`, World records)
+rather than editing the JSON by hand: it validates after every edit, cascades
+renames and removals through every reference, and `play` runs a world through
+the engine headlessly with a walkthrough script. The `world` skill documents
+the commands. Every game in `games/` needs a `NAME.walkthrough.txt` beside it;
+`test/lib/classic_game/walkthrough_test.rb` plays them.
+
+Advisory checks (warnings and infos) live in `ClassicGame::WorldLinter` and in
+`lintWorld` in `app/javascript/world_builder/contract.js`; the two must agree,
+and `ContractParityTest` proves it over `test/fixtures/files/worlds/`.
+
 ## Static site (`site/`)
 
 `site/` holds the public site at supertextadventure.com: the landing page and

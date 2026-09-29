@@ -1,0 +1,6 @@
+{
+  "lint": [
+    "room.unreachable rooms.attic",
+    "room.unreachable rooms.vault"
+  ]
+}

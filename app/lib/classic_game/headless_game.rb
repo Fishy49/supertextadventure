@@ -1,0 +1,191 @@
+# frozen_string_literal: true
+
+module ClassicGame
+  # An in-memory game: the same state interface the Game model gives the
+  # engine, with no database behind it. The CLI plays worlds through it, and
+  # the handler tests use it as their double.
+  class HeadlessGame
+    attr_accessor :game_state
+
+    class NullMessages
+      def destroy_all
+        nil
+      end
+    end
+    WorldRecord = Struct.new(:world_data)
+
+    def initialize(world_data:)
+      @world_data = world_data
+      @game_state = fresh_state
+    end
+
+    # In-memory stand-in for ActiveRecord's row lock: no database, so just yield.
+    def with_lock
+      yield
+    end
+
+    # The restart path re-snapshots the world and clears the message log.
+    def world
+      WorldRecord.new(@world_data)
+    end
+
+    def messages
+      NullMessages.new
+    end
+
+    def world_snapshot
+      @game_state["world_snapshot"] || {}
+    end
+
+    def player_state(user_id)
+      @game_state.dig("player_states", user_id.to_s) || initialize_player_state(user_id)
+    end
+
+    def update_player_state(user_id, new_state)
+      @game_state["player_states"][user_id.to_s] = new_state
+    end
+
+    def room_state(room_id)
+      @game_state.dig("room_states", room_id.to_s) || initialize_room_state(room_id)
+    end
+
+    def update_room_state(room_id, new_state)
+      @game_state["room_states"][room_id.to_s] = new_state
+    end
+
+    def get_flag(flag_name)
+      @game_state.dig("global_flags", flag_name.to_s)
+    end
+
+    def set_flag(flag_name, value)
+      @game_state["global_flags"] ||= {}
+      @game_state["global_flags"][flag_name.to_s] = value
+    end
+
+    def exit_unlocked?(room_id, direction)
+      @game_state.dig("unlocked_exits", "#{room_id}_#{direction}") || false
+    end
+
+    def unlock_exit(room_id, direction)
+      @game_state["unlocked_exits"] ||= {}
+      @game_state["unlocked_exits"]["#{room_id}_#{direction}"] = true
+    end
+
+    def exit_revealed?(room_id, direction)
+      @game_state.dig("revealed_exits", "#{room_id}_#{direction}") || false
+    end
+
+    def reveal_exit(room_id, direction)
+      @game_state["revealed_exits"] ||= {}
+      @game_state["revealed_exits"]["#{room_id}_#{direction}"] = true
+    end
+
+    def container_open?(container_id)
+      state = @game_state.dig("container_states", container_id.to_s)
+      return state["open"] if state
+
+      item_def = world_snapshot.dig("items", container_id.to_s)
+      item_def&.dig("starts_closed") == false
+    end
+
+    def open_container(container_id)
+      @game_state["container_states"] ||= {}
+      @game_state["container_states"][container_id.to_s] = { "open" => true }
+    end
+
+    def close_container(container_id)
+      @game_state["container_states"] ||= {}
+      @game_state["container_states"][container_id.to_s] = { "open" => false }
+    end
+
+    def container_contents(container_id)
+      original = world_snapshot.dig("items", container_id.to_s, "contents") || []
+      removed = @game_state.dig("container_states", container_id.to_s, "removed_items") || []
+      original - removed
+    end
+
+    def remove_from_container(container_id, item_id)
+      @game_state["container_states"] ||= {}
+      @game_state["container_states"][container_id.to_s] ||= {}
+      @game_state["container_states"][container_id.to_s]["removed_items"] ||= []
+      @game_state["container_states"][container_id.to_s]["removed_items"] << item_id
+      @game_state["container_states"][container_id.to_s]["removed_items"].uniq!
+    end
+
+    def turn_count
+      @game_state["turn_count"] || 0
+    end
+
+    def increment_turn_count
+      @game_state["turn_count"] = turn_count + 1
+    end
+
+    def npc_movement_state(entity_id)
+      @game_state.dig("npc_movement", entity_id.to_s) || {}
+    end
+
+    def update_npc_movement_state(entity_id, state)
+      @game_state["npc_movement"] ||= {}
+      @game_state["npc_movement"][entity_id.to_s] = state
+    end
+
+    def starting_hp
+      10
+    end
+
+    def save!
+      # no-op: state lives in memory
+    end
+
+    def update!(attrs)
+      attrs.each do |key, value|
+        @game_state = value if key.to_s == "game_state"
+      end
+    end
+
+    private
+
+      def fresh_state
+        {
+          "world_snapshot" => @world_data,
+          "player_states" => {},
+          "room_states" => {},
+          "global_flags" => {},
+          "container_states" => {},
+          "unlocked_exits" => {},
+          "revealed_exits" => {},
+          "turn_count" => 0,
+          "npc_movement" => {}
+        }
+      end
+
+      def initialize_player_state(user_id)
+        starting_room = world_snapshot.dig("meta", "starting_room") ||
+                        world_snapshot["rooms"]&.keys&.first
+        state = {
+          "current_room" => starting_room,
+          "inventory" => [],
+          "health" => 10,
+          "max_health" => 10,
+          "visited_rooms" => [],
+          "flags" => {}
+        }
+        @game_state["player_states"][user_id.to_s] = state
+        state
+      end
+
+      def initialize_room_state(room_id)
+        room_def = world_snapshot.dig("rooms", room_id.to_s)
+        return {} unless room_def
+
+        state = {
+          "items" => (room_def["items"] || []).dup,
+          "npcs" => (room_def["npcs"] || []).dup,
+          "creatures" => (room_def["creatures"] || []).dup,
+          "modified" => false
+        }
+        @game_state["room_states"][room_id.to_s] = state
+        state
+      end
+  end
+end

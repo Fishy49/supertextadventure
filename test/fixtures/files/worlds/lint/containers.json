@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "name": "Containers",
+    "description": "Lint fixture.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Room",
+      "description": "A room.",
+      "items": [
+        "chest",
+        "crate",
+        "bag",
+        "open_box"
+      ]
+    }
+  },
+  "items": {
+    "chest": {
+      "name": "Chest",
+      "description": "Locked with no way in.",
+      "is_container": true,
+      "locked": true,
+      "contents": [
+        "coin"
+      ]
+    },
+    "crate": {
+      "name": "Crate",
+      "description": "Locked but starts open.",
+      "is_container": true,
+      "locked": true,
+      "starts_closed": false,
+      "unlock_flag": "crate_flag"
+    },
+    "bag": {
+      "name": "Bag",
+      "description": "Has contents but is not a container.",
+      "contents": [
+        "coin"
+      ]
+    },
+    "open_box": {
+      "name": "Box",
+      "description": "Unlockable by an item that is never placed.",
+      "is_container": true,
+      "locked": true,
+      "unlock_item": "small_key"
+    },
+    "coin": {
+      "name": "Coin",
+      "description": "A coin."
+    },
+    "small_key": {
+      "name": "Small Key",
+      "description": "Never placed."
+    },
+    "crate_key": {
+      "name": "Crate Key",
+      "description": "Sets the crate flag.",
+      "on_use": {
+        "type": "message",
+        "text": "Click.",
+        "sets_flag": "crate_flag"
+      }
+    }
+  }
+}

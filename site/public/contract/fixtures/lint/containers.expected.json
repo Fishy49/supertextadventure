@@ -1,0 +1,10 @@
+{
+  "lint": [
+    "container.locked_but_open items.crate",
+    "container.no_unlock items.chest",
+    "container.no_unlock items.open_box",
+    "item.contents_without_container items.bag",
+    "item.unplaced items.crate_key",
+    "item.unplaced items.small_key"
+  ]
+}

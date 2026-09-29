@@ -275,56 +275,7 @@ class Game < ApplicationRecord
     end
 
     def generate_starting_room_description
-      starting_room_id = world_snapshot.dig("meta", "starting_room") || world_snapshot["rooms"]&.keys&.first
-      room_def = world_snapshot.dig("rooms", starting_room_id)
-
-      return "Error: Starting room not found." unless room_def
-
-      # Initialize room state for starting room
-      room_state = room_state(starting_room_id)
-
-      lines = []
-      lines << "=== #{room_def['name']} ==="
-      lines << ""
-      lines << room_def["description"]
-
-      # List visible items
-      visible_items = room_state["items"] || []
-      if visible_items.any?
-        lines << ""
-        item_names = visible_items.map { |item_id| world_snapshot.dig("items", item_id, "name") || item_id }
-        lines << "You see: #{item_names.join(', ')}"
-      end
-
-      # List NPCs
-      npcs = room_state["npcs"] || []
-      if npcs.any?
-        lines << ""
-        npc_names = npcs.map { |npc_id| world_snapshot.dig("npcs", npc_id, "name") || npc_id }
-        lines << "Present: #{npc_names.join(', ')}"
-      end
-
-      # List creatures
-      creatures = room_state["creatures"] || []
-      if creatures.any?
-        lines << ""
-        creature_names = creatures.map do |creature_id|
-          world_snapshot.dig("creatures", creature_id, "name") || creature_id
-        end
-        lines << "Creatures: #{creature_names.join(', ')}"
-      end
-
-      # List exits
-      exits = room_def["exits"] || {}
-      if exits.any?
-        lines << ""
-        lines << "Exits: #{exits.keys.map { |k| k.to_s.upcase }.join(', ')}"
-      end
-
-      lines << ""
-      lines << "Type HELP for available commands."
-
-      lines.join("\n")
+      ClassicGame::StartingRoom.describe(self)
     end
 
     def should_dump_game_state?

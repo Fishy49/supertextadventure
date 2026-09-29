@@ -8,7 +8,7 @@
 #
 #   public/contract/world.schema.json      <- app/lib/classic_game/contract/
 #   public/contract/world.refs.json        <- app/lib/classic_game/contract/
-#   public/contract/fixtures/{valid,invalid}/*.json <- test/fixtures/files/worlds/
+#   public/contract/fixtures/{valid,invalid,lint}/*.json <- test/fixtures/files/worlds/
 #   public/contract/index.json             <- generated listing
 #
 # Like public/llms.txt, the output is committed: the DigitalOcean build only
@@ -36,7 +36,7 @@ Dir[File.join(CONTRACT, "*.json")].sort.each do |file|
 end
 
 listing = {}
-%w[valid invalid].each do |kind|
+%w[valid invalid lint].each do |kind|
   dir = File.join(OUT, "fixtures", kind)
   FileUtils.mkdir_p(dir)
   files = Dir[File.join(FIXTURES, kind, "*.json")].sort
@@ -51,7 +51,8 @@ index = {
   "schema" => "world.schema.json",
   "refs" => "world.refs.json",
   "fixtures" => listing,
-  "note" => "Invalid fixtures have a sibling <name>.expected.json listing the error codes a validator must produce."
+  "note" => "Invalid fixtures have a sibling <name>.expected.json listing the error codes a validator must produce. " \
+            "Lint fixtures validate cleanly; their <name>.expected.json lists the advisory code and path pairs a linter should report."
 }
 File.write(File.join(OUT, "index.json"), JSON.pretty_generate(index) + "\n")
 count += 1

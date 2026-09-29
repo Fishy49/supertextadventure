@@ -1,0 +1,43 @@
+# The Tipsy Dragon: settle last night's tab with Greta.
+# Run it with: bin/world play games/the_tipsy_dragon.json --script games/the_tipsy_dragon.walkthrough.txt
+
+take mug
+take receipt
+expect has sticky_mug
+expect has crumpled_receipt
+examine receipt
+expect says 1,000 gold pieces
+
+up
+expect room tavern_floor
+talk to greta
+ask greta about tab
+south
+expect room village_square
+talk to wizard
+ask wizard about troll
+
+west
+expect room bridge
+west
+expect room bridge
+expect says none shall pass
+give mug to troll
+expect flag troll_satisfied
+expect has wizard_hat
+expect not has sticky_mug
+
+west
+expect room hermit_cave
+open chest
+take pouch
+expect has gold_pouch
+
+east
+east
+north
+expect room tavern_floor
+give pouch to greta
+expect flag debt_paid
+expect has rusty_pan
+expect not has gold_pouch

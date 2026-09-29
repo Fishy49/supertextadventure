@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "name": "Exits",
+    "description": "Lint fixture.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Room",
+      "description": "A room.",
+      "exits": {
+        "north": {
+          "to": "hall",
+          "use_item": "iron_key"
+        },
+        "east": {
+          "to": "hall",
+          "requires": "pass",
+          "use_item": "pass"
+        },
+        "west": {
+          "to": "hall",
+          "hidden": true
+        }
+      },
+      "items": [
+        "pass",
+        "lever",
+        "note"
+      ]
+    },
+    "hall": {
+      "name": "Room",
+      "description": "A room.",
+      "exits": {
+        "south": "start"
+      }
+    }
+  },
+  "items": {
+    "iron_key": {
+      "name": "Iron Key",
+      "description": "Never placed."
+    },
+    "pass": {
+      "name": "Pass",
+      "description": "Both requires and use_item."
+    },
+    "lever": {
+      "name": "Lever",
+      "description": "Reveals a direction nothing hides.",
+      "takeable": false,
+      "reveals_exit": {
+        "direction": "up"
+      }
+    },
+    "note": {
+      "name": "Note",
+      "description": "Examining reveals west, which is hidden, so no warning.",
+      "on_examine": {
+        "reveals_exit": "west"
+      }
+    }
+  }
+}

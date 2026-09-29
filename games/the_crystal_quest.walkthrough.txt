@@ -1,0 +1,46 @@
+# The Crystal Quest: fetch the Crystal of Power and bring it back to the wizard.
+# Run it with: bin/world play games/the_crystal_quest.json --script games/the_crystal_quest.walkthrough.txt
+
+talk to wizard
+expect flag met_wizard
+ask wizard about quest
+expect flag quest_started
+ask wizard about danger
+expect says giant spider
+
+open chest
+take potion
+take sword
+expect has rusty_sword
+expect has health_potion
+
+north
+take key
+expect has rusty_key
+north
+expect room deep_forest
+
+# Strike first. The spider attacks on its own after three actions in this room.
+attack spider
+attack
+attack
+expect flag spider_defeated
+take silk
+expect has spider_silk
+
+use key on gate
+expect flag gate_opened
+expect not has rusty_key
+north
+expect room crystal_cave
+take crystal
+expect has power_crystal
+
+south
+south
+south
+expect room tavern
+give crystal to wizard
+expect flag quest_complete
+expect has spell_book
+expect not has power_crystal

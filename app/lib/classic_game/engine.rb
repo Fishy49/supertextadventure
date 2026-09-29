@@ -17,26 +17,10 @@ module ClassicGame
         error_response("Something went wrong: #{e.message}")
       end
 
-      VALID_CONSUME_ON = %w[failure success any].freeze
-
+      # Validates a world against the shared contract (see WorldValidator) and
+      # returns human-readable messages. Empty means the world is playable.
       def validate_world_data(world_data)
-        errors = []
-        items = world_data["items"] || {}
-        items.each do |item_id, item_def|
-          next unless item_def.is_a?(Hash) && item_def["dice_roll"]
-
-          roll = item_def["dice_roll"]
-          unless roll["on_success"].is_a?(Hash) && roll["on_failure"].is_a?(Hash)
-            errors << "Item '#{item_id}' has a dice_roll missing on_success or on_failure."
-          end
-
-          next unless roll["consume_on"] && VALID_CONSUME_ON.exclude?(roll["consume_on"])
-
-          error_text = "Item '#{item_id}' has invalid consume_on '#{roll['consume_on']}'"
-          error_text += " (must be: #{VALID_CONSUME_ON.join(', ')})."
-          errors << error_text
-        end
-        errors
+        WorldValidator.new(world_data).messages
       end
 
       private

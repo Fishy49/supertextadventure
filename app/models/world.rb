@@ -3,9 +3,11 @@
 class World < ApplicationRecord
   validates :name, presence: true, uniqueness: true
   validates :world_data, presence: true
+  validate :world_data_contract
 
   # Set default structure for world_data
   after_initialize :set_default_world_data, if: :new_record?
+  before_validation :fill_meta_defaults
   after_save :dump_to_file, if: :sync_enabled?
 
   attr_accessor :skip_file_dump
@@ -30,19 +32,53 @@ class World < ApplicationRecord
     world_data.dig("meta", "starting_room") || rooms.keys.first
   end
 
+  # Errors from the shared world contract: [{ code:, path:, message: }]
+  def contract_errors
+    ClassicGame::WorldValidator.new(world_data).errors
+  end
+
   private
 
     def set_default_world_data
       self.world_data ||= {
         "meta" => {
+          "name" => name,
+          "description" => description,
           "starting_room" => "start",
           "version" => "1.0"
         },
-        "rooms" => {},
+        "rooms" => {
+          "start" => {
+            "name" => "Starting Room",
+            "description" => "You are standing in an empty room. Describe it, then add some exits.",
+            "exits" => {},
+            "items" => [],
+            "npcs" => [],
+            "creatures" => []
+          }
+        },
         "items" => {},
         "npcs" => {},
         "creatures" => {}
       }
+    end
+
+    # meta.name and meta.description are required by the contract; fill them
+    # from the record when the author has not written them yet.
+    def fill_meta_defaults
+      return unless world_data.is_a?(Hash)
+
+      meta = (world_data["meta"] ||= {})
+      return unless meta.is_a?(Hash)
+
+      meta["name"] = name if meta["name"].blank? && name.present?
+      meta["description"] = description if meta["description"].blank? && description.present?
+    end
+
+    def world_data_contract
+      return if world_data.blank?
+
+      contract_errors.each { |e| errors.add(:world_data, e[:message]) }
     end
 
     def sync_enabled?

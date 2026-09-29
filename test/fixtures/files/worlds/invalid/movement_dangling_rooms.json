@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "name": "Minimal",
+    "description": "The smallest valid world.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {},
+      "npcs": [
+        "bob"
+      ],
+      "creatures": [
+        "bug"
+      ]
+    }
+  },
+  "npcs": {
+    "bob": {
+      "name": "Bob",
+      "description": "Bob.",
+      "movement": {
+        "type": "patrol",
+        "schedule": [
+          {
+            "room": "nowhere",
+            "duration": 2
+          }
+        ]
+      }
+    }
+  },
+  "creatures": {
+    "bug": {
+      "name": "Bug",
+      "description": "A bug.",
+      "health": 1,
+      "movement": {
+        "type": "triggered",
+        "trigger_flag": "x",
+        "destination": "elsewhere"
+      }
+    }
+  }
+}

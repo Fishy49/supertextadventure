@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "name": "Minimal",
+    "description": "The smallest valid world.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {},
+      "items": [
+        "box"
+      ]
+    }
+  },
+  "items": {
+    "box": {
+      "name": "Box",
+      "description": "A box.",
+      "is_container": true,
+      "unlock_item": "ghost",
+      "contents": [
+        "ghost2"
+      ]
+    }
+  }
+}

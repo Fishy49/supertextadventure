@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "name": "Minimal",
+    "description": "The smallest valid world.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {},
+      "npcs": [
+        "bob",
+        "sue"
+      ]
+    }
+  },
+  "npcs": {
+    "bob": {
+      "name": "Bob",
+      "description": "Bob.",
+      "dialogue": {
+        "topics": {
+          "a": {
+            "keywords": [
+              "a"
+            ],
+            "text": "A.",
+            "leads_to": [
+              "b"
+            ]
+          }
+        }
+      }
+    },
+    "sue": {
+      "name": "Sue",
+      "description": "Sue.",
+      "dialogue": {
+        "topics": {
+          "b": {
+            "keywords": [
+              "b"
+            ],
+            "text": "B."
+          }
+        }
+      }
+    }
+  }
+}

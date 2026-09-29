@@ -56,6 +56,22 @@
   <span class="key">"creatures"</span>: { <span class="comment">/* creature definitions */</span> }
 }</pre>
 
+<h2 id="contract" class="text-3xl pt-8 pb-3 border-b border-terminal-dim">Validation Contract</h2>
+
+<p class="text-xl pt-4 pb-3">
+  The engine checks every world against a machine-readable contract before a game starts, and the same files are published here so other tools can validate worlds exactly the same way:
+</p>
+
+<div class="pt-2 text-xl space-y-2">
+  <p><a href="/contract/world.schema.json" class="text-terminal-bright hover:underline">> world.schema.json</a> - JSON Schema for the document shape, with engine defaults recorded on the fields</p>
+  <p><a href="/contract/world.refs.json" class="text-terminal-bright hover:underline">> world.refs.json</a> - every place an id is referenced and which collection it must exist in</p>
+  <p><a href="/contract/index.json" class="text-terminal-bright hover:underline">> index.json</a> - a corpus of valid and invalid worlds; each invalid one lists the error codes a validator must produce</p>
+</div>
+
+<p class="text-xl pt-4 pb-3">
+  Error codes are stable: <code>schema.invalid</code>, <code>starting_room.missing</code>, <code>ref.missing</code>, <code>topic.missing</code>, <code>dice.outcomes</code>, <code>dice.consume_on</code>, and <code>attack_condition.invalid</code>. Unknown keys are allowed everywhere except <code>attack_condition</code>, and <code>meta.editor</code> is reserved for editor tooling and never validated.
+</p>
+
 <h2 class="text-3xl pt-8 pb-3 border-b border-terminal-dim">Quick Links</h2>
 
 <div class="pt-2 text-xl space-y-2">

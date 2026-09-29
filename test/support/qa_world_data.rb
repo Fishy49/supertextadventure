@@ -14,6 +14,7 @@ module TestSupport
 
     def self.meta
       {
+        "name" => "QA Test World",
         "starting_room" => "town_square",
         "version" => "2.0",
         "author" => "SuperTextAdventure",
@@ -173,6 +174,7 @@ module TestSupport
     def self.chest_item
       {
         "name" => "Wooden Chest",
+        "description" => "A sturdy wooden chest with an iron lock.",
         "keywords" => ["chest"],
         "is_container" => true,
         "starts_closed" => true,

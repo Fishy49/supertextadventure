@@ -4,19 +4,24 @@
 
 ## What You Can Build
 
-- **Explorable Worlds**: Rooms connected by exits with descriptions, hidden passages, locked doors, and directional navigation.
-- **Items & Inventory**: Pickupable items, containers with locks, weapons, healing potions, and items that interact with the world.
-- **NPCs & Quests**: Characters with branching dialogue trees, item trading, quest flags, gated conversations, and patrol movement.
-- **Combat & Dice**: Turn-based combat with initiative, attack/defend/flee, weapons, armor, D&D-style dice rolls, and hostile creatures that ambush the player.
+**Explorable Worlds Rooms connected by exits with descriptions, hidden passages, locked doors, and directional navigation. Items & Inventory Pickupable items, containers with locks, weapons, healing potions, and items that interact with the world. NPCs & Quests Characters with branching dialogue trees, item trading, quest flags, gated conversations, and patrol movement. Combat & Dice Turn-based combat with initiative, attack/defend/flee, weapons, armor, D&D-style dice rolls, and hostile creatures that ambush the player. ## How It Works 1. You write a JSON file describing your world -- rooms, items, NPCs, and creatures. 2. The engine loads your JSON as the `world_data`. 3. Players type natural-language commands like `go north`, `take sword`, or `talk to wizard`. 4. The **CommandParser** translates input into structured commands (verb + target + modifier). 5. The **Engine** routes commands to the appropriate **Handler** (movement, items, combat, etc.). 6. The handler processes the command, updates game state, and returns a text response. ## Top-Level JSON Structure Every game world is defined by a single JSON object with these top-level keys: 
+```
+// world_data.json
+{
+  "meta": {
+    "name": "My Adventure",
+    "description": "A short quest to retrieve the Crystal of Power.",
+    "starting_room": "tavern",
+    "version": "1.0"
+  },
+  "rooms":     { /* room definitions */ },
+  "items":     { /* item definitions */ },
+  "npcs":      { /* NPC definitions */ },
+  "creatures": { /* creature definitions */ }
+}
+```
 
-## How It Works
-
-1. You write a JSON file describing your world -- rooms, items, NPCs, and creatures.
-2. The engine loads your JSON as the `world_data`.
-3. Players type natural-language commands like `go north`, `take sword`, or `talk to wizard`.
-4. The **CommandParser** translates input into structured commands (verb + target + modifier).
-5. The **Engine** routes commands to the appropriate **Handler** (movement, items, combat, etc.).
-6. The handler processes the command, updates game state, and returns a text response.
+ ## Validation Contract The engine checks every world against a machine-readable contract before a game starts, and the same files are published here so other tools can validate worlds exactly the same way: [> world.schema.json](/contract/world.schema.json) - JSON Schema for the document shape, with engine defaults recorded on the fields [> world.refs.json](/contract/world.refs.json) - every place an id is referenced and which collection it must exist in [> index.json](/contract/index.json) - a corpus of valid and invalid worlds; each invalid one lists the error codes a validator must produce** Error codes are stable: `schema.invalid`, `starting_room.missing`, `ref.missing`, `topic.missing`, `dice.outcomes`, `dice.consume_on`, and `attack_condition.invalid`. Unknown keys are allowed everywhere except `attack_condition`, and `meta.editor` is reserved for editor tooling and never validated. ## Quick Links [> World Structure](#) -- Full top-level schema details [> Rooms](#) -- Defining rooms, descriptions, and entry events [> Exits](#) -- Simple and complex exits, locks, hidden passages [> Items](#) -- All item types: weapons, consumables, keys, and more [> NPCs & Dialogue](#) -- Characters, dialogue trees, and quests [> Creatures](#) -- Enemies and their combat stats [> Combat](#) -- Turn-based combat mechanics [> Dice Rolls](#) -- D&D-style skill checks [> Flags & State](#) -- Global flags and game state tracking [> Containers](#) -- Openable and lockable containers [> Commands](#) -- All player commands and synonyms [> Full Example](#) -- A complete game world JSON
 
 ---
 

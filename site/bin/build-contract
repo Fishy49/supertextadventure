@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Copies the world validation contract from the Rails app into public/contract
+# so the site serves it at supertextadventure.com/contract/:
+#
+#   bin/build-contract
+#
+#   public/contract/world.schema.json      <- app/lib/classic_game/contract/
+#   public/contract/world.refs.json        <- app/lib/classic_game/contract/
+#   public/contract/fixtures/{valid,invalid}/*.json <- test/fixtures/files/worlds/
+#   public/contract/index.json             <- generated listing
+#
+# Like public/llms.txt, the output is committed: the DigitalOcean build only
+# sees the site directory, so it cannot copy from the app at deploy time.
+
+require "fileutils"
+require "json"
+
+ROOT = File.expand_path("..", __dir__)
+REPO = File.expand_path("..", ROOT)
+CONTRACT = File.join(REPO, "app", "lib", "classic_game", "contract")
+FIXTURES = File.join(REPO, "test", "fixtures", "files", "worlds")
+OUT = File.join(ROOT, "public", "contract")
+
+abort "contract directory not found: #{CONTRACT}" unless File.directory?(CONTRACT)
+abort "fixtures directory not found: #{FIXTURES}" unless File.directory?(FIXTURES)
+
+FileUtils.rm_rf(OUT)
+FileUtils.mkdir_p(OUT)
+count = 0
+
+Dir[File.join(CONTRACT, "*.json")].sort.each do |file|
+  FileUtils.cp(file, OUT)
+  count += 1
+end
+
+listing = {}
+%w[valid invalid].each do |kind|
+  dir = File.join(OUT, "fixtures", kind)
+  FileUtils.mkdir_p(dir)
+  files = Dir[File.join(FIXTURES, kind, "*.json")].sort
+  files.each do |file|
+    FileUtils.cp(file, dir)
+    count += 1
+  end
+  listing[kind] = files.map { |f| File.basename(f) }.reject { |f| f.end_with?(".expected.json") }
+end
+
+index = {
+  "schema" => "world.schema.json",
+  "refs" => "world.refs.json",
+  "fixtures" => listing,
+  "note" => "Invalid fixtures have a sibling <name>.expected.json listing the error codes a validator must produce."
+}
+File.write(File.join(OUT, "index.json"), JSON.pretty_generate(index) + "\n")
+count += 1
+
+puts "wrote public/contract (#{count} files)"

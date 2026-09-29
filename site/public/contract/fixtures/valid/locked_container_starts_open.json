@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "name": "Minimal",
+    "description": "The smallest valid world.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {},
+      "items": [
+        "crate",
+        "key"
+      ]
+    }
+  },
+  "items": {
+    "crate": {
+      "name": "Crate",
+      "description": "A crate.",
+      "is_container": true,
+      "starts_closed": false,
+      "locked": true,
+      "unlock_item": "key",
+      "contents": []
+    },
+    "key": {
+      "name": "Key",
+      "description": "A key."
+    }
+  }
+}

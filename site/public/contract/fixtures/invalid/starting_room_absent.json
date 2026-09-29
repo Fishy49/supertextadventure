@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "name": "X",
+    "description": "x"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {}
+    }
+  }
+}

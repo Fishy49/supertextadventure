@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "name": "Minimal",
+    "description": "The smallest valid world.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {},
+      "items": [
+        "pick"
+      ]
+    }
+  },
+  "items": {
+    "pick": {
+      "name": "Pick",
+      "description": "A pick.",
+      "dice_roll": {
+        "dc": 10,
+        "consume_on": "sometimes",
+        "on_success": {
+          "message": "ok"
+        },
+        "on_failure": {
+          "message": "no"
+        }
+      }
+    }
+  }
+}

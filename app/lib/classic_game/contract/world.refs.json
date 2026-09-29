@@ -1,0 +1,47 @@
+{
+  "description": "Every place a world document refers to an id defined elsewhere. Paths are dotted; * matches any key of an object or any index of an array. kind names the top-level collection the value must exist in (rooms, items, npcs, creatures), or flag for global flags (which need no definition), or topic for dialogue topic keys. mode is advice for tooling: place means the entity starts there or is obtainable there; set and check say what a flag reference does. when: string restricts a rule to string values, for exits that can be either a room id or an object.",
+  "refs": [
+    { "path": "meta.starting_room", "kind": "rooms" },
+
+    { "path": "rooms.*.exits.*", "kind": "rooms", "when": "string" },
+    { "path": "rooms.*.exits.*.to", "kind": "rooms" },
+    { "path": "rooms.*.exits.*.requires", "kind": "items" },
+    { "path": "rooms.*.exits.*.use_item", "kind": "items" },
+    { "path": "rooms.*.exits.*.requires_flag", "kind": "flag", "mode": "check" },
+    { "path": "rooms.*.exits.*.sets_flag", "kind": "flag", "mode": "set" },
+    { "path": "rooms.*.items.*", "kind": "items", "mode": "place" },
+    { "path": "rooms.*.npcs.*", "kind": "npcs", "mode": "place" },
+    { "path": "rooms.*.creatures.*", "kind": "creatures", "mode": "place" },
+
+    { "path": "items.*.on_use.sets_flag", "kind": "flag", "mode": "set" },
+    { "path": "items.*.dice_roll.on_success.sets_flag", "kind": "flag", "mode": "set" },
+    { "path": "items.*.dice_roll.on_failure.sets_flag", "kind": "flag", "mode": "set" },
+    { "path": "items.*.dice_roll.on_success.unlocks_exit.room", "kind": "rooms" },
+    { "path": "items.*.dice_roll.on_failure.unlocks_exit.room", "kind": "rooms" },
+    { "path": "items.*.dice_roll.on_success.unlocks_dialogue.topic", "kind": "topic", "scope": "world" },
+    { "path": "items.*.dice_roll.on_failure.unlocks_dialogue.topic", "kind": "topic", "scope": "world" },
+    { "path": "items.*.unlock_item", "kind": "items" },
+    { "path": "items.*.unlock_flag", "kind": "flag", "mode": "check" },
+    { "path": "items.*.contents.*", "kind": "items", "mode": "place" },
+
+    { "path": "npcs.*.dialogue.sets_flag", "kind": "flag", "mode": "set" },
+    { "path": "npcs.*.dialogue.topics.*.sets_flag", "kind": "flag", "mode": "set" },
+    { "path": "npcs.*.dialogue.topics.*.requires_flag", "kind": "flag", "mode": "check" },
+    { "path": "npcs.*.dialogue.topics.*.requires_item", "kind": "items" },
+    { "path": "npcs.*.dialogue.topics.*.leads_to.*", "kind": "topic", "scope": "npc" },
+    { "path": "npcs.*.accepts_item", "kind": "items" },
+    { "path": "npcs.*.gives_item", "kind": "items", "mode": "place" },
+    { "path": "npcs.*.sets_flag", "kind": "flag", "mode": "set" },
+    { "path": "npcs.*.movement.schedule.*.room", "kind": "rooms" },
+    { "path": "npcs.*.movement.schedule.*.blocked_while_player_in.*", "kind": "rooms" },
+    { "path": "npcs.*.movement.trigger_flag", "kind": "flag", "mode": "check" },
+    { "path": "npcs.*.movement.destination", "kind": "rooms" },
+
+    { "path": "creatures.*.loot.*", "kind": "items", "mode": "place" },
+    { "path": "creatures.*.sets_flag_on_defeat", "kind": "flag", "mode": "set" },
+    { "path": "creatures.*.movement.schedule.*.room", "kind": "rooms" },
+    { "path": "creatures.*.movement.schedule.*.blocked_while_player_in.*", "kind": "rooms" },
+    { "path": "creatures.*.movement.trigger_flag", "kind": "flag", "mode": "check" },
+    { "path": "creatures.*.movement.destination", "kind": "rooms" }
+  ]
+}

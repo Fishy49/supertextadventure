@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "name": "Minimal",
+    "description": "The smallest valid world.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {},
+      "creatures": [
+        "bug"
+      ]
+    }
+  },
+  "creatures": {
+    "bug": {
+      "name": "Bug",
+      "description": "A bug.",
+      "health": 2,
+      "hostile": true,
+      "attack_condition": {
+        "after_turns": 2
+      }
+    }
+  }
+}

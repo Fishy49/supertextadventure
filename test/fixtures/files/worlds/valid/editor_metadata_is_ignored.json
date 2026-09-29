@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "name": "Editor",
+    "description": "meta.editor may hold anything.",
+    "starting_room": "start",
+    "editor": [
+      "nonsense",
+      1,
+      {
+        "rooms": "not even an object"
+      }
+    ]
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {}
+    }
+  }
+}

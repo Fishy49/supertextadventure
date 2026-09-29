@@ -99,3 +99,5 @@ gem "ostruct", "~> 0.6.1"
 gem "openssl", "~> 4.0"
 
 gem "image_processing", "~> 1.14"
+
+gem "json_schemer", "~> 2.5"

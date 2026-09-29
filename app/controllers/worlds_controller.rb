@@ -107,7 +107,7 @@ class WorldsController < ApplicationController
       world_data[plural_type][entity_id] = entity_data
     end
 
-    return unless @world.update(world_data: world_data)
+    return render_world_errors unless @world.update(world_data: world_data)
 
     respond_to do |format|
       format.turbo_stream do
@@ -138,7 +138,7 @@ class WorldsController < ApplicationController
       world_data[plural_type][entity_id] = entity_data
     end
 
-    return unless @world.update(world_data: world_data)
+    return render_world_errors unless @world.update(world_data: world_data)
 
     respond_to do |format|
       format.turbo_stream do
@@ -162,7 +162,7 @@ class WorldsController < ApplicationController
     plural_type = pluralize(entity_type)
     world_data[plural_type]&.delete(entity_id)
 
-    return unless @world.update(world_data: world_data)
+    return render_world_errors unless @world.update(world_data: world_data)
 
     respond_to do |format|
       format.turbo_stream do
@@ -179,6 +179,18 @@ class WorldsController < ApplicationController
 
     def set_world
       @world = World.find(params.expect(:id))
+    end
+
+    # The world contract rejected the change: show why in place of the modal.
+    def render_world_errors
+      lines = [helpers.tag.div("Not saved. The world would no longer be valid:", class: "font-bold mb-2")]
+      lines += @world.errors.full_messages.map { |m| helpers.tag.div(m, class: "text-sm") }
+      button_classes = "mt-3 px-3 py-1 border border-red-500 text-red-400 hover:bg-red-500 hover:text-white text-sm"
+      lines << helpers.tag.button("Dismiss", type: "button", class: button_classes,
+                                             onclick: "this.closest('#world-errors').remove()")
+      banner_classes = "fixed top-4 right-4 z-50 max-w-lg bg-stone-900 border-2 border-red-500 text-red-400 p-4"
+      banner = helpers.tag.div(helpers.safe_join(lines), id: "world-errors", class: banner_classes)
+      render turbo_stream: turbo_stream.update("entity-modal", banner)
     end
 
     def pluralize(entity_type)

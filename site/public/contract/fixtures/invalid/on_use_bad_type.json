@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "name": "Minimal",
+    "description": "The smallest valid world.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {},
+      "items": [
+        "thing"
+      ]
+    }
+  },
+  "items": {
+    "thing": {
+      "name": "Thing",
+      "description": "A thing.",
+      "on_use": {
+        "type": "explode"
+      }
+    }
+  }
+}

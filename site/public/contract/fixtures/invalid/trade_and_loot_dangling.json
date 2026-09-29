@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "name": "Minimal",
+    "description": "The smallest valid world.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {},
+      "npcs": [
+        "bob"
+      ],
+      "creatures": [
+        "bug"
+      ]
+    }
+  },
+  "npcs": {
+    "bob": {
+      "name": "Bob",
+      "description": "Bob.",
+      "accepts_item": "nothing",
+      "gives_item": "nada"
+    }
+  },
+  "creatures": {
+    "bug": {
+      "name": "Bug",
+      "description": "A bug.",
+      "health": 1,
+      "loot": [
+        "zip"
+      ]
+    }
+  }
+}

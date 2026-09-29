@@ -1,0 +1,307 @@
+{
+  "meta": {
+    "name": "Every Feature",
+    "description": "One of everything the contract knows about.",
+    "starting_room": "hall",
+    "version": "1.0",
+    "author": "tests"
+  },
+  "rooms": {
+    "hall": {
+      "name": "Hall",
+      "description": "A hall.",
+      "exits": {
+        "north": "vault",
+        "east": {
+          "to": "garden",
+          "keywords": [
+            "gate"
+          ],
+          "use_item": "key",
+          "on_unlock": "Click.",
+          "permanently_unlock": true,
+          "consume_item": false,
+          "sets_flag": "gate_open",
+          "locked_msg": "Locked."
+        },
+        "down": {
+          "to": "cellar",
+          "hidden": true,
+          "reveal_msg": "A trapdoor!",
+          "requires_flag": "lever_pulled"
+        }
+      },
+      "items": [
+        "key",
+        "painting",
+        "chest",
+        "potion",
+        "lockpick"
+      ],
+      "npcs": [
+        "guide"
+      ],
+      "creatures": [
+        "rat"
+      ],
+      "on_enter": {
+        "type": "message",
+        "text": "Welcome."
+      }
+    },
+    "vault": {
+      "name": "Vault",
+      "description": "A vault.",
+      "exits": {
+        "south": "hall"
+      },
+      "items": [
+        "sword"
+      ]
+    },
+    "garden": {
+      "name": "Garden",
+      "description": "A garden.",
+      "exits": {
+        "west": "hall"
+      },
+      "npcs": [
+        "guard"
+      ],
+      "creatures": [
+        "spider"
+      ]
+    },
+    "cellar": {
+      "name": "Cellar",
+      "description": "A cellar.",
+      "exits": {
+        "up": "hall"
+      }
+    }
+  },
+  "items": {
+    "key": {
+      "name": "Key",
+      "description": "A key.",
+      "keywords": [
+        "brass key"
+      ]
+    },
+    "sword": {
+      "name": "Sword",
+      "description": "A sword.",
+      "weapon_damage": 6,
+      "takeable": true
+    },
+    "painting": {
+      "name": "Painting",
+      "description": "A painting.",
+      "takeable": false,
+      "cant_take_msg": "Bolted.",
+      "on_examine": {
+        "reveals_exit": "down",
+        "text": "A lever behind it."
+      },
+      "reveals_exit": {
+        "direction": "down",
+        "message": "The trapdoor opens."
+      }
+    },
+    "chest": {
+      "name": "Chest",
+      "description": "A chest.",
+      "is_container": true,
+      "locked": true,
+      "unlock_flag": "gate_open",
+      "locked_message": "Locked.",
+      "on_open_message": "Creak.",
+      "on_close_message": "Thud.",
+      "open_description": "Open.",
+      "closed_description": "Closed.",
+      "empty_message": "Empty.",
+      "contents": [
+        "gem"
+      ],
+      "takeable": false
+    },
+    "gem": {
+      "name": "Gem",
+      "description": "A gem.",
+      "consumable": false
+    },
+    "potion": {
+      "name": "Potion",
+      "description": "A potion.",
+      "consumable": true,
+      "combat_effect": {
+        "type": "heal",
+        "amount": 8
+      },
+      "on_use": {
+        "type": "heal",
+        "amount": 8,
+        "success_msg": "Better."
+      }
+    },
+    "lockpick": {
+      "name": "Lockpick",
+      "description": "A pick.",
+      "consumable": true,
+      "dice_roll": {
+        "dc": 12,
+        "dice": "1d20",
+        "attempt_message": "You try...",
+        "completed_message": "Done already.",
+        "consume_on": "failure",
+        "on_success": {
+          "message": "Click.",
+          "sets_flag": "lever_pulled",
+          "unlocks_exit": {
+            "direction": "down",
+            "room": "hall"
+          },
+          "unlocks_dialogue": {
+            "topic": "secret"
+          }
+        },
+        "on_failure": {
+          "message": "Snap.",
+          "sets_flag": "pick_broken"
+        }
+      }
+    },
+    "bell": {
+      "name": "Bell",
+      "description": "A bell.",
+      "on_use": {
+        "type": "unlock",
+        "requires_target": true,
+        "sets_flag": "bell_rung",
+        "success_msg": "Dong."
+      }
+    },
+    "note": {
+      "name": "Note",
+      "description": "A note.",
+      "on_use": {
+        "type": "message",
+        "text": "It reads: hi."
+      }
+    },
+    "shield": {
+      "name": "Shield",
+      "description": "A shield.",
+      "defense_bonus": 2
+    }
+  },
+  "npcs": {
+    "guide": {
+      "name": "Guide",
+      "description": "A guide.",
+      "keywords": [
+        "guide"
+      ],
+      "dialogue": {
+        "greeting": "Hello.",
+        "default": "Hmm.",
+        "sets_flag": "met_guide",
+        "topics": {
+          "quest": {
+            "keywords": [
+              "quest"
+            ],
+            "text": "Find the gem.",
+            "sets_flag": "quest_started",
+            "leads_to": [
+              "secret"
+            ]
+          },
+          "secret": {
+            "keywords": [
+              "secret"
+            ],
+            "text": "Psst.",
+            "requires_flag": "quest_started",
+            "requires_item": "key",
+            "locked_text": "Not yet."
+          }
+        }
+      },
+      "accepts_item": "gem",
+      "gives_item": "shield",
+      "accept_message": "Thanks.",
+      "sets_flag": "quest_done",
+      "movement": {
+        "type": "patrol",
+        "schedule": [
+          {
+            "room": "hall",
+            "duration": 2
+          },
+          {
+            "room": "vault",
+            "duration": 1,
+            "blocked_while_player_in": [
+              "vault"
+            ]
+          }
+        ],
+        "depart_msg": "Off he goes.",
+        "arrive_msg": "Here he is."
+      }
+    },
+    "guard": {
+      "name": "Guard",
+      "description": "A guard.",
+      "movement": {
+        "type": "triggered",
+        "trigger_flag": "bell_rung",
+        "destination": "hall",
+        "depart_msg": "Marches out.",
+        "arrive_msg": "Storms in."
+      }
+    }
+  },
+  "creatures": {
+    "rat": {
+      "name": "Rat",
+      "description": "A rat.",
+      "health": 3,
+      "attack": 1,
+      "defense": 0,
+      "talk_text": "Squeak."
+    },
+    "spider": {
+      "name": "Spider",
+      "description": "A spider.",
+      "keywords": [
+        "spider"
+      ],
+      "health": 15,
+      "attack": 4,
+      "defense": 1,
+      "hostile": true,
+      "aggro_text": "Hiss!",
+      "attack_condition": {
+        "moves": 3
+      },
+      "on_defeat_msg": "Splat.",
+      "on_flee_msg": "It hisses.",
+      "loot": [
+        "bell",
+        "note"
+      ],
+      "sets_flag_on_defeat": "spider_dead",
+      "movement": {
+        "type": "patrol",
+        "schedule": [
+          {
+            "room": "garden",
+            "duration": 3
+          }
+        ]
+      }
+    }
+  }
+}

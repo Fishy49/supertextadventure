@@ -41,6 +41,17 @@ DNS is at DNSimple, so after creating the app, point the apex at the app's
 default `ondigitalocean.app` hostname with an ALIAS record. The certificate
 issues once that resolves.
 
+## Generating `public/contract/`
+
+`bin/build-contract` copies the world validation contract (JSON Schema, refs
+table, and the valid/invalid fixture corpus) from the Rails app into
+`public/contract/` and writes an `index.json`. Commit the output; the
+DigitalOcean build cannot reach the app directory.
+
+```sh
+bin/build-contract
+```
+
 ## Generating `public/llms.txt`
 
 `bin/build-llms` converts the ERB docs in `views/docs/` into a single

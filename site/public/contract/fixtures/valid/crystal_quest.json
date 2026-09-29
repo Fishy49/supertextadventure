@@ -1,0 +1,263 @@
+{
+  "meta": {
+    "name": "The Crystal Quest",
+    "description": "Retrieve the Crystal of Power from the forest cave and return it to the wizard.",
+    "starting_room": "tavern",
+    "version": "1.0"
+  },
+  "rooms": {
+    "tavern": {
+      "name": "The Rusty Flagon",
+      "description": "A cozy tavern with a crackling fireplace. The bartender polishes glasses behind the bar. A wooden chest sits in the corner.",
+      "exits": {
+        "north": "forest_edge"
+      },
+      "on_enter": {
+        "type": "message",
+        "text": "The warmth of the fire embraces you. A wizard in the corner catches your eye."
+      },
+      "items": [
+        "rusty_sword",
+        "tavern_chest",
+        "old_map"
+      ],
+      "npcs": [
+        "wizard"
+      ],
+      "creatures": []
+    },
+    "forest_edge": {
+      "name": "Forest Edge",
+      "description": "Tall trees loom before you. A narrow path winds into the dark woods. You can hear something skittering in the undergrowth.",
+      "exits": {
+        "south": "tavern",
+        "north": "deep_forest"
+      },
+      "items": [
+        "rusty_key"
+      ],
+      "npcs": [],
+      "creatures": []
+    },
+    "deep_forest": {
+      "name": "Deep Forest",
+      "description": "The canopy blocks out most of the light. Thick webs hang between the trees. An iron gate blocks the path further north.",
+      "exits": {
+        "south": "forest_edge",
+        "north": {
+          "to": "crystal_cave",
+          "keywords": [
+            "gate",
+            "iron gate"
+          ],
+          "use_item": "rusty_key",
+          "on_unlock": "The rusty key turns in the lock with a grinding screech. The gate swings open.",
+          "permanently_unlock": true,
+          "consume_item": true,
+          "locked_msg": "An iron gate blocks the way. It's locked.",
+          "sets_flag": "gate_opened"
+        }
+      },
+      "items": [],
+      "npcs": [],
+      "creatures": [
+        "giant_spider"
+      ]
+    },
+    "crystal_cave": {
+      "name": "Crystal Cave",
+      "description": "The cave glows with an ethereal blue light. In the center, a crystal floats above a stone pedestal.",
+      "exits": {
+        "south": "deep_forest"
+      },
+      "on_enter": {
+        "type": "message",
+        "text": "The air hums with magical energy. You feel the crystal calling to you."
+      },
+      "items": [
+        "power_crystal"
+      ],
+      "npcs": [],
+      "creatures": []
+    }
+  },
+  "items": {
+    "rusty_sword": {
+      "name": "Rusty Sword",
+      "description": "A dull but serviceable blade. Better than nothing.",
+      "keywords": [
+        "sword",
+        "blade"
+      ],
+      "weapon_damage": 5
+    },
+    "health_potion": {
+      "name": "Health Potion",
+      "description": "A small vial of glowing red liquid.",
+      "keywords": [
+        "potion",
+        "vial"
+      ],
+      "consumable": true,
+      "combat_effect": {
+        "type": "heal",
+        "amount": 15
+      }
+    },
+    "rusty_key": {
+      "name": "Rusty Key",
+      "description": "An old iron key covered in rust. It might fit the gate in the forest.",
+      "keywords": [
+        "key",
+        "iron key"
+      ]
+    },
+    "power_crystal": {
+      "name": "Crystal of Power",
+      "description": "A brilliant blue crystal that pulses with magical energy.",
+      "keywords": [
+        "crystal",
+        "blue crystal"
+      ]
+    },
+    "spider_silk": {
+      "name": "Spider Silk",
+      "description": "A bundle of incredibly strong silk from the giant spider.",
+      "keywords": [
+        "silk",
+        "web"
+      ],
+      "defense_bonus": 2
+    },
+    "spell_book": {
+      "name": "Spell Book",
+      "description": "A leather-bound tome filled with arcane knowledge.",
+      "keywords": [
+        "book",
+        "tome"
+      ]
+    },
+    "tavern_chest": {
+      "name": "Wooden Chest",
+      "description": "A small wooden chest tucked in the corner.",
+      "keywords": [
+        "chest",
+        "box"
+      ],
+      "is_container": true,
+      "takeable": false,
+      "locked": false,
+      "on_open_message": "The chest lid creaks open.",
+      "contents": [
+        "health_potion"
+      ]
+    },
+    "old_map": {
+      "name": "Faded Map",
+      "description": "A map showing the forest paths. There's an X marked at a cave.",
+      "keywords": [
+        "map"
+      ],
+      "takeable": false,
+      "on_examine": {
+        "text": "Studying the map carefully, you notice a hidden trail marked with small runes."
+      }
+    },
+    "lockpick": {
+      "name": "Lockpick",
+      "description": "A thin metal pick for opening locks.",
+      "keywords": [
+        "pick"
+      ],
+      "consumable": true,
+      "dice_roll": {
+        "dc": 12,
+        "dice": "1d20",
+        "attempt_message": "You carefully insert the lockpick...",
+        "consume_on": "failure",
+        "on_success": {
+          "message": "Click! The lock opens.",
+          "sets_flag": "lock_picked"
+        },
+        "on_failure": {
+          "message": "The pick snaps! You'll need another."
+        }
+      }
+    }
+  },
+  "npcs": {
+    "wizard": {
+      "name": "Old Wizard",
+      "description": "An elderly wizard in blue robes. His beard nearly touches the floor.",
+      "keywords": [
+        "wizard",
+        "old man",
+        "mage"
+      ],
+      "dialogue": {
+        "greeting": "Ah, a brave soul! I've been waiting for someone like you. Ask me about the quest.",
+        "default": "Hmm, I know nothing of that.",
+        "sets_flag": "met_wizard",
+        "topics": {
+          "quest": {
+            "keywords": [
+              "quest",
+              "mission",
+              "adventure"
+            ],
+            "text": "Deep in the forest lies a Crystal of Power. Retrieve it and bring it to me. Take the key by the forest edge, you'll need it for the gate.",
+            "sets_flag": "quest_started",
+            "leads_to": [
+              "crystal",
+              "danger"
+            ]
+          },
+          "crystal": {
+            "keywords": [
+              "crystal",
+              "power"
+            ],
+            "text": "The Crystal of Power is an ancient artifact. It must not fall into the wrong hands.",
+            "locked_text": "Ask me about the quest first."
+          },
+          "danger": {
+            "keywords": [
+              "danger",
+              "warning",
+              "monster"
+            ],
+            "text": "Beware the giant spider that guards the forest path. It won't let you pass easily.",
+            "locked_text": "There's nothing to warn you about yet."
+          }
+        }
+      },
+      "accepts_item": "power_crystal",
+      "gives_item": "spell_book",
+      "accept_message": "The wizard's eyes widen. 'You found it! The Crystal of Power! As promised, take this spell book. You've earned it, adventurer.'",
+      "sets_flag": "quest_complete"
+    }
+  },
+  "creatures": {
+    "giant_spider": {
+      "name": "Giant Spider",
+      "description": "A spider the size of a large dog. Its fangs drip with venom.",
+      "keywords": [
+        "spider"
+      ],
+      "health": 20,
+      "attack": 6,
+      "defense": 1,
+      "hostile": true,
+      "attack_condition": {
+        "moves": 3
+      },
+      "aggro_text": "The Giant Spider lunges at you!",
+      "on_defeat_msg": "The spider collapses, its legs curling inward. A bundle of silk falls from its web.",
+      "on_flee_msg": "You scramble away from the spider's reach!",
+      "loot": [
+        "spider_silk"
+      ],
+      "sets_flag_on_defeat": "spider_defeated"
+    }
+  }
+}

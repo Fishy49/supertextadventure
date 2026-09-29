@@ -1,0 +1,42 @@
+{
+  "schema": "world.schema.json",
+  "refs": "world.refs.json",
+  "fixtures": {
+    "valid": [
+      "crystal_quest.json",
+      "editor_metadata_is_ignored.json",
+      "every_feature.json",
+      "locked_container_starts_open.json",
+      "minimal.json",
+      "the_tipsy_dragon.json"
+    ],
+    "invalid": [
+      "attack_condition_two_keys.json",
+      "attack_condition_unknown_key.json",
+      "combat_effect_bad_type.json",
+      "container_dangling_refs.json",
+      "creature_without_health.json",
+      "creature_zero_health.json",
+      "dice_bad_consume_on.json",
+      "dice_missing_outcomes.json",
+      "dice_unlocks_unknown_topic_and_room.json",
+      "exit_object_dangling_refs.json",
+      "exit_object_without_to.json",
+      "exit_to_unknown_room.json",
+      "meta_missing_name_and_description.json",
+      "movement_bad_type.json",
+      "movement_dangling_rooms.json",
+      "on_enter_bad_shape.json",
+      "on_use_bad_type.json",
+      "room_contents_unknown_ids.json",
+      "room_without_description.json",
+      "rooms_missing_entirely.json",
+      "starting_room_absent.json",
+      "starting_room_unknown.json",
+      "topic_leads_to_other_npcs_topic.json",
+      "topic_leads_to_unknown.json",
+      "trade_and_loot_dangling.json"
+    ]
+  },
+  "note": "Invalid fixtures have a sibling <name>.expected.json listing the error codes a validator must produce."
+}

@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "name": "Minimal",
+    "description": "The smallest valid world.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {
+        "north": {
+          "to": "nowhere",
+          "requires": "ghost_key",
+          "use_item": "other_ghost"
+        }
+      }
+    }
+  }
+}

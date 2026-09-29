@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "name": "Minimal",
+    "description": "The smallest valid world.",
+    "starting_room": "start"
+  },
+  "rooms": {
+    "start": {
+      "name": "Start",
+      "description": "An empty room.",
+      "exits": {},
+      "items": [
+        "pick"
+      ]
+    }
+  },
+  "items": {
+    "pick": {
+      "name": "Pick",
+      "description": "A pick.",
+      "dice_roll": {
+        "dc": 10,
+        "on_success": {
+          "unlocks_dialogue": {
+            "topic": "nope"
+          },
+          "unlocks_exit": {
+            "direction": "north",
+            "room": "nowhere"
+          }
+        },
+        "on_failure": {
+          "message": "no"
+        }
+      }
+    }
+  }
+}

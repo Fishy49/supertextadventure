@@ -67,6 +67,8 @@ module ClassicGame
         def check_aggressive_creatures(game, user, command, result)
           ps = game.player_state(user.id)
           return result if ps.dig("combat", "active")
+          # A defeated player is waiting to restart; nothing attacks a corpse.
+          return result if ps["pending_restart"]
 
           # Increment room action counter
           ps["room_actions"] ||= {}

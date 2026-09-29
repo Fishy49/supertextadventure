@@ -130,11 +130,9 @@ class Game < ApplicationRecord
     state = container_state(container_id)
     return state["open"] if state
 
-    # If no state exists, check if container starts closed
+    # No state yet: containers start closed unless the world says starts_closed: false
     item_def = world_snapshot.dig("items", container_id.to_s)
-    return true unless item_def&.dig("starts_closed")
-
-    false
+    item_def&.dig("starts_closed") == false
   end
 
   def open_container(container_id)

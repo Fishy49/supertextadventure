@@ -75,9 +75,7 @@ module ClassicGameTestHelper
       return state["open"] if state
 
       item_def = world_snapshot.dig("items", container_id.to_s)
-      return true unless item_def&.dig("starts_closed")
-
-      false
+      item_def&.dig("starts_closed") == false
     end
 
     def open_container(container_id)

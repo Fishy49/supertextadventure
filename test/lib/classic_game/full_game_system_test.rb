@@ -71,7 +71,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
         "storeroom" => {
           "name" => "Storeroom",
           "description" => "A dusty storeroom with shelves.",
-          "items" => %w[supply_crate lockpick],
+          "items" => %w[supply_crate lockpick open_barrel],
           "exits" => { "west" => "entrance" }
         },
         "cave" => {
@@ -155,7 +155,7 @@ class FullGameSystemTest < ActiveSupport::TestCase
         },
         "supply_crate" => {
           "name" => "Supply Crate", "keywords" => %w[crate supply chest],
-          "is_container" => true, "starts_closed" => true,
+          "is_container" => true,
           "locked" => true, "unlock_item" => "old_key",
           "contents" => ["health_potion"],
           "description" => "A heavy wooden crate.",
@@ -163,7 +163,14 @@ class FullGameSystemTest < ActiveSupport::TestCase
           "open_description" => "An open supply crate.",
           "locked_message" => "It's locked tight.",
           "on_open_message" => "You unlock and open the crate."
-        }
+        },
+        "open_barrel" => {
+          "name" => "Open Barrel", "keywords" => %w[barrel],
+          "is_container" => true, "starts_closed" => false,
+          "contents" => ["tin_cup"],
+          "description" => "A barrel with no lid."
+        },
+        "tin_cup" => { "name" => "Tin Cup", "keywords" => %w[cup tin], "takeable" => true }
       }
     end
 
@@ -315,6 +322,15 @@ class FullGameSystemTest < ActiveSupport::TestCase
 
       r = ex(game, user, "examine crate")
       assert_includes r[:response], "firmly closed"
+
+      # Containers start closed by default; starts_closed: false opts a container out
+      r = ex(game, user, "open barrel")
+      assert_not r[:success], "barrel starts open because starts_closed is false"
+      assert_includes r[:response], "already open"
+
+      r = ex(game, user, "take cup")
+      assert r[:success], "contents of an open-by-default container are reachable without opening it"
+      assert_includes game.player_state(USER_ID)["inventory"], "tin_cup"
 
       r = ex(game, user, "take lockpick")
       assert r[:success]

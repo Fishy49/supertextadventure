@@ -55,15 +55,7 @@ Rails.application.routes.draw do
 
   get "tavern", to: "games#index", as: :tavern
 
-  resources :worlds do
-    member do
-      post :preview
-      get :entity_form
-      post :create_entity
-      patch :update_entity
-      delete :delete_entity
-    end
-  end
+  resources :worlds
 
   unless Rails.env.production?
     namespace :dev do

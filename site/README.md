@@ -41,6 +41,16 @@ DNS is at DNSimple, so after creating the app, point the apex at the app's
 default `ondigitalocean.app` hostname with an ALIAS record. The certificate
 issues once that resolves.
 
+## Generating `public/builder/`
+
+`bin/build-builder` assembles the offline World Builder page from the Rails
+app's builder sources, the validation contract, and the shipped games in
+`games/`. Commit the output.
+
+```sh
+bin/build-builder
+```
+
 ## Generating `public/contract/`
 
 `bin/build-contract` copies the world validation contract (JSON Schema, refs

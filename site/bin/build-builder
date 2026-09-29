@@ -1,0 +1,91 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Assembles the offline World Builder into public/builder/index.html from the
+# Rails app's sources, so supertextadventure.com/builder/ runs the same editor
+# as /worlds/:id/edit, with file open and save instead of a server:
+#
+#   bin/build-builder
+#
+#   app/assets/stylesheets/world_builder.css     -> inline <style>
+#   app/javascript/world_builder/contract.js     -> inline <script> (exports stripped)
+#   app/javascript/world_builder/builder.js      -> inline <script> (import stripped)
+#   app/lib/classic_game/contract/*.json         -> embedded contract
+#   games/*.json                                 -> embedded samples
+#
+# Like llms.txt and public/contract, the output is committed because the
+# DigitalOcean build only sees the site directory.
+
+require "json"
+require "fileutils"
+
+ROOT = File.expand_path("..", __dir__)
+REPO = File.expand_path("..", ROOT)
+OUT_DIR = File.join(ROOT, "public", "builder")
+OUT = File.join(OUT_DIR, "index.html")
+
+css = File.read(File.join(REPO, "app", "assets", "stylesheets", "world_builder.css"))
+contract_js = File.read(File.join(REPO, "app", "javascript", "world_builder", "contract.js"))
+                  .gsub(/^export (function|const) /, '\1 ')
+builder_js = File.read(File.join(REPO, "app", "javascript", "world_builder", "builder.js"))
+                 .gsub(/^import .*\n/, "")
+                 .sub(/^export function mountWorldBuilder/, "function mountWorldBuilder")
+abort "builder.js still has an export or import" if builder_js.match?(/^(export|import) /)
+
+schema = File.read(File.join(REPO, "app", "lib", "classic_game", "contract", "world.schema.json"))
+refs = File.read(File.join(REPO, "app", "lib", "classic_game", "contract", "world.refs.json"))
+samples = Dir[File.join(REPO, "games", "*.json")].sort.map do |file|
+  world = JSON.parse(File.read(file))
+  { "key" => File.basename(file, ".json"), "name" => world.dig("meta", "name"), "description" => world.dig("meta", "description").to_s[0, 90], "world" => world }
+end
+samples << {
+  "key" => "blank", "name" => "Blank world", "description" => "One starting room and nothing else",
+  "world" => { "meta" => { "name" => "Untitled Adventure", "description" => "A brand new world.", "starting_room" => "start", "version" => "1.0" },
+               "rooms" => { "start" => { "name" => "Starting Room", "description" => "You are standing in an empty room. It is waiting for you to describe it.", "exits" => {}, "items" => [], "npcs" => [], "creatures" => [] } },
+               "items" => {}, "npcs" => {}, "creatures" => {} }
+}
+
+# JSON inside <script> must not contain "</script"; escaping "<" covers it.
+json_tag = ->(id, text) { %(<script type="application/json" id="#{id}">#{text.gsub('<', '<')}</script>) }
+
+html = <<~HTML
+  <!DOCTYPE html>
+  <html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>World Builder - Super Text Adventure</title>
+    <meta name="description" content="Build a Classic Game Engine world in your browser: map, rooms, items, characters, creatures, and live validation. Works offline; open and save world JSON files.">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+    <style>
+  #{css}
+    </style>
+  </head>
+  <body>
+    <div class="wb-host" id="builder"></div>
+    #{json_tag.call('wb-schema', schema)}
+    #{json_tag.call('wb-refs', refs)}
+    #{json_tag.call('wb-samples', JSON.generate(samples))}
+    <script>
+  (function () {
+  #{contract_js}
+  #{builder_js}
+    const read = id => JSON.parse(document.getElementById(id).textContent);
+    mountWorldBuilder(document.getElementById('builder'), {
+      mode: 'file',
+      contract: { schema: read('wb-schema'), refs: read('wb-refs') },
+      samples: read('wb-samples'),
+      storageKey: 'sta-wb-file'
+    });
+  })();
+    </script>
+  </body>
+  </html>
+HTML
+
+FileUtils.mkdir_p(OUT_DIR)
+File.write(OUT, html)
+puts "wrote public/builder/index.html (#{html.bytesize} bytes, #{samples.size} samples)"

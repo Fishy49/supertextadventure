@@ -17,12 +17,21 @@ module ClassicGame
     CONSUME_ON = %w[failure success any].freeze
 
     class << self
+      # The parsed contract files, for embedding in pages that run the JavaScript validator.
+      def schema_document
+        @schema_document ||= JSON.parse(File.read(CONTRACT_DIR.join("world.schema.json")))
+      end
+
+      def refs_document
+        @refs_document ||= JSON.parse(File.read(CONTRACT_DIR.join("world.refs.json")))
+      end
+
       def schema
-        @schema ||= JSONSchemer.schema(JSON.parse(File.read(CONTRACT_DIR.join("world.schema.json"))))
+        @schema ||= JSONSchemer.schema(schema_document)
       end
 
       def refs
-        @refs ||= JSON.parse(File.read(CONTRACT_DIR.join("world.refs.json"))).fetch("refs")
+        @refs ||= refs_document.fetch("refs")
       end
     end
 

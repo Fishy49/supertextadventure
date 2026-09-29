@@ -1398,7 +1398,6 @@ Containers are items that can hold other items. They can be opened, closed, lock
   "name": "Wooden Chest",
   "description": "A sturdy wooden chest bound with iron bands.",
   "is_container": true,
-  "starts_closed": true,
   "locked": true,
   "unlock_item": "chest_key",
   "unlock_flag": "chest_unlocked",
@@ -1418,7 +1417,7 @@ Containers are items that can hold other items. They can be opened, closed, lock
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `is_container` | boolean | `false` | Marks this item as a container. **required** for container behavior. |
-| `starts_closed` | boolean | `false` | If `true`, the container begins the game closed and must be opened. **Without it the container starts open**, and `locked` has no effect. |
+| `starts_closed` | boolean | `true` | Containers begin the game closed. Set to `false` for one that starts open. A locked container must start closed, or the lock is never checked. |
 | `locked` | boolean | `false` | If `true`, the container must be unlocked before opening. |
 | `unlock_item` | string | -- | Item ID needed in inventory to unlock the container. |
 | `unlock_flag` | string | -- | Global flag that must be `true` to unlock the container. |
@@ -1430,9 +1429,9 @@ Containers are items that can hold other items. They can be opened, closed, lock
 | `empty_message` | string | -- | Message shown when examining an open but empty container. |
 | `contents` | array | `[]` | Item IDs initially inside the container. |
 
-### Open by Default
+### Closed by Default
 
-A container with no `starts_closed` field is **already open** when the game starts: its contents are visible and takeable, and `open` replies "It's already open." Set `"starts_closed": true` for anything the player should have to open, and always pair it with `locked`, because the lock is only checked when the player opens a closed container.
+Every container begins the game closed: the player has to `open` it before its contents are visible or takeable. Set `"starts_closed": false` for something that should start open, like a bookshelf or an open crate. Do not combine that with `locked`: the lock is only checked when the player opens a closed container, so a locked container that starts open is never locked at all.
 
 ### Container Commands
 
@@ -1461,14 +1460,12 @@ Containers can hold other containers, creating nested structures. The engine sup
 "big_chest": {
   "name": "Big Chest",
   "is_container": true,
-  "starts_closed": true,
   "contents": ["small_box"]
 }
 
 "small_box": {
   "name": "Small Box",
   "is_container": true,
-  "starts_closed": true,
   "contents": ["gold_ring"]
 }
 ```
@@ -1491,7 +1488,6 @@ When a player examines a container, they see:
   "description": "A tall cabinet with glass doors and golden trim.",
   "keywords": ["cabinet", "cupboard"],
   "is_container": true,
-  "starts_closed": true,
   "takeable": false,
   "cant_take_msg": "The cabinet is bolted to the wall.",
   "locked": true,
@@ -1743,7 +1739,6 @@ This example creates a small adventure where the player starts in a tavern, talk
       "description": "A small wooden chest tucked in the corner.",
       "keywords": ["chest", "box"],
       "is_container": true,
-      "starts_closed": true,
       "takeable": false,
       "locked": false,
       "on_open_message": "The chest lid creaks open.",

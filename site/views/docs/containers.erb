@@ -10,7 +10,6 @@
   <span class="key">"name"</span>: <span class="str">"Wooden Chest"</span>,
   <span class="key">"description"</span>: <span class="str">"A sturdy wooden chest bound with iron bands."</span>,
   <span class="key">"is_container"</span>: <span class="bool">true</span>,
-  <span class="key">"starts_closed"</span>: <span class="bool">true</span>,
   <span class="key">"locked"</span>: <span class="bool">true</span>,
   <span class="key">"unlock_item"</span>: <span class="str">"chest_key"</span>,
   <span class="key">"unlock_flag"</span>: <span class="str">"chest_unlocked"</span>,
@@ -40,8 +39,8 @@
     <tr>
       <td><code>starts_closed</code></td>
       <td>boolean</td>
-      <td><code>false</code></td>
-      <td>If <code>true</code>, the container begins the game closed and must be opened. <strong>Without it the container starts open</strong>, and <code>locked</code> has no effect.</td>
+      <td><code>true</code></td>
+      <td>Containers begin the game closed. Set to <code>false</code> for one that starts open. A locked container must start closed, or the lock is never checked.</td>
     </tr>
     <tr>
       <td><code>locked</code></td>
@@ -106,10 +105,10 @@
   </tbody>
 </table>
 
-<h2 id="open-by-default" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Open by Default</h2>
+<h2 id="closed-by-default" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Closed by Default</h2>
 
 <p class="text-xl pt-4 pb-3">
-  A container with no <code class="text-terminal-bright">starts_closed</code> field is <strong>already open</strong> when the game starts: its contents are visible and takeable, and <code>open</code> replies "It's already open." Set <code class="text-terminal-bright">"starts_closed": true</code> for anything the player should have to open, and always pair it with <code>locked</code>, because the lock is only checked when the player opens a closed container.
+  Every container begins the game closed: the player has to <code class="text-terminal-bright">open</code> it before its contents are visible or takeable. Set <code class="text-terminal-bright">"starts_closed": false</code> for something that should start open, like a bookshelf or an open crate. Do not combine that with <code>locked</code>: the lock is only checked when the player opens a closed container, so a locked container that starts open is never locked at all.
 </p>
 
 <h2 id="commands" class="doc-section text-3xl pt-8 pb-3 border-b border-terminal-dim">Container Commands</h2>
@@ -170,14 +169,12 @@
 <span class="key">"big_chest"</span>: {
   <span class="key">"name"</span>: <span class="str">"Big Chest"</span>,
   <span class="key">"is_container"</span>: <span class="bool">true</span>,
-  <span class="key">"starts_closed"</span>: <span class="bool">true</span>,
   <span class="key">"contents"</span>: [<span class="str">"small_box"</span>]
 }
 
 <span class="key">"small_box"</span>: {
   <span class="key">"name"</span>: <span class="str">"Small Box"</span>,
   <span class="key">"is_container"</span>: <span class="bool">true</span>,
-  <span class="key">"starts_closed"</span>: <span class="bool">true</span>,
   <span class="key">"contents"</span>: [<span class="str">"gold_ring"</span>]
 }</pre>
 
@@ -205,7 +202,6 @@
   <span class="key">"description"</span>: <span class="str">"A tall cabinet with glass doors and golden trim."</span>,
   <span class="key">"keywords"</span>: [<span class="str">"cabinet"</span>, <span class="str">"cupboard"</span>],
   <span class="key">"is_container"</span>: <span class="bool">true</span>,
-  <span class="key">"starts_closed"</span>: <span class="bool">true</span>,
   <span class="key">"takeable"</span>: <span class="bool">false</span>,
   <span class="key">"cant_take_msg"</span>: <span class="str">"The cabinet is bolted to the wall."</span>,
   <span class="key">"locked"</span>: <span class="bool">true</span>,
